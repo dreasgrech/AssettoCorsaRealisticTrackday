@@ -18,7 +18,7 @@ local LIST_RADIUS_FILTER_M  = 400.0  -- show cars within this distance in the de
 -- State
 ----------------------------------------------------------------------
 local enabled, debugDraw, drawOnTop = true, true, true
-local ai = {}  -- per-AI memory: [index] = { offset=0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0 }
+local ai = {}  -- [index] = { offset=0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0 }
 
 -- Persist UI toggles across unloads (LAZY = FULL)
 local S = ac.storage and ac.storage('AC_AICarsOvertake') or nil
@@ -51,7 +51,7 @@ local function playerIsClearlyAhead(aiCar, playerCar, meters)
   return dot(fwd, rel) > meters
 end
 
--- Tooltip helper (Dear ImGui immediate-mode pattern)
+-- Tooltip helper (Dear ImGui immediate-mode)
 local function tip(text)
   if ui.itemHovered and ui.setTooltip then
     if ui.itemHovered() then ui.setTooltip(text) end
@@ -78,12 +78,10 @@ end
 -- Decide target offset for a single AI (returns desired, dist, prog, rightSide, reason)
 ----------------------------------------------------------------------
 local function desiredOffsetFor(aiCar, playerCar, wasYielding)
-  -- Basic gates (provide reasons for debug list)
   if playerCar.speedKmh < MIN_PLAYER_SPEED_KMH then return 0, nil, nil, nil, 'playerSlow' end
   if (playerCar.speedKmh - aiCar.speedKmh) < MIN_SPEED_DELTA_KMH then return 0, nil, nil, nil, 'noClosingSpeed' end
   if aiCar.speedKmh < 35.0 then return 0, nil, nil, nil, 'aiSlow' end
 
-  -- Distance with hysteresis
   local radius = wasYielding and (DETECT_INNER_M + DETECT_HYSTERESIS_M) or DETECT_INNER_M
   local d = vlen(vsub(playerCar.position, aiCar.position))
   if d > radius then return 0, d, nil, nil, 'tooFar' end
@@ -95,7 +93,6 @@ local function desiredOffsetFor(aiCar, playerCar, wasYielding)
     return 0, d, prog, rightSide, 'noRightSpace'
   end
 
-  -- Good to yield
   return clamped, d, prog, rightSide, 'ok'
 end
 
@@ -144,7 +141,7 @@ function script.update(dt)
   end
 end
 
--- IMPORTANT: this function name MUST match manifest’s [RENDER_CALLBACKS] mapping.
+-- IMPORTANT: function name must match manifest’s [RENDER_CALLBACKS]
 function script.Draw3D(dt)
   if not debugDraw then return end
   local sim = ac.getSim(); if not sim then return end
@@ -220,7 +217,18 @@ function script.windowMain(dt)
   end
   ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
-  ui.text('Cars (Y = yielding):')
+  -- Friendly reason text
+  local friendly = {
+    playerSlow    = 'Player below minimum speed',
+    noClosingSpeed= 'No closing speed vs AI',
+    aiSlow        = 'AI speed too low (corner/traffic)',
+    tooFar        = 'Too far (outside detect radius)',
+    notBehind     = 'Player not behind AI',
+    noRightSpace  = 'No room on the right',
+    ok            = ''
+  }
+
+  ui.text('Cars:')
   local player = ac.getCar(0)
   if sim and player then
     for i = 1, totalAI do
@@ -229,34 +237,29 @@ function script.windowMain(dt)
       if c and st then
         local show = (LIST_RADIUS_FILTER_M <= 0) or ((st.dist or 0) <= LIST_RADIUS_FILTER_M)
         if show then
-          local flag = st.yielding and "[Y]" or "[ ]"
-          local line = string.format(
-            "%s #%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  maxR=%4.1f  prog=%.3f  %s%s",
-            flag, i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0,
-            st.desired or 0, st.maxRight or 0, st.prog or -1,
-            st.yielding and "" or "why=", st.yielding and "" or (st.reason or "-")
+          -- build a stable-length line WITHOUT any [Y] prefix
+          local base = string.format(
+            "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  maxR=%4.1f  prog=%.3f",
+            i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0,
+            st.desired or 0, st.maxRight or 0, st.prog or -1
           )
 
           if st.yielding then
-            -- Prefer Push/Pop style (ImGui pattern) and fall back to TextColored if needed.
             if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
-              -- Note: rgbm expects 0..1 with alpha; this is reliable in CSP UI bindings. (Dear ImGui reference for PushStyleColor) 
-              ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
-              ui.text(line)
+              ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))  -- green text
+              ui.text(base)
               ui.popStyleColor()
             elseif ui.textColored then
-              ui.textColored(rgbm(0.2, 0.95, 0.2, 1.0), line)
+              ui.textColored(rgbm(0.2, 0.95, 0.2, 1.0), base)
             else
-              ui.text(line)
+              ui.text(base)
             end
-          else
-            ui.text(line)
-          end
-
-          -- Show yield time when applicable
-          if st.yielding then
+            -- keep optional yield time on same line (doesn’t shift the prefix anymore)
             ui.sameLine()
             ui.text(string.format("  (yield %.1fs)", st.yieldTime or 0))
+          else
+            local reason = friendly[st.reason or '-'] or (st.reason or '-')
+            ui.text(string.format("%s  reason: %s", base, reason))
           end
         end
       end
