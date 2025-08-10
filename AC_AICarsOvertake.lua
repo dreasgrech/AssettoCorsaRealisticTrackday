@@ -63,8 +63,7 @@ local function _userIniPath()
       end
     end
   end
-  -- 3) New hard fallback: game root → apps\lua\AC_AICarsOvertake\…
-  --    (Works on every build that exposes Root; saves next to the app.)
+  -- 3) Fallback: game root → apps\lua\AC_AICarsOvertake\…
   if ac and ac.getFolder and ac.FolderID and ac.FolderID.Root then
     local ok, root = pcall(function() return ac.getFolder(ac.FolderID.Root) end)
     if ok and root and #root > 0 then
@@ -115,6 +114,9 @@ local function _loadIni()
 end
 
 local function _saveIni()
+  -- log every attempt so we can see it in CSP log
+  if ac and ac.log then ac.log('AC_AICarsOvertake: saving to '..tostring(CFG_PATH)) end
+
   if BOOT_LOADING then return end
   CFG_PATH = CFG_PATH or _userIniPath()
   if not CFG_PATH then lastSaveOk=false; lastSaveErr='no path'; return end
@@ -143,26 +145,56 @@ local function _saveIni()
 end
 
 local function _persist(k, v)
-  if BOOT_LOADING then return end
   if P then P[k] = v end
   SETTINGS[k] = v
   _saveIni()
 end
 
--- Lazy config resolver: try to resolve+load if not yet done
+-- Lazy config resolver
 local _lazyResolved = false
+local _lastSaved = nil
+local SAVE_INTERVAL = 0.5
+local _autosaveTimer = 0
+
+local function _snapshot()
+  return {
+    enabled=enabled, debugDraw=debugDraw, drawOnTop=drawOnTop,
+    DETECT_INNER_M=DETECT_INNER_M, DETECT_HYSTERESIS_M=DETECT_HYSTERESIS_M,
+    MIN_PLAYER_SPEED_KMH=MIN_PLAYER_SPEED_KMH, MIN_SPEED_DELTA_KMH=MIN_SPEED_DELTA_KMH,
+    YIELD_OFFSET_M=YIELD_OFFSET_M, RAMP_SPEED_MPS=RAMP_SPEED_MPS,
+    CLEAR_AHEAD_M=CLEAR_AHEAD_M, RIGHT_MARGIN_M=RIGHT_MARGIN_M,
+    LIST_RADIUS_FILTER_M=LIST_RADIUS_FILTER_M
+  }
+end
+
+local function _differs(a,b)
+  if not a or not b then return true end
+  local function ne(x,y)
+    if type(x)=="number" and type(y)=="number" then return math.abs(x-y)>1e-6 end
+    return x~=y
+  end
+  return ne(a.enabled,b.enabled) or ne(a.debugDraw,b.debugDraw) or ne(a.drawOnTop,b.drawOnTop)
+      or ne(a.DETECT_INNER_M,b.DETECT_INNER_M) or ne(a.DETECT_HYSTERESIS_M,b.DETECT_HYSTERESIS_M)
+      or ne(a.MIN_PLAYER_SPEED_KMH,b.MIN_PLAYER_SPEED_KMH) or ne(a.MIN_SPEED_DELTA_KMH,b.MIN_SPEED_DELTA_KMH)
+      or ne(a.YIELD_OFFSET_M,b.YIELD_OFFSET_M) or ne(a.RAMP_SPEED_MPS,b.RAMP_SPEED_MPS)
+      or ne(a.CLEAR_AHEAD_M,b.CLEAR_AHEAD_M) or ne(a.RIGHT_MARGIN_M,b.RIGHT_MARGIN_M)
+      or ne(a.LIST_RADIUS_FILTER_M,b.LIST_RADIUS_FILTER_M)
+end
+
 local function _ensureConfig()
   if _lazyResolved and CFG_PATH then return end
   if not CFG_PATH then
-    -- Try to resolve now
     local p = _userIniPath()
     if p then
       CFG_PATH = p
-      -- Read existing values (don’t save yet)
       local wasBoot = BOOT_LOADING
       BOOT_LOADING = true
-      _loadIni()              -- will re-call _userIniPath() and fill SETTINGS
-      BOOT_LOADING = wasBoot  -- keep boot guard state
+      _loadIni()
+      -- *** THE FIX: allow saving even if __init__ hasn't run yet ***
+      BOOT_LOADING = false
+      _lastSaved = _snapshot()
+      -- restore previous if needed (but we want boot guard OFF now)
+      if wasBoot == false then BOOT_LOADING = false end
       _lazyResolved = true
       return
     end
@@ -170,7 +202,6 @@ local function _ensureConfig()
     _lazyResolved = true
   end
 end
-
 
 ----------------------------------------------------------------------
 -- Helpers
@@ -279,11 +310,26 @@ function script.__init__()
     if P.LIST_RADIUS_FILTER_M  ~= nil then LIST_RADIUS_FILTER_M  = P.LIST_RADIUS_FILTER_M  end
   end
 
+  _lastSaved = _snapshot()
   BOOT_LOADING = false
 end
 
 function script.update(dt)
   _ensureConfig()
+
+  -- autosave if anything changed
+  if not BOOT_LOADING and CFG_PATH then
+    _autosaveTimer = _autosaveTimer + dt
+    if _autosaveTimer >= SAVE_INTERVAL then
+      _autosaveTimer = 0
+      local now = _snapshot()
+      if _differs(now, _lastSaved) then
+        _saveIni()
+        _lastSaved = now
+      end
+    end
+  end
+
   if not enabled then return end
   if not physics or not physics.setAISplineAbsoluteOffset then return end
   local sim = ac.getSim(); if not sim then return end
@@ -309,7 +355,7 @@ function script.update(dt)
   end
 end
 
--- manifest: [RENDER_CALLBACKS] TRANSPARENT = Draw3D (debug-only) :contentReference[oaicite:3]{index=3}
+-- manifest [RENDER_CALLBACKS]
 function script.Draw3D(dt)
   if not debugDraw then return end
   local sim = ac.getSim(); if not sim then return end
@@ -408,4 +454,9 @@ function script.windowMain(dt)
       end
     end
   end
+end
+
+-- Save when window is closed/hidden as a last resort
+function script.onHide()
+  _saveIni()
 end
