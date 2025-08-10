@@ -12,12 +12,13 @@ local YIELD_OFFSET_M        = 2.5    -- desired rightward offset (meters) — ve
 local RAMP_SPEED_MPS        = 4.0    -- how fast offset ramps (m/s)
 local CLEAR_AHEAD_M         = 6.0    -- drop yielding once player is this far ahead (longitudinal)
 local RIGHT_MARGIN_M        = 0.6    -- keep this much space from right edge when clamping
+local LIST_RADIUS_FILTER_M  = 400.0  -- show cars within this distance in the debug list (0 = show all)
 
 ----------------------------------------------------------------------
 -- State
 ----------------------------------------------------------------------
 local enabled, debugDraw, drawOnTop = true, true, true
-local ai = {}  -- per-AI memory: [index] = { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1 }
+local ai = {}  -- per-AI memory: [index] = { offset=0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0 }
 
 -- Persist UI toggles across unloads (LAZY = FULL)
 local S = ac.storage and ac.storage('AC_AICarsOvertake') or nil
@@ -50,12 +51,11 @@ local function playerIsClearlyAhead(aiCar, playerCar, meters)
   return dot(fwd, rel) > meters
 end
 
--- Small tooltip helper that adapts to available UI bindings
+-- Tooltip helper (Dear ImGui immediate-mode pattern)
 local function tip(text)
   if ui.itemHovered and ui.setTooltip then
     if ui.itemHovered() then ui.setTooltip(text) end
   elseif ui.tooltip then
-    -- some CSP builds expose ui.tooltip(text)
     ui.tooltip(text)
   end
 end
@@ -75,20 +75,28 @@ local function clampRightOffsetMeters(aiWorldPos, desired)
 end
 
 ----------------------------------------------------------------------
--- Decide target offset for a single AI
+-- Decide target offset for a single AI (returns desired, dist, prog, rightSide, reason)
 ----------------------------------------------------------------------
 local function desiredOffsetFor(aiCar, playerCar, wasYielding)
-  if playerCar.speedKmh < MIN_PLAYER_SPEED_KMH then return 0 end
-  if (playerCar.speedKmh - aiCar.speedKmh) < MIN_SPEED_DELTA_KMH then return 0 end
-  if aiCar.speedKmh < 35.0 then return 0 end
+  -- Basic gates (provide reasons for debug list)
+  if playerCar.speedKmh < MIN_PLAYER_SPEED_KMH then return 0, nil, nil, nil, 'playerSlow' end
+  if (playerCar.speedKmh - aiCar.speedKmh) < MIN_SPEED_DELTA_KMH then return 0, nil, nil, nil, 'noClosingSpeed' end
+  if aiCar.speedKmh < 35.0 then return 0, nil, nil, nil, 'aiSlow' end
 
+  -- Distance with hysteresis
   local radius = wasYielding and (DETECT_INNER_M + DETECT_HYSTERESIS_M) or DETECT_INNER_M
   local d = vlen(vsub(playerCar.position, aiCar.position))
-  if d > radius then return 0, d end
-  if not isBehind(aiCar, playerCar) then return 0, d end
+  if d > radius then return 0, d, nil, nil, 'tooFar' end
+
+  if not isBehind(aiCar, playerCar) then return 0, d, nil, nil, 'notBehind' end
 
   local clamped, prog, rightSide = clampRightOffsetMeters(aiCar.position, YIELD_OFFSET_M)
-  return clamped, d, prog, rightSide
+  if (clamped or 0) <= 0.01 then
+    return 0, d, prog, rightSide, 'noRightSpace'
+  end
+
+  -- Good to yield
+  return clamped, d, prog, rightSide, 'ok'
 end
 
 ----------------------------------------------------------------------
@@ -113,21 +121,24 @@ function script.update(dt)
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
     if c and c.isAIControlled ~= false then
-      ai[i] = ai[i] or { offset = 0.0, yielding = false, dist = 0, desired = 0, maxRight = 0, prog = -1 }
+      ai[i] = ai[i] or { offset = 0.0, yielding = false, dist = 0, desired = 0, maxRight = 0, prog = -1, reason='-', yieldTime=0 }
 
-      local desired, dist, prog, rightSide = desiredOffsetFor(c, player, ai[i].yielding)
-      ai[i].dist     = dist or 0
+      local desired, dist, prog, rightSide, reason = desiredOffsetFor(c, player, ai[i].yielding)
+      ai[i].dist     = dist or ai[i].dist or 0
       ai[i].desired  = desired or 0
       ai[i].prog     = prog or -1
       ai[i].maxRight = rightSide or 0
+      ai[i].reason   = reason or '-'
 
       if ai[i].yielding and playerIsClearlyAhead(c, player, CLEAR_AHEAD_M) then
         desired = 0.0
       end
 
-      ai[i].yielding = (desired or 0) > 0.01
-      ai[i].offset   = approach(ai[i].offset, desired or 0, RAMP_SPEED_MPS * dt)
+      local willYield = (desired or 0) > 0.01
+      if willYield then ai[i].yieldTime = (ai[i].yieldTime or 0) + dt end
+      ai[i].yielding = willYield
 
+      ai[i].offset   = approach(ai[i].offset, desired or 0, RAMP_SPEED_MPS * dt)
       physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
     end
   end
@@ -183,36 +194,70 @@ function script.windowMain(dt)
   DETECT_INNER_M = ui.slider('Detect radius (m)', DETECT_INNER_M, 20, 90)
   tip('Start yielding if the player is within this distance AND behind the AI car.')
   DETECT_HYSTERESIS_M = ui.slider('Hysteresis (m)', DETECT_HYSTERESIS_M, 20, 120)
-  tip('Extra distance added while yielding so AI doesn’t flicker on/off as distance hovers around the threshold.')
+  tip('Extra distance added while yielding so AI doesn’t flicker on/off near the threshold.')
   YIELD_OFFSET_M = ui.slider('Right offset (m)', YIELD_OFFSET_M, 0.5, 4.0)
-  tip('How far to move to the right when yielding. Larger values are more obvious but risk running out of road.')
+  tip('How far to move to the right when yielding. Bigger = more obvious, but risk using up road.')
   RIGHT_MARGIN_M = ui.slider('Right margin (m)', RIGHT_MARGIN_M, 0.3, 1.2)
-  tip('Safety gap from the right edge. We clamp target offset so AI keeps at least this much room.')
+  tip('Safety gap from right edge. Target offset is clamped so AI keeps at least this much room.')
   MIN_PLAYER_SPEED_KMH = ui.slider('Min player speed (km/h)', MIN_PLAYER_SPEED_KMH, 40, 160)
   tip('Ignore very low-speed approaches (pit exits, traffic jams).')
   MIN_SPEED_DELTA_KMH = ui.slider('Min speed delta (km/h)', MIN_SPEED_DELTA_KMH, 0, 30)
-  tip('Require some closing speed before we ask AI to yield (prevents constant shuffling).')
+  tip('Require some closing speed before asking AI to yield (prevents constant shuffling).')
   RAMP_SPEED_MPS = ui.slider('Offset ramp (m/s)', RAMP_SPEED_MPS, 1.0, 10.0)
   tip('How quickly AI transitions toward the desired offset; higher = snappier, lower = smoother.')
 
   ui.separator()
-  ui.text('Cars (Y = yielding):')
+  LIST_RADIUS_FILTER_M = ui.slider('List radius filter (m)', LIST_RADIUS_FILTER_M, 0, 1000)
+  tip('Only show cars within this distance in the list (0 = show all). Helps keep the list readable.')
+
+  ui.separator()
+  -- Summary
   local sim = ac.getSim()
+  local totalAI, yieldingCount = 0, 0
+  if sim then
+    totalAI = math.max(0, (sim.carsCount or 1) - 1)
+    for i = 1, totalAI do if ai[i] and ai[i].yielding then yieldingCount = yieldingCount + 1 end end
+  end
+  ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
+
+  ui.text('Cars (Y = yielding):')
   local player = ac.getCar(0)
   if sim and player then
-    for i = 1, (sim.carsCount or 0) - 1 do
+    for i = 1, totalAI do
       local c = ac.getCar(i)
       local st = ai[i]
       if c and st then
-        local flag = st.yielding and "[Y]" or "[ ]"
-        local line = string.format(
-          "%s #%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  maxR=%4.1f  prog=%.3f",
-          flag, i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
-        )
-        if st.yielding and ui.textColored then
-          ui.textColored(rgb(0.2, 0.9, 0.2), line)
-        else
-          ui.text(line)
+        local show = (LIST_RADIUS_FILTER_M <= 0) or ((st.dist or 0) <= LIST_RADIUS_FILTER_M)
+        if show then
+          local flag = st.yielding and "[Y]" or "[ ]"
+          local line = string.format(
+            "%s #%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  maxR=%4.1f  prog=%.3f  %s%s",
+            flag, i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0,
+            st.desired or 0, st.maxRight or 0, st.prog or -1,
+            st.yielding and "" or "why=", st.yielding and "" or (st.reason or "-")
+          )
+
+          if st.yielding then
+            -- Prefer Push/Pop style (ImGui pattern) and fall back to TextColored if needed.
+            if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
+              -- Note: rgbm expects 0..1 with alpha; this is reliable in CSP UI bindings. (Dear ImGui reference for PushStyleColor) 
+              ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
+              ui.text(line)
+              ui.popStyleColor()
+            elseif ui.textColored then
+              ui.textColored(rgbm(0.2, 0.95, 0.2, 1.0), line)
+            else
+              ui.text(line)
+            end
+          else
+            ui.text(line)
+          end
+
+          -- Show yield time when applicable
+          if st.yielding then
+            ui.sameLine()
+            ui.text(string.format("  (yield %.1fs)", st.yieldTime or 0))
+          end
         end
       end
     end
