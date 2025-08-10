@@ -17,14 +17,15 @@ local RIGHT_MARGIN_M        = 0.6    -- keep this much space from right edge whe
 ----------------------------------------------------------------------
 -- State
 ----------------------------------------------------------------------
-local enabled, debugDraw = true, true
-local ai = {}  -- per-AI memory: [index] = { offset=0.0, yielding=false }
+local enabled, debugDraw, drawOnTop = true, true, true
+local ai = {}  -- per-AI memory: [index] = { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0 }
 
 -- Persist UI toggles across unloads (LAZY = FULL)
 local S = ac.storage and ac.storage('AC_AICarsOvertake') or nil
 if S then
-  enabled   = S.enabled   ~= nil and S.enabled   or enabled
-  debugDraw = S.debugDraw ~= nil and S.debugDraw or debugDraw
+  enabled    = S.enabled    ~= nil and S.enabled    or enabled
+  debugDraw  = S.debugDraw  ~= nil and S.debugDraw  or debugDraw
+  drawOnTop  = S.drawOnTop  ~= nil and S.drawOnTop  or drawOnTop
 end
 
 ----------------------------------------------------------------------
@@ -62,7 +63,7 @@ local function clampRightOffsetMeters(aiWorldPos, desired)
   if prog < 0 then return desired end                          -- no spline? trust CSP clamping
   local sides = ac.getTrackAISplineSides(prog)                 -- vec2(left, right) in meters
   local maxRight = math.max(0, (sides.y or 0) - RIGHT_MARGIN_M)
-  return math.max(0, math.min(desired, maxRight))
+  return math.max(0, math.min(desired, maxRight)), prog, (sides.y or 0)
 end
 
 ----------------------------------------------------------------------
@@ -77,10 +78,12 @@ local function desiredOffsetFor(aiCar, playerCar, wasYielding)
   -- distance with hysteresis
   local radius = wasYielding and (DETECT_INNER_M + DETECT_HYSTERESIS_M) or DETECT_INNER_M
   local d = vlen(vsub(playerCar.position, aiCar.position))
-  if d > radius then return 0 end
+  if d > radius then return 0, d end
 
-  if not isBehind(aiCar, playerCar) then return 0 end
-  return clampRightOffsetMeters(aiCar.position, YIELD_OFFSET_M)
+  if not isBehind(aiCar, playerCar) then return 0, d end
+  local clamped, prog, rightSide = clampRightOffsetMeters(aiCar.position, YIELD_OFFSET_M)
+  -- Return desired and also the distance/progress/side for debugging
+  return clamped, d, prog, rightSide
 end
 
 ----------------------------------------------------------------------
@@ -89,15 +92,16 @@ end
 function script.__init__()
   ac.log('AC_AICarsOvertake: init')
   if S then
-    enabled   = S.enabled   ~= nil and S.enabled   or enabled
-    debugDraw = S.debugDraw ~= nil and S.debugDraw or debugDraw
+    enabled    = S.enabled    ~= nil and S.enabled    or enabled
+    debugDraw  = S.debugDraw  ~= nil and S.debugDraw  or debugDraw
+    drawOnTop  = S.drawOnTop  ~= nil and S.drawOnTop  or drawOnTop
   end
 end
 
 function script.update(dt)
   if not enabled then return end
   -- Guard for older CSP builds where physics helpers might be missing:
-  if not physics or not physics.setAISplineAbsoluteOffset then return end  -- meters, + = right; override flag available  :contentReference[oaicite:2]{index=2}
+  if not physics or not physics.setAISplineAbsoluteOffset then return end  -- meters, + = right; override flag available
 
   local sim = ac.getSim(); if not sim then return end
   local player = ac.getCar(0); if not player then return end
@@ -106,24 +110,49 @@ function script.update(dt)
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
     if c and c.isAIControlled ~= false then
-      ai[i] = ai[i] or { offset = 0.0, yielding = false }
+      ai[i] = ai[i] or { offset = 0.0, yielding = false, dist = 0, desired = 0, maxRight = 0, prog = -1 }
 
-      -- Compute desired state
-      local desired = desiredOffsetFor(c, player, ai[i].yielding)
+      -- Compute desired state (+ debug metrics)
+      local desired, dist, prog, rightSide = desiredOffsetFor(c, player, ai[i].yielding)
+      ai[i].dist    = dist or 0
+      ai[i].desired = desired or 0
+      ai[i].prog    = prog or -1
+      ai[i].maxRight= rightSide or 0
 
       -- If we were yielding and player is clearly ahead, recenter
       if ai[i].yielding and playerIsClearlyAhead(c, player, CLEAR_AHEAD_M) then
         desired = 0.0
       end
 
-      ai[i].yielding = (desired > 0.01)
-      ai[i].offset   = approach(ai[i].offset, desired, RAMP_SPEED_MPS * dt)
+      ai[i].yielding = (desired or 0) > 0.01
+      ai[i].offset   = approach(ai[i].offset, desired or 0, RAMP_SPEED_MPS * dt)
 
       -- Apply rightward offset along the AI spline (absolute meters). Third arg overrides AI awareness.
-      physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)             -- documented in SDK stubs  :contentReference[oaicite:3]{index=3}
+      physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
+    end
+  end
+end
 
-      if debugDraw and ai[i].offset > 0.02 then
-        render.debugText(c.position + vec3(0, 2.0, 0), string.format('-> %.1f m', ai[i].offset))  -- on-track marker  :contentReference[oaicite:4]{index=4}
+-- Draw 3D debug markers after main geometry; this is where CSP expects debug shapes.
+-- If drawOnTop=true, disable depth test so labels aren’t hidden by cars/bodywork.
+function script.draw3D()
+  if not debugDraw then return end
+  local sim = ac.getSim(); if not sim then return end
+
+  if drawOnTop then
+    render.setDepthMode(false, true)   -- no depth test, still write depth
+  else
+    render.setDepthMode(true, true)    -- default: depth test on
+  end
+
+  for i = 1, (sim.carsCount or 0) - 1 do
+    local st = ai[i]
+    if st and st.offset and st.offset > 0.02 then
+      local c = ac.getCar(i)
+      if c then
+        local txt = string.format("-> %.1fm  (des=%.1f, maxR=%.1f, d=%.1fm)",
+          st.offset, st.desired or 0, st.maxRight or 0, st.dist or 0)
+        render.debugText(c.position + vec3(0, 2.0, 0), txt)
       end
     end
   end
@@ -132,14 +161,18 @@ end
 function script.windowMain(dt)
   ui.text('AI Cars Overtake — keep right, pass left')
 
-  -- Immediate-mode checkboxes: toggle only when clicked (checkbox returns true on click)
-  if ui.checkbox('Enabled', enabled) then                 -- returns true when clicked  :contentReference[oaicite:5]{index=5}
+  -- Immediate-mode checkboxes: toggle only when clicked
+  if ui.checkbox('Enabled', enabled) then
     enabled = not enabled
     if S then S.enabled = enabled end
   end
-  if ui.checkbox('Debug markers', debugDraw) then         -- immediate-mode pattern     :contentReference[oaicite:6]{index=6}
+  if ui.checkbox('Debug markers (3D)', debugDraw) then
     debugDraw = not debugDraw
     if S then S.debugDraw = debugDraw end
+  end
+  if ui.checkbox('Draw markers on top (no depth test)', drawOnTop) then
+    drawOnTop = not drawOnTop
+    if S then S.drawOnTop = drawOnTop end
   end
 
   ui.separator()
@@ -151,4 +184,23 @@ function script.windowMain(dt)
   MIN_PLAYER_SPEED_KMH = ui.slider('Min player speed (km/h)', MIN_PLAYER_SPEED_KMH, 40, 160)
   MIN_SPEED_DELTA_KMH  = ui.slider('Min speed delta (km/h)',  MIN_SPEED_DELTA_KMH, 0, 30)
   RAMP_SPEED_MPS       = ui.slider('Offset ramp (m/s)', RAMP_SPEED_MPS, 1.0, 10.0)
+
+  ui.separator()
+  ui.text('Cars (Y = yielding):')
+  local sim = ac.getSim()
+  local player = ac.getCar(0)
+  if sim and player then
+    for i = 1, (sim.carsCount or 0) - 1 do
+      local c = ac.getCar(i)
+      local st = ai[i]
+      if c and st then
+        local flag = st.yielding and "[Y]" or "[ ]"
+        local line = string.format(
+          "%s #%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  maxR=%4.1f  prog=%.3f",
+          flag, i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
+        )
+        ui.text(line)
+      end
+    end
+  end
 end
