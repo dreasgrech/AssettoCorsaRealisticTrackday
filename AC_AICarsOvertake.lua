@@ -114,9 +114,7 @@ local function _loadIni()
 end
 
 local function _saveIni()
-  -- log every attempt so we can see it in CSP log
   if ac and ac.log then ac.log('AC_AICarsOvertake: saving to '..tostring(CFG_PATH)) end
-
   if BOOT_LOADING then return end
   CFG_PATH = CFG_PATH or _userIniPath()
   if not CFG_PATH then lastSaveOk=false; lastSaveErr='no path'; return end
@@ -190,10 +188,35 @@ local function _ensureConfig()
       local wasBoot = BOOT_LOADING
       BOOT_LOADING = true
       _loadIni()
-      -- *** THE FIX: allow saving even if __init__ hasn't run yet ***
+
+      -- >>> APPLY LOADED VALUES IMMEDIATELY (so sliders show persisted values)
+      local t = SETTINGS
+      if t then
+        if t.enabled               ~= nil then enabled               = t.enabled               end
+        if t.debugDraw             ~= nil then debugDraw             = t.debugDraw             end
+        if t.drawOnTop             ~= nil then drawOnTop             = t.drawOnTop             end
+        if t.DETECT_INNER_M        ~= nil then DETECT_INNER_M        = t.DETECT_INNER_M        end
+        if t.DETECT_HYSTERESIS_M   ~= nil then DETECT_HYSTERESIS_M   = t.DETECT_HYSTERESIS_M   end
+        if t.MIN_PLAYER_SPEED_KMH  ~= nil then MIN_PLAYER_SPEED_KMH  = t.MIN_PLAYER_SPEED_KMH  end
+        if t.MIN_SPEED_DELTA_KMH   ~= nil then MIN_SPEED_DELTA_KMH   = t.MIN_SPEED_DELTA_KMH   end
+        if t.YIELD_OFFSET_M        ~= nil then YIELD_OFFSET_M        = t.YIELD_OFFSET_M        end
+        if t.RAMP_SPEED_MPS        ~= nil then RAMP_SPEED_MPS        = t.RAMP_SPEED_MPS        end
+        if t.CLEAR_AHEAD_M         ~= nil then CLEAR_AHEAD_M         = t.CLEAR_AHEAD_M         end
+        if t.RIGHT_MARGIN_M        ~= nil then RIGHT_MARGIN_M        = t.RIGHT_MARGIN_M        end
+        if t.LIST_RADIUS_FILTER_M  ~= nil then LIST_RADIUS_FILTER_M  = t.LIST_RADIUS_FILTER_M  end
+        if P then
+          P.enabled=enabled; P.debugDraw=debugDraw; P.drawOnTop=drawOnTop
+          P.DETECT_INNER_M=DETECT_INNER_M; P.DETECT_HYSTERESIS_M=DETECT_HYSTERESIS_M
+          P.MIN_PLAYER_SPEED_KMH=MIN_PLAYER_SPEED_KMH; P.MIN_SPEED_DELTA_KMH=MIN_SPEED_DELTA_KMH
+          P.YIELD_OFFSET_M=YIELD_OFFSET_M; P.RAMP_SPEED_MPS=RAMP_SPEED_MPS
+          P.CLEAR_AHEAD_M=CLEAR_AHEAD_M; P.RIGHT_MARGIN_M=RIGHT_MARGIN_M; P.LIST_RADIUS_FILTER_M=LIST_RADIUS_FILTER_M
+        end
+      end
+      -- <<< APPLY LOADED VALUES
+
+      -- unlock saving *after* values are applied
       BOOT_LOADING = false
       _lastSaved = _snapshot()
-      -- restore previous if needed (but we want boot guard OFF now)
       if wasBoot == false then BOOT_LOADING = false end
       _lazyResolved = true
       return
