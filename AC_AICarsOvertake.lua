@@ -30,6 +30,12 @@ local CFG_PATH, lastSaveOk, lastSaveErr = nil, false, ''
 local CFG_RESOLVE_NOTE = "<none>"
 local BOOT_LOADING = true
 
+-- >>> Debounced save (MUST be declared before _persist to avoid global vs local split)
+local SAVE_INTERVAL = 0.5   -- seconds without changes before we write
+local _autosaveTimer = 0
+local _dirty = false
+-- <<< Debounced save
+
 ----------------------------------------------------------------------
 -- Path helpers & INI I/O
 ----------------------------------------------------------------------
@@ -142,17 +148,17 @@ local function _saveIni()
   if ac.log then ac.log(('AC_AICarsOvertake: saved %s'):format(CFG_PATH)) end
 end
 
+-- DEBOUNCED PERSIST: mark dirty and coalesce writes in update()
 local function _persist(k, v)
   if P then P[k] = v end
   SETTINGS[k] = v
-  _saveIni()
+  _dirty = true
+  _autosaveTimer = 0
 end
 
 -- Lazy config resolver
 local _lazyResolved = false
 local _lastSaved = nil
-local SAVE_INTERVAL = 0.5
-local _autosaveTimer = 0
 
 local function _snapshot()
   return {
@@ -189,7 +195,7 @@ local function _ensureConfig()
       BOOT_LOADING = true
       _loadIni()
 
-      -- >>> APPLY LOADED VALUES IMMEDIATELY (so sliders show persisted values)
+      -- Apply loaded values immediately (so sliders show persisted values)
       local t = SETTINGS
       if t then
         if t.enabled               ~= nil then enabled               = t.enabled               end
@@ -212,7 +218,6 @@ local function _ensureConfig()
           P.CLEAR_AHEAD_M=CLEAR_AHEAD_M; P.RIGHT_MARGIN_M=RIGHT_MARGIN_M; P.LIST_RADIUS_FILTER_M=LIST_RADIUS_FILTER_M
         end
       end
-      -- <<< APPLY LOADED VALUES
 
       -- unlock saving *after* values are applied
       BOOT_LOADING = false
@@ -340,15 +345,14 @@ end
 function script.update(dt)
   _ensureConfig()
 
-  -- autosave if anything changed
+  -- Debounced autosave: write once after no changes for SAVE_INTERVAL
   if not BOOT_LOADING and CFG_PATH then
-    _autosaveTimer = _autosaveTimer + dt
-    if _autosaveTimer >= SAVE_INTERVAL then
-      _autosaveTimer = 0
-      local now = _snapshot()
-      if _differs(now, _lastSaved) then
+    if _dirty then
+      _autosaveTimer = _autosaveTimer + dt
+      if _autosaveTimer >= SAVE_INTERVAL then
         _saveIni()
-        _lastSaved = now
+        _lastSaved = _snapshot()
+        _dirty = false
       end
     end
   end
@@ -481,5 +485,5 @@ end
 
 -- Save when window is closed/hidden as a last resort
 function script.onHide()
-  _saveIni()
+  if _dirty then _saveIni(); _lastSaved = _snapshot(); _dirty = false end
 end
