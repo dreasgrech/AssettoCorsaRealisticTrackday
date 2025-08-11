@@ -241,9 +241,6 @@ end
 ----------------------------------------------------------------------
 -- Helpers
 ----------------------------------------------------------------------
-local function vsub(a,b) return vec3(a.x-b.x, a.y-b.y, a.z-b-z) end
--- fix typo in previous line? keep as-is: original used v.z-v.z; but we won't change functionality elsewhere
--- Retain original correct implementation:
 local function vsub(a,b) return vec3(a.x-b.x, a.y-b.y, a.z-b.z) end
 local function vlen(v) return math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z) end
 local function dot(a,b) return a.x*b.x + a.y*b.y + a.z*b.z end
@@ -375,66 +372,66 @@ function script.Draw3D(dt)
 end
 
 ----------------------------------------------------------------------
--- UI (dedup checkboxes + sliders)
+-- UI (unified ordered list so you can interleave any controls)
 ----------------------------------------------------------------------
--- Describe checkboxes once (IMGUI keeps state in user code; we provide it here). 
--- Toggling returns true for the frame when clicked, so we flip the boolean ourselves. 
--- References: IMGUI paradigm & immediate-mode docs. 
--- (We keep behavior identical to previous per-checkbox code.) 
--- Sources: ImGui wiki and immediate-mode articles. :contentReference[oaicite:2]{index=2}
-local CHECKBOX_SPEC = {
-  { k = 'enabled',   label = 'Enabled',
-    tip = 'Master switch for this app.' },
-  { k = 'debugDraw', label = 'Debug markers (3D)',
-    tip = 'Shows floating text above AI cars currently yielding.' },
-  { k = 'drawOnTop', label = 'Draw markers on top (no depth test)',
-    tip = 'If markers are hidden by car bodywork, enable this so text ignores depth testing.' },
+-- Each entry is either a checkbox or a slider; order here = order in UI.
+-- This matches immediate-mode best practices: the UI is declared per-frame from data. :contentReference[oaicite:2]{index=2}
+local UI_ELEMENTS = {
+  { kind='checkbox', k='enabled',   label='Enabled',
+    tip='Master switch for this app.' },
+
+  { kind='checkbox', k='debugDraw', label='Debug markers (3D)',
+    tip='Shows floating text above AI cars currently yielding.' },
+
+  { kind='checkbox', k='drawOnTop', label='Draw markers on top (no depth test)',
+    tip='If markers are hidden by car bodywork, enable this so text ignores depth testing.' },
+
+  { kind='slider',   k='DETECT_INNER_M', label='Detect radius (m)', min=20,  max=90,
+    tip='Start yielding if the player is within this distance AND behind the AI car.' },
+
+  { kind='slider',   k='DETECT_HYSTERESIS_M', label='Hysteresis (m)', min=20, max=120,
+    tip='Extra distance while yielding so AI doesn’t flicker on/off near threshold.' },
+
+  { kind='slider',   k='YIELD_OFFSET_M', label='Right offset (m)', min=0.5, max=4.0,
+    tip='How far to move to the right when yielding.' },
+
+  { kind='slider',   k='RIGHT_MARGIN_M', label='Right margin (m)', min=0.3, max=1.2,
+    tip='Safety gap from right edge; target offset is clamped by available width.' },
+
+  { kind='slider',   k='MIN_PLAYER_SPEED_KMH', label='Min player speed (km/h)', min=40, max=160,
+    tip='Ignore very low-speed approaches (pit exits, traffic jams).' },
+
+  { kind='slider',   k='MIN_SPEED_DELTA_KMH',  label='Min speed delta (km/h)', min=0,  max=30,
+    tip='Require some closing speed before asking AI to yield.' },
+
+  { kind='slider',   k='RAMP_SPEED_MPS', label='Offset ramp (m/s)', min=1.0, max=10.0,
+    tip='Ramp speed of rightward offset change.' },
+
+  { kind='slider',   k='LIST_RADIUS_FILTER_M', label='List radius filter (m)', min=0, max=1000,
+    tip='Only show cars within this distance in the list (0 = show all).' },
 }
 
-local function drawCheckboxes()
-  for _, s in ipairs(CHECKBOX_SPEC) do
-    local spec = SETTINGS_SPEC_BY_KEY[s.k]
+local function drawControls()
+  for _, e in ipairs(UI_ELEMENTS) do
+    local spec = SETTINGS_SPEC_BY_KEY[e.k]
     if spec then
-      local cur = spec.get()
-      if ui.checkbox(s.label, cur) then
-        local new = not cur
-        spec.set(new)
-        _persist(s.k, new)
+      if e.kind == 'checkbox' then
+        local cur = spec.get()
+        if ui.checkbox(e.label, cur) then
+          local new = not cur
+          spec.set(new)
+          _persist(e.k, new)
+        end
+        tip(e.tip)
+      elseif e.kind == 'slider' then
+        local cur = spec.get()
+        local new = ui.slider(e.label, cur, e.min, e.max)
+        if new ~= cur then
+          spec.set(new)
+          _persist(e.k, new)
+        end
+        tip(e.tip)
       end
-      tip(s.tip)
-    end
-  end
-end
-
--- Describe sliders once, render in a loop (idiomatic immediate-mode UI) 
--- IMGUI pattern: state lives in our code; widgets return interactions per-frame. :contentReference[oaicite:3]{index=3}
-local SLIDER_SPEC = {
-  { k = 'DETECT_INNER_M',      label = 'Detect radius (m)',        min = 20,   max = 90,
-    tip = 'Start yielding if the player is within this distance AND behind the AI car.' },
-  { k = 'DETECT_HYSTERESIS_M', label = 'Hysteresis (m)',           min = 20,   max = 120,
-    tip = 'Extra distance while yielding so AI doesn’t flicker on/off near threshold.' },
-  { k = 'YIELD_OFFSET_M',      label = 'Right offset (m)',         min = 0.5,  max = 4.0,
-    tip = 'How far to move to the right when yielding.' },
-  { k = 'RIGHT_MARGIN_M',      label = 'Right margin (m)',         min = 0.3,  max = 1.2,
-    tip = 'Safety gap from right edge; target offset is clamped by available width.' },
-  { k = 'MIN_PLAYER_SPEED_KMH',label = 'Min player speed (km/h)',  min = 40,   max = 160,
-    tip = 'Ignore very low-speed approaches (pit exits, traffic jams).' },
-  { k = 'MIN_SPEED_DELTA_KMH', label = 'Min speed delta (km/h)',   min = 0,    max = 30,
-    tip = 'Require some closing speed before asking AI to yield.' },
-  { k = 'RAMP_SPEED_MPS',      label = 'Offset ramp (m/s)',        min = 1.0,  max = 10.0,
-    tip = 'Ramp speed of rightward offset change.' },
-  { k = 'LIST_RADIUS_FILTER_M',label = 'List radius filter (m)',   min = 0,    max = 1000,
-    tip = 'Only show cars within this distance in the list (0 = show all).' },
-}
-
-local function drawSliders()
-  for _, s in ipairs(SLIDER_SPEC) do
-    local spec = SETTINGS_SPEC_BY_KEY[s.k]
-    if spec then
-      local cur = spec.get()
-      local new = ui.slider(s.label, cur, s.min, s.max)
-      if new ~= cur then spec.set(new); _persist(s.k, new) end
-      tip(s.tip)
     end
   end
 end
@@ -451,13 +448,8 @@ function script.windowMain(dt)
     ui.text(string.format('Config: <unresolved>  [via %s]', CFG_RESOLVE_NOTE or '?'))
   end
 
-  -- Deduped checkboxes (behavior identical)
-  drawCheckboxes()
-
-  ui.separator()
-
-  -- Deduped sliders (from previous refactor)
-  drawSliders()
+  -- Unified controls (order defined by UI_ELEMENTS)
+  drawControls()
 
   ui.separator()
   local sim = ac.getSim()
