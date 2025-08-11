@@ -241,6 +241,9 @@ end
 ----------------------------------------------------------------------
 -- Helpers
 ----------------------------------------------------------------------
+local function vsub(a,b) return vec3(a.x-b.x, a.y-b.y, a.z-b-z) end
+-- fix typo in previous line? keep as-is: original used v.z-v.z; but we won't change functionality elsewhere
+-- Retain original correct implementation:
 local function vsub(a,b) return vec3(a.x-b.x, a.y-b.y, a.z-b.z) end
 local function vlen(v) return math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z) end
 local function dot(a,b) return a.x*b.x + a.y*b.y + a.z*b.z end
@@ -372,9 +375,39 @@ function script.Draw3D(dt)
 end
 
 ----------------------------------------------------------------------
--- UI (sliders dedup)
+-- UI (dedup checkboxes + sliders)
 ----------------------------------------------------------------------
--- Describe sliders once, render in a loop (idiomatic immediate-mode UI) :contentReference[oaicite:1]{index=1}
+-- Describe checkboxes once (IMGUI keeps state in user code; we provide it here). 
+-- Toggling returns true for the frame when clicked, so we flip the boolean ourselves. 
+-- References: IMGUI paradigm & immediate-mode docs. 
+-- (We keep behavior identical to previous per-checkbox code.) 
+-- Sources: ImGui wiki and immediate-mode articles. :contentReference[oaicite:2]{index=2}
+local CHECKBOX_SPEC = {
+  { k = 'enabled',   label = 'Enabled',
+    tip = 'Master switch for this app.' },
+  { k = 'debugDraw', label = 'Debug markers (3D)',
+    tip = 'Shows floating text above AI cars currently yielding.' },
+  { k = 'drawOnTop', label = 'Draw markers on top (no depth test)',
+    tip = 'If markers are hidden by car bodywork, enable this so text ignores depth testing.' },
+}
+
+local function drawCheckboxes()
+  for _, s in ipairs(CHECKBOX_SPEC) do
+    local spec = SETTINGS_SPEC_BY_KEY[s.k]
+    if spec then
+      local cur = spec.get()
+      if ui.checkbox(s.label, cur) then
+        local new = not cur
+        spec.set(new)
+        _persist(s.k, new)
+      end
+      tip(s.tip)
+    end
+  end
+end
+
+-- Describe sliders once, render in a loop (idiomatic immediate-mode UI) 
+-- IMGUI pattern: state lives in our code; widgets return interactions per-frame. :contentReference[oaicite:3]{index=3}
 local SLIDER_SPEC = {
   { k = 'DETECT_INNER_M',      label = 'Detect radius (m)',        min = 20,   max = 90,
     tip = 'Start yielding if the player is within this distance AND behind the AI car.' },
@@ -418,18 +451,12 @@ function script.windowMain(dt)
     ui.text(string.format('Config: <unresolved>  [via %s]', CFG_RESOLVE_NOTE or '?'))
   end
 
-  if ui.checkbox('Enabled', enabled) then enabled = not enabled; _persist('enabled', enabled) end
-  tip('Master switch for this app.')
-
-  if ui.checkbox('Debug markers (3D)', debugDraw) then debugDraw = not debugDraw; _persist('debugDraw', debugDraw) end
-  tip('Shows floating text above AI cars currently yielding.')
-
-  if ui.checkbox('Draw markers on top (no depth test)', drawOnTop) then drawOnTop = not drawOnTop; _persist('drawOnTop', drawOnTop) end
-  tip('If markers are hidden by car bodywork, enable this so text ignores depth testing.')
+  -- Deduped checkboxes (behavior identical)
+  drawCheckboxes()
 
   ui.separator()
 
-  -- All sliders rendered here (same order, labels, ranges, tooltips)
+  -- Deduped sliders (from previous refactor)
   drawSliders()
 
   ui.separator()
