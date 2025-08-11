@@ -54,6 +54,10 @@ local SETTINGS_SPEC = {
   { k = 'LIST_RADIUS_FILTER_M', get = function() return LIST_RADIUS_FILTER_M end, set = function(v) LIST_RADIUS_FILTER_M = v end },
 }
 
+-- Fast lookup by key for UI code
+local SETTINGS_SPEC_BY_KEY = {}
+for _, s in ipairs(SETTINGS_SPEC) do SETTINGS_SPEC_BY_KEY[s.k] = s end
+
 local function settings_apply(t)
   if not t then return end
   for _, s in ipairs(SETTINGS_SPEC) do
@@ -367,6 +371,41 @@ function script.Draw3D(dt)
   end
 end
 
+----------------------------------------------------------------------
+-- UI (sliders dedup)
+----------------------------------------------------------------------
+-- Describe sliders once, render in a loop (idiomatic immediate-mode UI) :contentReference[oaicite:1]{index=1}
+local SLIDER_SPEC = {
+  { k = 'DETECT_INNER_M',      label = 'Detect radius (m)',        min = 20,   max = 90,
+    tip = 'Start yielding if the player is within this distance AND behind the AI car.' },
+  { k = 'DETECT_HYSTERESIS_M', label = 'Hysteresis (m)',           min = 20,   max = 120,
+    tip = 'Extra distance while yielding so AI doesn’t flicker on/off near threshold.' },
+  { k = 'YIELD_OFFSET_M',      label = 'Right offset (m)',         min = 0.5,  max = 4.0,
+    tip = 'How far to move to the right when yielding.' },
+  { k = 'RIGHT_MARGIN_M',      label = 'Right margin (m)',         min = 0.3,  max = 1.2,
+    tip = 'Safety gap from right edge; target offset is clamped by available width.' },
+  { k = 'MIN_PLAYER_SPEED_KMH',label = 'Min player speed (km/h)',  min = 40,   max = 160,
+    tip = 'Ignore very low-speed approaches (pit exits, traffic jams).' },
+  { k = 'MIN_SPEED_DELTA_KMH', label = 'Min speed delta (km/h)',   min = 0,    max = 30,
+    tip = 'Require some closing speed before asking AI to yield.' },
+  { k = 'RAMP_SPEED_MPS',      label = 'Offset ramp (m/s)',        min = 1.0,  max = 10.0,
+    tip = 'Ramp speed of rightward offset change.' },
+  { k = 'LIST_RADIUS_FILTER_M',label = 'List radius filter (m)',   min = 0,    max = 1000,
+    tip = 'Only show cars within this distance in the list (0 = show all).' },
+}
+
+local function drawSliders()
+  for _, s in ipairs(SLIDER_SPEC) do
+    local spec = SETTINGS_SPEC_BY_KEY[s.k]
+    if spec then
+      local cur = spec.get()
+      local new = ui.slider(s.label, cur, s.min, s.max)
+      if new ~= cur then spec.set(new); _persist(s.k, new) end
+      tip(s.tip)
+    end
+  end
+end
+
 function script.windowMain(dt)
   _ensureConfig()
   ui.text('AI Cars Overtake — keep right, pass left')
@@ -389,25 +428,9 @@ function script.windowMain(dt)
   tip('If markers are hidden by car bodywork, enable this so text ignores depth testing.')
 
   ui.separator()
-  local v
-  v = ui.slider('Detect radius (m)', DETECT_INNER_M, 20, 90);  if v ~= DETECT_INNER_M then DETECT_INNER_M = v; _persist('DETECT_INNER_M', v) end
-  tip('Start yielding if the player is within this distance AND behind the AI car.')
-  v = ui.slider('Hysteresis (m)', DETECT_HYSTERESIS_M, 20, 120); if v ~= DETECT_HYSTERESIS_M then DETECT_HYSTERESIS_M = v; _persist('DETECT_HYSTERESIS_M', v) end
-  tip('Extra distance while yielding so AI doesn’t flicker on/off near threshold.')
-  v = ui.slider('Right offset (m)', YIELD_OFFSET_M, 0.5, 4.0);  if v ~= YIELD_OFFSET_M then YIELD_OFFSET_M = v; _persist('YIELD_OFFSET_M', v) end
-  tip('How far to move to the right when yielding.')
-  v = ui.slider('Right margin (m)', RIGHT_MARGIN_M, 0.3, 1.2); if v ~= RIGHT_MARGIN_M then RIGHT_MARGIN_M = v; _persist('RIGHT_MARGIN_M', v) end
-  tip('Safety gap from right edge; target offset is clamped by available width.')
-  v = ui.slider('Min player speed (km/h)', MIN_PLAYER_SPEED_KMH, 40, 160); if v ~= MIN_PLAYER_SPEED_KMH then MIN_PLAYER_SPEED_KMH = v; _persist('MIN_PLAYER_SPEED_KMH', v) end
-  tip('Ignore very low-speed approaches (pit exits, traffic jams).')
-  v = ui.slider('Min speed delta (km/h)', MIN_SPEED_DELTA_KMH, 0, 30); if v ~= MIN_SPEED_DELTA_KMH then MIN_SPEED_DELTA_KMH = v; _persist('MIN_SPEED_DELTA_KMH', v) end
-  tip('Require some closing speed before asking AI to yield.')
-  v = ui.slider('Offset ramp (m/s)', RAMP_SPEED_MPS, 1.0, 10.0); if v ~= RAMP_SPEED_MPS then RAMP_SPEED_MPS = v; _persist('RAMP_SPEED_MPS', v) end
-  tip('Ramp speed of rightward offset change.')
 
-  ui.separator()
-  v = ui.slider('List radius filter (m)', LIST_RADIUS_FILTER_M, 0, 1000); if v ~= LIST_RADIUS_FILTER_M then LIST_RADIUS_FILTER_M = v; _persist('LIST_RADIUS_FILTER_M', v) end
-  tip('Only show cars within this distance in the list (0 = show all).')
+  -- All sliders rendered here (same order, labels, ranges, tooltips)
+  drawSliders()
 
   ui.separator()
   local sim = ac.getSim()
