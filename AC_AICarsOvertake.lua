@@ -30,11 +30,62 @@ local CFG_PATH, lastSaveOk, lastSaveErr = nil, false, ''
 local CFG_RESOLVE_NOTE = "<none>"
 local BOOT_LOADING = true
 
--- >>> Debounced save (MUST be declared before _persist to avoid global vs local split)
+-- >>> Debounced save (declared before _persist to avoid global/local split)
 local SAVE_INTERVAL = 0.5   -- seconds without changes before we write
 local _autosaveTimer = 0
 local _dirty = false
 -- <<< Debounced save
+
+----------------------------------------------------------------------
+-- Centralized settings spec & helpers (NO functional changes)
+----------------------------------------------------------------------
+local SETTINGS_SPEC = {
+  { k = 'enabled',              get = function() return enabled end,              set = function(v) enabled = v end },
+  { k = 'debugDraw',            get = function() return debugDraw end,            set = function(v) debugDraw = v end },
+  { k = 'drawOnTop',            get = function() return drawOnTop end,            set = function(v) drawOnTop = v end },
+  { k = 'DETECT_INNER_M',       get = function() return DETECT_INNER_M end,       set = function(v) DETECT_INNER_M = v end },
+  { k = 'DETECT_HYSTERESIS_M',  get = function() return DETECT_HYSTERESIS_M end,  set = function(v) DETECT_HYSTERESIS_M = v end },
+  { k = 'MIN_PLAYER_SPEED_KMH', get = function() return MIN_PLAYER_SPEED_KMH end, set = function(v) MIN_PLAYER_SPEED_KMH = v end },
+  { k = 'MIN_SPEED_DELTA_KMH',  get = function() return MIN_SPEED_DELTA_KMH end,  set = function(v) MIN_SPEED_DELTA_KMH = v end },
+  { k = 'YIELD_OFFSET_M',       get = function() return YIELD_OFFSET_M end,       set = function(v) YIELD_OFFSET_M = v end },
+  { k = 'RAMP_SPEED_MPS',       get = function() return RAMP_SPEED_MPS end,       set = function(v) RAMP_SPEED_MPS = v end },
+  { k = 'CLEAR_AHEAD_M',        get = function() return CLEAR_AHEAD_M end,        set = function(v) CLEAR_AHEAD_M = v end },
+  { k = 'RIGHT_MARGIN_M',       get = function() return RIGHT_MARGIN_M end,       set = function(v) RIGHT_MARGIN_M = v end },
+  { k = 'LIST_RADIUS_FILTER_M', get = function() return LIST_RADIUS_FILTER_M end, set = function(v) LIST_RADIUS_FILTER_M = v end },
+}
+
+local function settings_apply(t)
+  if not t then return end
+  for _, s in ipairs(SETTINGS_SPEC) do
+    local v = t[s.k]; if v ~= nil then s.set(v) end
+  end
+  if P then
+    for _, s in ipairs(SETTINGS_SPEC) do P[s.k] = s.get() end
+  end
+end
+
+local function settings_snapshot()
+  local out = {}
+  for _, s in ipairs(SETTINGS_SPEC) do out[s.k] = s.get() end
+  return out
+end
+
+local function settings_write(writekv)
+  for _, s in ipairs(SETTINGS_SPEC) do writekv(s.k, s.get()) end
+end
+
+local function settings_differs(a, b)
+  if not a or not b then return true end
+  for _, s in ipairs(SETTINGS_SPEC) do
+    local va, vb = a[s.k], b[s.k]
+    if type(va) == 'number' and type(vb) == 'number' then
+      if math.abs(va - vb) > 1e-6 then return true end
+    else
+      if va ~= vb then return true end
+    end
+  end
+  return false
+end
 
 ----------------------------------------------------------------------
 -- Path helpers & INI I/O
@@ -131,18 +182,8 @@ local function _saveIni()
     if type(v) == "boolean" then v = v and "true" or "false" end
     f:write(("%s=%s\n"):format(k, tostring(v)))
   end
-  w("enabled",               enabled)
-  w("debugDraw",             debugDraw)
-  w("drawOnTop",             drawOnTop)
-  w("DETECT_INNER_M",        DETECT_INNER_M)
-  w("DETECT_HYSTERESIS_M",   DETECT_HYSTERESIS_M)
-  w("MIN_PLAYER_SPEED_KMH",  MIN_PLAYER_SPEED_KMH)
-  w("MIN_SPEED_DELTA_KMH",   MIN_SPEED_DELTA_KMH)
-  w("YIELD_OFFSET_M",        YIELD_OFFSET_M)
-  w("RAMP_SPEED_MPS",        RAMP_SPEED_MPS)
-  w("CLEAR_AHEAD_M",         CLEAR_AHEAD_M)
-  w("RIGHT_MARGIN_M",        RIGHT_MARGIN_M)
-  w("LIST_RADIUS_FILTER_M",  LIST_RADIUS_FILTER_M)
+  -- deduplicated write:
+  settings_write(w)
   f:close()
   lastSaveOk, lastSaveErr = true, ''
   if ac.log then ac.log(('AC_AICarsOvertake: saved %s'):format(CFG_PATH)) end
@@ -161,28 +202,11 @@ local _lazyResolved = false
 local _lastSaved = nil
 
 local function _snapshot()
-  return {
-    enabled=enabled, debugDraw=debugDraw, drawOnTop=drawOnTop,
-    DETECT_INNER_M=DETECT_INNER_M, DETECT_HYSTERESIS_M=DETECT_HYSTERESIS_M,
-    MIN_PLAYER_SPEED_KMH=MIN_PLAYER_SPEED_KMH, MIN_SPEED_DELTA_KMH=MIN_SPEED_DELTA_KMH,
-    YIELD_OFFSET_M=YIELD_OFFSET_M, RAMP_SPEED_MPS=RAMP_SPEED_MPS,
-    CLEAR_AHEAD_M=CLEAR_AHEAD_M, RIGHT_MARGIN_M=RIGHT_MARGIN_M,
-    LIST_RADIUS_FILTER_M=LIST_RADIUS_FILTER_M
-  }
+  return settings_snapshot()   -- deduplicated snapshot
 end
 
 local function _differs(a,b)
-  if not a or not b then return true end
-  local function ne(x,y)
-    if type(x)=="number" and type(y)=="number" then return math.abs(x-y)>1e-6 end
-    return x~=y
-  end
-  return ne(a.enabled,b.enabled) or ne(a.debugDraw,b.debugDraw) or ne(a.drawOnTop,b.drawOnTop)
-      or ne(a.DETECT_INNER_M,b.DETECT_INNER_M) or ne(a.DETECT_HYSTERESIS_M,b.DETECT_HYSTERESIS_M)
-      or ne(a.MIN_PLAYER_SPEED_KMH,b.MIN_PLAYER_SPEED_KMH) or ne(a.MIN_SPEED_DELTA_KMH,b.MIN_SPEED_DELTA_KMH)
-      or ne(a.YIELD_OFFSET_M,b.YIELD_OFFSET_M) or ne(a.RAMP_SPEED_MPS,b.RAMP_SPEED_MPS)
-      or ne(a.CLEAR_AHEAD_M,b.CLEAR_AHEAD_M) or ne(a.RIGHT_MARGIN_M,b.RIGHT_MARGIN_M)
-      or ne(a.LIST_RADIUS_FILTER_M,b.LIST_RADIUS_FILTER_M)
+  return settings_differs(a, b)  -- deduplicated compare
 end
 
 local function _ensureConfig()
@@ -196,28 +220,7 @@ local function _ensureConfig()
       _loadIni()
 
       -- Apply loaded values immediately (so sliders show persisted values)
-      local t = SETTINGS
-      if t then
-        if t.enabled               ~= nil then enabled               = t.enabled               end
-        if t.debugDraw             ~= nil then debugDraw             = t.debugDraw             end
-        if t.drawOnTop             ~= nil then drawOnTop             = t.drawOnTop             end
-        if t.DETECT_INNER_M        ~= nil then DETECT_INNER_M        = t.DETECT_INNER_M        end
-        if t.DETECT_HYSTERESIS_M   ~= nil then DETECT_HYSTERESIS_M   = t.DETECT_HYSTERESIS_M   end
-        if t.MIN_PLAYER_SPEED_KMH  ~= nil then MIN_PLAYER_SPEED_KMH  = t.MIN_PLAYER_SPEED_KMH  end
-        if t.MIN_SPEED_DELTA_KMH   ~= nil then MIN_SPEED_DELTA_KMH   = t.MIN_SPEED_DELTA_KMH   end
-        if t.YIELD_OFFSET_M        ~= nil then YIELD_OFFSET_M        = t.YIELD_OFFSET_M        end
-        if t.RAMP_SPEED_MPS        ~= nil then RAMP_SPEED_MPS        = t.RAMP_SPEED_MPS        end
-        if t.CLEAR_AHEAD_M         ~= nil then CLEAR_AHEAD_M         = t.CLEAR_AHEAD_M         end
-        if t.RIGHT_MARGIN_M        ~= nil then RIGHT_MARGIN_M        = t.RIGHT_MARGIN_M        end
-        if t.LIST_RADIUS_FILTER_M  ~= nil then LIST_RADIUS_FILTER_M  = t.LIST_RADIUS_FILTER_M  end
-        if P then
-          P.enabled=enabled; P.debugDraw=debugDraw; P.drawOnTop=drawOnTop
-          P.DETECT_INNER_M=DETECT_INNER_M; P.DETECT_HYSTERESIS_M=DETECT_HYSTERESIS_M
-          P.MIN_PLAYER_SPEED_KMH=MIN_PLAYER_SPEED_KMH; P.MIN_SPEED_DELTA_KMH=MIN_SPEED_DELTA_KMH
-          P.YIELD_OFFSET_M=YIELD_OFFSET_M; P.RAMP_SPEED_MPS=RAMP_SPEED_MPS
-          P.CLEAR_AHEAD_M=CLEAR_AHEAD_M; P.RIGHT_MARGIN_M=RIGHT_MARGIN_M; P.LIST_RADIUS_FILTER_M=LIST_RADIUS_FILTER_M
-        end
-      end
+      settings_apply(SETTINGS)
 
       -- unlock saving *after* values are applied
       BOOT_LOADING = false
@@ -299,44 +302,9 @@ function script.__init__()
   if ac.log then ac.log('AC_AICarsOvertake: init') end
   _loadIni()
 
-  local function applyFrom(t)
-    if not t then return end
-    if t.enabled               ~= nil then enabled               = t.enabled               end
-    if t.debugDraw             ~= nil then debugDraw             = t.debugDraw             end
-    if t.drawOnTop             ~= nil then drawOnTop             = t.drawOnTop             end
-    if t.DETECT_INNER_M        ~= nil then DETECT_INNER_M        = t.DETECT_INNER_M        end
-    if t.DETECT_HYSTERESIS_M   ~= nil then DETECT_HYSTERESIS_M   = t.DETECT_HYSTERESIS_M   end
-    if t.MIN_PLAYER_SPEED_KMH  ~= nil then MIN_PLAYER_SPEED_KMH  = t.MIN_PLAYER_SPEED_KMH  end
-    if t.MIN_SPEED_DELTA_KMH   ~= nil then MIN_SPEED_DELTA_KMH   = t.MIN_SPEED_DELTA_KMH   end
-    if t.YIELD_OFFSET_M        ~= nil then YIELD_OFFSET_M        = t.YIELD_OFFSET_M        end
-    if t.RAMP_SPEED_MPS        ~= nil then RAMP_SPEED_MPS        = t.RAMP_SPEED_MPS        end
-    if t.CLEAR_AHEAD_M         ~= nil then CLEAR_AHEAD_M         = t.CLEAR_AHEAD_M         end
-    if t.RIGHT_MARGIN_M        ~= nil then RIGHT_MARGIN_M        = t.RIGHT_MARGIN_M        end
-    if t.LIST_RADIUS_FILTER_M  ~= nil then LIST_RADIUS_FILTER_M  = t.LIST_RADIUS_FILTER_M  end
-    if P then
-      P.enabled=enabled; P.debugDraw=debugDraw; P.drawOnTop=drawOnTop
-      P.DETECT_INNER_M=DETECT_INNER_M; P.DETECT_HYSTERESIS_M=DETECT_HYSTERESIS_M
-      P.MIN_PLAYER_SPEED_KMH=MIN_PLAYER_SPEED_KMH; P.MIN_SPEED_DELTA_KMH=MIN_SPEED_DELTA_KMH
-      P.YIELD_OFFSET_M=YIELD_OFFSET_M; P.RAMP_SPEED_MPS=RAMP_SPEED_MPS
-      P.CLEAR_AHEAD_M=CLEAR_AHEAD_M; P.RIGHT_MARGIN_M=RIGHT_MARGIN_M; P.LIST_RADIUS_FILTER_M=LIST_RADIUS_FILTER_M
-    end
-  end
-  applyFrom(SETTINGS)
-
-  if P then
-    if P.enabled               ~= nil then enabled               = P.enabled               end
-    if P.debugDraw             ~= nil then debugDraw             = P.debugDraw             end
-    if P.drawOnTop             ~= nil then drawOnTop             = P.drawOnTop             end
-    if P.DETECT_INNER_M        ~= nil then DETECT_INNER_M        = P.DETECT_INNER_M        end
-    if P.DETECT_HYSTERESIS_M   ~= nil then DETECT_HYSTERESIS_M   = P.DETECT_HYSTERESIS_M   end
-    if P.MIN_PLAYER_SPEED_KMH  ~= nil then MIN_PLAYER_SPEED_KMH  = P.MIN_PLAYER_SPEED_KMH  end
-    if P.MIN_SPEED_DELTA_KMH   ~= nil then MIN_SPEED_DELTA_KMH   = P.MIN_SPEED_DELTA_KMH   end
-    if P.YIELD_OFFSET_M        ~= nil then YIELD_OFFSET_M        = P.YIELD_OFFSET_M        end
-    if P.RAMP_SPEED_MPS        ~= nil then RAMP_SPEED_MPS        = P.RAMP_SPEED_MPS        end
-    if P.CLEAR_AHEAD_M         ~= nil then CLEAR_AHEAD_M         = P.CLEAR_AHEAD_M         end
-    if P.RIGHT_MARGIN_M        ~= nil then RIGHT_MARGIN_M        = P.RIGHT_MARGIN_M        end
-    if P.LIST_RADIUS_FILTER_M  ~= nil then LIST_RADIUS_FILTER_M  = P.LIST_RADIUS_FILTER_M  end
-  end
+  -- Apply values from INI and storage (keeps UI in sync on start)
+  settings_apply(SETTINGS)
+  settings_apply(P)
 
   _lastSaved = _snapshot()
   BOOT_LOADING = false
