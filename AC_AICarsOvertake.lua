@@ -358,7 +358,13 @@ end
 function script.Draw3D(dt)
   if not debugDraw then return end
   local sim = ac.getSim(); if not sim then return end
-  render.setDepthMode(not drawOnTop, true)
+  if drawOnTop then
+    -- draw over everything (no depth testing)
+    render.setDepthMode(render.DepthMode.Off)
+  else
+    -- respect existing depth, don’t write to depth (debug text won’t “punch holes”)
+    render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
+  end
   for i = 1, (sim.carsCount or 0) - 1 do
     local st = ai[i]
     if st and (st.offset or 0) > 0.02 then
@@ -369,6 +375,7 @@ function script.Draw3D(dt)
       end
     end
   end
+  render.setDepthMode(render.DepthMode.Normal)
 end
 
 ----------------------------------------------------------------------
@@ -478,7 +485,7 @@ function script.windowMain(dt)
               ui.text(base)
               ui.popStyleColor()
             elseif ui.textColored then
-              ui.textColored(rgbm(0.2, 0.95, 0.2, 1.0), base)
+              ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
             else
               ui.text(base)
             end
