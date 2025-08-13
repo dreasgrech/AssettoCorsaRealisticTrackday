@@ -1,5 +1,5 @@
 -- AC_AICarsOvertake.lua
--- Nudge AI to the RIGHT so the player can pass on the LEFT (Trackday / AI Flood).
+-- Nudge AI to one side so the player can pass on the other (Trackday / AI Flood).
 
 ----------------------------------------------------------------------
 -- Tunables (live-editable in UI)
@@ -14,6 +14,7 @@ local CLEAR_AHEAD_M         = 6.0
 local RIGHT_MARGIN_M        = 0.6
 local LIST_RADIUS_FILTER_M  = 400.0
 local MIN_AI_SPEED_KMH      = 35.0
+local YIELD_TO_LEFT         = false
 
 ----------------------------------------------------------------------
 -- State
@@ -54,6 +55,7 @@ local SETTINGS_SPEC = {
   { k = 'RIGHT_MARGIN_M',       get = function() return RIGHT_MARGIN_M end,       set = function(v) RIGHT_MARGIN_M = v end },
   { k = 'LIST_RADIUS_FILTER_M', get = function() return LIST_RADIUS_FILTER_M end, set = function(v) LIST_RADIUS_FILTER_M = v end },
   { k = 'MIN_AI_SPEED_KMH',     get = function() return MIN_AI_SPEED_KMH end,     set = function(v) MIN_AI_SPEED_KMH = v end },
+  { k = 'YIELD_TO_LEFT',        get = function() return YIELD_TO_LEFT end,        set = function(v) YIELD_TO_LEFT = v end },
 }
 
 -- Fast lookup by key for UI code
@@ -274,12 +276,19 @@ end
 ----------------------------------------------------------------------
 -- Trackside clamping
 ----------------------------------------------------------------------
-local function clampRightOffsetMeters(aiWorldPos, desired)
+local function clampSideOffsetMeters(aiWorldPos, desired, sideSign)
   if not ac.worldCoordinateToTrackProgress or not ac.getTrackAISplineSides then return desired end
   local prog = ac.worldCoordinateToTrackProgress(aiWorldPos); if prog < 0 then return desired end
   local sides = ac.getTrackAISplineSides(prog) -- vec2(left, right)
-  local maxRight = math.max(0, (sides.y or 0) - RIGHT_MARGIN_M)
-  return math.max(0, math.min(desired, maxRight)), prog, (sides.y or 0)
+  if sideSign > 0 then
+    local maxRight = math.max(0, (sides.y or 0) - RIGHT_MARGIN_M)
+    local clamped  = math.max(0, math.min(desired, maxRight))
+    return clamped, prog, maxRight
+  else
+    local maxLeft  = math.max(0, (sides.x or 0) - RIGHT_MARGIN_M)
+    local clamped  = math.min(0, math.max(desired, -maxLeft))
+    return clamped, prog, maxLeft
+  end
 end
 
 ----------------------------------------------------------------------
@@ -293,9 +302,14 @@ local function desiredOffsetFor(aiCar, playerCar, wasYielding)
   local d = vlen(vsub(playerCar.position, aiCar.position))
   if d > radius then return 0, d, nil, nil, 'Too far (outside detect radius)' end
   if not isBehind(aiCar, playerCar) then return 0, d, nil, nil, 'Player not behind AI' end
-  local clamped, prog, rightSide = clampRightOffsetMeters(aiCar.position, YIELD_OFFSET_M)
-  if (clamped or 0) <= 0.01 then return 0, d, prog, rightSide, 'No room on the right' end
-  return clamped, d, prog, rightSide, 'ok'
+
+  local sideSign = YIELD_TO_LEFT and -1 or 1
+  local target   = sideSign * YIELD_OFFSET_M
+  local clamped, prog, sideMax = clampSideOffsetMeters(aiCar.position, target, sideSign)
+  if (sideSign > 0 and (clamped or 0) <= 0.01) or (sideSign < 0 and (clamped or 0) >= -0.01) then
+    return 0, d, prog, sideMax, 'No room on chosen side'
+  end
+  return clamped, d, prog, sideMax, 'ok'
 end
 
 ----------------------------------------------------------------------
@@ -337,14 +351,14 @@ function script.update(dt)
     local c = ac.getCar(i)
     if c and c.isAIControlled ~= false then
       ai[i] = ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0 }
-      local desired, dist, prog, rightSide, reason = desiredOffsetFor(c, player, ai[i].yielding)
+      local desired, dist, prog, sideMax, reason = desiredOffsetFor(c, player, ai[i].yielding)
       ai[i].dist = dist or ai[i].dist or 0
       ai[i].desired = desired or 0
       ai[i].prog = prog or -1
-      ai[i].maxRight = rightSide or 0
+      ai[i].maxRight = sideMax or 0
       ai[i].reason = reason or '-'
       if ai[i].yielding and playerIsClearlyAhead(c, player, CLEAR_AHEAD_M) then desired = 0.0 end
-      local willYield = (desired or 0) > 0.01
+      local willYield = math.abs(desired or 0) > 0.01
       if willYield then ai[i].yieldTime = (ai[i].yieldTime or 0) + dt end
       ai[i].yielding = willYield
       ai[i].offset = approach(ai[i].offset, desired or 0, RAMP_SPEED_MPS * dt)
@@ -366,10 +380,10 @@ function script.Draw3D(dt)
   end
   for i = 1, (sim.carsCount or 0) - 1 do
     local st = ai[i]
-    if st and (st.offset or 0) > 0.02 then
+    if st and (math.abs(st.offset or 0) > 0.02) then
       local c = ac.getCar(i)
       if c then
-        local txt = string.format("-> %.1fm  (des=%.1f, maxR=%.1f, d=%.1fm)", st.offset, st.desired or 0, st.maxRight or 0, st.dist or 0)
+        local txt = string.format("-> %.1fm  (des=%.1f, max=%.1f, d=%.1fm)", st.offset, st.desired or 0, st.maxRight or 0, st.dist or 0)
         render.debugText(c.position + vec3(0, 2.0, 0), txt)
       end
     end
@@ -383,13 +397,14 @@ local UI_ELEMENTS = {
   { kind='checkbox', k='drawOnTop', label='Draw markers on top (no depth test)', tip='If markers are hidden by car bodywork, enable this so text ignores depth testing.' },
   { kind='slider',   k='DETECT_INNER_M', label='Detect radius (m)', min=20,  max=90, tip='Start yielding if the player is within this distance AND behind the AI car.' },
   { kind='slider',   k='DETECT_HYSTERESIS_M', label='Hysteresis (m)', min=20, max=120, tip='Extra distance while yielding so AI doesn’t flicker on/off near threshold.' },
-  { kind='slider',   k='YIELD_OFFSET_M', label='Right offset (m)', min=0.5, max=4.0, tip='How far to move to the right when yielding.' },
-  { kind='slider',   k='RIGHT_MARGIN_M', label='Right margin (m)', min=0.3, max=1.2, tip='Safety gap from right edge; target offset is clamped by available width.' },
+  { kind='slider',   k='YIELD_OFFSET_M', label='Side offset (m)', min=0.5, max=4.0, tip='How far to move towards the chosen side when yielding.' },
+  { kind='slider',   k='RIGHT_MARGIN_M', label='Edge margin (m)', min=0.3, max=1.2, tip='Safety gap from the outer edge on the chosen side.' },
   { kind='slider',   k='MIN_PLAYER_SPEED_KMH', label='Min player speed (km/h)', min=40, max=160, tip='Ignore very low-speed approaches (pit exits, traffic jams).' },
   { kind='slider',   k='MIN_SPEED_DELTA_KMH',  label='Min speed delta (km/h)', min=0,  max=30, tip='Require some closing speed before asking AI to yield.' },
-  { kind='slider',   k='RAMP_SPEED_MPS', label='Offset ramp (m/s)', min=1.0, max=10.0, tip='Ramp speed of rightward offset change.' },
+  { kind='slider',   k='RAMP_SPEED_MPS', label='Offset ramp (m/s)', min=1.0, max=10.0, tip='Ramp speed of offset change.' },
   { kind='slider',   k='LIST_RADIUS_FILTER_M', label='List radius filter (m)', min=0, max=1000, tip='Only show cars within this distance in the list (0 = show all).' },
   { kind='slider',   k='MIN_AI_SPEED_KMH', label='Min AI speed (km/h)', min=0, max=120, tip='Don’t ask AI to yield if its own speed is below this (corners/traffic).' },
+  { kind='checkbox', k='YIELD_TO_LEFT', label='Yield to LEFT (instead of RIGHT)', tip='If enabled, AI moves left to let you pass on the right. Otherwise AI moves right so you pass on the left.' },
 }
 
 local function drawControls()
@@ -419,7 +434,7 @@ end
 
 function script.windowMain(dt)
   _ensureConfig()
-  ui.text('AI Cars Overtake — keep right, pass left')
+  ui.text(string.format('AI Cars Overtake — yield %s', (YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
   if CFG_PATH then
     ui.text(string.format('Config: %s  [via %s] %s',
       CFG_PATH, CFG_RESOLVE_NOTE or '?',
@@ -449,7 +464,7 @@ function script.windowMain(dt)
         local show = (LIST_RADIUS_FILTER_M <= 0) or ((st.dist or 0) <= LIST_RADIUS_FILTER_M)
         if show then
           local base = string.format(
-            "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  maxR=%4.1f  prog=%.3f",
+            "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
             i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
           )
           if st.yielding then
