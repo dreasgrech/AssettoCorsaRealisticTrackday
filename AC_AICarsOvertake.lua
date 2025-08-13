@@ -240,9 +240,6 @@ local function _ensureConfig()
   end
 end
 
-----------------------------------------------------------------------
--- Helpers
-----------------------------------------------------------------------
 local function vsub(a,b) return vec3(a.x-b.x, a.y-b.y, a.z-b.z) end
 local function vlen(v) return math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z) end
 local function dot(a,b) return a.x*b.x + a.y*b.y + a.z*b.z end
@@ -380,46 +377,19 @@ function script.Draw3D(dt)
   render.setDepthMode(render.DepthMode.Normal)
 end
 
-----------------------------------------------------------------------
--- UI (unified ordered list so you can interleave any controls)
-----------------------------------------------------------------------
--- Each entry is either a checkbox or a slider; order here = order in UI.
 local UI_ELEMENTS = {
-  { kind='checkbox', k='enabled',   label='Enabled',
-    tip='Master switch for this app.' },
-
-  { kind='checkbox', k='debugDraw', label='Debug markers (3D)',
-    tip='Shows floating text above AI cars currently yielding.' },
-
-  { kind='checkbox', k='drawOnTop', label='Draw markers on top (no depth test)',
-    tip='If markers are hidden by car bodywork, enable this so text ignores depth testing.' },
-
-  { kind='slider',   k='DETECT_INNER_M', label='Detect radius (m)', min=20,  max=90,
-    tip='Start yielding if the player is within this distance AND behind the AI car.' },
-
-  { kind='slider',   k='DETECT_HYSTERESIS_M', label='Hysteresis (m)', min=20, max=120,
-    tip='Extra distance while yielding so AI doesn’t flicker on/off near threshold.' },
-
-  { kind='slider',   k='YIELD_OFFSET_M', label='Right offset (m)', min=0.5, max=4.0,
-    tip='How far to move to the right when yielding.' },
-
-  { kind='slider',   k='RIGHT_MARGIN_M', label='Right margin (m)', min=0.3, max=1.2,
-    tip='Safety gap from right edge; target offset is clamped by available width.' },
-
-  { kind='slider',   k='MIN_PLAYER_SPEED_KMH', label='Min player speed (km/h)', min=40, max=160,
-    tip='Ignore very low-speed approaches (pit exits, traffic jams).' },
-
-  { kind='slider',   k='MIN_SPEED_DELTA_KMH',  label='Min speed delta (km/h)', min=0,  max=30,
-    tip='Require some closing speed before asking AI to yield.' },
-
-  { kind='slider',   k='RAMP_SPEED_MPS', label='Offset ramp (m/s)', min=1.0, max=10.0,
-    tip='Ramp speed of rightward offset change.' },
-
-  { kind='slider',   k='LIST_RADIUS_FILTER_M', label='List radius filter (m)', min=0, max=1000,
-    tip='Only show cars within this distance in the list (0 = show all).' },
-
-  { kind='slider',   k='MIN_AI_SPEED_KMH', label='Min AI speed (km/h)', min=0, max=120,
-    tip='Don’t ask AI to yield if its own speed is below this (corners/traffic).' },
+  { kind='checkbox', k='enabled',   label='Enabled', tip='Master switch for this app.' },
+  { kind='checkbox', k='debugDraw', label='Debug markers (3D)', tip='Shows floating text above AI cars currently yielding.' },
+  { kind='checkbox', k='drawOnTop', label='Draw markers on top (no depth test)', tip='If markers are hidden by car bodywork, enable this so text ignores depth testing.' },
+  { kind='slider',   k='DETECT_INNER_M', label='Detect radius (m)', min=20,  max=90, tip='Start yielding if the player is within this distance AND behind the AI car.' },
+  { kind='slider',   k='DETECT_HYSTERESIS_M', label='Hysteresis (m)', min=20, max=120, tip='Extra distance while yielding so AI doesn’t flicker on/off near threshold.' },
+  { kind='slider',   k='YIELD_OFFSET_M', label='Right offset (m)', min=0.5, max=4.0, tip='How far to move to the right when yielding.' },
+  { kind='slider',   k='RIGHT_MARGIN_M', label='Right margin (m)', min=0.3, max=1.2, tip='Safety gap from right edge; target offset is clamped by available width.' },
+  { kind='slider',   k='MIN_PLAYER_SPEED_KMH', label='Min player speed (km/h)', min=40, max=160, tip='Ignore very low-speed approaches (pit exits, traffic jams).' },
+  { kind='slider',   k='MIN_SPEED_DELTA_KMH',  label='Min speed delta (km/h)', min=0,  max=30, tip='Require some closing speed before asking AI to yield.' },
+  { kind='slider',   k='RAMP_SPEED_MPS', label='Offset ramp (m/s)', min=1.0, max=10.0, tip='Ramp speed of rightward offset change.' },
+  { kind='slider',   k='LIST_RADIUS_FILTER_M', label='List radius filter (m)', min=0, max=1000, tip='Only show cars within this distance in the list (0 = show all).' },
+  { kind='slider',   k='MIN_AI_SPEED_KMH', label='Min AI speed (km/h)', min=0, max=120, tip='Don’t ask AI to yield if its own speed is below this (corners/traffic).' },
 }
 
 local function drawControls()
@@ -459,7 +429,6 @@ function script.windowMain(dt)
     ui.text(string.format('Config: <unresolved>  [via %s]', CFG_RESOLVE_NOTE or '?'))
   end
 
-  -- Unified controls (order defined by UI_ELEMENTS)
   drawControls()
 
   ui.separator()
