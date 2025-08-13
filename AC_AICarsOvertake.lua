@@ -13,6 +13,7 @@ local RAMP_SPEED_MPS        = 4.0
 local CLEAR_AHEAD_M         = 6.0
 local RIGHT_MARGIN_M        = 0.6
 local LIST_RADIUS_FILTER_M  = 400.0
+local MIN_AI_SPEED_KMH      = 35.0
 
 ----------------------------------------------------------------------
 -- State
@@ -52,6 +53,7 @@ local SETTINGS_SPEC = {
   { k = 'CLEAR_AHEAD_M',        get = function() return CLEAR_AHEAD_M end,        set = function(v) CLEAR_AHEAD_M = v end },
   { k = 'RIGHT_MARGIN_M',       get = function() return RIGHT_MARGIN_M end,       set = function(v) RIGHT_MARGIN_M = v end },
   { k = 'LIST_RADIUS_FILTER_M', get = function() return LIST_RADIUS_FILTER_M end, set = function(v) LIST_RADIUS_FILTER_M = v end },
+  { k = 'MIN_AI_SPEED_KMH',     get = function() return MIN_AI_SPEED_KMH end,     set = function(v) MIN_AI_SPEED_KMH = v end },
 }
 
 -- Fast lookup by key for UI code
@@ -289,7 +291,7 @@ end
 local function desiredOffsetFor(aiCar, playerCar, wasYielding)
   if playerCar.speedKmh < MIN_PLAYER_SPEED_KMH then return 0, nil, nil, nil, 'Player below minimum speed' end
   if (playerCar.speedKmh - aiCar.speedKmh) < MIN_SPEED_DELTA_KMH then return 0, nil, nil, nil, 'No closing speed vs AI' end
-  if aiCar.speedKmh < 35.0 then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
+  if aiCar.speedKmh < MIN_AI_SPEED_KMH then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
   local radius = wasYielding and (DETECT_INNER_M + DETECT_HYSTERESIS_M) or DETECT_INNER_M
   local d = vlen(vsub(playerCar.position, aiCar.position))
   if d > radius then return 0, d, nil, nil, 'Too far (outside detect radius)' end
@@ -382,7 +384,6 @@ end
 -- UI (unified ordered list so you can interleave any controls)
 ----------------------------------------------------------------------
 -- Each entry is either a checkbox or a slider; order here = order in UI.
--- This matches immediate-mode best practices: the UI is declared per-frame from data. :contentReference[oaicite:2]{index=2}
 local UI_ELEMENTS = {
   { kind='checkbox', k='enabled',   label='Enabled',
     tip='Master switch for this app.' },
@@ -416,6 +417,9 @@ local UI_ELEMENTS = {
 
   { kind='slider',   k='LIST_RADIUS_FILTER_M', label='List radius filter (m)', min=0, max=1000,
     tip='Only show cars within this distance in the list (0 = show all).' },
+
+  { kind='slider',   k='MIN_AI_SPEED_KMH', label='Min AI speed (km/h)', min=0, max=120,
+    tip='Don’t ask AI to yield if its own speed is below this (corners/traffic).' },
 }
 
 local function drawControls()
