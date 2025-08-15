@@ -20,7 +20,7 @@ local YIELD_TO_LEFT         = false
 -- State
 ----------------------------------------------------------------------
 local enabled, debugDraw, drawOnTop = true, true, true
-local ai = {}  -- [i] = { offset, yielding, dist, desired, maxRight, prog, reason, yieldTime }
+local ai = {}  -- [i] = { offset, yielding, dist, desired, maxRight, prog, reason, yieldTime, blink }
 
 -- Storage that survives LAZY unloads
 local P = (ac.store and ac.store('AC_AICarsOvertake'))
@@ -156,9 +156,11 @@ local function _userIniPath()
 end
 
 local function _ensureParentDir(path)
-  local dir = path:match("^(.*)[/\\][^/\\]+$")
+  local dir = path:match("^(.*[/\\])[^/\\]+$")
   if not dir or dir == '' then return end
-  os.execute(('cmd /c mkdir "%s" >nul 2>&1'):format(dir))
+  if os and os.execute then os.execute(('mkdir "%s"'):format(dir)) end
+  if ac and ac.executeShell then ac.executeShell(('cmd /c mkdir "%s" >nul 2>&1'):format(dir)) end
+  if execute then execute(('cmd /c mkdir "%s" >nul 2>&1'):format(dir)) end
 end
 
 local function _loadIni()
@@ -323,7 +325,7 @@ function script.__init__()
   settings_apply(SETTINGS)
   settings_apply(P)
 
-  _lastSaved = _snapshot()
+  _lastSaved = settings_snapshot()
   BOOT_LOADING = false
 end
 
@@ -336,7 +338,7 @@ function script.update(dt)
       _autosaveTimer = _autosaveTimer + dt
       if _autosaveTimer >= SAVE_INTERVAL then
         _saveIni()
-        _lastSaved = _snapshot()
+        _lastSaved = settings_snapshot()
         _dirty = false
       end
     end
@@ -350,7 +352,7 @@ function script.update(dt)
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
     if c and c.isAIControlled ~= false then
-      ai[i] = ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0 }
+      ai[i] = ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0, blink=nil }
       local desired, dist, prog, sideMax, reason = desiredOffsetFor(c, player, ai[i].yielding)
       ai[i].dist = dist or ai[i].dist or 0
       ai[i].desired = desired or 0
@@ -363,6 +365,31 @@ function script.update(dt)
       ai[i].yielding = willYield
       ai[i].offset = approach(ai[i].offset, desired or 0, RAMP_SPEED_MPS * dt)
       physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
+
+      -- Use car indicators while yielding. Set every frame because other systems may override it.
+      -- if ac and ac.setTurningLights and ac.setTargetCar then
+      -- if c.hasTurningLights then
+        local mode = ac.TurningLights and ac.TurningLights.None or 0
+        if willYield then
+          mode = (ac.TurningLights and ((YIELD_TO_LEFT and ac.TurningLights.Left) or ac.TurningLights.Right)) or ((YIELD_TO_LEFT and 1) or 2)
+        end
+        if ac.setTargetCar(i) then
+          
+          -- pcall(ac.setTurningLights, mode)
+          ac.setTurningLights(mode)
+          -- ac.setTurningLights(ac.TurningLights.Right)
+
+          ac.setTargetCar(0)
+          ai[i].blink = mode
+        else
+          ac.log('ac.setTargetCar(i) return false')
+        end
+        -- Snapshot indicator state for debug UI (phase shows if current blink is on)
+        ai[i].indLeft = c.turningLeftLights or false
+        ai[i].indRight = c.turningRightLights or false
+        ai[i].indPhase = c.turningLightsActivePhase or false
+        ai[i].hasTL = c.hasTurningLights or false
+      -- end
     end
   end
 end
@@ -384,6 +411,20 @@ function script.Draw3D(dt)
       local c = ac.getCar(i)
       if c then
         local txt = string.format("-> %.1fm  (des=%.1f, max=%.1f, d=%.1fm)", st.offset, st.desired or 0, st.maxRight or 0, st.dist or 0)
+        do
+          local indTxt = '-'
+          local l = st.indLeft
+          local r = st.indRight
+          local ph = st.indPhase
+          if l or r then
+            if l and r then indTxt = ph and 'H*' or 'H'
+            elseif l then indTxt = ph and 'L*' or 'L'
+            elseif r then indTxt = ph and 'R*' or 'R'
+            end
+          end
+          if st.hasTL == false then indTxt = indTxt .. '(!)' end
+          txt = txt .. string.format("  ind=%s", indTxt)
+        end
         render.debugText(c.position + vec3(0, 2.0, 0), txt)
       end
     end
@@ -467,6 +508,20 @@ function script.windowMain(dt)
             "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
             i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
           )
+          do
+            local indTxt = '-'
+            local l = st.indLeft
+            local r = st.indRight
+            local ph = st.indPhase
+            if l or r then
+              if l and r then indTxt = ph and 'H*' or 'H'
+              elseif l then indTxt = ph and 'L*' or 'L'
+              elseif r then indTxt = ph and 'R*' or 'R'
+              end
+            end
+            if st.hasTL == false then indTxt = indTxt .. '(!)' end
+            base = base .. string.format("  ind=%s", indTxt)
+          end
           if st.yielding then
             if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
               ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
@@ -490,5 +545,5 @@ end
 
 -- Save when window is closed/hidden as a last resort
 function script.onHide()
-  if _dirty then _saveIni(); _lastSaved = _snapshot(); _dirty = false end
+  if _dirty then _saveIni(); _lastSaved = settings_snapshot(); _dirty = false end
 end
