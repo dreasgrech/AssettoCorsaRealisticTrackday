@@ -329,6 +329,28 @@ function script.__init__()
   BOOT_LOADING = false
 end
 
+local function _indModeForYielding(willYield)
+  local TL = ac and ac.TurningLights
+  if willYield then
+    return TL and ((YIELD_TO_LEFT and TL.Left) or TL.Right) or ((YIELD_TO_LEFT and 1) or 2)
+  end
+  return TL and TL.None or 0
+end
+
+local function _applyIndicators(i, willYield, car, st)
+  if not (ac and ac.setTurningLights and ac.setTargetCar) then return end
+  local mode = _indModeForYielding(willYield)
+  if ac.setTargetCar(i) then
+    ac.setTurningLights(mode)
+    ac.setTargetCar(0)
+    st.blink = mode
+  end
+  st.indLeft = car.turningLeftLights or false
+  st.indRight = car.turningRightLights or false
+  st.indPhase = car.turningLightsActivePhase or false
+  st.hasTL = car.hasTurningLights or false
+end
+
 function script.update(dt)
   _ensureConfig()
 
@@ -365,33 +387,27 @@ function script.update(dt)
       ai[i].yielding = willYield
       ai[i].offset = approach(ai[i].offset, desired or 0, RAMP_SPEED_MPS * dt)
       physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
-
-      -- Use car indicators while yielding. Set every frame because other systems may override it.
-      -- if ac and ac.setTurningLights and ac.setTargetCar then
-      -- if c.hasTurningLights then
-        local mode = ac.TurningLights and ac.TurningLights.None or 0
-        if willYield then
-          mode = (ac.TurningLights and ((YIELD_TO_LEFT and ac.TurningLights.Left) or ac.TurningLights.Right)) or ((YIELD_TO_LEFT and 1) or 2)
-        end
-        if ac.setTargetCar(i) then
-          
-          -- pcall(ac.setTurningLights, mode)
-          ac.setTurningLights(mode)
-          -- ac.setTurningLights(ac.TurningLights.Right)
-
-          ac.setTargetCar(0)
-          ai[i].blink = mode
-        else
-          ac.log('ac.setTargetCar(i) return false')
-        end
-        -- Snapshot indicator state for debug UI (phase shows if current blink is on)
-        ai[i].indLeft = c.turningLeftLights or false
-        ai[i].indRight = c.turningRightLights or false
-        ai[i].indPhase = c.turningLightsActivePhase or false
-        ai[i].hasTL = c.hasTurningLights or false
-      -- end
+      _applyIndicators(i, willYield, c, ai[i])
     end
   end
+end
+
+local function _indicatorStatusText(st)
+  local l = st.indLeft
+  local r = st.indRight
+  local ph = st.indPhase
+  local indTxt = '-'
+  if l or r then
+    if l and r then
+      indTxt = ph and 'H*' or 'H'
+    elseif l then
+      indTxt = ph and 'L*' or 'L'
+    else
+      indTxt = ph and 'R*' or 'R'
+    end
+  end
+  if st.hasTL == false then indTxt = indTxt .. '(!)' end
+  return indTxt
 end
 
 -- manifest [RENDER_CALLBACKS]
@@ -412,17 +428,7 @@ function script.Draw3D(dt)
       if c then
         local txt = string.format("-> %.1fm  (des=%.1f, max=%.1f, d=%.1fm)", st.offset, st.desired or 0, st.maxRight or 0, st.dist or 0)
         do
-          local indTxt = '-'
-          local l = st.indLeft
-          local r = st.indRight
-          local ph = st.indPhase
-          if l or r then
-            if l and r then indTxt = ph and 'H*' or 'H'
-            elseif l then indTxt = ph and 'L*' or 'L'
-            elseif r then indTxt = ph and 'R*' or 'R'
-            end
-          end
-          if st.hasTL == false then indTxt = indTxt .. '(!)' end
+          local indTxt = _indicatorStatusText(st)
           txt = txt .. string.format("  ind=%s", indTxt)
         end
         render.debugText(c.position + vec3(0, 2.0, 0), txt)
@@ -509,17 +515,7 @@ function script.windowMain(dt)
             i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
           )
           do
-            local indTxt = '-'
-            local l = st.indLeft
-            local r = st.indRight
-            local ph = st.indPhase
-            if l or r then
-              if l and r then indTxt = ph and 'H*' or 'H'
-              elseif l then indTxt = ph and 'L*' or 'L'
-              elseif r then indTxt = ph and 'R*' or 'R'
-              end
-            end
-            if st.hasTL == false then indTxt = indTxt .. '(!)' end
+            local indTxt = _indicatorStatusText(st)
             base = base .. string.format("  ind=%s", indTxt)
           end
           if st.yielding then
