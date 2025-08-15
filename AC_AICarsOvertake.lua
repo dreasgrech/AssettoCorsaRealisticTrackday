@@ -10,6 +10,7 @@ local MIN_PLAYER_SPEED_KMH  = 70.0
 local MIN_SPEED_DELTA_KMH   = 5.0
 local YIELD_OFFSET_M        = 2.5
 local RAMP_SPEED_MPS        = 4.0
+local RAMP_RELEASE_MPS      = 1.6  -- slower return to center to avoid “snap back” once player is clearly ahead
 local CLEAR_AHEAD_M         = 6.0
 local RIGHT_MARGIN_M        = 0.6
 local LIST_RADIUS_FILTER_M  = 400.0
@@ -51,6 +52,7 @@ local SETTINGS_SPEC = {
   { k = 'MIN_SPEED_DELTA_KMH',  get = function() return MIN_SPEED_DELTA_KMH end,  set = function(v) MIN_SPEED_DELTA_KMH = v end },
   { k = 'YIELD_OFFSET_M',       get = function() return YIELD_OFFSET_M end,       set = function(v) YIELD_OFFSET_M = v end },
   { k = 'RAMP_SPEED_MPS',       get = function() return RAMP_SPEED_MPS end,       set = function(v) RAMP_SPEED_MPS = v end },
+  { k = 'RAMP_RELEASE_MPS',     get = function() return RAMP_RELEASE_MPS end,     set = function(v) RAMP_RELEASE_MPS = v end },
   { k = 'CLEAR_AHEAD_M',        get = function() return CLEAR_AHEAD_M end,        set = function(v) CLEAR_AHEAD_M = v end },
   { k = 'RIGHT_MARGIN_M',       get = function() return RIGHT_MARGIN_M end,       set = function(v) RIGHT_MARGIN_M = v end },
   { k = 'LIST_RADIUS_FILTER_M', get = function() return LIST_RADIUS_FILTER_M end, set = function(v) LIST_RADIUS_FILTER_M = v end },
@@ -357,17 +359,33 @@ function script.update(dt)
     if c and c.isAIControlled ~= false then
       ai[i] = ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0, blink=nil }
       local desired, dist, prog, sideMax, reason = desiredOffsetFor(c, player, ai[i].yielding)
+
       ai[i].dist = dist or ai[i].dist or 0
-      ai[i].desired = desired or 0
       ai[i].prog = prog or -1
       ai[i].maxRight = sideMax or 0
       ai[i].reason = reason or '-'
-      if ai[i].yielding and playerIsClearlyAhead(c, player, CLEAR_AHEAD_M) then desired = 0.0 end
-      local willYield = math.abs(desired or 0) > 0.01
+
+      -- Ease desired back to 0 once player is clearly ahead; keep yielding during the release
+      local releasing = false
+      if ai[i].yielding and playerIsClearlyAhead(c, player, CLEAR_AHEAD_M) then
+        releasing = true
+      end
+      local targetDesired
+      if releasing then
+        targetDesired = approach((ai[i].desired or desired or 0), 0.0, RAMP_RELEASE_MPS * dt)
+      else
+        targetDesired = desired or 0
+      end
+      ai[i].desired = targetDesired
+
+      local willYield = math.abs(targetDesired) > 0.01
       if willYield then ai[i].yieldTime = (ai[i].yieldTime or 0) + dt end
       ai[i].yielding = willYield
-      ai[i].offset = approach(ai[i].offset, desired or 0, RAMP_SPEED_MPS * dt)
+
+      local stepMps = releasing and RAMP_RELEASE_MPS or RAMP_SPEED_MPS
+      ai[i].offset = approach(ai[i].offset, targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
+
       _applyIndicators(i, willYield, c, ai[i])
     end
   end
@@ -430,6 +448,7 @@ local UI_ELEMENTS = {
   { kind='slider',   k='MIN_PLAYER_SPEED_KMH', label='Min player speed (km/h)', min=40, max=160, tip='Ignore very low-speed approaches (pit exits, traffic jams).' },
   { kind='slider',   k='MIN_SPEED_DELTA_KMH',  label='Min speed delta (km/h)', min=0,  max=30, tip='Require some closing speed before asking AI to yield.' },
   { kind='slider',   k='RAMP_SPEED_MPS', label='Offset ramp (m/s)', min=1.0, max=10.0, tip='Ramp speed of offset change.' },
+  { kind='slider',   k='RAMP_RELEASE_MPS', label='Offset release (m/s)', min=0.2, max=6.0, tip='How quickly offset returns to center once you’re past the AI.' },
   { kind='slider',   k='LIST_RADIUS_FILTER_M', label='List radius filter (m)', min=0, max=1000, tip='Only show cars within this distance in the list (0 = show all).' },
   { kind='slider',   k='MIN_AI_SPEED_KMH', label='Min AI speed (km/h)', min=0, max=120, tip='Don’t ask AI to yield if its own speed is below this (corners/traffic).' },
   { kind='checkbox', k='YIELD_TO_LEFT', label='Yield to LEFT (instead of RIGHT)', tip='If enabled, AI moves left to let you pass on the right. Otherwise AI moves right so you pass on the left.' },
