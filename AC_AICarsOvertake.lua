@@ -278,7 +278,15 @@ local function desiredOffsetFor(aiCar, playerCar, wasYielding)
   local radius = wasYielding and (DETECT_INNER_M + DETECT_HYSTERESIS_M) or DETECT_INNER_M
   local d = vlen(vsub(playerCar.position, aiCar.position))
   if d > radius then return 0, d, nil, nil, 'Too far (outside detect radius)' end
-  if not isBehind(aiCar, playerCar) then return 0, d, nil, nil, 'Player not behind AI' end
+
+  -- Keep yielding even if the player pulls alongside; only stop once the player is clearly ahead.
+  if not isBehind(aiCar, playerCar) then
+    if wasYielding and not playerIsClearlyAhead(aiCar, playerCar, CLEAR_AHEAD_M) then
+      -- continue yielding through the pass; fall through to compute side offset
+    else
+      return 0, d, nil, nil, 'Player not behind (clear)'
+    end
+  end
 
   local sideSign = YIELD_TO_LEFT and -1 or 1
   local target   = sideSign * YIELD_OFFSET_M
