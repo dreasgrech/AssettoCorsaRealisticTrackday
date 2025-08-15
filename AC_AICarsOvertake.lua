@@ -505,14 +505,28 @@ function script.windowMain(dt)
   ui.text('Cars:')
   local player = ac.getCar(0)
   if sim and player then
+    -- sort cars by distance to player for clearer list
+    local order = {}
     for i = 1, totalAI do
       local c = ac.getCar(i); local st = ai[i]
       if c and st then
-        local show = (LIST_RADIUS_FILTER_M <= 0) or ((st.dist or 0) <= LIST_RADIUS_FILTER_M)
+        local d = st.dist
+        if not d or d <= 0 then d = vlen(vsub(player.position, c.position)) end
+        table.insert(order, { i = i, d = d })
+      end
+    end
+    table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
+
+    for n = 1, #order do
+      local i = order[n].i
+      local c = ac.getCar(i); local st = ai[i]
+      if c and st then
+        local distShown = order[n].d or st.dist or 0
+        local show = (LIST_RADIUS_FILTER_M <= 0) or (distShown <= LIST_RADIUS_FILTER_M)
         if show then
           local base = string.format(
             "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
-            i, math.floor(c.speedKmh or 0), st.dist or 0, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
+            i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
           )
           do
             local indTxt = _indicatorStatusText(st)
