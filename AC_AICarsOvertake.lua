@@ -82,22 +82,7 @@ local function settings_write(writekv)
   for _, s in ipairs(SETTINGS_SPEC) do writekv(s.k, s.get()) end
 end
 
-local function settings_differs(a, b)
-  if not a or not b then return true end
-  for _, s in ipairs(SETTINGS_SPEC) do
-    local va, vb = a[s.k], b[s.k]
-    if type(va) == 'number' and type(vb) == 'number' then
-      if math.abs(va - vb) > 1e-6 then return true end
-    else
-      if va ~= vb then return true end
-    end
-  end
-  return false
-end
-
-----------------------------------------------------------------------
--- Path helpers & INI I/O
-----------------------------------------------------------------------
+-- Path join (supports both / and \)
 local function _join(a, b)
   if not a or a == '' then return b end
   local last = a:sub(-1); if last == '\\' or last == '/' then return a..b end
@@ -209,15 +194,6 @@ end
 
 -- Lazy config resolver
 local _lazyResolved = false
-local _lastSaved = nil
-
-local function _snapshot()
-  return settings_snapshot()   -- deduplicated snapshot
-end
-
-local function _differs(a,b)
-  return settings_differs(a, b)  -- deduplicated compare
-end
 
 local function _ensureConfig()
   if _lazyResolved and CFG_PATH then return end
@@ -234,7 +210,6 @@ local function _ensureConfig()
 
       -- unlock saving *after* values are applied
       BOOT_LOADING = false
-      _lastSaved = _snapshot()
       if wasBoot == false then BOOT_LOADING = false end
       _lazyResolved = true
       return
@@ -325,7 +300,6 @@ function script.__init__()
   settings_apply(SETTINGS)
   settings_apply(P)
 
-  _lastSaved = settings_snapshot()
   BOOT_LOADING = false
 end
 
@@ -360,7 +334,6 @@ function script.update(dt)
       _autosaveTimer = _autosaveTimer + dt
       if _autosaveTimer >= SAVE_INTERVAL then
         _saveIni()
-        _lastSaved = settings_snapshot()
         _dirty = false
       end
     end
@@ -541,5 +514,5 @@ end
 
 -- Save when window is closed/hidden as a last resort
 function script.onHide()
-  if _dirty then _saveIni(); _lastSaved = settings_snapshot(); _dirty = false end
+  if _dirty then _saveIni(); _dirty = false end
 end
