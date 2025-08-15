@@ -525,8 +525,10 @@ function script.windowMain(dt)
         local show = (LIST_RADIUS_FILTER_M <= 0) or (distShown <= LIST_RADIUS_FILTER_M)
         if show then
           local base = string.format(
-            "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
-            i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
+            -- "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
+            "#%02d d=%5.1fm  v=%3dkm/h  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
+            -- i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
+            i, distShown, math.floor(c.speedKmh or 0), st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
           )
           do
             local indTxt = _indicatorStatusText(st)
