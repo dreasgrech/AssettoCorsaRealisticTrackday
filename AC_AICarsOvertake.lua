@@ -425,7 +425,11 @@ function script.Draw3D(dt)
     if st and (math.abs(st.offset or 0) > 0.02) then
       local c = ac.getCar(i)
       if c then
-        local txt = string.format("-> %.1fm  (des=%.1f, max=%.1f, d=%.1fm)", st.offset, st.desired or 0, st.maxRight or 0, st.dist or 0)
+        local txt = string.format(
+        -- "-> %.1fm  (des=%.1f, max=%.1f, d=%.1fm)", 
+        -- st.offset, st.desired or 0, st.maxRight or 0, st.dist or 0)
+        "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f", 
+        i, st.dist, math.floor(c.speedKmh or 0), st.offset or 0)
         do
           local indTxt = _indicatorStatusText(st)
           txt = txt .. string.format("  ind=%s", indTxt)
@@ -442,7 +446,7 @@ local UI_ELEMENTS = {
   { kind='checkbox', k='debugDraw', label='Debug markers (3D)', tip='Shows floating text above AI cars currently yielding.' },
   { kind='checkbox', k='drawOnTop', label='Draw markers on top (no depth test)', tip='If markers are hidden by car bodywork, enable this so text ignores depth testing.' },
   { kind='checkbox', k='YIELD_TO_LEFT', label='Yield to LEFT (instead of RIGHT)', tip='If enabled, AI moves left to let you pass on the right. Otherwise AI moves right so you pass on the left.' },
-  { kind='slider',   k='DETECT_INNER_M', label='Detect radius (m)', min=20,  max=90, tip='Start yielding if the player is within this distance AND behind the AI car.' },
+  { kind='slider',   k='DETECT_INNER_M', label='Detect radius (m)', min=5,  max=90, tip='Start yielding if the player is within this distance AND behind the AI car.' },
   { kind='slider',   k='DETECT_HYSTERESIS_M', label='Hysteresis (m)', min=20, max=120, tip='Extra distance while yielding so AI doesn’t flicker on/off near threshold.' },
   { kind='slider',   k='YIELD_OFFSET_M', label='Side offset (m)', min=0.5, max=4.0, tip='How far to move towards the chosen side when yielding.' },
   { kind='slider',   k='RIGHT_MARGIN_M', label='Edge margin (m)', min=0.3, max=1.2, tip='Safety gap from the outer edge on the chosen side.' },
