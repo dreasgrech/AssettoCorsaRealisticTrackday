@@ -10,3 +10,5 @@ This is because I want to recreate the true **Nordschleife Touristenfahrten** ex
 
 Currently a work in progress but it's already showing positive, working results.  Once the yielding to the right functionality is solid, I'll expand the app to allow for both right AND left yielding so it can be used for street road tracks in other countries.
 
+Video of first working draft: https://www.youtube.com/watch?v=v83cmlmwVZs
+
