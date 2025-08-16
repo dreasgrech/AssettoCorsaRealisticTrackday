@@ -303,15 +303,27 @@ end
 ----------------------------------------------------------------------
 local function desiredOffsetFor(aiCar, playerCar, wasYielding)
   if playerCar.speedKmh < MIN_PLAYER_SPEED_KMH then return 0, nil, nil, nil, 'Player below minimum speed' end
-  if (playerCar.speedKmh - aiCar.speedKmh) < MIN_SPEED_DELTA_KMH then return 0, nil, nil, nil, 'No closing speed vs AI' end
+
+  -- If cars are abeam (neither clearly behind nor clearly ahead), or we’re already yielding and
+  -- player isn’t clearly ahead yet, ignore closing-speed — yielding must persist mid-pass.
+  local behind = isBehind(aiCar, playerCar)
+  local aheadClear = playerIsClearlyAhead(aiCar, playerCar, CLEAR_AHEAD_M)
+  local sideBySide = (not behind) and (not aheadClear)
+  local ignoreDelta = sideBySide or (wasYielding and not aheadClear)
+
+  if not ignoreDelta and (playerCar.speedKmh - aiCar.speedKmh) < MIN_SPEED_DELTA_KMH then
+    return 0, nil, nil, nil, 'No closing speed vs AI'
+  end
+
   if aiCar.speedKmh < MIN_AI_SPEED_KMH then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
+
   local radius = wasYielding and (DETECT_INNER_M + DETECT_HYSTERESIS_M) or DETECT_INNER_M
   local d = vlen(vsub(playerCar.position, aiCar.position))
   if d > radius then return 0, d, nil, nil, 'Too far (outside detect radius)' end
 
   -- Keep yielding even if the player pulls alongside; only stop once the player is clearly ahead.
-  if not isBehind(aiCar, playerCar) then
-    if wasYielding and not playerIsClearlyAhead(aiCar, playerCar, CLEAR_AHEAD_M) then
+  if not behind then
+    if wasYielding and not aheadClear then
       -- continue yielding through the pass; fall through to compute side offset
     else
       return 0, d, nil, nil, 'Player not behind (clear)'
