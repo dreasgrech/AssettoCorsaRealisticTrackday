@@ -17,6 +17,12 @@ local LIST_RADIUS_FILTER_M  = 400.0
 local MIN_AI_SPEED_KMH      = 35.0
 local YIELD_TO_LEFT         = false
 
+-- Side-by-side guard: if target side is occupied, don’t cut in — briefly slow down to find a gap
+local BLOCK_SIDE_LAT_M      = 2.2   -- lateral threshold (m) to consider another AI “next to” us
+local BLOCK_SIDE_LONG_M     = 5.5   -- longitudinal window (m) for “alongside”
+local BLOCK_SLOWDOWN_KMH    = 12.0  -- temporary speed reduction while blocked
+local BLOCK_THROTTLE_LIMIT  = 0.92  -- soft throttle cap while blocked (1 = no cap)
+
 ----------------------------------------------------------------------
 -- State
 ----------------------------------------------------------------------
@@ -252,6 +258,28 @@ local function tip(text)
   if b and e and pcall(b) then if ui.textWrapped then ui.textWrapped(text) else ui.text(text) end pcall(e) end
 end
 
+-- Check if target side of car i is occupied by another AI alongside (prevents unsafe lateral move)
+local function _isTargetSideBlocked(i, sideSign)
+  local me = ac.getCar(i); if not me then return false end
+  local sim = ac.getSim(); if not sim then return false end
+  local mySide = me.side or vec3(1,0,0)
+  local myLook = me.look or vec3(0,0,1)
+  for j = 1, (sim.carsCount or 0) - 1 do
+    if j ~= i then
+      local o = ac.getCar(j)
+      if o and o.isAIControlled ~= false then
+        local rel = vsub(o.position, me.position)
+        local lat = dot(rel, mySide)   -- + right, - left
+        local fwd = dot(rel, myLook)   -- + ahead, - behind
+        if lat*sideSign > 0 and math.abs(lat) <= BLOCK_SIDE_LAT_M and math.abs(fwd) <= BLOCK_SIDE_LONG_M then
+          return true, j
+        end
+      end
+    end
+  end
+  return false
+end
+
 ----------------------------------------------------------------------
 -- Trackside clamping
 ----------------------------------------------------------------------
@@ -365,26 +393,51 @@ function script.update(dt)
       ai[i].maxRight = sideMax or 0
       ai[i].reason = reason or '-'
 
-      -- Ease desired back to 0 once player is clearly ahead; keep yielding during the release
+      -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
       if ai[i].yielding and playerIsClearlyAhead(c, player, CLEAR_AHEAD_M) then
         releasing = true
       end
+
+      -- Side-by-side guard: if the target side is occupied, don’t cut in — create space first
+      local sideSign = YIELD_TO_LEFT and -1 or 1
+      local intendsSideMove = desired and math.abs(desired) > 0.01
+      local blocked, blocker = false, nil
+      if intendsSideMove then
+        blocked, blocker = _isTargetSideBlocked(i, sideSign)
+      end
+
       local targetDesired
-      if releasing then
+      if blocked and not releasing then
+        -- keep indicators on, but don’t move laterally yet
+        targetDesired = approach((ai[i].desired or desired or 0), 0.0, RAMP_RELEASE_MPS * dt)
+      elseif releasing then
         targetDesired = approach((ai[i].desired or desired or 0), 0.0, RAMP_RELEASE_MPS * dt)
       else
         targetDesired = desired or 0
       end
       ai[i].desired = targetDesired
 
-      local willYield = math.abs(targetDesired) > 0.01
+      -- Keep yielding (blinkers) while blocked to signal intent
+      local willYield = (blocked and intendsSideMove) or (math.abs(targetDesired) > 0.01)
       if willYield then ai[i].yieldTime = (ai[i].yieldTime or 0) + dt end
       ai[i].yielding = willYield
 
-      local stepMps = releasing and RAMP_RELEASE_MPS or RAMP_SPEED_MPS
+      -- Apply offset with appropriate ramp (slower when releasing or blocked)
+      local stepMps = (releasing or blocked) and RAMP_RELEASE_MPS or RAMP_SPEED_MPS
       ai[i].offset = approach(ai[i].offset, targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
+
+      -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
+      if blocked and intendsSideMove then
+        local cap = math.max((c.speedKmh or 0) - BLOCK_SLOWDOWN_KMH, 5)
+        if physics.setAITopSpeed then physics.setAITopSpeed(i, cap) end
+        if physics.setAIThrottleLimit then physics.setAIThrottleLimit(i, BLOCK_THROTTLE_LIMIT) end
+        ai[i].reason = 'Blocked by car on side'
+      else
+        if physics.setAITopSpeed then physics.setAITopSpeed(i, 1e9) end
+        if physics.setAIThrottleLimit then physics.setAIThrottleLimit(i, 1) end
+      end
 
       _applyIndicators(i, willYield, c, ai[i])
     end
