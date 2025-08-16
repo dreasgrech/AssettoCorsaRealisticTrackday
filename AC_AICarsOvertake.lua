@@ -397,7 +397,7 @@ function script.update(dt)
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
     if c and c.isAIControlled ~= false then
-      ai[i] = ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0, blink=nil }
+      ai[i] = ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0, blink=nil, blocked=false, blocker=nil }
       local desired, dist, prog, sideMax, reason = desiredOffsetFor(c, player, ai[i].yielding)
 
       ai[i].dist = dist or ai[i].dist or 0
@@ -418,6 +418,8 @@ function script.update(dt)
       if intendsSideMove then
         blocked, blocker = _isTargetSideBlocked(i, sideSign)
       end
+      ai[i].blocked = blocked
+      ai[i].blocker = blocker
 
       local targetDesired
       if blocked and not releasing then
@@ -471,6 +473,10 @@ local function _indicatorStatusText(st)
     end
   end
   if st.hasTL == false then indTxt = indTxt .. '(!)' end
+  if st.blocked then
+    -- explicitly show that we’re not able to move over yet and are slowing to create space
+    indTxt = (indTxt ~= '-' and (indTxt .. ' ') or '') .. '(slowing due to yield lane blocked)'
+  end
   return indTxt
 end
 
@@ -487,14 +493,13 @@ function script.Draw3D(dt)
   end
   for i = 1, (sim.carsCount or 0) - 1 do
     local st = ai[i]
-    if st and (math.abs(st.offset or 0) > 0.02) then
+    if st and (math.abs(st.offset or 0) > 0.02 or st.blocked) then
       local c = ac.getCar(i)
       if c then
         local txt = string.format(
-        -- "-> %.1fm  (des=%.1f, max=%.1f, d=%.1fm)", 
-        -- st.offset, st.desired or 0, st.maxRight or 0, st.dist or 0)
-        "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f", 
-        i, st.dist, math.floor(c.speedKmh or 0), st.offset or 0)
+          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
+          i, st.dist, math.floor(c.speedKmh or 0), st.offset or 0
+        )
         do
           local indTxt = _indicatorStatusText(st)
           txt = txt .. string.format("  ind=%s", indTxt)
