@@ -41,8 +41,15 @@ end
 
 -- Tooltip helper that works across CSP builds
 local function tip(text)
-    local hovered=false; if ui and ui.itemHovered then local ok,res=pcall(ui.itemHovered); hovered=ok and res or false end
-    if not hovered then return end
+    local hovered=false;
+    if ui and ui.itemHovered then
+        local ok, res=pcall(ui.itemHovered); hovered=ok and res or false
+    end
+
+    if not hovered then
+        return
+    end
+
     local fn = ui and (ui.setTooltip or ui.tooltip or ui.toolTip)
     if fn then pcall(fn, text); return end
     local b = ui and (ui.beginTooltip or ui.beginItemTooltip)
@@ -56,6 +63,37 @@ local function _persist(k, v)
     SettingsManager.SETTINGS[k] = v
     SettingsManager._dirty = true
     SettingsManager._autosaveTimer = 0
+end
+
+function UIManager.draw3DOverheadText()
+  if not SettingsManager.debugDraw then return end
+  local sim = ac.getSim(); if not sim then return end
+  if SettingsManager.drawOnTop then
+    -- draw over everything (no depth testing)
+    render.setDepthMode(render.DepthMode.Off)
+  else
+    -- respect existing depth, don’t write to depth (debug text won’t “punch holes”)
+    render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
+  end
+
+  for i = 1, (sim.carsCount or 0) - 1 do
+    local st = CarManager.ai[i]
+    if st and (math.abs(st.offset or 0) > 0.02 or st.blocked) then
+      local c = ac.getCar(i)
+      if c then
+        local txt = string.format(
+          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
+          i, st.dist, math.floor(c.speedKmh or 0), st.offset or 0
+        )
+        do
+          local indTxt = UIManager.indicatorStatusText(st)
+          txt = txt .. string.format("  ind=%s", indTxt)
+        end
+        render.debugText(c.position + vec3(0, 2.0, 0), txt)
+      end
+    end
+  end
+
 end
 
 function UIManager.drawControls()

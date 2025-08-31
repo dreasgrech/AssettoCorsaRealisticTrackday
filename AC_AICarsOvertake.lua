@@ -8,11 +8,6 @@ CarOperations = require("CarOperations")
 CarManager = require("CarManager")
 
 ----------------------------------------------------------------------
--- State
-----------------------------------------------------------------------
-local enabled, debugDraw, drawOnTop = true, true, true
-
-----------------------------------------------------------------------
 -- CSP entry points
 ----------------------------------------------------------------------
 function script.__init__()
@@ -40,7 +35,7 @@ function script.update(dt)
     end
   end
 
-  if not enabled then return end
+  if not SettingsManager.enabled then return end
   if not physics or not physics.setAISplineAbsoluteOffset then return end
   local sim = ac.getSim(); if not sim then return end
   local player = ac.getCar(0); if not player then return end
@@ -111,33 +106,7 @@ end
 
 -- manifest [RENDER_CALLBACKS]
 function script.Draw3D(dt)
-  if not debugDraw then return end
-  local sim = ac.getSim(); if not sim then return end
-  if drawOnTop then
-    -- draw over everything (no depth testing)
-    render.setDepthMode(render.DepthMode.Off)
-  else
-    -- respect existing depth, don’t write to depth (debug text won’t “punch holes”)
-    render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
-  end
-    
-  for i = 1, (sim.carsCount or 0) - 1 do
-    local st = CarManager.ai[i]
-    if st and (math.abs(st.offset or 0) > 0.02 or st.blocked) then
-      local c = ac.getCar(i)
-      if c then
-        local txt = string.format(
-          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
-          i, st.dist, math.floor(c.speedKmh or 0), st.offset or 0
-        )
-        do
-          local indTxt = UIManager.indicatorStatusText(st)
-          txt = txt .. string.format("  ind=%s", indTxt)
-        end
-        render.debugText(c.position + vec3(0, 2.0, 0), txt)
-      end
-    end
-  end
+  UIManager.draw3DOverheadText()
   render.setDepthMode(render.DepthMode.Normal)
 end
 
