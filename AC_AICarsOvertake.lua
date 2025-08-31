@@ -2,6 +2,7 @@
 -- Nudge AI to one side so the player can pass on the other (Trackday / AI Flood).
 
 SettingsManager = require("SettingsManager")
+MathHelpers = require("MathHelpers")
 
 ----------------------------------------------------------------------
 -- State
@@ -165,24 +166,16 @@ local function _ensureConfig()
   end
 end
 
-local function vsub(a,b) return vec3(a.x-b.x, a.y-b.y, a.z-b.z) end
-local function vlen(v) return math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z) end
-local function dot(a,b) return a.x*b.x + a.y*b.y + a.z*b.z end
-local function approach(curr, target, step)
-  if math.abs(target - curr) <= step then return target end
-  return curr + (target > curr and step or -step)
-end
-
 local function isBehind(aiCar, playerCar)
   local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
-  local rel = vsub(playerCar.position, aiCar.position)
-  return dot(fwd, rel) < 0
+  local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
+  return MathHelpers.dot(fwd, rel) < 0
 end
 
 local function playerIsClearlyAhead(aiCar, playerCar, meters)
   local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
-  local rel = vsub(playerCar.position, aiCar.position)
-  return dot(fwd, rel) > meters
+  local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
+  return MathHelpers.dot(fwd, rel) > meters
 end
 
 -- Tooltip helper that works across CSP builds
@@ -206,9 +199,9 @@ local function _isTargetSideBlocked(i, sideSign)
     if j ~= i then
       local o = ac.getCar(j)
       if o and o.isAIControlled ~= false then
-        local rel = vsub(o.position, me.position)
-        local lat = dot(rel, mySide)   -- + right, - left
-        local fwd = dot(rel, myLook)   -- + ahead, - behind
+        local rel = MathHelpers.vsub(o.position, me.position)
+        local lat = MathHelpers.dot(rel, mySide)   -- + right, - left
+        local fwd = MathHelpers.dot(rel, myLook)   -- + ahead, - behind
         if lat*sideSign > 0 and math.abs(lat) <= SettingsManager.BLOCK_SIDE_LAT_M and math.abs(fwd) <= SettingsManager.BLOCK_SIDE_LONG_M then
           return true, j
         end
@@ -256,7 +249,7 @@ local function desiredOffsetFor(aiCar, playerCar, wasYielding)
   if aiCar.speedKmh < SettingsManager.MIN_AI_SPEED_KMH then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
 
   local radius = wasYielding and (SettingsManager.DETECT_INNER_M + SettingsManager.DETECT_HYSTERESIS_M) or SettingsManager.DETECT_INNER_M
-  local d = vlen(vsub(playerCar.position, aiCar.position))
+  local d = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, aiCar.position))
   if d > radius then return 0, d, nil, nil, 'Too far (outside detect radius)' end
 
   -- Keep yielding even if the player pulls alongside; only stop once the player is clearly ahead.
@@ -362,9 +355,9 @@ function script.update(dt)
       local targetDesired
       if blocked and not releasing then
         -- keep indicators on, but don’t move laterally yet
-        targetDesired = approach((ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
+        targetDesired = MathHelpers.approach((ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       elseif releasing then
-        targetDesired = approach((ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
+        targetDesired = MathHelpers.approach((ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       else
         targetDesired = desired or 0
       end
@@ -377,7 +370,7 @@ function script.update(dt)
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
       local stepMps = (releasing or blocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.RAMP_SPEED_MPS
-      ai[i].offset = approach(ai[i].offset, targetDesired, stepMps * dt)
+      ai[i].offset = MathHelpers.approach(ai[i].offset, targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
@@ -523,7 +516,7 @@ function script.windowMain(dt)
       local c = ac.getCar(i); local st = ai[i]
       if c and st then
         local d = st.dist
-        if not d or d <= 0 then d = vlen(vsub(player.position, c.position)) end
+        if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, c.position)) end
         table.insert(order, { i = i, d = d })
       end
     end
