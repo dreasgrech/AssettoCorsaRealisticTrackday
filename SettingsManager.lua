@@ -37,6 +37,12 @@ local SETTINGS_SPEC = {
     { k = 'YIELD_TO_LEFT',        get = function() return YIELD_TO_LEFT end,        set = function(v) YIELD_TO_LEFT = v end },
 }
 
+SettingsManager.SETTINGS = {}
+SettingsManager.CFG_PATH = nil
+SettingsManager.lastSaveOk = false
+SettingsManager.lastSaveErr = ''
+
+
 -- Fast lookup by key for UI code
 SettingsManager.SETTINGS_SPEC_BY_KEY = {}
 for _, s in ipairs(SETTINGS_SPEC) do SettingsManager.SETTINGS_SPEC_BY_KEY[s.k] = s end

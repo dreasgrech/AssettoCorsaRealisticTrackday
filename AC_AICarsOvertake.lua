@@ -15,8 +15,6 @@ local P = (ac.store and ac.store('AC_AICarsOvertake'))
        or (ac.storage and ac.storage('AC_AICarsOvertake')) or nil
 
 -- File persistence
-local SETTINGS = {}
-local CFG_PATH, lastSaveOk, lastSaveErr = nil, false, ''
 local CFG_RESOLVE_NOTE = "<none>"
 local BOOT_LOADING = true
 
@@ -96,30 +94,30 @@ local function _ensureParentDir(path)
 end
 
 local function _loadIni()
-  SETTINGS = {}
-  CFG_PATH = _userIniPath()
-  if not CFG_PATH then return end
-  local f = io.open(CFG_PATH, "r"); if not f then return end
+  SettingsManager.SETTINGS = {}
+  SettingsManager.CFG_PATH = _userIniPath()
+  if not SettingsManager.CFG_PATH then return end
+  local f = io.open(SettingsManager.CFG_PATH, "r"); if not f then return end
   for line in f:lines() do
     local k, v = line:match("^%s*([%w_]+)%s*=%s*([^;%s]+)")
     if k and v then
       if v == "true" then v = true
       elseif v == "false" then v = false
       else v = tonumber(v) or v end
-      SETTINGS[k] = v
+      SettingsManager.SETTINGS[k] = v
     end
   end
   f:close()
 end
 
 local function _saveIni()
-  if ac and ac.log then ac.log('AC_AICarsOvertake: saving to '..tostring(CFG_PATH)) end
+  if ac and ac.log then ac.log('AC_AICarsOvertake: saving to '..tostring(SettingsManager.CFG_PATH)) end
   if BOOT_LOADING then return end
-  CFG_PATH = CFG_PATH or _userIniPath()
-  if not CFG_PATH then lastSaveOk=false; lastSaveErr='no path'; return end
-  _ensureParentDir(CFG_PATH)
-  local f, err = io.open(CFG_PATH, "w")
-  if not f then lastSaveOk=false; lastSaveErr=tostring(err or 'open failed'); return end
+  SettingsManager.CFG_PATH = SettingsManager.CFG_PATH or _userIniPath()
+  if not SettingsManager.CFG_PATH then SettingsManager.lastSaveOk=false; SettingsManager.lastSaveErr='no path'; return end
+  _ensureParentDir(SettingsManager.CFG_PATH)
+  local f, err = io.open(SettingsManager.CFG_PATH, "w")
+  if not f then SettingsManager.lastSaveOk=false; SettingsManager.lastSaveErr=tostring(err or 'open failed'); return end
   local function w(k, v)
     if type(v) == "boolean" then v = v and "true" or "false" end
     f:write(("%s=%s\n"):format(k, tostring(v)))
@@ -127,14 +125,14 @@ local function _saveIni()
   -- deduplicated write:
   SettingsManager.settings_write(w)
   f:close()
-  lastSaveOk, lastSaveErr = true, ''
-  if ac.log then ac.log(('AC_AICarsOvertake: saved %s'):format(CFG_PATH)) end
+  SettingsManager.lastSaveOk, SettingsManager.lastSaveErr = true, ''
+  if ac.log then ac.log(('AC_AICarsOvertake: saved %s'):format(SettingsManager.CFG_PATH)) end
 end
 
 -- DEBOUNCED PERSIST: mark dirty and coalesce writes in update()
 local function _persist(k, v)
   if P then P[k] = v end
-  SETTINGS[k] = v
+  SettingsManager.SETTINGS[k] = v
   _dirty = true
   _autosaveTimer = 0
 end
@@ -143,17 +141,17 @@ end
 local _lazyResolved = false
 
 local function _ensureConfig()
-  if _lazyResolved and CFG_PATH then return end
-  if not CFG_PATH then
+  if _lazyResolved and SettingsManager.CFG_PATH then return end
+  if not SettingsManager.CFG_PATH then
     local p = _userIniPath()
     if p then
-      CFG_PATH = p
+      SettingsManager.CFG_PATH = p
       local wasBoot = BOOT_LOADING
       BOOT_LOADING = true
       _loadIni()
 
       -- Apply loaded values immediately (so sliders show persisted values)
-      SettingsManager.settings_apply(SETTINGS)
+      SettingsManager.settings_apply(SettingsManager.SETTINGS)
 
       -- unlock saving *after* values are applied
       BOOT_LOADING = false
@@ -278,7 +276,7 @@ function script.__init__()
   _loadIni()
 
   -- Apply values from INI and storage (keeps UI in sync on start)
-  SettingsManager.settings_apply(SETTINGS)
+  SettingsManager.settings_apply(SettingsManager.SETTINGS)
   SettingsManager.settings_apply(P)
 
   BOOT_LOADING = false
@@ -310,7 +308,7 @@ function script.update(dt)
   _ensureConfig()
 
   -- Debounced autosave: write once after no changes for SAVE_INTERVAL
-  if not BOOT_LOADING and CFG_PATH then
+  if not BOOT_LOADING and SettingsManager.CFG_PATH then
     if _dirty then
       _autosaveTimer = _autosaveTimer + dt
       if _autosaveTimer >= SAVE_INTERVAL then
@@ -487,10 +485,10 @@ end
 function script.windowMain(dt)
   _ensureConfig()
   ui.text(string.format('AI Cars Overtake — yield %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
-  if CFG_PATH then
+  if SettingsManager.CFG_PATH then
     ui.text(string.format('Config: %s  [via %s] %s',
-      CFG_PATH, CFG_RESOLVE_NOTE or '?',
-      lastSaveOk and '(saved ✓)' or (lastSaveErr ~= '' and ('(save error: '..lastSaveErr..')') or '')
+      SettingsManager.CFG_PATH, CFG_RESOLVE_NOTE or '?',
+      SettingsManager.lastSaveOk and '(saved ✓)' or (SettingsManager.lastSaveErr ~= '' and ('(save error: '..SettingsManager.lastSaveErr..')') or '')
     ))
   else
     ui.text(string.format('Config: <unresolved>  [via %s]', CFG_RESOLVE_NOTE or '?'))
