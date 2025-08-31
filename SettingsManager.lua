@@ -37,6 +37,11 @@ local SETTINGS_SPEC = {
     { k = 'YIELD_TO_LEFT',        get = function() return YIELD_TO_LEFT end,        set = function(v) YIELD_TO_LEFT = v end },
 }
 
+-- Storage that survives LAZY unloads
+SettingsManager.P = (ac.store and ac.store('AC_AICarsOvertake'))
+        or (ac.storage and ac.storage('AC_AICarsOvertake')) or nil
+
+
 SettingsManager.SETTINGS = {}
 SettingsManager.CFG_PATH = nil
 SettingsManager.lastSaveOk = false
@@ -50,6 +55,14 @@ SettingsManager.BOOT_LOADING = true
 SettingsManager.SAVE_INTERVAL = 0.5   -- seconds without changes before we write
 SettingsManager._autosaveTimer = 0
 SettingsManager._dirty = false
+
+function SettingsManager._ensureParentDir(path)
+    local dir = path:match("^(.*[/\\])[^/\\]+$")
+    if not dir or dir == '' then return end
+    if os and os.execute then os.execute(('mkdir "%s"'):format(dir)) end
+    if ac and ac.executeShell then ac.executeShell(('cmd /c mkdir "%s" >nul 2>&1'):format(dir)) end
+    if execute then execute(('cmd /c mkdir "%s" >nul 2>&1'):format(dir)) end
+end
 
 -- Path join (supports both / and \)
 function SettingsManager._join(a, b)

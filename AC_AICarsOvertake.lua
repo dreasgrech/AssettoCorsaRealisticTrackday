@@ -10,10 +10,6 @@ MathHelpers = require("MathHelpers")
 local enabled, debugDraw, drawOnTop = true, true, true
 local ai = {}  -- [i] = { offset, yielding, dist, desired, maxRight, prog, reason, yieldTime, blink }
 
--- Storage that survives LAZY unloads
-local P = (ac.store and ac.store('AC_AICarsOvertake'))
-       or (ac.storage and ac.storage('AC_AICarsOvertake')) or nil
-
 ----------------------------------------------------------------------
 -- Centralized settings spec & helpers (NO functional changes)
 ----------------------------------------------------------------------
@@ -68,14 +64,6 @@ local function _userIniPath()
   return nil
 end
 
-local function _ensureParentDir(path)
-  local dir = path:match("^(.*[/\\])[^/\\]+$")
-  if not dir or dir == '' then return end
-  if os and os.execute then os.execute(('mkdir "%s"'):format(dir)) end
-  if ac and ac.executeShell then ac.executeShell(('cmd /c mkdir "%s" >nul 2>&1'):format(dir)) end
-  if execute then execute(('cmd /c mkdir "%s" >nul 2>&1'):format(dir)) end
-end
-
 local function _loadIni()
   SettingsManager.SETTINGS = {}
   SettingsManager.CFG_PATH = _userIniPath()
@@ -98,7 +86,7 @@ local function _saveIni()
   if SettingsManager.BOOT_LOADING then return end
   SettingsManager.CFG_PATH = SettingsManager.CFG_PATH or _userIniPath()
   if not SettingsManager.CFG_PATH then SettingsManager.lastSaveOk=false; SettingsManager.lastSaveErr='no path'; return end
-  _ensureParentDir(SettingsManager.CFG_PATH)
+  SettingsManager._ensureParentDir(SettingsManager.CFG_PATH)
   local f, err = io.open(SettingsManager.CFG_PATH, "w")
   if not f then SettingsManager.lastSaveOk=false; SettingsManager.lastSaveErr=tostring(err or 'open failed'); return end
   local function w(k, v)
@@ -114,7 +102,7 @@ end
 
 -- DEBOUNCED PERSIST: mark dirty and coalesce writes in update()
 local function _persist(k, v)
-  if P then P[k] = v end
+  if SettingsManager.P then SettingsManager.P[k] = v end
   SettingsManager.SETTINGS[k] = v
   SettingsManager._dirty = true
   SettingsManager._autosaveTimer = 0
@@ -260,7 +248,7 @@ function script.__init__()
 
   -- Apply values from INI and storage (keeps UI in sync on start)
   SettingsManager.settings_apply(SettingsManager.SETTINGS)
-  SettingsManager.settings_apply(P)
+  SettingsManager.settings_apply(SettingsManager.P)
 
   SettingsManager.BOOT_LOADING = false
 end
