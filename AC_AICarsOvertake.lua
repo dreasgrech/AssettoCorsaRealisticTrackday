@@ -36,7 +36,6 @@ function script.update(dt)
   end
 
   if not SettingsManager.enabled then return end
-  if not physics or not physics.setAISplineAbsoluteOffset then return end
   local sim = ac.getSim(); if not sim then return end
   local player = ac.getCar(0); if not player then return end
 
@@ -91,12 +90,12 @@ function script.update(dt)
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if blocked and intendsSideMove then
         local cap = math.max((c.speedKmh or 0) - SettingsManager.BLOCK_SLOWDOWN_KMH, 5)
-        if physics.setAITopSpeed then physics.setAITopSpeed(i, cap) end
-        if physics.setAIThrottleLimit then physics.setAIThrottleLimit(i, SettingsManager.BLOCK_THROTTLE_LIMIT) end
+        physics.setAITopSpeed(i, cap)
+        physics.setAIThrottleLimit(i, SettingsManager.BLOCK_THROTTLE_LIMIT)
         CarManager.ai[i].reason = 'Blocked by car on side'
       else
-        if physics.setAITopSpeed then physics.setAITopSpeed(i, 1e9) end
-        if physics.setAIThrottleLimit then physics.setAIThrottleLimit(i, 1) end
+        physics.setAITopSpeed(i, 1e9)
+        physics.setAIThrottleLimit(i, 1)
       end
 
       CarOperations._applyIndicators(i, willYield, c, CarManager.ai[i])
