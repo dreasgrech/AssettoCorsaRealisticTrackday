@@ -17,6 +17,28 @@ local UI_ELEMENTS = {
     { kind='slider',   k='MIN_AI_SPEED_KMH', label='Min AI speed (km/h)', min=0, max=120, tip='Don’t ask AI to yield if its own speed is below this (corners/traffic).' },
 }
 
+function UIManager.indicatorStatusText(st)
+    local l = st.indLeft
+    local r = st.indRight
+    local ph = st.indPhase
+    local indTxt = '-'
+    if l or r then
+        if l and r then
+            indTxt = ph and 'H*' or 'H'
+        elseif l then
+            indTxt = ph and 'L*' or 'L'
+        else
+            indTxt = ph and 'R*' or 'R'
+        end
+    end
+    if st.hasTL == false then indTxt = indTxt .. '(!)' end
+    if st.blocked then
+        -- explicitly show that we’re not able to move over yet and are slowing to create space
+        indTxt = (indTxt ~= '-' and (indTxt .. ' ') or '') .. '(slowing due to yield lane blocked)'
+    end
+    return indTxt
+end
+
 -- Tooltip helper that works across CSP builds
 local function tip(text)
     local hovered=false; if ui and ui.itemHovered then local ok,res=pcall(ui.itemHovered); hovered=ok and res or false end
@@ -60,7 +82,5 @@ function UIManager.drawControls()
         end
     end
 end
-
-
 
 return UIManager

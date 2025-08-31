@@ -223,28 +223,6 @@ function script.update(dt)
   end
 end
 
-local function _indicatorStatusText(st)
-  local l = st.indLeft
-  local r = st.indRight
-  local ph = st.indPhase
-  local indTxt = '-'
-  if l or r then
-    if l and r then
-      indTxt = ph and 'H*' or 'H'
-    elseif l then
-      indTxt = ph and 'L*' or 'L'
-    else
-      indTxt = ph and 'R*' or 'R'
-    end
-  end
-  if st.hasTL == false then indTxt = indTxt .. '(!)' end
-  if st.blocked then
-    -- explicitly show that we’re not able to move over yet and are slowing to create space
-    indTxt = (indTxt ~= '-' and (indTxt .. ' ') or '') .. '(slowing due to yield lane blocked)'
-  end
-  return indTxt
-end
-
 -- manifest [RENDER_CALLBACKS]
 function script.Draw3D(dt)
   if not debugDraw then return end
@@ -256,6 +234,7 @@ function script.Draw3D(dt)
     -- respect existing depth, don’t write to depth (debug text won’t “punch holes”)
     render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
   end
+    
   for i = 1, (sim.carsCount or 0) - 1 do
     local st = ai[i]
     if st and (math.abs(st.offset or 0) > 0.02 or st.blocked) then
@@ -266,7 +245,7 @@ function script.Draw3D(dt)
           i, st.dist, math.floor(c.speedKmh or 0), st.offset or 0
         )
         do
-          local indTxt = _indicatorStatusText(st)
+          local indTxt = UIManager.indicatorStatusText(st)
           txt = txt .. string.format("  ind=%s", indTxt)
         end
         render.debugText(c.position + vec3(0, 2.0, 0), txt)
@@ -328,7 +307,7 @@ function script.windowMain(dt)
             i, distShown, math.floor(c.speedKmh or 0), st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
           )
           do
-            local indTxt = _indicatorStatusText(st)
+            local indTxt = UIManager.indicatorStatusText(st)
             base = base .. string.format("  ind=%s", indTxt)
           end
           if st.yielding then
