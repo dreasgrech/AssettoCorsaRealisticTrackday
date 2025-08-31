@@ -56,6 +56,32 @@ SettingsManager.SAVE_INTERVAL = 0.5   -- seconds without changes before we write
 SettingsManager._autosaveTimer = 0
 SettingsManager._dirty = false
 
+local _lazyResolved = false
+
+function SettingsManager._ensureConfig()
+    if _lazyResolved and SettingsManager.CFG_PATH then return end
+    if not SettingsManager.CFG_PATH then
+        local p = SettingsManager._userIniPath()
+        if p then
+            SettingsManager.CFG_PATH = p
+            local wasBoot = SettingsManager.BOOT_LOADING
+            SettingsManager.BOOT_LOADING = true
+            SettingsManager._loadIni()
+
+            -- Apply loaded values immediately (so sliders show persisted values)
+            SettingsManager.settings_apply(SettingsManager.SETTINGS)
+
+            -- unlock saving *after* values are applied
+            SettingsManager.BOOT_LOADING = false
+            if wasBoot == false then SettingsManager.BOOT_LOADING = false end
+            _lazyResolved = true
+            return
+        end
+    else
+        _lazyResolved = true
+    end
+end
+
 function SettingsManager._loadIni()
     SettingsManager.SETTINGS = {}
     SettingsManager.CFG_PATH = SettingsManager._userIniPath()

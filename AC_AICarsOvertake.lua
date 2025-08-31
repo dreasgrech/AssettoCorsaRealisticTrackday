@@ -18,33 +18,6 @@ local function _persist(k, v)
   SettingsManager._autosaveTimer = 0
 end
 
--- Lazy config resolver
-local _lazyResolved = false
-
-local function _ensureConfig()
-  if _lazyResolved and SettingsManager.CFG_PATH then return end
-  if not SettingsManager.CFG_PATH then
-    local p = SettingsManager._userIniPath()
-    if p then
-      SettingsManager.CFG_PATH = p
-      local wasBoot = SettingsManager.BOOT_LOADING
-      SettingsManager.BOOT_LOADING = true
-      SettingsManager._loadIni()
-
-      -- Apply loaded values immediately (so sliders show persisted values)
-      SettingsManager.settings_apply(SettingsManager.SETTINGS)
-
-      -- unlock saving *after* values are applied
-      SettingsManager.BOOT_LOADING = false
-      if wasBoot == false then SettingsManager.BOOT_LOADING = false end
-      _lazyResolved = true
-      return
-    end
-  else
-    _lazyResolved = true
-  end
-end
-
 local function isBehind(aiCar, playerCar)
   local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
   local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
@@ -186,7 +159,7 @@ local function _applyIndicators(i, willYield, car, st)
 end
 
 function script.update(dt)
-  _ensureConfig()
+  SettingsManager._ensureConfig()
 
   -- Debounced autosave: write once after no changes for SAVE_INTERVAL
   if not SettingsManager.BOOT_LOADING and SettingsManager.CFG_PATH then
@@ -364,7 +337,7 @@ local function drawControls()
 end
 
 function script.windowMain(dt)
-  _ensureConfig()
+  SettingsManager._ensureConfig()
   ui.text(string.format('AI Cars Overtake — yield %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
   if SettingsManager.CFG_PATH then
     ui.text(string.format('Config: %s  [via %s] %s',
