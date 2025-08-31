@@ -1,27 +1,7 @@
 -- AC_AICarsOvertake.lua
 -- Nudge AI to one side so the player can pass on the other (Trackday / AI Flood).
 
-----------------------------------------------------------------------
--- Tunables (live-editable in UI)
-----------------------------------------------------------------------
-local DETECT_INNER_M        = 42.0
-local DETECT_HYSTERESIS_M   = 60.0
-local MIN_PLAYER_SPEED_KMH  = 70.0
-local MIN_SPEED_DELTA_KMH   = 5.0
-local YIELD_OFFSET_M        = 2.5
-local RAMP_SPEED_MPS        = 4.0
-local RAMP_RELEASE_MPS      = 1.6  -- slower return to center to avoid “snap back” once player is clearly ahead
-local CLEAR_AHEAD_M         = 6.0
-local RIGHT_MARGIN_M        = 0.6
-local LIST_RADIUS_FILTER_M  = 400.0
-local MIN_AI_SPEED_KMH      = 35.0
-local YIELD_TO_LEFT         = false
-
--- Side-by-side guard: if target side is occupied, don’t cut in — briefly slow down to find a gap
-local BLOCK_SIDE_LAT_M      = 2.2   -- lateral threshold (m) to consider another AI “next to” us
-local BLOCK_SIDE_LONG_M     = 5.5   -- longitudinal window (m) for “alongside”
-local BLOCK_SLOWDOWN_KMH    = 12.0  -- temporary speed reduction while blocked
-local BLOCK_THROTTLE_LIMIT  = 0.92  -- soft throttle cap while blocked (1 = no cap)
+SettingsManager = require("SettingsManager")
 
 ----------------------------------------------------------------------
 -- State
@@ -48,48 +28,6 @@ local _dirty = false
 ----------------------------------------------------------------------
 -- Centralized settings spec & helpers (NO functional changes)
 ----------------------------------------------------------------------
-local SETTINGS_SPEC = {
-  { k = 'enabled',              get = function() return enabled end,              set = function(v) enabled = v end },
-  { k = 'debugDraw',            get = function() return debugDraw end,            set = function(v) debugDraw = v end },
-  { k = 'drawOnTop',            get = function() return drawOnTop end,            set = function(v) drawOnTop = v end },
-  { k = 'DETECT_INNER_M',       get = function() return DETECT_INNER_M end,       set = function(v) DETECT_INNER_M = v end },
-  { k = 'DETECT_HYSTERESIS_M',  get = function() return DETECT_HYSTERESIS_M end,  set = function(v) DETECT_HYSTERESIS_M = v end },
-  { k = 'MIN_PLAYER_SPEED_KMH', get = function() return MIN_PLAYER_SPEED_KMH end, set = function(v) MIN_PLAYER_SPEED_KMH = v end },
-  { k = 'MIN_SPEED_DELTA_KMH',  get = function() return MIN_SPEED_DELTA_KMH end,  set = function(v) MIN_SPEED_DELTA_KMH = v end },
-  { k = 'YIELD_OFFSET_M',       get = function() return YIELD_OFFSET_M end,       set = function(v) YIELD_OFFSET_M = v end },
-  { k = 'RAMP_SPEED_MPS',       get = function() return RAMP_SPEED_MPS end,       set = function(v) RAMP_SPEED_MPS = v end },
-  { k = 'RAMP_RELEASE_MPS',     get = function() return RAMP_RELEASE_MPS end,     set = function(v) RAMP_RELEASE_MPS = v end },
-  { k = 'CLEAR_AHEAD_M',        get = function() return CLEAR_AHEAD_M end,        set = function(v) CLEAR_AHEAD_M = v end },
-  { k = 'RIGHT_MARGIN_M',       get = function() return RIGHT_MARGIN_M end,       set = function(v) RIGHT_MARGIN_M = v end },
-  { k = 'LIST_RADIUS_FILTER_M', get = function() return LIST_RADIUS_FILTER_M end, set = function(v) LIST_RADIUS_FILTER_M = v end },
-  { k = 'MIN_AI_SPEED_KMH',     get = function() return MIN_AI_SPEED_KMH end,     set = function(v) MIN_AI_SPEED_KMH = v end },
-  { k = 'YIELD_TO_LEFT',        get = function() return YIELD_TO_LEFT end,        set = function(v) YIELD_TO_LEFT = v end },
-}
-
--- Fast lookup by key for UI code
-local SETTINGS_SPEC_BY_KEY = {}
-for _, s in ipairs(SETTINGS_SPEC) do SETTINGS_SPEC_BY_KEY[s.k] = s end
-
-local function settings_apply(t)
-  if not t then return end
-  for _, s in ipairs(SETTINGS_SPEC) do
-    local v = t[s.k]; if v ~= nil then s.set(v) end
-  end
-  if P then
-    for _, s in ipairs(SETTINGS_SPEC) do P[s.k] = s.get() end
-  end
-end
-
-local function settings_snapshot()
-  local out = {}
-  for _, s in ipairs(SETTINGS_SPEC) do out[s.k] = s.get() end
-  return out
-end
-
-local function settings_write(writekv)
-  for _, s in ipairs(SETTINGS_SPEC) do writekv(s.k, s.get()) end
-end
-
 -- Path join (supports both / and \)
 local function _join(a, b)
   if not a or a == '' then return b end
@@ -186,7 +124,7 @@ local function _saveIni()
     f:write(("%s=%s\n"):format(k, tostring(v)))
   end
   -- deduplicated write:
-  settings_write(w)
+  SettingsManager.settings_write(w)
   f:close()
   lastSaveOk, lastSaveErr = true, ''
   if ac.log then ac.log(('AC_AICarsOvertake: saved %s'):format(CFG_PATH)) end
@@ -214,7 +152,7 @@ local function _ensureConfig()
       _loadIni()
 
       -- Apply loaded values immediately (so sliders show persisted values)
-      settings_apply(SETTINGS)
+      SettingsManager.settings_apply(SETTINGS)
 
       -- unlock saving *after* values are applied
       BOOT_LOADING = false
@@ -271,7 +209,7 @@ local function _isTargetSideBlocked(i, sideSign)
         local rel = vsub(o.position, me.position)
         local lat = dot(rel, mySide)   -- + right, - left
         local fwd = dot(rel, myLook)   -- + ahead, - behind
-        if lat*sideSign > 0 and math.abs(lat) <= BLOCK_SIDE_LAT_M and math.abs(fwd) <= BLOCK_SIDE_LONG_M then
+        if lat*sideSign > 0 and math.abs(lat) <= SettingsManager.BLOCK_SIDE_LAT_M and math.abs(fwd) <= SettingsManager.BLOCK_SIDE_LONG_M then
           return true, j
         end
       end
@@ -288,11 +226,11 @@ local function clampSideOffsetMeters(aiWorldPos, desired, sideSign)
   local prog = ac.worldCoordinateToTrackProgress(aiWorldPos); if prog < 0 then return desired end
   local sides = ac.getTrackAISplineSides(prog) -- vec2(left, right)
   if sideSign > 0 then
-    local maxRight = math.max(0, (sides.y or 0) - RIGHT_MARGIN_M)
+    local maxRight = math.max(0, (sides.y or 0) - SettingsManager.RIGHT_MARGIN_M)
     local clamped  = math.max(0, math.min(desired, maxRight))
     return clamped, prog, maxRight
   else
-    local maxLeft  = math.max(0, (sides.x or 0) - RIGHT_MARGIN_M)
+    local maxLeft  = math.max(0, (sides.x or 0) - SettingsManager.RIGHT_MARGIN_M)
     local clamped  = math.min(0, math.max(desired, -maxLeft))
     return clamped, prog, maxLeft
   end
@@ -302,22 +240,22 @@ end
 -- Decision
 ----------------------------------------------------------------------
 local function desiredOffsetFor(aiCar, playerCar, wasYielding)
-  if playerCar.speedKmh < MIN_PLAYER_SPEED_KMH then return 0, nil, nil, nil, 'Player below minimum speed' end
+  if playerCar.speedKmh < SettingsManager.MIN_PLAYER_SPEED_KMH then return 0, nil, nil, nil, 'Player below minimum speed' end
 
   -- If cars are abeam (neither clearly behind nor clearly ahead), or we’re already yielding and
   -- player isn’t clearly ahead yet, ignore closing-speed — yielding must persist mid-pass.
   local behind = isBehind(aiCar, playerCar)
-  local aheadClear = playerIsClearlyAhead(aiCar, playerCar, CLEAR_AHEAD_M)
+  local aheadClear = playerIsClearlyAhead(aiCar, playerCar, SettingsManager.CLEAR_AHEAD_M)
   local sideBySide = (not behind) and (not aheadClear)
   local ignoreDelta = sideBySide or (wasYielding and not aheadClear)
 
-  if not ignoreDelta and (playerCar.speedKmh - aiCar.speedKmh) < MIN_SPEED_DELTA_KMH then
+  if not ignoreDelta and (playerCar.speedKmh - aiCar.speedKmh) < SettingsManager.MIN_SPEED_DELTA_KMH then
     return 0, nil, nil, nil, 'No closing speed vs AI'
   end
 
-  if aiCar.speedKmh < MIN_AI_SPEED_KMH then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
+  if aiCar.speedKmh < SettingsManager.MIN_AI_SPEED_KMH then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
 
-  local radius = wasYielding and (DETECT_INNER_M + DETECT_HYSTERESIS_M) or DETECT_INNER_M
+  local radius = wasYielding and (SettingsManager.DETECT_INNER_M + SettingsManager.DETECT_HYSTERESIS_M) or SettingsManager.DETECT_INNER_M
   local d = vlen(vsub(playerCar.position, aiCar.position))
   if d > radius then return 0, d, nil, nil, 'Too far (outside detect radius)' end
 
@@ -330,8 +268,8 @@ local function desiredOffsetFor(aiCar, playerCar, wasYielding)
     end
   end
 
-  local sideSign = YIELD_TO_LEFT and -1 or 1
-  local target   = sideSign * YIELD_OFFSET_M
+  local sideSign = SettingsManager.YIELD_TO_LEFT and -1 or 1
+  local target   = sideSign * SettingsManager.YIELD_OFFSET_M
   local clamped, prog, sideMax = clampSideOffsetMeters(aiCar.position, target, sideSign)
   if (sideSign > 0 and (clamped or 0) <= 0.01) or (sideSign < 0 and (clamped or 0) >= -0.01) then
     return 0, d, prog, sideMax, 'No room on chosen side'
@@ -347,8 +285,8 @@ function script.__init__()
   _loadIni()
 
   -- Apply values from INI and storage (keeps UI in sync on start)
-  settings_apply(SETTINGS)
-  settings_apply(P)
+  SettingsManager.settings_apply(SETTINGS)
+  SettingsManager.settings_apply(P)
 
   BOOT_LOADING = false
 end
@@ -356,7 +294,7 @@ end
 local function _indModeForYielding(willYield)
   local TL = ac and ac.TurningLights
   if willYield then
-    return TL and ((YIELD_TO_LEFT and TL.Left) or TL.Right) or ((YIELD_TO_LEFT and 1) or 2)
+    return TL and ((SettingsManager.YIELD_TO_LEFT and TL.Left) or TL.Right) or ((SettingsManager.YIELD_TO_LEFT and 1) or 2)
   end
   return TL and TL.None or 0
 end
@@ -407,12 +345,12 @@ function script.update(dt)
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
-      if ai[i].yielding and playerIsClearlyAhead(c, player, CLEAR_AHEAD_M) then
+      if ai[i].yielding and playerIsClearlyAhead(c, player, SettingsManager.CLEAR_AHEAD_M) then
         releasing = true
       end
 
       -- Side-by-side guard: if the target side is occupied, don’t cut in — create space first
-      local sideSign = YIELD_TO_LEFT and -1 or 1
+      local sideSign = SettingsManager.YIELD_TO_LEFT and -1 or 1
       local intendsSideMove = desired and math.abs(desired) > 0.01
       local blocked, blocker = false, nil
       if intendsSideMove then
@@ -424,9 +362,9 @@ function script.update(dt)
       local targetDesired
       if blocked and not releasing then
         -- keep indicators on, but don’t move laterally yet
-        targetDesired = approach((ai[i].desired or desired or 0), 0.0, RAMP_RELEASE_MPS * dt)
+        targetDesired = approach((ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       elseif releasing then
-        targetDesired = approach((ai[i].desired or desired or 0), 0.0, RAMP_RELEASE_MPS * dt)
+        targetDesired = approach((ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       else
         targetDesired = desired or 0
       end
@@ -438,15 +376,15 @@ function script.update(dt)
       ai[i].yielding = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
-      local stepMps = (releasing or blocked) and RAMP_RELEASE_MPS or RAMP_SPEED_MPS
+      local stepMps = (releasing or blocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.RAMP_SPEED_MPS
       ai[i].offset = approach(ai[i].offset, targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if blocked and intendsSideMove then
-        local cap = math.max((c.speedKmh or 0) - BLOCK_SLOWDOWN_KMH, 5)
+        local cap = math.max((c.speedKmh or 0) - SettingsManager.BLOCK_SLOWDOWN_KMH, 5)
         if physics.setAITopSpeed then physics.setAITopSpeed(i, cap) end
-        if physics.setAIThrottleLimit then physics.setAIThrottleLimit(i, BLOCK_THROTTLE_LIMIT) end
+        if physics.setAIThrottleLimit then physics.setAIThrottleLimit(i, SettingsManager.BLOCK_THROTTLE_LIMIT) end
         ai[i].reason = 'Blocked by car on side'
       else
         if physics.setAITopSpeed then physics.setAITopSpeed(i, 1e9) end
@@ -530,7 +468,7 @@ local UI_ELEMENTS = {
 
 local function drawControls()
   for _, e in ipairs(UI_ELEMENTS) do
-    local spec = SETTINGS_SPEC_BY_KEY[e.k]
+    local spec = SettingsManager.SETTINGS_SPEC_BY_KEY[e.k]
     if spec then
       if e.kind == 'checkbox' then
         local cur = spec.get()
@@ -555,7 +493,7 @@ end
 
 function script.windowMain(dt)
   _ensureConfig()
-  ui.text(string.format('AI Cars Overtake — yield %s', (YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
+  ui.text(string.format('AI Cars Overtake — yield %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
   if CFG_PATH then
     ui.text(string.format('Config: %s  [via %s] %s',
       CFG_PATH, CFG_RESOLVE_NOTE or '?',
@@ -596,7 +534,7 @@ function script.windowMain(dt)
       local c = ac.getCar(i); local st = ai[i]
       if c and st then
         local distShown = order[n].d or st.dist or 0
-        local show = (LIST_RADIUS_FILTER_M <= 0) or (distShown <= LIST_RADIUS_FILTER_M)
+        local show = (SettingsManager.LIST_RADIUS_FILTER_M <= 0) or (distShown <= SettingsManager.LIST_RADIUS_FILTER_M)
         if show then
           local base = string.format(
             -- "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
