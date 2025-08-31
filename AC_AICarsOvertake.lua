@@ -4,24 +4,13 @@
 SettingsManager = require("SettingsManager")
 MathHelpers = require("MathHelpers")
 UIManager = require("UIManager")
+CarOperations = require("CarOperations")
 
 ----------------------------------------------------------------------
 -- State
 ----------------------------------------------------------------------
 local enabled, debugDraw, drawOnTop = true, true, true
 local ai = {}  -- [i] = { offset, yielding, dist, desired, maxRight, prog, reason, yieldTime, blink }
-
-local function isBehind(aiCar, playerCar)
-  local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
-  local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
-  return MathHelpers.dot(fwd, rel) < 0
-end
-
-local function playerIsClearlyAhead(aiCar, playerCar, meters)
-  local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
-  local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
-  return MathHelpers.dot(fwd, rel) > meters
-end
 
 -- Check if target side of car i is occupied by another AI alongside (prevents unsafe lateral move)
 local function _isTargetSideBlocked(i, sideSign)
@@ -71,8 +60,8 @@ local function desiredOffsetFor(aiCar, playerCar, wasYielding)
 
   -- If cars are abeam (neither clearly behind nor clearly ahead), or we’re already yielding and
   -- player isn’t clearly ahead yet, ignore closing-speed — yielding must persist mid-pass.
-  local behind = isBehind(aiCar, playerCar)
-  local aheadClear = playerIsClearlyAhead(aiCar, playerCar, SettingsManager.CLEAR_AHEAD_M)
+  local behind = CarOperations.isBehind(aiCar, playerCar)
+  local aheadClear = CarOperations.playerIsClearlyAhead(aiCar, playerCar, SettingsManager.CLEAR_AHEAD_M)
   local sideBySide = (not behind) and (not aheadClear)
   local ignoreDelta = sideBySide or (wasYielding and not aheadClear)
 
@@ -172,7 +161,7 @@ function script.update(dt)
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
-      if ai[i].yielding and playerIsClearlyAhead(c, player, SettingsManager.CLEAR_AHEAD_M) then
+      if ai[i].yielding and CarOperations.playerIsClearlyAhead(c, player, SettingsManager.CLEAR_AHEAD_M) then
         releasing = true
       end
 
