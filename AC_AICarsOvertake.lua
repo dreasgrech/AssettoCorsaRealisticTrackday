@@ -5,12 +5,12 @@ SettingsManager = require("SettingsManager")
 MathHelpers = require("MathHelpers")
 UIManager = require("UIManager")
 CarOperations = require("CarOperations")
+CarManager = require("CarManager")
 
 ----------------------------------------------------------------------
 -- State
 ----------------------------------------------------------------------
 local enabled, debugDraw, drawOnTop = true, true, true
-local ai = {}  -- [i] = { offset, yielding, dist, desired, maxRight, prog, reason, yieldTime, blink }
 
 ----------------------------------------------------------------------
 -- CSP entry points
@@ -48,17 +48,17 @@ function script.update(dt)
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
     if c and c.isAIControlled ~= false then
-      ai[i] = ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0, blink=nil, blocked=false, blocker=nil }
-      local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, ai[i].yielding)
+      CarManager.ai[i] = CarManager.ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0, blink=nil, blocked=false, blocker=nil }
+      local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, CarManager.ai[i].yielding)
 
-      ai[i].dist = dist or ai[i].dist or 0
-      ai[i].prog = prog or -1
-      ai[i].maxRight = sideMax or 0
-      ai[i].reason = reason or '-'
+      CarManager.ai[i].dist = dist or CarManager.ai[i].dist or 0
+      CarManager.ai[i].prog = prog or -1
+      CarManager.ai[i].maxRight = sideMax or 0
+      CarManager.ai[i].reason = reason or '-'
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
-      if ai[i].yielding and CarOperations.playerIsClearlyAhead(c, player, SettingsManager.CLEAR_AHEAD_M) then
+      if CarManager.ai[i].yielding and CarOperations.playerIsClearlyAhead(c, player, SettingsManager.CLEAR_AHEAD_M) then
         releasing = true
       end
 
@@ -69,42 +69,42 @@ function script.update(dt)
       if intendsSideMove then
         blocked, blocker = CarOperations._isTargetSideBlocked(i, sideSign)
       end
-      ai[i].blocked = blocked
-      ai[i].blocker = blocker
+      CarManager.ai[i].blocked = blocked
+      CarManager.ai[i].blocker = blocker
 
       local targetDesired
       if blocked and not releasing then
         -- keep indicators on, but don’t move laterally yet
-        targetDesired = MathHelpers.approach((ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
+        targetDesired = MathHelpers.approach((CarManager.ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       elseif releasing then
-        targetDesired = MathHelpers.approach((ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
+        targetDesired = MathHelpers.approach((CarManager.ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       else
         targetDesired = desired or 0
       end
-      ai[i].desired = targetDesired
+      CarManager.ai[i].desired = targetDesired
 
       -- Keep yielding (blinkers) while blocked to signal intent
       local willYield = (blocked and intendsSideMove) or (math.abs(targetDesired) > 0.01)
-      if willYield then ai[i].yieldTime = (ai[i].yieldTime or 0) + dt end
-      ai[i].yielding = willYield
+      if willYield then CarManager.ai[i].yieldTime = (CarManager.ai[i].yieldTime or 0) + dt end
+      CarManager.ai[i].yielding = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
       local stepMps = (releasing or blocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.RAMP_SPEED_MPS
-      ai[i].offset = MathHelpers.approach(ai[i].offset, targetDesired, stepMps * dt)
-      physics.setAISplineAbsoluteOffset(i, ai[i].offset, true)
+      CarManager.ai[i].offset = MathHelpers.approach(CarManager.ai[i].offset, targetDesired, stepMps * dt)
+      physics.setAISplineAbsoluteOffset(i, CarManager.ai[i].offset, true)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if blocked and intendsSideMove then
         local cap = math.max((c.speedKmh or 0) - SettingsManager.BLOCK_SLOWDOWN_KMH, 5)
         if physics.setAITopSpeed then physics.setAITopSpeed(i, cap) end
         if physics.setAIThrottleLimit then physics.setAIThrottleLimit(i, SettingsManager.BLOCK_THROTTLE_LIMIT) end
-        ai[i].reason = 'Blocked by car on side'
+        CarManager.ai[i].reason = 'Blocked by car on side'
       else
         if physics.setAITopSpeed then physics.setAITopSpeed(i, 1e9) end
         if physics.setAIThrottleLimit then physics.setAIThrottleLimit(i, 1) end
       end
 
-      CarOperations._applyIndicators(i, willYield, c, ai[i])
+      CarOperations._applyIndicators(i, willYield, c, CarManager.ai[i])
     end
   end
 end
@@ -122,7 +122,7 @@ function script.Draw3D(dt)
   end
     
   for i = 1, (sim.carsCount or 0) - 1 do
-    local st = ai[i]
+    local st = CarManager.ai[i]
     if st and (math.abs(st.offset or 0) > 0.02 or st.blocked) then
       local c = ac.getCar(i)
       if c then
@@ -160,7 +160,7 @@ function script.windowMain(dt)
   local totalAI, yieldingCount = 0, 0
   if sim then
     totalAI = math.max(0, (sim.carsCount or 1) - 1)
-    for i = 1, totalAI do if ai[i] and ai[i].yielding then yieldingCount = yieldingCount + 1 end end
+    for i = 1, totalAI do if CarManager.ai[i] and CarManager.ai[i].yielding then yieldingCount = yieldingCount + 1 end end
   end
   ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
@@ -170,7 +170,7 @@ function script.windowMain(dt)
     -- sort cars by distance to player for clearer list
     local order = {}
     for i = 1, totalAI do
-      local c = ac.getCar(i); local st = ai[i]
+      local c = ac.getCar(i); local st = CarManager.ai[i]
       if c and st then
         local d = st.dist
         if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, c.position)) end
@@ -181,7 +181,7 @@ function script.windowMain(dt)
 
     for n = 1, #order do
       local i = order[n].i
-      local c = ac.getCar(i); local st = ai[i]
+      local c = ac.getCar(i); local st = CarManager.ai[i]
       if c and st then
         local distShown = order[n].d or st.dist or 0
         local show = (SettingsManager.LIST_RADIUS_FILTER_M <= 0) or (distShown <= SettingsManager.LIST_RADIUS_FILTER_M)
