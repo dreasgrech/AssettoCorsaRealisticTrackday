@@ -14,30 +14,13 @@ local ai = {}  -- [i] = { offset, yielding, dist, desired, maxRight, prog, reaso
 local P = (ac.store and ac.store('AC_AICarsOvertake'))
        or (ac.storage and ac.storage('AC_AICarsOvertake')) or nil
 
--- File persistence
-local CFG_RESOLVE_NOTE = "<none>"
-local BOOT_LOADING = true
-
--- >>> Debounced save (declared before _persist to avoid global/local split)
-local SAVE_INTERVAL = 0.5   -- seconds without changes before we write
-local _autosaveTimer = 0
-local _dirty = false
--- <<< Debounced save
-
 ----------------------------------------------------------------------
 -- Centralized settings spec & helpers (NO functional changes)
 ----------------------------------------------------------------------
--- Path join (supports both / and \)
-local function _join(a, b)
-  if not a or a == '' then return b end
-  local last = a:sub(-1); if last == '\\' or last == '/' then return a..b end
-  return a..'\\'..b
-end
-
 -- Returns absolute path to our INI or nil; also sets CFG_RESOLVE_NOTE
 local function _userIniPath()
   local function set(p, how)
-    if p and #p > 0 then CFG_RESOLVE_NOTE = how; return p end
+    if p and #p > 0 then SettingsManager.CFG_RESOLVE_NOTE = how; return p end
     return nil
   end
 
@@ -45,7 +28,7 @@ local function _userIniPath()
   if ac and ac.getFolder and ac.FolderID and ac.FolderID.DocumentsAC then
     local ok, docs = pcall(function() return ac.getFolder(ac.FolderID.DocumentsAC) end)
     if ok and docs and #docs > 0 then
-      return set(_join(_join(docs, "cfg"), "AC_AICarsOvertake.ini"), "DocumentsAC")
+      return set(SettingsManager._join(SettingsManager._join(docs, "cfg"), "AC_AICarsOvertake.ini"), "DocumentsAC")
     end
   end
   -- 2) Try Logs→Cfg swap (Docs\Assetto Corsa\logs → \cfg)
@@ -54,7 +37,7 @@ local function _userIniPath()
     if ok and logs and #logs > 0 then
       local cfgRoot = logs:gsub("[/\\]logs[/\\]?$", "\\cfg")
       if cfgRoot ~= logs then
-        return set(_join(cfgRoot, "AC_AICarsOvertake.ini"), "Logs→Cfg")
+        return set(SettingsManager._join(cfgRoot, "AC_AICarsOvertake.ini"), "Logs→Cfg")
       end
     end
   end
@@ -62,26 +45,26 @@ local function _userIniPath()
   if ac and ac.getFolder and ac.FolderID and ac.FolderID.Root then
     local ok, root = pcall(function() return ac.getFolder(ac.FolderID.Root) end)
     if ok and root and #root > 0 then
-      return set(_join(root, "apps\\lua\\AC_AICarsOvertake\\AC_AICarsOvertake.ini"), "Root")
+      return set(SettingsManager._join(root, "apps\\lua\\AC_AICarsOvertake\\AC_AICarsOvertake.ini"), "Root")
     end
   end
   -- 4) Plain Documents → “Assetto Corsa\cfg”
   if ac and ac.getFolder and ac.FolderID and ac.FolderID.Documents then
     local ok, docs = pcall(function() return ac.getFolder(ac.FolderID.Documents) end)
     if ok and docs and #docs > 0 then
-      local acDocs = docs:lower():find("assetto corsa", 1, true) and docs or _join(docs, "Assetto Corsa")
-      return set(_join(_join(acDocs, "cfg"), "AC_AICarsOvertake.ini"), "Documents")
+      local acDocs = docs:lower():find("assetto corsa", 1, true) and docs or SettingsManager._join(docs, "Assetto Corsa")
+      return set(SettingsManager._join(SettingsManager._join(acDocs, "cfg"), "AC_AICarsOvertake.ini"), "Documents")
     end
   end
   -- 5) OS env fallback
   if os and os.getenv then
     local user = os.getenv('USERPROFILE') or ((os.getenv('HOMEDRIVE') or '')..(os.getenv('HOMEPATH') or ''))
     if user and #user > 0 then
-      return set(_join(_join(_join(user, "Documents"), "Assetto Corsa\\cfg"), "AC_AICarsOvertake.ini"), "Env Documents")
+      return set(SettingsManager._join(SettingsManager._join(SettingsManager._join(user, "Documents"), "Assetto Corsa\\cfg"), "AC_AICarsOvertake.ini"), "Env Documents")
     end
   end
 
-  CFG_RESOLVE_NOTE = "<failed>"
+  SettingsManager.CFG_RESOLVE_NOTE = "<failed>"
   return nil
 end
 
@@ -112,7 +95,7 @@ end
 
 local function _saveIni()
   if ac and ac.log then ac.log('AC_AICarsOvertake: saving to '..tostring(SettingsManager.CFG_PATH)) end
-  if BOOT_LOADING then return end
+  if SettingsManager.BOOT_LOADING then return end
   SettingsManager.CFG_PATH = SettingsManager.CFG_PATH or _userIniPath()
   if not SettingsManager.CFG_PATH then SettingsManager.lastSaveOk=false; SettingsManager.lastSaveErr='no path'; return end
   _ensureParentDir(SettingsManager.CFG_PATH)
@@ -133,8 +116,8 @@ end
 local function _persist(k, v)
   if P then P[k] = v end
   SettingsManager.SETTINGS[k] = v
-  _dirty = true
-  _autosaveTimer = 0
+  SettingsManager._dirty = true
+  SettingsManager._autosaveTimer = 0
 end
 
 -- Lazy config resolver
@@ -146,16 +129,16 @@ local function _ensureConfig()
     local p = _userIniPath()
     if p then
       SettingsManager.CFG_PATH = p
-      local wasBoot = BOOT_LOADING
-      BOOT_LOADING = true
+      local wasBoot = SettingsManager.BOOT_LOADING
+      SettingsManager.BOOT_LOADING = true
       _loadIni()
 
       -- Apply loaded values immediately (so sliders show persisted values)
       SettingsManager.settings_apply(SettingsManager.SETTINGS)
 
       -- unlock saving *after* values are applied
-      BOOT_LOADING = false
-      if wasBoot == false then BOOT_LOADING = false end
+      SettingsManager.BOOT_LOADING = false
+      if wasBoot == false then SettingsManager.BOOT_LOADING = false end
       _lazyResolved = true
       return
     end
@@ -279,7 +262,7 @@ function script.__init__()
   SettingsManager.settings_apply(SettingsManager.SETTINGS)
   SettingsManager.settings_apply(P)
 
-  BOOT_LOADING = false
+  SettingsManager.BOOT_LOADING = false
 end
 
 local function _indModeForYielding(willYield)
@@ -308,12 +291,12 @@ function script.update(dt)
   _ensureConfig()
 
   -- Debounced autosave: write once after no changes for SAVE_INTERVAL
-  if not BOOT_LOADING and SettingsManager.CFG_PATH then
-    if _dirty then
-      _autosaveTimer = _autosaveTimer + dt
-      if _autosaveTimer >= SAVE_INTERVAL then
+  if not SettingsManager.BOOT_LOADING and SettingsManager.CFG_PATH then
+    if SettingsManager._dirty then
+      SettingsManager._autosaveTimer = SettingsManager._autosaveTimer + dt
+      if SettingsManager._autosaveTimer >= SettingsManager.SAVE_INTERVAL then
         _saveIni()
-        _dirty = false
+        SettingsManager._dirty = false
       end
     end
   end
@@ -487,11 +470,11 @@ function script.windowMain(dt)
   ui.text(string.format('AI Cars Overtake — yield %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
   if SettingsManager.CFG_PATH then
     ui.text(string.format('Config: %s  [via %s] %s',
-      SettingsManager.CFG_PATH, CFG_RESOLVE_NOTE or '?',
+      SettingsManager.CFG_PATH, SettingsManager.CFG_RESOLVE_NOTE or '?',
       SettingsManager.lastSaveOk and '(saved ✓)' or (SettingsManager.lastSaveErr ~= '' and ('(save error: '..SettingsManager.lastSaveErr..')') or '')
     ))
   else
-    ui.text(string.format('Config: <unresolved>  [via %s]', CFG_RESOLVE_NOTE or '?'))
+    ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.CFG_RESOLVE_NOTE or '?'))
   end
 
   drawControls()
@@ -560,5 +543,5 @@ end
 
 -- Save when window is closed/hidden as a last resort
 function script.onHide()
-  if _dirty then _saveIni(); _dirty = false end
+  if SettingsManager._dirty then _saveIni(); SettingsManager._dirty = false end
 end

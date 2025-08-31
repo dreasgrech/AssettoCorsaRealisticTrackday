@@ -42,6 +42,21 @@ SettingsManager.CFG_PATH = nil
 SettingsManager.lastSaveOk = false
 SettingsManager.lastSaveErr = ''
 
+-- File persistence
+SettingsManager.CFG_RESOLVE_NOTE = "<none>"
+SettingsManager.BOOT_LOADING = true
+
+-- >>> Debounced save (declared before _persist to avoid global/local split)
+SettingsManager.SAVE_INTERVAL = 0.5   -- seconds without changes before we write
+SettingsManager._autosaveTimer = 0
+SettingsManager._dirty = false
+
+-- Path join (supports both / and \)
+function SettingsManager._join(a, b)
+    if not a or a == '' then return b end
+    local last = a:sub(-1); if last == '\\' or last == '/' then return a..b end
+    return a..'\\'..b
+end
 
 -- Fast lookup by key for UI code
 SettingsManager.SETTINGS_SPEC_BY_KEY = {}
