@@ -46,9 +46,9 @@ function script.update(dt)
       CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
       CarManager.ai[i] = CarManager.ai[i] or { 
         -- offset=0.0, 
-        yielding=false, 
-        dist=0, 
-        desired=0, 
+        -- yielding=false, 
+        -- dist=0, 
+        -- desired=0, 
         maxRight=0, 
         prog=-1, 
         reason='-', 
@@ -58,16 +58,16 @@ function script.update(dt)
         blocker=nil 
       }
 
-      local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, CarManager.ai[i].yielding)
+      local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, CarManager.cars_yielding[i])
 
-      CarManager.ai[i].dist = dist or CarManager.ai[i].dist or 0
+      CarManager.cars_dist[i] = dist or CarManager.cars_dist[i] or 0
       CarManager.ai[i].prog = prog or -1
       CarManager.ai[i].maxRight = sideMax or 0
       CarManager.ai[i].reason = reason or '-'
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
-      if CarManager.ai[i].yielding and CarOperations.playerIsClearlyAhead(c, player, SettingsManager.CLEAR_AHEAD_M) then
+      if CarManager.cars_yielding[i] and CarOperations.playerIsClearlyAhead(c, player, SettingsManager.CLEAR_AHEAD_M) then
         releasing = true
       end
 
@@ -84,18 +84,22 @@ function script.update(dt)
       local targetDesired
       if blocked and not releasing then
         -- keep indicators on, but don’t move laterally yet
-        targetDesired = MathHelpers.approach((CarManager.ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
+        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       elseif releasing then
-        targetDesired = MathHelpers.approach((CarManager.ai[i].desired or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
+        -- TODO: Is there a bug here because this line is exactly the same as above?
+        -- TODO: Is there a bug here because this line is exactly the same as above?
+        -- TODO: Is there a bug here because this line is exactly the same as above?
+        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       else
         targetDesired = desired or 0
       end
-      CarManager.ai[i].desired = targetDesired
+
+      CarManager.cars_desired[i] = targetDesired
 
       -- Keep yielding (blinkers) while blocked to signal intent
       local willYield = (blocked and intendsSideMove) or (math.abs(targetDesired) > 0.01)
       if willYield then CarManager.ai[i].yieldTime = (CarManager.ai[i].yieldTime or 0) + dt end
-      CarManager.ai[i].yielding = willYield
+      CarManager.cars_yielding[i] = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
       local stepMps = (releasing or blocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.RAMP_SPEED_MPS
@@ -143,8 +147,8 @@ function script.windowMain(dt)
   local totalAI, yieldingCount = 0, 0
   if sim then
     totalAI = math.max(0, (sim.carsCount or 1) - 1)
-    for i = 1, totalAI do 
-      if CarManager.ai[i] and CarManager.ai[i].yielding then
+    for i = 1, totalAI do
+      if CarManager.cars_yielding[i] then
         yieldingCount = yieldingCount + 1
       end
     end
@@ -159,7 +163,7 @@ function script.windowMain(dt)
     for i = 1, totalAI do
       local c = ac.getCar(i); local st = CarManager.ai[i]
       if c and st then
-        local d = st.dist
+        local d = CarManager.cars_dist[i]
         if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, c.position)) end
         table.insert(order, { i = i, d = d })
       end
@@ -170,20 +174,20 @@ function script.windowMain(dt)
       local i = order[n].i
       local c = ac.getCar(i); local st = CarManager.ai[i]
       if c and st then
-        local distShown = order[n].d or st.dist or 0
+        local distShown = order[n].d or CarManager.cars_dist[i] or 0
         local show = (SettingsManager.LIST_RADIUS_FILTER_M <= 0) or (distShown <= SettingsManager.LIST_RADIUS_FILTER_M)
         if show then
           local base = string.format(
             -- "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
             "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
             -- i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
-            i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
+            i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, st.maxRight or 0, st.prog or -1
           )
           do
             local indTxt = UIManager.indicatorStatusText(st)
             base = base .. string.format("  ind=%s", indTxt)
           end
-          if st.yielding then
+          if CarManager.cars_yielding[i] then
             if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
               ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
               ui.text(base)

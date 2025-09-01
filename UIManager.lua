@@ -84,7 +84,7 @@ function UIManager.draw3DOverheadText()
       if c then
         local txt = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
-          i, st.dist, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0
+          i, CarManager.cars_dist[i], math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0
         )
         do
           local indTxt = UIManager.indicatorStatusText(st)
