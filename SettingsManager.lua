@@ -206,8 +206,8 @@ function SettingsManager.settings_apply(t)
     for _, s in ipairs(SETTINGS_SPEC) do
         local v = t[s.k]; if v ~= nil then s.set(v) end
     end
-    if P then
-        for _, s in ipairs(SETTINGS_SPEC) do P[s.k] = s.get() end
+    if SettingsManager.P then
+        for _, s in ipairs(SETTINGS_SPEC) do SettingsManager.P[s.k] = s.get() end
     end
 end
 
