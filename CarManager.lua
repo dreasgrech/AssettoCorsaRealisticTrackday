@@ -44,6 +44,16 @@ local function setInitializedDefaults(carIndex)
   physics.setAIStopCounter(carIndex, 0)
   physics.setGentleStop(carIndex, false)
 
+  local car = ac.getCar(carIndex)
+  if car then
+    ac.setTargetCar(carIndex)
+
+    -- Turn off any turning lights
+    if car.hasTurningLights then
+        ac.setTurningLights(ac.TurningLights.None)
+    end
+  end
+
   evacuating[carIndex] = false
 end
 
@@ -70,50 +80,119 @@ ac.onCarJumped(-1, function(carIndex)
   setInitializedDefaults(carIndex) -- reset state on jump/reset
 end)
 
+-- Utility: compute world right-vector at a given progress on the AI spline
+local function trackRightAt(progress)
+  -- sample two points along the spline to get forward dir
+  local p0 = ac.trackProgressToWorldCoordinate(progress)
+  local p1 = ac.trackProgressToWorldCoordinate((progress + 0.0008) % 1.0)
+  local fwd = (p1 - p0):normalize()
+  -- Y-up world, so right = up × fwd
+  local up  = vec3(0,1,0)
+  local right = up:cross(fwd):normalize()
+  return right
+end
+
+-- Physics shove for ~1.2 s (applied at physics rate) to push the car onto grass
+local function shoveCarSideways(carIndex, towardsRight, strengthN, seconds)
+  CarManager.cars_reason[carIndex] = "starting to shove car sideways to evacuate"
+
+  -- optional safety bubble: disable car-car collisions during the shove
+  physics.disableCarCollisions(carIndex, true)            -- re-enable later  :contentReference[oaicite:0]{index=0}
+
+  -- cap pace while evacuating
+  physics.setAITopSpeed(carIndex, 15)                     -- 15 km/h crawl   :contentReference[oaicite:1]{index=1}
+  physics.setAIThrottleLimit(carIndex, 0.25)
+
+  -- Let tyres-out be OK globally in modes; prevents penalties while off track (optional)
+  physics.setAllowedTyresOut(-1)
+
+  -- launch short physics worker to add lateral force each physics tick
+  local startedAt = os.clock()
+  physics.startPhysicsWorker([[
+    local idx, dirSign, forceN = __input.idx, __input.sign, __input.forceN
+    function script.update(dt)
+      -- grab current progress and compute world right
+      local car = ac.getCar(idx)
+      if not car then return end
+      local prog = math.max(0, math.min(1, ac.worldCoordinateToTrack(car.position).z))
+      local p0   = ac.trackProgressToWorldCoordinate(prog)
+      local p1   = ac.trackProgressToWorldCoordinate((prog + 0.001) % 1.0)
+      local fwd  = (p1 - p0):normalize()
+      local right= vec3(0,1,0):cross(fwd):normalize()
+      local sideways = right * dirSign
+
+      -- apply a gentle, ground-level push near CG (world coords)
+      local applyPos = car.position + vec3(0, 0.2, 0)
+      physics.addForce(idx, applyPos, false, sideways * forceN * dt, false, -1)
+      ac.log("lateral log")
+    end
+  ]], { idx = carIndex, sign = (towardsRight and 1 or -1), forceN = strengthN }, function(err) end)   -- :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5} :contentReference[oaicite:6]{index=6}
+      -- CarManager.cars_reason[carIndex] = "applying lateral shove to evacuate in loop"
+
+  -- stop the shove and restore things later
+  setTimeout(function()
+    CarManager.cars_reason[carIndex] = "Stopping shove to restore things later"
+    physics.disableCarCollisions(carIndex, false)         -- restore collisions
+    physics.setAITopSpeed(carIndex, math.huge)
+    physics.setAIThrottleLimit(carIndex, 1)
+  end, seconds or 1.2)
+end
+
 -- Monitor collisions
 ac.onCarCollision(-1, function (carIndex)
-  -- ignore for local player car
-  -- if carIndex == 0 then return end
-
   local car = ac.getCar(carIndex)
   if not car or evacuating[carIndex] then return end
 
-  -- Lights on
+  -- hazard lights
   ac.setTargetCar(carIndex)
   if car.hasTurningLights then
     ac.setTurningLights(ac.TurningLights.Hazards)
   end
 
-  -- Figure which side to go to (prefer nearest safe edge)
-  local tcoords = ac.worldCoordinateToTrack(car.position)               -- X∈[-1..1], Z∈[0..1]
+  -- pick nearer side and immediately bias AI to that edge (cheap hint)
+  local tcoords = ac.worldCoordinateToTrack(car.position)                       -- X∈[-1..1], Z∈[0..1]  :contentReference[oaicite:8]{index=8}
   local prog    = tcoords.z
-  local sides   = ac.getTrackAISplineSides(prog)                        -- vec2(leftDist, rightDist)
-
-  -- Choose the closer boundary to clear the racing line quicker:
-  -- if you prefer always-right, replace this with: local goRight = true
+  local sides   = ac.getTrackAISplineSides(prog)                                -- vec2(leftDistM, rightDistM)  :contentReference[oaicite:9]{index=9}
   local goRight = (sides.y <= sides.x)
+  local edgeOffsetNorm = goRight and 0.98 or -0.98                              -- hug the boundary
+  physics.setAISplineOffset(carIndex, edgeOffsetNorm, true)                     -- override AI awareness       :contentReference[oaicite:10]{index=10}
 
-  -- Target lateral offset relative to spline:
-  --   +1 = full right, -1 = full left. Aim a bit inside the boundary (±0.85)
-  local targetOffset = goRight and 0.85 or -0.85
-
-  -- Phase 1: brief full stop, then roll to the side slowly
+  -- brief settle, then push onto grass if still near racing line
   evacuating[carIndex] = true
-  physics.setGentleStop(carIndex, true)
-  physics.setAIStopCounter(carIndex, 0.7)                               -- quick “collect yourself” pause
+  physics.setAIStopCounter(carIndex, 0.4)                                       -- momentary pause              :contentReference[oaicite:11]{index=11}
+  physics.setGentleStop(carIndex, true)                                         -- smooth decel                 :contentReference[oaicite:12]{index=12}
+
+  CarManager.cars_reason[carIndex] = ("Just collided.  Evacuating %s side at spline=%.3f") 
+                                :format(goRight and "RIGHT" or "LEFT", car.splinePosition)
+
+  CarManager.cars_yielding[carIndex] = false
 
   setTimeout(function()
-    -- Let it crawl at low speed while sliding to the chosen side
     physics.setAIStopCounter(carIndex, 0)
-    physics.setAITopSpeed(carIndex, 20)                                 -- ~20 km/h crawl
-    physics.setAIThrottleLimit(carIndex, 0.35)                          -- soft cap
+    physics.setGentleStop(carIndex, false)
 
-    -- Ask AI to hold to the side; override awareness so it doesn’t get “shy”
-    physics.setAISplineOffset(carIndex, targetOffset, true)
+    CarManager.cars_reason[carIndex] = "Starting to shove car off track to the " .. (goRight and "RIGHT" or "LEFT")
 
-    ac.log(("Car #%d (%s) evacuating %s side at spline=%.3f")
-      :format(carIndex, car.name, goRight and "RIGHT" or "LEFT", car.splinePosition))
-  end, 0.8)                                                              -- run after the brief stop
+    -- crawl and steer bias remain; now physically nudge off the tarmac
+    shoveCarSideways(carIndex, goRight, 9000, 1.2)                              -- ~9 kN lateral shove ~1.2 s   :contentReference[oaicite:13]{index=13}
+
+    -- if you want them to then head to pits once clear:
+    -- physics.setAIPitStopRequest(carIndex, true)                                 -- optional                     :contentReference[oaicite:14]{index=14}
+
+    ac.log(("Car #%d (%s) evacuating %s side at spline=%.3f") :format(carIndex, car.name, goRight and "RIGHT" or "LEFT", car.splinePosition))
+
+--[=====[ 
+    -- after a few seconds, clear state & lights so AI can recover
+    setTimeout(function()
+      physics.setAISplineOffset(carIndex, 0, true)
+      physics.setAITopSpeed(carIndex, math.huge)
+      physics.setAIThrottleLimit(carIndex, 1)
+      if car.hasTurningLights then ac.setTurningLights(ac.TurningLights.None) end
+      evacuating[carIndex] = nil
+    end, 6.0)
+--]=====]
+  end, 0.6)
+
 end)
 
 return CarManager
