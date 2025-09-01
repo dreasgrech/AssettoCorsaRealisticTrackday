@@ -1,7 +1,5 @@
 local CarManager = {}
 
-CarManager.ai = {} -- [i] = { offset, yielding, dist, desired, maxRight, prog, reason, yieldTime, blink }
-
 CarManager.cars_initialized = {}
 CarManager.cars_offset = {}
 CarManager.cars_yielding = {}

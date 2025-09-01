@@ -78,8 +78,7 @@ function UIManager.draw3DOverheadText()
 
   for i = 1, (sim.carsCount or 0) - 1 do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
-    local st = CarManager.ai[i]
-    if st and (math.abs(CarManager.cars_offset[i] or 0) > 0.02 or CarManager.cars_blocked[i]) then
+    if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_offset[i] or 0) > 0.02 or CarManager.cars_blocked[i]) then
       local c = ac.getCar(i)
       if c then
         local txt = string.format(

@@ -44,19 +44,6 @@ function script.update(dt)
     if c and c.isAIControlled ~= false then
 
       CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
-      CarManager.ai[i] = CarManager.ai[i] or { 
-        -- offset=0.0, 
-        -- yielding=false, 
-        -- dist=0, 
-        -- desired=0, 
-        -- maxRight=0, 
-        -- prog=-1, 
-        -- reason='-', 
-        -- yieldTime=0, 
-        -- blink=nil, 
-        -- blocked=false, 
-        -- blocker=nil 
-      }
 
       local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, CarManager.cars_yielding[i])
 
@@ -117,7 +104,7 @@ function script.update(dt)
         physics.setAIThrottleLimit(i, 1)
       end
 
-      CarOperations._applyIndicators(i, willYield, c, CarManager.ai[i])
+      CarOperations._applyIndicators(i, willYield, c)
     end
   end
 end
@@ -161,8 +148,8 @@ function script.windowMain(dt)
     -- sort cars by distance to player for clearer list
     local order = {}
     for i = 1, totalAI do
-      local c = ac.getCar(i); local st = CarManager.ai[i]
-      if c and st then
+      local c = ac.getCar(i)
+      if c and CarManager.cars_initialized[i] then
         local d = CarManager.cars_dist[i]
         if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, c.position)) end
         table.insert(order, { i = i, d = d })
@@ -172,8 +159,8 @@ function script.windowMain(dt)
 
     for n = 1, #order do
       local i = order[n].i
-      local c = ac.getCar(i); local st = CarManager.ai[i]
-      if c and st then
+      local c = ac.getCar(i)
+      if c and CarManager.cars_initialized[i] then
         local distShown = order[n].d or CarManager.cars_dist[i] or 0
         local show = (SettingsManager.LIST_RADIUS_FILTER_M <= 0) or (distShown <= SettingsManager.LIST_RADIUS_FILTER_M)
         if show then

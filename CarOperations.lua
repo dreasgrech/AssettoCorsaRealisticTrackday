@@ -101,7 +101,7 @@ local function _indModeForYielding(willYield)
     return TL and TL.None or 0
 end
 
-function CarOperations._applyIndicators(i, willYield, car, st)
+function CarOperations._applyIndicators(i, willYield, car)
     if not (ac and ac.setTurningLights and ac.setTargetCar) then return end
     local mode = _indModeForYielding(willYield)
     if ac.setTargetCar(i) then
