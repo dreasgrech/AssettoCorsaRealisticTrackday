@@ -93,6 +93,8 @@ function script.update(dt)
       CarManager.cars_offset[i] = MathHelpers.approach(CarManager.cars_offset[i], targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, CarManager.cars_offset[i], true)
 
+      -- TODO: also try using physics.setAICaution(...)
+
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if isTargetSideBlocked and intendsSideMove then
         local cap = math.max((c.speedKmh or 0) - SettingsManager.BLOCK_SLOWDOWN_KMH, 5)
