@@ -61,15 +61,15 @@ function script.update(dt)
       -- Side-by-side guard: if the target side is occupied, don’t cut in — create space first
       local sideSign = SettingsManager.YIELD_TO_LEFT and -1 or 1
       local intendsSideMove = desired and math.abs(desired) > 0.01
-      local blocked, blocker = false, nil
+      local isTargetSideBlocked, blockerCarIndex = false, nil
       if intendsSideMove then
-        blocked, blocker = CarOperations._isTargetSideBlocked(i, sideSign)
+        isTargetSideBlocked, blockerCarIndex = CarOperations.isTargetSideBlocked(i, sideSign)
       end
-      CarManager.cars_blocked[i] = blocked
-      CarManager.cars_blocker[i] = blocker
+      CarManager.cars_blocked[i] = isTargetSideBlocked
+      CarManager.cars_blocker[i] = blockerCarIndex
 
       local targetDesired
-      if blocked and not releasing then
+      if isTargetSideBlocked and not releasing then
         -- keep indicators on, but don’t move laterally yet
         targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
       elseif releasing then
@@ -84,17 +84,17 @@ function script.update(dt)
       CarManager.cars_desired[i] = targetDesired
 
       -- Keep yielding (blinkers) while blocked to signal intent
-      local willYield = (blocked and intendsSideMove) or (math.abs(targetDesired) > 0.01)
+      local willYield = (isTargetSideBlocked and intendsSideMove) or (math.abs(targetDesired) > 0.01)
       if willYield then CarManager.cars_yieldTime[i] = (CarManager.cars_yieldTime[i] or 0) + dt end
       CarManager.cars_yielding[i] = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
-      local stepMps = (releasing or blocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.RAMP_SPEED_MPS
+      local stepMps = (releasing or isTargetSideBlocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.RAMP_SPEED_MPS
       CarManager.cars_offset[i] = MathHelpers.approach(CarManager.cars_offset[i], targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, CarManager.cars_offset[i], true)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
-      if blocked and intendsSideMove then
+      if isTargetSideBlocked and intendsSideMove then
         local cap = math.max((c.speedKmh or 0) - SettingsManager.BLOCK_SLOWDOWN_KMH, 5)
         physics.setAITopSpeed(i, cap)
         physics.setAIThrottleLimit(i, SettingsManager.BLOCK_THROTTLE_LIMIT)
@@ -104,7 +104,7 @@ function script.update(dt)
         physics.setAIThrottleLimit(i, 1)
       end
 
-      CarOperations._applyIndicators(i, willYield, c)
+      CarOperations.applyIndicators(i, willYield, c)
     end
   end
 end

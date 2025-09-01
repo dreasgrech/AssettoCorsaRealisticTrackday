@@ -13,20 +13,20 @@ function CarOperations.playerIsClearlyAhead(aiCar, playerCar, meters)
 end
 
 -- Check if target side of car i is occupied by another AI alongside (prevents unsafe lateral move)
-function CarOperations._isTargetSideBlocked(i, sideSign)
-    local me = ac.getCar(i); if not me then return false end
+function CarOperations.isTargetSideBlocked(carIndex, sideSign)
+    local me = ac.getCar(carIndex); if not me then return false end
     local sim = ac.getSim(); if not sim then return false end
     local mySide = me.side or vec3(1,0,0)
     local myLook = me.look or vec3(0,0,1)
-    for j = 1, (sim.carsCount or 0) - 1 do
-        if j ~= i then
-            local o = ac.getCar(j)
+    for i = 1, (sim.carsCount or 0) - 1 do
+        if i ~= carIndex then
+            local o = ac.getCar(i)
             if o and o.isAIControlled ~= false then
                 local rel = MathHelpers.vsub(o.position, me.position)
                 local lat = MathHelpers.dot(rel, mySide)   -- + right, - left
                 local fwd = MathHelpers.dot(rel, myLook)   -- + ahead, - behind
                 if lat*sideSign > 0 and math.abs(lat) <= SettingsManager.BLOCK_SIDE_LAT_M and math.abs(fwd) <= SettingsManager.BLOCK_SIDE_LONG_M then
-                    return true, j
+                    return true, i
                 end
             end
         end
@@ -93,7 +93,7 @@ function CarOperations.desiredOffsetFor(aiCar, playerCar, wasYielding)
     return clamped, d, prog, sideMax, 'ok'
 end
 
-local function _indModeForYielding(willYield)
+local function indModeForYielding(willYield)
     local TL = ac and ac.TurningLights
     if willYield then
         return TL and ((SettingsManager.YIELD_TO_LEFT and TL.Left) or TL.Right) or ((SettingsManager.YIELD_TO_LEFT and 1) or 2)
@@ -101,9 +101,9 @@ local function _indModeForYielding(willYield)
     return TL and TL.None or 0
 end
 
-function CarOperations._applyIndicators(i, willYield, car)
-    if not (ac and ac.setTurningLights and ac.setTargetCar) then return end
-    local mode = _indModeForYielding(willYield)
+function CarOperations.applyIndicators(i, willYield, car)
+    -- if not (ac and ac.setTurningLights and ac.setTargetCar) then return end
+    local mode = indModeForYielding(willYield)
     if ac.setTargetCar(i) then
         ac.setTurningLights(mode)
         ac.setTargetCar(0)
