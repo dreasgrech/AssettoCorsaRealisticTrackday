@@ -107,12 +107,12 @@ function CarOperations._applyIndicators(i, willYield, car, st)
     if ac.setTargetCar(i) then
         ac.setTurningLights(mode)
         ac.setTargetCar(0)
-        st.blink = mode
+        CarManager.cars_blink[i] = mode
     end
-    st.indLeft = car.turningLeftLights or false
-    st.indRight = car.turningRightLights or false
-    st.indPhase = car.turningLightsActivePhase or false
-    st.hasTL = car.hasTurningLights or false
+    CarManager.cars_indLeft[i] = car.turningLeftLights or false
+    CarManager.cars_indRight[i] = car.turningRightLights or false
+    CarManager.cars_indPhase[i] = car.turningLightsActivePhase or false
+    CarManager.cars_hasTL[i] = car.hasTurningLights or false
 end
 
 return CarOperations

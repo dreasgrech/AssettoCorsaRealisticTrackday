@@ -49,21 +49,21 @@ function script.update(dt)
         -- yielding=false, 
         -- dist=0, 
         -- desired=0, 
-        maxRight=0, 
-        prog=-1, 
-        reason='-', 
-        yieldTime=0, 
-        blink=nil, 
-        blocked=false, 
-        blocker=nil 
+        -- maxRight=0, 
+        -- prog=-1, 
+        -- reason='-', 
+        -- yieldTime=0, 
+        -- blink=nil, 
+        -- blocked=false, 
+        -- blocker=nil 
       }
 
       local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, CarManager.cars_yielding[i])
 
       CarManager.cars_dist[i] = dist or CarManager.cars_dist[i] or 0
-      CarManager.ai[i].prog = prog or -1
-      CarManager.ai[i].maxRight = sideMax or 0
-      CarManager.ai[i].reason = reason or '-'
+      CarManager.cars_prog[i] = prog or -1
+      CarManager.cars_maxRight[i] = sideMax or 0
+      CarManager.cars_reason[i] = reason or '-'
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
@@ -78,8 +78,8 @@ function script.update(dt)
       if intendsSideMove then
         blocked, blocker = CarOperations._isTargetSideBlocked(i, sideSign)
       end
-      CarManager.ai[i].blocked = blocked
-      CarManager.ai[i].blocker = blocker
+      CarManager.cars_blocked[i] = blocked
+      CarManager.cars_blocker[i] = blocker
 
       local targetDesired
       if blocked and not releasing then
@@ -98,7 +98,7 @@ function script.update(dt)
 
       -- Keep yielding (blinkers) while blocked to signal intent
       local willYield = (blocked and intendsSideMove) or (math.abs(targetDesired) > 0.01)
-      if willYield then CarManager.ai[i].yieldTime = (CarManager.ai[i].yieldTime or 0) + dt end
+      if willYield then CarManager.cars_yieldTime[i] = (CarManager.cars_yieldTime[i] or 0) + dt end
       CarManager.cars_yielding[i] = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
@@ -111,7 +111,7 @@ function script.update(dt)
         local cap = math.max((c.speedKmh or 0) - SettingsManager.BLOCK_SLOWDOWN_KMH, 5)
         physics.setAITopSpeed(i, cap)
         physics.setAIThrottleLimit(i, SettingsManager.BLOCK_THROTTLE_LIMIT)
-        CarManager.ai[i].reason = 'Blocked by car on side'
+        CarManager.cars_reason[i] = 'Blocked by car on side'
       else
         physics.setAITopSpeed(i, 1e9)
         physics.setAIThrottleLimit(i, 1)
@@ -181,10 +181,10 @@ function script.windowMain(dt)
             -- "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
             "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
             -- i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
-            i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, st.maxRight or 0, st.prog or -1
+            i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
           )
           do
-            local indTxt = UIManager.indicatorStatusText(st)
+            local indTxt = UIManager.indicatorStatusText(i)
             base = base .. string.format("  ind=%s", indTxt)
           end
           if CarManager.cars_yielding[i] then
@@ -197,9 +197,9 @@ function script.windowMain(dt)
             else
               ui.text(base)
             end
-            ui.sameLine(); ui.text(string.format("  (yield %.1fs)", st.yieldTime or 0))
+            ui.sameLine(); ui.text(string.format("  (yield %.1fs)", CarManager.cars_yieldTime[i] or 0))
           else
-            local reason = st.reason or '-'
+            local reason = CarManager.cars_reason[i] or '-'
             ui.text(string.format("%s  reason: %s", base, reason))
           end
         end

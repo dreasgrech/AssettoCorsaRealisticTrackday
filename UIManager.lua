@@ -17,10 +17,10 @@ local UI_ELEMENTS = {
     { kind='slider',   k='MIN_AI_SPEED_KMH', label='Min AI speed (km/h)', min=0, max=120, tip='Don’t ask AI to yield if its own speed is below this (corners/traffic).' },
 }
 
-function UIManager.indicatorStatusText(st)
-    local l = st.indLeft
-    local r = st.indRight
-    local ph = st.indPhase
+function UIManager.indicatorStatusText(i)
+    local l = CarManager.cars_indLeft[i]
+    local r = CarManager.cars_indRight[i]
+    local ph = CarManager.cars_indPhase[i]
     local indTxt = '-'
     if l or r then
         if l and r then
@@ -31,8 +31,8 @@ function UIManager.indicatorStatusText(st)
             indTxt = ph and 'R*' or 'R'
         end
     end
-    if st.hasTL == false then indTxt = indTxt .. '(!)' end
-    if st.blocked then
+    if CarManager.cars_hasTL[i] == false then indTxt = indTxt .. '(!)' end
+    if CarManager.cars_blocked[i] then
         -- explicitly show that we’re not able to move over yet and are slowing to create space
         indTxt = (indTxt ~= '-' and (indTxt .. ' ') or '') .. '(slowing due to yield lane blocked)'
     end
@@ -79,7 +79,7 @@ function UIManager.draw3DOverheadText()
   for i = 1, (sim.carsCount or 0) - 1 do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
     local st = CarManager.ai[i]
-    if st and (math.abs(CarManager.cars_offset[i] or 0) > 0.02 or st.blocked) then
+    if st and (math.abs(CarManager.cars_offset[i] or 0) > 0.02 or CarManager.cars_blocked[i]) then
       local c = ac.getCar(i)
       if c then
         local txt = string.format(
@@ -87,7 +87,7 @@ function UIManager.draw3DOverheadText()
           i, CarManager.cars_dist[i], math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0
         )
         do
-          local indTxt = UIManager.indicatorStatusText(st)
+          local indTxt = UIManager.indicatorStatusText(i)
           txt = txt .. string.format("  ind=%s", indTxt)
         end
         render.debugText(c.position + vec3(0, 2.0, 0), txt)
