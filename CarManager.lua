@@ -17,6 +17,9 @@ CarManager.cars_indRight = {}
 CarManager.cars_indPhase = {}
 CarManager.cars_hasTL = {}
 
+-- evacuate state so we don’t re-trigger while a car is already evacuating
+local evacuating = {}
+
 local function setInitializedDefaults(carIndex)
   CarManager.cars_initialized[carIndex] = true
   CarManager.cars_offset[carIndex] = 0
@@ -40,6 +43,8 @@ local function setInitializedDefaults(carIndex)
   physics.setAITopSpeed(carIndex, math.huge)
   physics.setAIStopCounter(carIndex, 0)
   physics.setGentleStop(carIndex, false)
+
+  evacuating[carIndex] = false
 end
 
 function CarManager.ensureDefaults(carIndex)
@@ -50,46 +55,65 @@ function CarManager.ensureDefaults(carIndex)
   setInitializedDefaults(carIndex)
 end
 
+function CarManager.isCarEvacuating(carIndex)
+    return evacuating[carIndex]
+end
+
 -- Monitor flood ai cars cycle event so that we also reset our state
 ac.onCarJumped(-1, function(carIndex)
   local car = ac.getCar(carIndex)
-  if car then
-    ac.log(("Car #%d (%s) jumped/reset at spline=%.3f"):format(carIndex, car.name, car.splinePosition))
-    setInitializedDefaults(carIndex) -- reset state on jump/reset
-  else
-    ac.log(("Car #%d jumped/reset"):format(carIndex))
+  if not car then
+    return
   end
+
+  -- ac.log(("Car #%d (%s) jumped/reset at spline=%.3f"):format(carIndex, car.name, car.splinePosition))
+  setInitializedDefaults(carIndex) -- reset state on jump/reset
 end)
 
 -- Monitor collisions
 ac.onCarCollision(-1, function (carIndex)
-    -- ignore for local player car
-  if carIndex == 0 then return end
+  -- ignore for local player car
+  -- if carIndex == 0 then return end
 
   local car = ac.getCar(carIndex)
-  if not car then return end
+  if not car or evacuating[carIndex] then return end
 
-  -- 1) Switch hazards on (if car has turn signals)
-  -- (setTargetCar lets light control hit non-user cars)
-  ac.setTargetCar(carIndex)                                   -- may no-op for some cars, but usually fine
+  -- Lights on
+  ac.setTargetCar(carIndex)
   if car.hasTurningLights then
-    ac.setTurningLights(ac.TurningLights.Hazards)             -- hazards = both blinkers
+    ac.setTurningLights(ac.TurningLights.Hazards)
   end
 
-  -- 2) Make the AI stop completely
-  --    • setAIStopCounter tells AI to brake for N seconds (use >0 if you want timed stop)
-  --    • throttle limit 0 blocks gas
-  --    • top speed ~0 km/h prevents creeping
-  --    • gentle stop engages a smooth stop (leave on until you want to release)
-  physics.setAIThrottleLimit(carIndex, 0)
-  physics.setAITopSpeed(carIndex, 1)                          -- 1 km/h ≈ hard stop
-  physics.setAIStopCounter(carIndex, 5)                       -- brakes for 5 s; set 0 to cancel later
+  -- Figure which side to go to (prefer nearest safe edge)
+  local tcoords = ac.worldCoordinateToTrack(car.position)               -- X∈[-1..1], Z∈[0..1]
+  local prog    = tcoords.z
+  local sides   = ac.getTrackAISplineSides(prog)                        -- vec2(leftDist, rightDist)
+
+  -- Choose the closer boundary to clear the racing line quicker:
+  -- if you prefer always-right, replace this with: local goRight = true
+  local goRight = (sides.y <= sides.x)
+
+  -- Target lateral offset relative to spline:
+  --   +1 = full right, -1 = full left. Aim a bit inside the boundary (±0.85)
+  local targetOffset = goRight and 0.85 or -0.85
+
+  -- Phase 1: brief full stop, then roll to the side slowly
+  evacuating[carIndex] = true
   physics.setGentleStop(carIndex, true)
+  physics.setAIStopCounter(carIndex, 0.7)                               -- quick “collect yourself” pause
 
-  -- Optional: drop gearbox to neutral to emulate a human securing the car:
-  ac.switchToNeutralGear()
+  setTimeout(function()
+    -- Let it crawl at low speed while sliding to the chosen side
+    physics.setAIStopCounter(carIndex, 0)
+    physics.setAITopSpeed(carIndex, 20)                                 -- ~20 km/h crawl
+    physics.setAIThrottleLimit(carIndex, 0.35)                          -- soft cap
 
-  ac.log(("Car #%d (%s) collided: hazards on, stopping at spline=%.3f") :format(carIndex, car.name, car.splinePosition))
+    -- Ask AI to hold to the side; override awareness so it doesn’t get “shy”
+    physics.setAISplineOffset(carIndex, targetOffset, true)
+
+    ac.log(("Car #%d (%s) evacuating %s side at spline=%.3f")
+      :format(carIndex, car.name, goRight and "RIGHT" or "LEFT", car.splinePosition))
+  end, 0.8)                                                              -- run after the brief stop
 end)
 
 return CarManager

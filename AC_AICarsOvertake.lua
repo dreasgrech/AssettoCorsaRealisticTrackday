@@ -41,7 +41,10 @@ function script.update(dt)
 
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
-    if c and c.isAIControlled ~= false then
+    if c and 
+    c.isAIControlled and  -- only run the yielding logic on ai cars
+    not CarManager.isCarEvacuating(i) -- don't run yielding logic if car is evacuating
+    then
 
       CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
 
