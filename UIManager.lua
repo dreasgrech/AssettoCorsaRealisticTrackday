@@ -77,13 +77,14 @@ function UIManager.draw3DOverheadText()
   end
 
   for i = 1, (sim.carsCount or 0) - 1 do
+    CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
     local st = CarManager.ai[i]
-    if st and (math.abs(st.offset or 0) > 0.02 or st.blocked) then
+    if st and (math.abs(CarManager.cars_offset[i] or 0) > 0.02 or st.blocked) then
       local c = ac.getCar(i)
       if c then
         local txt = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
-          i, st.dist, math.floor(c.speedKmh or 0), st.offset or 0
+          i, st.dist, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0
         )
         do
           local indTxt = UIManager.indicatorStatusText(st)

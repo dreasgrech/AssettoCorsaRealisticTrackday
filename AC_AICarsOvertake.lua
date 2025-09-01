@@ -42,7 +42,22 @@ function script.update(dt)
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
     if c and c.isAIControlled ~= false then
-      CarManager.ai[i] = CarManager.ai[i] or { offset=0.0, yielding=false, dist=0, desired=0, maxRight=0, prog=-1, reason='-', yieldTime=0, blink=nil, blocked=false, blocker=nil }
+
+      CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
+      CarManager.ai[i] = CarManager.ai[i] or { 
+        -- offset=0.0, 
+        yielding=false, 
+        dist=0, 
+        desired=0, 
+        maxRight=0, 
+        prog=-1, 
+        reason='-', 
+        yieldTime=0, 
+        blink=nil, 
+        blocked=false, 
+        blocker=nil 
+      }
+
       local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, CarManager.ai[i].yielding)
 
       CarManager.ai[i].dist = dist or CarManager.ai[i].dist or 0
@@ -84,8 +99,8 @@ function script.update(dt)
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
       local stepMps = (releasing or blocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.RAMP_SPEED_MPS
-      CarManager.ai[i].offset = MathHelpers.approach(CarManager.ai[i].offset, targetDesired, stepMps * dt)
-      physics.setAISplineAbsoluteOffset(i, CarManager.ai[i].offset, true)
+      CarManager.cars_offset[i] = MathHelpers.approach(CarManager.cars_offset[i], targetDesired, stepMps * dt)
+      physics.setAISplineAbsoluteOffset(i, CarManager.cars_offset[i], true)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if blocked and intendsSideMove then
@@ -128,7 +143,11 @@ function script.windowMain(dt)
   local totalAI, yieldingCount = 0, 0
   if sim then
     totalAI = math.max(0, (sim.carsCount or 1) - 1)
-    for i = 1, totalAI do if CarManager.ai[i] and CarManager.ai[i].yielding then yieldingCount = yieldingCount + 1 end end
+    for i = 1, totalAI do 
+      if CarManager.ai[i] and CarManager.ai[i].yielding then
+        yieldingCount = yieldingCount + 1
+      end
+    end
   end
   ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
@@ -158,7 +177,7 @@ function script.windowMain(dt)
             -- "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
             "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
             -- i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
-            i, distShown, math.floor(c.speedKmh or 0), st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
+            i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
           )
           do
             local indTxt = UIManager.indicatorStatusText(st)
