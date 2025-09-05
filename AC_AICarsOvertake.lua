@@ -7,15 +7,18 @@ UIManager = require("UIManager")
 CarOperations = require("CarOperations")
 CarManager = require("CarManager")
 
-local sim = ac.getSim()
-local isOnline = sim.isOnlineRace
-ac.log('AC_AICarsOvertake: isOnline: ' .. tostring(isOnline))
-if isOnline then
-  ac.log('AC_AICarsOvertake: Online so not initializing')
-end
+local isOnline = false
 
-local runApp = not isOnline
-if runApp then
+-- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
+local function awake()
+  local sim = ac.getSim()
+  isOnline = sim.isOnlineRace
+  ac.log('AC_AICarsOvertake: isOnline: ' .. tostring(isOnline))
+  if isOnline then
+    ac.log('AC_AICarsOvertake: Online so not initializing')
+    return
+  end
+
   ac.log('AC_AICarsOvertake: init')
   SettingsManager._loadIni()
 
@@ -25,6 +28,7 @@ if runApp then
 
   SettingsManager.BOOT_LOADING = false
 end
+awake()
 
 -- Function defined in manifest.ini
 -- wiki: function to be called each frame to draw window content
