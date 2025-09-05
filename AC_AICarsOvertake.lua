@@ -1,26 +1,29 @@
 -- AC_AICarsOvertake.lua
 -- Nudge AI to one side so the player can pass on the other (Trackday / AI Flood).
 
+Constants = require("Constants")
+Logger = require("Logger")
 SettingsManager = require("SettingsManager")
 MathHelpers = require("MathHelpers")
 UIManager = require("UIManager")
 CarOperations = require("CarOperations")
 CarManager = require("CarManager")
 
+local runApp = false
 local isOnline = false
 
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
 local function awake()
   local sim = ac.getSim()
   isOnline = sim.isOnlineRace
-  ac.log('AC_AICarsOvertake: isOnline: ' .. tostring(isOnline))
-  if isOnline then
-    ac.log('AC_AICarsOvertake: Online so not initializing')
+  runApp = not isOnline
+  if not runApp then
+    Logger.log('App will not run.  Online? ' .. tostring(isOnline))
     return
   end
 
-  ac.log('AC_AICarsOvertake: init')
-  SettingsManager._loadIni()
+  Logger.log('Initializing')
+  SettingsManager.loadINIFile()
 
   -- Apply values from INI and storage (keeps UI in sync on start)
   SettingsManager.settings_apply(SettingsManager.SETTINGS)
@@ -33,13 +36,13 @@ awake()
 -- Function defined in manifest.ini
 -- wiki: function to be called each frame to draw window content
 function script.MANIFEST__FUNCTION_MAIN(dt)
-  if isOnline then
-    ui.text(string.format('AI Cars Overtake — This app does not work in online mode'))
+  if not runApp then
+    ui.text(string.format('App not running.  Online? %s', tostring(isOnline)))
     return
   end
 
   SettingsManager._ensureConfig()
-  ui.text(string.format('AI Cars Overtake — yield %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
+  ui.text(string.format('AI cars yielding to the %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
   if SettingsManager.CFG_PATH then
     ui.text(string.format('Config: %s  [via %s] %s',
       SettingsManager.CFG_PATH, SettingsManager.CFG_RESOLVE_NOTE or '?',
@@ -120,7 +123,7 @@ end
 -- wiki: Called each frame after world matrix traversal ends for each app, even if none of its windows are active. 
 -- wiki: Please make sure to not do anything too computationally expensive there (unless app needs it for some reason).
 function script.update(dt)
-  if isOnline then return end
+  if not runApp then return end
 
   SettingsManager._ensureConfig()
 
@@ -129,7 +132,7 @@ function script.update(dt)
     if SettingsManager._dirty then
       SettingsManager._autosaveTimer = SettingsManager._autosaveTimer + dt
       if SettingsManager._autosaveTimer >= SettingsManager.SAVE_INTERVAL then
-        SettingsManager._saveIni()
+        SettingsManager.saveINIFile()
         SettingsManager._dirty = false
       end
     end
@@ -215,8 +218,8 @@ function script.update(dt)
 end
 
 -- wiki: called when transparent objects are finished rendering
-function script.Draw3D(dt)
-  if isOnline then return end
+function script.MANIFEST__TRANSPARENT(dt)
+  if not runApp then return end
   UIManager.draw3DOverheadText()
   render.setDepthMode(render.DepthMode.Normal)
 end
@@ -224,6 +227,6 @@ end
 -- Save when window is closed/hidden as a last resort
 -- wiki: function to be called once when window closes
 function script.MANIFEST__FUNCTION_ON_HIDE()
-  if isOnline then return end
-  if SettingsManager._dirty then SettingsManager._saveIni(); SettingsManager._dirty = false end
+  if not runApp then return end
+  if SettingsManager._dirty then SettingsManager.saveNIFile(); SettingsManager._dirty = false end
 end

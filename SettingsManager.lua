@@ -4,6 +4,7 @@ SettingsManager.enabled = true
 SettingsManager.debugDraw = false
 SettingsManager.drawOnTop = false
 
+-- TODO: Change these to lower case since they are not constants
 SettingsManager.DETECT_INNER_M        = 42.0
 SettingsManager.DETECT_HYSTERESIS_M   = 60.0
 SettingsManager.MIN_PLAYER_SPEED_KMH  = 70.0
@@ -71,7 +72,7 @@ function SettingsManager._ensureConfig()
             SettingsManager.CFG_PATH = p
             local wasBoot = SettingsManager.BOOT_LOADING
             SettingsManager.BOOT_LOADING = true
-            SettingsManager._loadIni()
+            SettingsManager.loadINIFile()
 
             -- Apply loaded values immediately (so sliders show persisted values)
             SettingsManager.settings_apply(SettingsManager.SETTINGS)
@@ -87,7 +88,7 @@ function SettingsManager._ensureConfig()
     end
 end
 
-function SettingsManager._loadIni()
+function SettingsManager.loadINIFile()
     SettingsManager.SETTINGS = {}
     SettingsManager.CFG_PATH = SettingsManager._userIniPath()
     if not SettingsManager.CFG_PATH then return end
@@ -104,8 +105,8 @@ function SettingsManager._loadIni()
     f:close()
 end
 
-function SettingsManager._saveIni()
-    ac.log('AC_AICarsOvertake: saving to '..tostring(SettingsManager.CFG_PATH))
+function SettingsManager.saveINIFile()
+    Logger.log('AC_AICarsOvertake: saving to '..tostring(SettingsManager.CFG_PATH))
     if SettingsManager.BOOT_LOADING then
          return
     end

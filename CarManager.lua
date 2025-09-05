@@ -179,7 +179,7 @@ ac.onCarCollision(-1, function (carIndex)
     -- if you want them to then head to pits once clear:
     -- physics.setAIPitStopRequest(carIndex, true)                                 -- optional                     :contentReference[oaicite:14]{index=14}
 
-    ac.log(("Car #%d (%s) evacuating %s side at spline=%.3f") :format(carIndex, car.name, goRight and "RIGHT" or "LEFT", car.splinePosition))
+    Logger.log(("Car #%d (%s) evacuating %s side at spline=%.3f") :format(carIndex, car.name, goRight and "RIGHT" or "LEFT", car.splinePosition))
 
 --[=====[ 
     -- after a few seconds, clear state & lights so AI can recover
