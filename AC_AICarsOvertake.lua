@@ -51,14 +51,16 @@ awake()
 -- wiki: function to be called each frame to draw window content
 ---
 function script.MANIFEST__FUNCTION_MAIN(dt)
+  local storage = StorageManager.getStorage()
   if (not SettingsManager.shouldAppRun()) then
-    ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(SettingsManager.enabled), tostring(Constants.IS_ONLINE)))
+    -- ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(SettingsManager.enabled), tostring(Constants.IS_ONLINE)))
+    ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(storage.enabled), tostring(Constants.IS_ONLINE)))
     return
   end
 
   SettingsManager._ensureConfig()
 
-  ui.text(string.format('AI cars yielding to the %s', (SettingsManager.yieldToLeft and 'LEFT') or 'RIGHT'))
+  ui.text(string.format('AI cars yielding to the %s', (storage.yieldToLeft and 'LEFT') or 'RIGHT'))
 
   ui.separator()
 
@@ -91,7 +93,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
     local c = ac.getCar(i)
     if c and CarManager.cars_initialized[i] then
       local distShown = order[n].d or CarManager.cars_dist[i] or 0
-      local show = (SettingsManager.listRadiusFilter_meters <= 0) or (distShown <= SettingsManager.listRadiusFilter_meters)
+      local show = (storage.listRadiusFilter_meters <= 0) or (distShown <= storage.listRadiusFilter_meters)
       if show then
         local base = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
@@ -148,6 +150,7 @@ end
 -- wiki: called after a whole simulation update
 ---
 function script.MANIFEST__UPDATE(dt)
+  local storage = StorageManager.getStorage()
   if (not SettingsManager.shouldAppRun()) then return end
 
   local sim = ac.getSim()
@@ -171,12 +174,12 @@ function script.MANIFEST__UPDATE(dt)
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
-      if CarManager.cars_yielding[i] and CarOperations.playerIsClearlyAhead(c, player, SettingsManager.clearAhead_meters) then
+      if CarManager.cars_yielding[i] and CarOperations.playerIsClearlyAhead(c, player, storage.clearAhead_meters) then
         releasing = true
       end
 
       -- Side-by-side guard: if the target side is occupied, don’t cut in — create space first
-      local sideSign = SettingsManager.yieldToLeft and -1 or 1
+      local sideSign = storage.yieldToLeft and -1 or 1
       local intendsSideMove = desired and math.abs(desired) > 0.01
       local isTargetSideBlocked, blockerCarIndex = false, nil
       if intendsSideMove then
@@ -188,12 +191,12 @@ function script.MANIFEST__UPDATE(dt)
       local targetDesired
       if isTargetSideBlocked and not releasing then
         -- keep indicators on, but don’t move laterally yet
-        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.rampRelease_mps * dt)
+        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, storage.rampRelease_mps * dt)
       elseif releasing then
         -- TODO: Is there a bug here because this line is exactly the same as above?
         -- TODO: Is there a bug here because this line is exactly the same as above?
         -- TODO: Is there a bug here because this line is exactly the same as above?
-        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.rampRelease_mps * dt)
+        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, storage.rampRelease_mps * dt)
       else
         targetDesired = desired or 0
       end
@@ -206,7 +209,7 @@ function script.MANIFEST__UPDATE(dt)
       CarManager.cars_yielding[i] = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
-      local stepMps = (releasing or isTargetSideBlocked) and SettingsManager.rampRelease_mps or SettingsManager.rampSpeed_mps
+      local stepMps = (releasing or isTargetSideBlocked) and storage.rampRelease_mps or storage.rampSpeed_mps
       CarManager.cars_offset[i] = MathHelpers.approach(CarManager.cars_offset[i], targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, CarManager.cars_offset[i], true)
 
@@ -214,9 +217,9 @@ function script.MANIFEST__UPDATE(dt)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if isTargetSideBlocked and intendsSideMove then
-        local cap = math.max((c.speedKmh or 0) - SettingsManager.blockSlowdownKmh, 5)
+        local cap = math.max((c.speedKmh or 0) - storage.blockSlowdownKmh, 5)
         physics.setAITopSpeed(i, cap)
-        physics.setAIThrottleLimit(i, SettingsManager.blockThrottleLimit)
+        physics.setAIThrottleLimit(i, storage.blockThrottleLimit)
         CarManager.cars_reason[i] = 'Blocked by car on side'
       else
         physics.setAITopSpeed(i, 1e9)

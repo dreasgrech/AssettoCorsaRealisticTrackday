@@ -63,6 +63,7 @@ local storageTable = {
     enabled = true,
     debugDraw = false,
     drawOnTop = false,
+    yieldToLeft = false,
     detectInner_meters = 66,
     detectHysteresis_meters = 60.0,
     minPlayerSpeed_kmh = 0,
@@ -74,7 +75,10 @@ local storageTable = {
     rightMargin_meters = 0.6,
     listRadiusFilter_meters = 400.0,
     minAISpeed_kmh = 35.0,
-    yieldToLeft = false,
+    blockSideLateral_meters = 2.2,
+    blockSideLongitudinal_meters = 5.5,
+    blockSlowdownKmh = 12.0,
+    blockThrottleLimit = 0.92,
 }
 
 local storage = ac.storage(storageTable)

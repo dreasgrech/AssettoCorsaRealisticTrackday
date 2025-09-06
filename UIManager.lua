@@ -23,9 +23,10 @@ function UIManager.indicatorStatusText(i)
 end
 
 function UIManager.draw3DOverheadText()
-  if not SettingsManager.debugDraw then return end
+  local storage = StorageManager.getStorage()
+  if not storage.debugDraw then return end
   local sim = ac.getSim()
-  if SettingsManager.drawOnTop then
+  if storage.drawOnTop then
     -- draw over everything (no depth testing)
     render.setDepthMode(render.DepthMode.Off)
   else
