@@ -126,10 +126,10 @@ function script.MANIFEST__UPDATE(dt)
 
       local targetSplineOffset_meters, distanceFromPlayerCarToAICar, normalizedTrackProgress, maxSideMargin_meters, reason = CarOperations.desiredOffsetFor(car, player, CarManager.cars_currentlyYielding[carIndex])
 
-      CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar or CarManager.cars_distanceFromPlayerToCar[carIndex] or 0
-      CarManager.cars_currentNormalizedTrackProgress[carIndex] = normalizedTrackProgress or -1
-      CarManager.cars_maxSideMargin[carIndex] = maxSideMargin_meters or 0
-      CarManager.cars_reason[carIndex] = reason or '-'
+      CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar
+      CarManager.cars_currentNormalizedTrackProgress[carIndex] = normalizedTrackProgress
+      CarManager.cars_maxSideMargin[carIndex] = maxSideMargin_meters
+      CarManager.cars_reason[carIndex] = reason -- or '-'
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local carReturningBackToNormal = false
@@ -139,13 +139,13 @@ function script.MANIFEST__UPDATE(dt)
 
       -- Side-by-side guard: if the target side is occupied, don’t cut in — create space first
       local sideSign = storage.yieldToLeft and -1 or 1
-      local intendsSideMove = targetSplineOffset_meters and math.abs(targetSplineOffset_meters) > 0.01
+      local intendsSideMove = math.abs(targetSplineOffset_meters) > 0.01
       local isTargetSideBlocked, blockerCarIndex = false, nil
       if intendsSideMove then
         isTargetSideBlocked, blockerCarIndex = CarOperations.isTargetSideBlocked(carIndex, sideSign)
       end
       CarManager.cars_isSideBlocked[carIndex] = isTargetSideBlocked
-      CarManager.cars_SideBlockedCarIndex[carIndex] = blockerCarIndex
+      CarManager.cars_sideBlockedCarIndex[carIndex] = blockerCarIndex
 
       local targetSplineOffset
       if isTargetSideBlocked and not carReturningBackToNormal then

@@ -14,7 +14,7 @@ CarManager.cars_reason = {}
 CarManager.cars_yieldTime = {}
 CarManager.cars_currentTurningLights = {}
 CarManager.cars_isSideBlocked = {}
-CarManager.cars_SideBlockedCarIndex = {}
+CarManager.cars_sideBlockedCarIndex = {}
 CarManager.cars_indLeft = {}
 CarManager.cars_indRight = {}
 CarManager.cars_indPhase = {}
@@ -36,7 +36,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_yieldTime[carIndex] = 0
   CarManager.cars_currentTurningLights[carIndex] = nil
   CarManager.cars_isSideBlocked[carIndex] = false
-  CarManager.cars_SideBlockedCarIndex[carIndex] = nil
+  CarManager.cars_sideBlockedCarIndex[carIndex] = nil
   CarManager.cars_indLeft[carIndex] = false
   CarManager.cars_indRight[carIndex] = false
   CarManager.cars_indPhase[carIndex] = false
