@@ -1,5 +1,8 @@
 local CarManager = {}
 
+-- Andreas: used while still writing the accident system
+local DISABLE_ACCIDENTCOLLISION_DETECTION = true
+
 CarManager.cars_initialized = {}
 CarManager.cars_offset = {}
 CarManager.cars_yielding = {}
@@ -55,8 +58,6 @@ local function setInitializedDefaults(carIndex)
         ac.setTurningLights(ac.TurningLights.None)
     end
   end
-
-  CarManager.cars_evacuating[carIndex] = false
 end
 
 function CarManager.ensureDefaults(carIndex)
@@ -138,6 +139,8 @@ end
 
 -- Monitor collisions
 ac.onCarCollision(-1, function (carIndex)
+  if DISABLE_ACCIDENTCOLLISION_DETECTION then return end
+
   local car = ac.getCar(carIndex)
   if not car or CarManager.cars_evacuating[carIndex] then return end
 
