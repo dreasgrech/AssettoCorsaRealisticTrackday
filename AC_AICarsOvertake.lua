@@ -42,17 +42,8 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   end
 
   SettingsManager._ensureConfig()
-  ui.text(string.format('AI cars yielding to the %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
-  if SettingsManager.CFG_PATH then
-    ui.text(string.format('Config: %s  [via %s] %s',
-      SettingsManager.CFG_PATH, SettingsManager.CFG_RESOLVE_NOTE or '?',
-      SettingsManager.lastSaveOk and '(saved ✓)' or (SettingsManager.lastSaveErr ~= '' and ('(save error: '..SettingsManager.lastSaveErr..')') or '')
-    ))
-  else
-    ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.CFG_RESOLVE_NOTE or '?'))
-  end
 
-  UIManager.drawControls()
+  ui.text(string.format('AI cars yielding to the %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
 
   ui.separator()
   local sim = ac.getSim()
@@ -229,6 +220,21 @@ function script.MANIFEST__TRANSPARENT(dt)
   if not runApp then return end
   UIManager.draw3DOverheadText()
   render.setDepthMode(render.DepthMode.Normal)
+end
+
+function script.MANIFEST__FUNCTION_SETTINGS()
+  if not runApp then return end
+
+  if SettingsManager.CFG_PATH then
+    ui.text(string.format('Config: %s  [via %s] %s',
+      SettingsManager.CFG_PATH, SettingsManager.CFG_RESOLVE_NOTE or '?',
+      SettingsManager.lastSaveOk and '(saved ✓)' or (SettingsManager.lastSaveErr ~= '' and ('(save error: '..SettingsManager.lastSaveErr..')') or '')
+    ))
+  else
+    ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.CFG_RESOLVE_NOTE or '?'))
+  end
+
+  UIManager.drawControls()
 end
 
 -- Save when window is closed/hidden as a last resort
