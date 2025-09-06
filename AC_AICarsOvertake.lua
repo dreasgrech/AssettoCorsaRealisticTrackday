@@ -40,6 +40,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   ui.text(string.format('AI cars yielding to the %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
 
   ui.separator()
+
   local sim = ac.getSim()
   local yieldingCount = 0
   local totalAI = math.max(0, (sim.carsCount or 1) - 1)
@@ -72,9 +73,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
       local show = (SettingsManager.LIST_RADIUS_FILTER_M <= 0) or (distShown <= SettingsManager.LIST_RADIUS_FILTER_M)
       if show then
         local base = string.format(
-          -- "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
-          -- i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
           i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
         )
         do
@@ -131,11 +130,11 @@ function script.MANIFEST__UPDATE(dt)
 
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
-    if c and 
-    c.isAIControlled and  -- only run the yielding logic on ai cars
-    not CarManager.isCarEvacuating(i) -- don't run yielding logic if car is evacuating
+    if
+      c and 
+      c.isAIControlled and  -- only run the yielding logic on ai cars
+      not CarManager.isCarEvacuating(i) -- don't run yielding logic if car is evacuating
     then
-
       CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
 
       local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, CarManager.cars_yielding[i])
