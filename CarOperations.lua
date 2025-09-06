@@ -15,19 +15,20 @@ end
 -- Check if target side of car i is occupied by another AI alongside (prevents unsafe lateral move)
 function CarOperations.isTargetSideBlocked(carIndex, sideSign)
     local storage = StorageManager.getStorage()
-    local me = ac.getCar(carIndex); if not me then return false end
-    local sim = ac.getSim(); if not sim then return false end
-    local mySide = me.side or vec3(1,0,0)
-    local myLook = me.look or vec3(0,0,1)
-    for i = 1, (sim.carsCount or 0) - 1 do
-        if i ~= carIndex then
-            local o = ac.getCar(i)
-            if o and o.isAIControlled ~= false then
-                local rel = MathHelpers.vsub(o.position, me.position)
-                local lat = MathHelpers.dot(rel, mySide)   -- + right, - left
-                local fwd = MathHelpers.dot(rel, myLook)   -- + ahead, - behind
+    local car = ac.getCar(carIndex)
+    if not car then return false end
+    local sim = ac.getSim()
+    local carSide = car.side or vec3(1,0,0)
+    local carLook = car.look or vec3(0,0,1)
+    for otherCarIndex = 1, (sim.carsCount or 0) - 1 do
+        if otherCarIndex ~= carIndex then
+            local otherCar = ac.getCar(otherCarIndex)
+            if otherCar and otherCar.isAIControlled then
+                local rel = MathHelpers.vsub(otherCar.position, car.position)
+                local lat = MathHelpers.dot(rel, carSide)   -- + right, - left
+                local fwd = MathHelpers.dot(rel, carLook)   -- + ahead, - behind
                 if lat*sideSign > 0 and math.abs(lat) <= storage.blockSideLateral_meters and math.abs(fwd) <= storage.blockSideLongitudinal_meters then
-                    return true, i
+                    return true, otherCarIndex
                 end
             end
         end
@@ -44,13 +45,13 @@ local function clampSideOffsetMeters(carPosition, targetSplineOffset_meters, sid
     if normalizedTrackProgress < 0 then return targetSplineOffset_meters end
     local sides = ac.getTrackAISplineSides(normalizedTrackProgress) -- vec2(left, right)
     if sideSign > 0 then
-        local maxRight = math.max(0, (sides.y or 0) - storage.rightMargin_meters)
-        local clampedTargetSplineOffset_meters  = math.max(0, math.min(targetSplineOffset_meters, maxRight))
-        return clampedTargetSplineOffset_meters, normalizedTrackProgress, maxRight
+        local maxRightMargin_meters = math.max(0, (sides.y or 0) - storage.rightMargin_meters)
+        local clampedTargetSplineOffset_meters  = math.max(0, math.min(targetSplineOffset_meters, maxRightMargin_meters))
+        return clampedTargetSplineOffset_meters, normalizedTrackProgress, maxRightMargin_meters
     else
-        local maxLeft  = math.max(0, (sides.x or 0) - storage.rightMargin_meters)
-        local clampedTargetSplineOffset_meters  = math.min(0, math.max(targetSplineOffset_meters, -maxLeft))
-        return clampedTargetSplineOffset_meters, normalizedTrackProgress, maxLeft
+        local maxLeftMargin_meters  = math.max(0, (sides.x or 0) - storage.rightMargin_meters)
+        local clampedTargetSplineOffset_meters  = math.min(0, math.max(targetSplineOffset_meters, -maxLeftMargin_meters))
+        return clampedTargetSplineOffset_meters, normalizedTrackProgress, maxLeftMargin_meters
     end
 end
 
@@ -89,11 +90,11 @@ function CarOperations.desiredOffsetFor(aiCar, playerCar, aiCarCurrentlyYielding
 
     local sideSign = storage.yieldToLeft and -1 or 1
     local targetSplineOffset_meters   = sideSign * storage.yieldOffset_meters
-    local clampedTargetSplineOffset_meters, normalizedTrackProgress, sideMax = clampSideOffsetMeters(aiCar.position, targetSplineOffset_meters, sideSign)
+    local clampedTargetSplineOffset_meters, normalizedTrackProgress, maxSideMargin_meters = clampSideOffsetMeters(aiCar.position, targetSplineOffset_meters, sideSign)
     if (sideSign > 0 and (clampedTargetSplineOffset_meters or 0) <= 0.01) or (sideSign < 0 and (clampedTargetSplineOffset_meters or 0) >= -0.01) then
-        return 0, distanceFromPlayerCarToAICar, normalizedTrackProgress, sideMax, 'No room on chosen side'
+        return 0, distanceFromPlayerCarToAICar, normalizedTrackProgress, maxSideMargin_meters, 'No room on chosen side'
     end
-    return clampedTargetSplineOffset_meters, distanceFromPlayerCarToAICar, normalizedTrackProgress, sideMax, 'ok'
+    return clampedTargetSplineOffset_meters, distanceFromPlayerCarToAICar, normalizedTrackProgress, maxSideMargin_meters, 'ok'
 end
 
 function CarOperations.applyIndicators(carIndex, carYielding, car)
@@ -109,10 +110,10 @@ function CarOperations.applyIndicators(carIndex, carYielding, car)
 
     if ac.setTargetCar(carIndex) then
         ac.setTurningLights(turningLights)
-        -- ac.setTargetCar(0)
-        CarManager.cars_blink[carIndex] = turningLights
     end
 
+    -- TODO: we don't need all of these
+    CarManager.cars_currentTurningLights[carIndex] = turningLights
     CarManager.cars_indLeft[carIndex] = car.turningLeftLights or false
     CarManager.cars_indRight[carIndex] = car.turningRightLights or false
     CarManager.cars_indPhase[carIndex] = car.turningLightsActivePhase or false

@@ -15,7 +15,7 @@ function UIManager.indicatorStatusText(i)
         end
     end
     if CarManager.cars_hasTL[i] == false then indTxt = indTxt .. '(!)' end
-    if CarManager.cars_blocked[i] then
+    if CarManager.cars_isSideBlocked[i] then
         -- explicitly show that we’re not able to move over yet and are slowing to create space
         indTxt = (indTxt ~= '-' and (indTxt .. ' ') or '') .. '(slowing due to yield lane blocked)'
     end
@@ -36,7 +36,7 @@ function UIManager.draw3DOverheadText()
 
   for i = 1, (sim.carsCount or 0) - 1 do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
-    if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset[i] or 0) > 0.02 or CarManager.cars_blocked[i]) then
+    if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
       local car = ac.getCar(i)
       if car then
         local txt = string.format(

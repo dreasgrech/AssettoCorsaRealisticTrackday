@@ -79,7 +79,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
       if show then
         local base = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
-          i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset[i] or 0, CarManager.cars_targetSplineOffset[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
+          i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset[i] or 0, CarManager.cars_targetSplineOffset[i] or 0, CarManager.cars_maxSideMargin[i] or 0, CarManager.cars_currentNormalizedTrackProgress[i] or -1
         )
         do
           local indTxt = UIManager.indicatorStatusText(i)
@@ -124,11 +124,11 @@ function script.MANIFEST__UPDATE(dt)
     then
       CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
-      local targetSplineOffset_meters, distanceFromPlayerCarToAICar, prog, sideMax, reason = CarOperations.desiredOffsetFor(car, player, CarManager.cars_currentlyYielding[carIndex])
+      local targetSplineOffset_meters, distanceFromPlayerCarToAICar, normalizedTrackProgress, maxSideMargin_meters, reason = CarOperations.desiredOffsetFor(car, player, CarManager.cars_currentlyYielding[carIndex])
 
       CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar or CarManager.cars_distanceFromPlayerToCar[carIndex] or 0
-      CarManager.cars_prog[carIndex] = prog or -1
-      CarManager.cars_maxRight[carIndex] = sideMax or 0
+      CarManager.cars_currentNormalizedTrackProgress[carIndex] = normalizedTrackProgress or -1
+      CarManager.cars_maxSideMargin[carIndex] = maxSideMargin_meters or 0
       CarManager.cars_reason[carIndex] = reason or '-'
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
@@ -144,8 +144,8 @@ function script.MANIFEST__UPDATE(dt)
       if intendsSideMove then
         isTargetSideBlocked, blockerCarIndex = CarOperations.isTargetSideBlocked(carIndex, sideSign)
       end
-      CarManager.cars_blocked[carIndex] = isTargetSideBlocked
-      CarManager.cars_blocker[carIndex] = blockerCarIndex
+      CarManager.cars_isSideBlocked[carIndex] = isTargetSideBlocked
+      CarManager.cars_SideBlockedCarIndex[carIndex] = blockerCarIndex
 
       local targetSplineOffset
       if isTargetSideBlocked and not carReturningBackToNormal then
@@ -157,7 +157,7 @@ function script.MANIFEST__UPDATE(dt)
         -- TODO: Is there a bug here because this line is exactly the same as above?
         targetSplineOffset = MathHelpers.approach((CarManager.cars_targetSplineOffset[carIndex] or targetSplineOffset_meters or 0), 0.0, storage.rampRelease_mps * dt)
       else
-        targetSplineOffset = targetSplineOffset_meters or 0
+        targetSplineOffset = targetSplineOffset_meters
       end
 
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
