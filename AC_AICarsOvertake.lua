@@ -1,26 +1,9 @@
 -- AC_AICarsOvertake.lua
 -- Nudge AI to one side so the player can pass on the other (Trackday / AI Flood).
 
----
---[=====[ 
-local dreasStorage = ac.storage{
-  myAddress = 'default home',
-  myName = 'Default Jeronimo',
-}
-
-ac.log('before change storage.  myAddress=' .. tostring(dreasStorage.myAddress) .. ', myName=' .. tostring(dreasStorage.myName))
-
-dreasStorage.myAddress = '123 Main St'
-dreasStorage.myName = 'Karl'
-
-ac.log('after change storage.  myAddress=' .. tostring(dreasStorage.myAddress) .. ', myName=' .. tostring(dreasStorage.myName))
---]=====]
----
-
 Constants = require("Constants")
 Logger = require("Logger")
 StorageManager = require("StorageManager")
--- SettingsManager = require("SettingsManager")
 MathHelpers = require("MathHelpers")
 UIManager = require("UIManager")
 CarOperations = require("CarOperations")
@@ -36,13 +19,6 @@ local function awake()
   end
 
   -- Logger.log('Initializing')
-  -- SettingsManager.loadINIFile()
-
-  -- Apply values from INI and storage (keeps UI in sync on start)
-  -- SettingsManager.settings_apply(SettingsManager.SETTINGS)
-  -- SettingsManager.settings_apply(SettingsManager.P)
-
-  -- SettingsManager.CurrentlyBootloading = false
 end
 awake()
 
@@ -60,12 +36,9 @@ end
 function script.MANIFEST__FUNCTION_MAIN(dt)
   local storage = StorageManager.getStorage()
   if (not shouldAppRun()) then
-    -- ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(SettingsManager.enabled), tostring(Constants.IS_ONLINE)))
     ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(storage.enabled), tostring(Constants.IS_ONLINE)))
     return
   end
-
-  -- SettingsManager._ensureConfig()
 
   ui.text(string.format('AI cars yielding to the %s', (storage.yieldToLeft and 'LEFT') or 'RIGHT'))
 
@@ -128,31 +101,6 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
       end
     end
   end
-end
-
----
--- wiki: Called each frame after world matrix traversal ends for each app, even if none of its windows are active. 
--- wiki: Please make sure to not do anything too computationally expensive there (unless app needs it for some reason).
----
-function script.update(dt)
-  if (not shouldAppRun()) then return end
-
-  -- TODO: We probably don't need these settings checks in here
-
-  -- SettingsManager._ensureConfig()
-
---[=====[ 
-  -- Debounced autosave: write once after no changes for SAVE_INTERVAL
-  if not SettingsManager.CurrentlyBootloading and SettingsManager.configFilePath then
-    if SettingsManager.settingsCurrentlyDirty then
-      SettingsManager.autosaveTimer = SettingsManager.autosaveTimer + dt
-      if SettingsManager.autosaveTimer >= SettingsManager.saveInterval then
-        SettingsManager.saveINIFile()
-        SettingsManager.settingsCurrentlyDirty = false
-      end
-    end
-  end
---]=====]
 end
 
 ---
@@ -255,26 +203,27 @@ end
 function script.MANIFEST__FUNCTION_SETTINGS()
   if (not Constants.CAN_APP_RUN) then return end
 
---[=====[ 
-  if SettingsManager.configFilePath then
-    ui.text(string.format('Config: %s  [via %s] %s',
-      SettingsManager.configFilePath, SettingsManager.configResolveNote or '?',
-      SettingsManager.lastSaveOk and '(saved ✓)' or (SettingsManager.lastSaveErr ~= '' and ('(save error: '..SettingsManager.lastSaveErr..')') or '')
-    ))
-  else
-    ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.configResolveNote or '?'))
-  end
---]=====]
-
   UIManager.renderUIOptionsControls()
-  -- UIManager.drawOptionsUIControls()
 end
 
+--[=====[ 
+---
+-- wiki: Called each frame after world matrix traversal ends for each app, even if none of its windows are active. 
+-- wiki: Please make sure to not do anything too computationally expensive there (unless app needs it for some reason).
+---
+function script.update(dt)
+  if (not shouldAppRun()) then return end
+
+  -- TODO: We probably don't need these settings checks in here
+end
+--]=====]
+
+--[=====[ 
 ---
 -- Save when window is closed/hidden as a last resort
 -- wiki: function to be called once when window closes
 ---
 function script.MANIFEST__FUNCTION_ON_HIDE()
   if (not shouldAppRun()) then return end
-  -- if SettingsManager.settingsCurrentlyDirty then SettingsManager.saveNIFile(); SettingsManager.settingsCurrentlyDirty = false end
 end
+--]=====]
