@@ -5,42 +5,42 @@ SettingsManager.debugDraw = false
 SettingsManager.drawOnTop = false
 
 -- TODO: Change these to lower case since they are not constants
-SettingsManager.DETECT_INNER_M        = 42.0
-SettingsManager.DETECT_HYSTERESIS_M   = 60.0
-SettingsManager.MIN_PLAYER_SPEED_KMH  = 70.0
-SettingsManager.MIN_SPEED_DELTA_KMH   = 5.0
-SettingsManager.YIELD_OFFSET_M        = 2.5
+SettingsManager.detectInner_meters        = 42.0
+SettingsManager.detectHysteresis_meters   = 60.0
+SettingsManager.minPlayerSpeed_kmh  = 70.0
+SettingsManager.minSpeedDelta_kmh   = 5.0
+SettingsManager.yieldOffset_meters        = 2.5
 SettingsManager.rampSpeedMps        = 4.0
-SettingsManager.RAMP_RELEASE_MPS      = 1.6  -- slower return to center to avoid “snap back” once player is clearly ahead
-SettingsManager.CLEAR_AHEAD_M         = 6.0
-SettingsManager.RIGHT_MARGIN_M        = 0.6
-SettingsManager.LIST_RADIUS_FILTER_M  = 400.0
-SettingsManager.MIN_AI_SPEED_KMH      = 35.0
-SettingsManager.YIELD_TO_LEFT         = false
+SettingsManager.rampRelease_mps      = 1.6  -- slower return to center to avoid “snap back” once player is clearly ahead
+SettingsManager.clearAhead_meters         = 6.0
+SettingsManager.rightMargin_meters        = 0.6
+SettingsManager.listRadiusFilter_meters  = 400.0
+SettingsManager.minAISpeed_kmh      = 35.0
+SettingsManager.yieldToLeft         = false
 
 -- Side-by-side guard: if target side is occupied, don’t cut in — briefly slow down to find a gap
-SettingsManager.BLOCK_SIDE_LAT_M      = 2.2   -- lateral threshold (m) to consider another AI “next to” us
-SettingsManager.BLOCK_SIDE_LONG_M     = 5.5   -- longitudinal window (m) for “alongside”
-SettingsManager.BLOCK_SLOWDOWN_KMH    = 12.0  -- temporary speed reduction while blocked
-SettingsManager.BLOCK_THROTTLE_LIMIT  = 0.92  -- soft throttle cap while blocked (1 = no cap)
+SettingsManager.blockSideLateral_meters      = 2.2   -- lateral threshold (m) to consider another AI “next to” us
+SettingsManager.blockSideLongitudinal_meters     = 5.5   -- longitudinal window (m) for “alongside”
+SettingsManager.blockSlowdownKmh    = 12.0  -- temporary speed reduction while blocked
+SettingsManager.blockThrottleLimit  = 0.92  -- soft throttle cap while blocked (1 = no cap)
 
 
 local SETTINGS_SPEC = {
     { k = 'enabled',              get = function() return SettingsManager.enabled end,              set = function(v) SettingsManager.enabled = v end },
     { k = 'debugDraw',            get = function() return SettingsManager.debugDraw end,            set = function(v) SettingsManager.debugDraw = v end },
     { k = 'drawOnTop',            get = function() return SettingsManager.drawOnTop end,            set = function(v) SettingsManager.drawOnTop = v end },
-    { k = 'DETECT_INNER_M',       get = function() return SettingsManager.DETECT_INNER_M end,       set = function(v) SettingsManager.DETECT_INNER_M = v end },
-    { k = 'DETECT_HYSTERESIS_M',  get = function() return SettingsManager.DETECT_HYSTERESIS_M end,  set = function(v) SettingsManager.DETECT_HYSTERESIS_M = v end },
-    { k = 'MIN_PLAYER_SPEED_KMH', get = function() return SettingsManager.MIN_PLAYER_SPEED_KMH end, set = function(v) SettingsManager.MIN_PLAYER_SPEED_KMH = v end },
-    { k = 'MIN_SPEED_DELTA_KMH',  get = function() return SettingsManager.MIN_SPEED_DELTA_KMH end,  set = function(v) SettingsManager.MIN_SPEED_DELTA_KMH = v end },
-    { k = 'YIELD_OFFSET_M',       get = function() return SettingsManager.YIELD_OFFSET_M end,       set = function(v) SettingsManager.YIELD_OFFSET_M = v end },
+    { k = 'DETECT_INNER_M',       get = function() return SettingsManager.detectInner_meters end,       set = function(v) SettingsManager.detectInner_meters = v end },
+    { k = 'DETECT_HYSTERESIS_M',  get = function() return SettingsManager.detectHysteresis_meters end,  set = function(v) SettingsManager.detectHysteresis_meters = v end },
+    { k = 'MIN_PLAYER_SPEED_KMH', get = function() return SettingsManager.minPlayerSpeed_kmh end, set = function(v) SettingsManager.minPlayerSpeed_kmh = v end },
+    { k = 'MIN_SPEED_DELTA_KMH',  get = function() return SettingsManager.minSpeedDelta_kmh end,  set = function(v) SettingsManager.minSpeedDelta_kmh = v end },
+    { k = 'YIELD_OFFSET_M',       get = function() return SettingsManager.yieldOffset_meters end,       set = function(v) SettingsManager.yieldOffset_meters = v end },
     { k = 'RAMP_SPEED_MPS',       get = function() return SettingsManager.rampSpeedMps end,       set = function(v) SettingsManager.rampSpeedMps = v end },
-    { k = 'RAMP_RELEASE_MPS',     get = function() return SettingsManager.RAMP_RELEASE_MPS end,     set = function(v) SettingsManager.RAMP_RELEASE_MPS = v end },
-    { k = 'CLEAR_AHEAD_M',        get = function() return SettingsManager.CLEAR_AHEAD_M end,        set = function(v) SettingsManager.CLEAR_AHEAD_M = v end },
-    { k = 'RIGHT_MARGIN_M',       get = function() return SettingsManager.RIGHT_MARGIN_M end,       set = function(v) SettingsManager.RIGHT_MARGIN_M = v end },
-    { k = 'LIST_RADIUS_FILTER_M', get = function() return SettingsManager.LIST_RADIUS_FILTER_M end, set = function(v) SettingsManager.LIST_RADIUS_FILTER_M = v end },
-    { k = 'MIN_AI_SPEED_KMH',     get = function() return SettingsManager.MIN_AI_SPEED_KMH end,     set = function(v) SettingsManager.MIN_AI_SPEED_KMH = v end },
-    { k = 'YIELD_TO_LEFT',        get = function() return SettingsManager.YIELD_TO_LEFT end,        set = function(v) SettingsManager.YIELD_TO_LEFT = v end },
+    { k = 'RAMP_RELEASE_MPS',     get = function() return SettingsManager.rampRelease_mps end,     set = function(v) SettingsManager.rampRelease_mps = v end },
+    { k = 'CLEAR_AHEAD_M',        get = function() return SettingsManager.clearAhead_meters end,        set = function(v) SettingsManager.clearAhead_meters = v end },
+    { k = 'RIGHT_MARGIN_M',       get = function() return SettingsManager.rightMargin_meters end,       set = function(v) SettingsManager.rightMargin_meters = v end },
+    { k = 'LIST_RADIUS_FILTER_M', get = function() return SettingsManager.listRadiusFilter_meters end, set = function(v) SettingsManager.listRadiusFilter_meters = v end },
+    { k = 'MIN_AI_SPEED_KMH',     get = function() return SettingsManager.minAISpeed_kmh end,     set = function(v) SettingsManager.minAISpeed_kmh = v end },
+    { k = 'YIELD_TO_LEFT',        get = function() return SettingsManager.yieldToLeft end,        set = function(v) SettingsManager.yieldToLeft = v end },
 }
 
 -- Storage that survives LAZY unloads
@@ -49,18 +49,18 @@ SettingsManager.P = (ac.store and ac.store('AC_AICarsOvertake'))
 
 
 SettingsManager.SETTINGS = {}
-SettingsManager.CFG_PATH = nil
+SettingsManager.configFilePath = nil
 SettingsManager.lastSaveOk = false
 SettingsManager.lastSaveErr = ''
 
 -- File persistence
-SettingsManager.CFG_RESOLVE_NOTE = "<none>"
-SettingsManager.BOOT_LOADING = true
+SettingsManager.configResolveNote = "<none>"
+SettingsManager.CurrentlyBootloading = true
 
 -- >>> Debounced save (declared before _persist to avoid global/local split)
-SettingsManager.SAVE_INTERVAL = 0.5   -- seconds without changes before we write
-SettingsManager._autosaveTimer = 0
-SettingsManager._dirty = false
+SettingsManager.saveInterval = 0.5   -- seconds without changes before we write
+SettingsManager.autosaveTimer = 0
+SettingsManager.settingsCurrentlyDirty = false
 
 local _lazyResolved = false
 
@@ -71,21 +71,21 @@ function SettingsManager.shouldAppRun()
 end
 
 function SettingsManager._ensureConfig()
-    if _lazyResolved and SettingsManager.CFG_PATH then return end
-    if not SettingsManager.CFG_PATH then
+    if _lazyResolved and SettingsManager.configFilePath then return end
+    if not SettingsManager.configFilePath then
         local p = SettingsManager._userIniPath()
         if p then
-            SettingsManager.CFG_PATH = p
-            local wasBoot = SettingsManager.BOOT_LOADING
-            SettingsManager.BOOT_LOADING = true
+            SettingsManager.configFilePath = p
+            local wasBoot = SettingsManager.CurrentlyBootloading
+            SettingsManager.CurrentlyBootloading = true
             SettingsManager.loadINIFile()
 
             -- Apply loaded values immediately (so sliders show persisted values)
             SettingsManager.settings_apply(SettingsManager.SETTINGS)
 
             -- unlock saving *after* values are applied
-            SettingsManager.BOOT_LOADING = false
-            if wasBoot == false then SettingsManager.BOOT_LOADING = false end
+            SettingsManager.CurrentlyBootloading = false
+            if wasBoot == false then SettingsManager.CurrentlyBootloading = false end
             _lazyResolved = true
             return
         end
@@ -96,9 +96,9 @@ end
 
 function SettingsManager.loadINIFile()
     SettingsManager.SETTINGS = {}
-    SettingsManager.CFG_PATH = SettingsManager._userIniPath()
-    if not SettingsManager.CFG_PATH then return end
-    local f = io.open(SettingsManager.CFG_PATH, "r"); if not f then return end
+    SettingsManager.configFilePath = SettingsManager._userIniPath()
+    if not SettingsManager.configFilePath then return end
+    local f = io.open(SettingsManager.configFilePath, "r"); if not f then return end
     for line in f:lines() do
         local k, v = line:match("^%s*([%w_]+)%s*=%s*([^;%s]+)")
         if k and v then
@@ -112,20 +112,20 @@ function SettingsManager.loadINIFile()
 end
 
 function SettingsManager.saveINIFile()
-    Logger.log('AC_AICarsOvertake: saving to '..tostring(SettingsManager.CFG_PATH))
-    if SettingsManager.BOOT_LOADING then
+    Logger.log('Saving to '..tostring(SettingsManager.configFilePath))
+    if SettingsManager.CurrentlyBootloading then
          return
     end
 
-    SettingsManager.CFG_PATH = SettingsManager.CFG_PATH or SettingsManager._userIniPath()
-    if not SettingsManager.CFG_PATH then
+    SettingsManager.configFilePath = SettingsManager.configFilePath or SettingsManager._userIniPath()
+    if not SettingsManager.configFilePath then
         SettingsManager.lastSaveOk=false; 
         SettingsManager.lastSaveErr='no path';
         return 
     end
 
-    SettingsManager._ensureParentDir(SettingsManager.CFG_PATH)
-    local f, err = io.open(SettingsManager.CFG_PATH, "w")
+    SettingsManager._ensureParentDir(SettingsManager.configFilePath)
+    local f, err = io.open(SettingsManager.configFilePath, "w")
     if not f then SettingsManager.lastSaveOk=false; SettingsManager.lastSaveErr=tostring(err or 'open failed'); return end
     local function w(k, v)
         if type(v) == "boolean" then v = v and "true" or "false" end
@@ -135,13 +135,13 @@ function SettingsManager.saveINIFile()
     SettingsManager.settings_write(w)
     f:close()
     SettingsManager.lastSaveOk, SettingsManager.lastSaveErr = true, ''
-    Logger.log(('saved %s'):format(SettingsManager.CFG_PATH))
+    Logger.log(('saved %s'):format(SettingsManager.configFilePath))
 end
 
 -- Returns absolute path to our INI or nil; also sets CFG_RESOLVE_NOTE
 function SettingsManager._userIniPath()
     local function set(p, how)
-        if p and #p > 0 then SettingsManager.CFG_RESOLVE_NOTE = how; return p end
+        if p and #p > 0 then SettingsManager.configResolveNote = how; return p end
         return nil
     end
 
@@ -185,7 +185,7 @@ function SettingsManager._userIniPath()
         end
     end
 
-    SettingsManager.CFG_RESOLVE_NOTE = "<failed>"
+    SettingsManager.configResolveNote = "<failed>"
     return nil
 end
 

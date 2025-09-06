@@ -25,7 +25,7 @@ function CarOperations.isTargetSideBlocked(carIndex, sideSign)
                 local rel = MathHelpers.vsub(o.position, me.position)
                 local lat = MathHelpers.dot(rel, mySide)   -- + right, - left
                 local fwd = MathHelpers.dot(rel, myLook)   -- + ahead, - behind
-                if lat*sideSign > 0 and math.abs(lat) <= SettingsManager.BLOCK_SIDE_LAT_M and math.abs(fwd) <= SettingsManager.BLOCK_SIDE_LONG_M then
+                if lat*sideSign > 0 and math.abs(lat) <= SettingsManager.blockSideLateral_meters and math.abs(fwd) <= SettingsManager.blockSideLongitudinal_meters then
                     return true, i
                 end
             end
@@ -42,11 +42,11 @@ function CarOperations.clampSideOffsetMeters(aiWorldPos, desired, sideSign)
     local prog = ac.worldCoordinateToTrackProgress(aiWorldPos); if prog < 0 then return desired end
     local sides = ac.getTrackAISplineSides(prog) -- vec2(left, right)
     if sideSign > 0 then
-        local maxRight = math.max(0, (sides.y or 0) - SettingsManager.RIGHT_MARGIN_M)
+        local maxRight = math.max(0, (sides.y or 0) - SettingsManager.rightMargin_meters)
         local clamped  = math.max(0, math.min(desired, maxRight))
         return clamped, prog, maxRight
     else
-        local maxLeft  = math.max(0, (sides.x or 0) - SettingsManager.RIGHT_MARGIN_M)
+        local maxLeft  = math.max(0, (sides.x or 0) - SettingsManager.rightMargin_meters)
         local clamped  = math.min(0, math.max(desired, -maxLeft))
         return clamped, prog, maxLeft
     end
@@ -56,22 +56,22 @@ end
 -- Decision
 ----------------------------------------------------------------------
 function CarOperations.desiredOffsetFor(aiCar, playerCar, wasYielding)
-    if playerCar.speedKmh < SettingsManager.MIN_PLAYER_SPEED_KMH then return 0, nil, nil, nil, 'Player below minimum speed' end
+    if playerCar.speedKmh < SettingsManager.minPlayerSpeed_kmh then return 0, nil, nil, nil, 'Player below minimum speed' end
 
     -- If cars are abeam (neither clearly behind nor clearly ahead), or we’re already yielding and
     -- player isn’t clearly ahead yet, ignore closing-speed — yielding must persist mid-pass.
     local behind = CarOperations.isBehind(aiCar, playerCar)
-    local aheadClear = CarOperations.playerIsClearlyAhead(aiCar, playerCar, SettingsManager.CLEAR_AHEAD_M)
+    local aheadClear = CarOperations.playerIsClearlyAhead(aiCar, playerCar, SettingsManager.clearAhead_meters)
     local sideBySide = (not behind) and (not aheadClear)
     local ignoreDelta = sideBySide or (wasYielding and not aheadClear)
 
-    if not ignoreDelta and (playerCar.speedKmh - aiCar.speedKmh) < SettingsManager.MIN_SPEED_DELTA_KMH then
+    if not ignoreDelta and (playerCar.speedKmh - aiCar.speedKmh) < SettingsManager.minSpeedDelta_kmh then
         return 0, nil, nil, nil, 'No closing speed vs AI'
     end
 
-    if aiCar.speedKmh < SettingsManager.MIN_AI_SPEED_KMH then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
+    if aiCar.speedKmh < SettingsManager.minAISpeed_kmh then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
 
-    local radius = wasYielding and (SettingsManager.DETECT_INNER_M + SettingsManager.DETECT_HYSTERESIS_M) or SettingsManager.DETECT_INNER_M
+    local radius = wasYielding and (SettingsManager.detectInner_meters + SettingsManager.detectHysteresis_meters) or SettingsManager.detectInner_meters
     local d = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, aiCar.position))
     if d > radius then return 0, d, nil, nil, 'Too far (outside detect radius)' end
 
@@ -84,8 +84,8 @@ function CarOperations.desiredOffsetFor(aiCar, playerCar, wasYielding)
         end
     end
 
-    local sideSign = SettingsManager.YIELD_TO_LEFT and -1 or 1
-    local target   = sideSign * SettingsManager.YIELD_OFFSET_M
+    local sideSign = SettingsManager.yieldToLeft and -1 or 1
+    local target   = sideSign * SettingsManager.yieldOffset_meters
     local clamped, prog, sideMax = CarOperations.clampSideOffsetMeters(aiCar.position, target, sideSign)
     if (sideSign > 0 and (clamped or 0) <= 0.01) or (sideSign < 0 and (clamped or 0) >= -0.01) then
         return 0, d, prog, sideMax, 'No room on chosen side'
@@ -96,7 +96,7 @@ end
 local function indModeForYielding(willYield)
     local TL = ac and ac.TurningLights
     if willYield then
-        return TL and ((SettingsManager.YIELD_TO_LEFT and TL.Left) or TL.Right) or ((SettingsManager.YIELD_TO_LEFT and 1) or 2)
+        return TL and ((SettingsManager.yieldToLeft and TL.Left) or TL.Right) or ((SettingsManager.yieldToLeft and 1) or 2)
     end
     return TL and TL.None or 0
 end

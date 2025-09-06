@@ -23,7 +23,7 @@ local function awake()
   SettingsManager.settings_apply(SettingsManager.SETTINGS)
   SettingsManager.settings_apply(SettingsManager.P)
 
-  SettingsManager.BOOT_LOADING = false
+  SettingsManager.CurrentlyBootloading = false
 end
 awake()
 
@@ -37,7 +37,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
 
   SettingsManager._ensureConfig()
 
-  ui.text(string.format('AI cars yielding to the %s', (SettingsManager.YIELD_TO_LEFT and 'LEFT') or 'RIGHT'))
+  ui.text(string.format('AI cars yielding to the %s', (SettingsManager.yieldToLeft and 'LEFT') or 'RIGHT'))
 
   ui.separator()
 
@@ -70,7 +70,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
     local c = ac.getCar(i)
     if c and CarManager.cars_initialized[i] then
       local distShown = order[n].d or CarManager.cars_dist[i] or 0
-      local show = (SettingsManager.LIST_RADIUS_FILTER_M <= 0) or (distShown <= SettingsManager.LIST_RADIUS_FILTER_M)
+      local show = (SettingsManager.listRadiusFilter_meters <= 0) or (distShown <= SettingsManager.listRadiusFilter_meters)
       if show then
         local base = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
@@ -110,12 +110,12 @@ function script.update(dt)
   SettingsManager._ensureConfig()
 
   -- Debounced autosave: write once after no changes for SAVE_INTERVAL
-  if not SettingsManager.BOOT_LOADING and SettingsManager.CFG_PATH then
-    if SettingsManager._dirty then
-      SettingsManager._autosaveTimer = SettingsManager._autosaveTimer + dt
-      if SettingsManager._autosaveTimer >= SettingsManager.SAVE_INTERVAL then
+  if not SettingsManager.CurrentlyBootloading and SettingsManager.configFilePath then
+    if SettingsManager.settingsCurrentlyDirty then
+      SettingsManager.autosaveTimer = SettingsManager.autosaveTimer + dt
+      if SettingsManager.autosaveTimer >= SettingsManager.saveInterval then
         SettingsManager.saveINIFile()
-        SettingsManager._dirty = false
+        SettingsManager.settingsCurrentlyDirty = false
       end
     end
   end
@@ -146,12 +146,12 @@ function script.MANIFEST__UPDATE(dt)
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
-      if CarManager.cars_yielding[i] and CarOperations.playerIsClearlyAhead(c, player, SettingsManager.CLEAR_AHEAD_M) then
+      if CarManager.cars_yielding[i] and CarOperations.playerIsClearlyAhead(c, player, SettingsManager.clearAhead_meters) then
         releasing = true
       end
 
       -- Side-by-side guard: if the target side is occupied, don’t cut in — create space first
-      local sideSign = SettingsManager.YIELD_TO_LEFT and -1 or 1
+      local sideSign = SettingsManager.yieldToLeft and -1 or 1
       local intendsSideMove = desired and math.abs(desired) > 0.01
       local isTargetSideBlocked, blockerCarIndex = false, nil
       if intendsSideMove then
@@ -163,12 +163,12 @@ function script.MANIFEST__UPDATE(dt)
       local targetDesired
       if isTargetSideBlocked and not releasing then
         -- keep indicators on, but don’t move laterally yet
-        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
+        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.rampRelease_mps * dt)
       elseif releasing then
         -- TODO: Is there a bug here because this line is exactly the same as above?
         -- TODO: Is there a bug here because this line is exactly the same as above?
         -- TODO: Is there a bug here because this line is exactly the same as above?
-        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.RAMP_RELEASE_MPS * dt)
+        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, SettingsManager.rampRelease_mps * dt)
       else
         targetDesired = desired or 0
       end
@@ -181,7 +181,7 @@ function script.MANIFEST__UPDATE(dt)
       CarManager.cars_yielding[i] = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
-      local stepMps = (releasing or isTargetSideBlocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.rampSpeedMps
+      local stepMps = (releasing or isTargetSideBlocked) and SettingsManager.rampRelease_mps or SettingsManager.rampSpeedMps
       CarManager.cars_offset[i] = MathHelpers.approach(CarManager.cars_offset[i], targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, CarManager.cars_offset[i], true)
 
@@ -189,9 +189,9 @@ function script.MANIFEST__UPDATE(dt)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if isTargetSideBlocked and intendsSideMove then
-        local cap = math.max((c.speedKmh or 0) - SettingsManager.BLOCK_SLOWDOWN_KMH, 5)
+        local cap = math.max((c.speedKmh or 0) - SettingsManager.blockSlowdownKmh, 5)
         physics.setAITopSpeed(i, cap)
-        physics.setAIThrottleLimit(i, SettingsManager.BLOCK_THROTTLE_LIMIT)
+        physics.setAIThrottleLimit(i, SettingsManager.blockThrottleLimit)
         CarManager.cars_reason[i] = 'Blocked by car on side'
       else
         physics.setAITopSpeed(i, 1e9)
@@ -213,13 +213,13 @@ end
 function script.MANIFEST__FUNCTION_SETTINGS()
   if (not Constants.CAN_APP_RUN) then return end
 
-  if SettingsManager.CFG_PATH then
+  if SettingsManager.configFilePath then
     ui.text(string.format('Config: %s  [via %s] %s',
-      SettingsManager.CFG_PATH, SettingsManager.CFG_RESOLVE_NOTE or '?',
+      SettingsManager.configFilePath, SettingsManager.configResolveNote or '?',
       SettingsManager.lastSaveOk and '(saved ✓)' or (SettingsManager.lastSaveErr ~= '' and ('(save error: '..SettingsManager.lastSaveErr..')') or '')
     ))
   else
-    ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.CFG_RESOLVE_NOTE or '?'))
+    ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.configResolveNote or '?'))
   end
 
   UIManager.drawControls()
@@ -229,5 +229,5 @@ end
 -- wiki: function to be called once when window closes
 function script.MANIFEST__FUNCTION_ON_HIDE()
   if (not SettingsManager.shouldAppRun()) then return end
-  if SettingsManager._dirty then SettingsManager.saveNIFile(); SettingsManager._dirty = false end
+  if SettingsManager.settingsCurrentlyDirty then SettingsManager.saveNIFile(); SettingsManager.settingsCurrentlyDirty = false end
 end

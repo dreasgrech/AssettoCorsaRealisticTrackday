@@ -61,8 +61,8 @@ end
 local function _persist(k, v)
     if SettingsManager.P then SettingsManager.P[k] = v end
     SettingsManager.SETTINGS[k] = v
-    SettingsManager._dirty = true
-    SettingsManager._autosaveTimer = 0
+    SettingsManager.settingsCurrentlyDirty = true
+    SettingsManager.autosaveTimer = 0
 end
 
 function UIManager.draw3DOverheadText()
