@@ -115,25 +115,25 @@ function script.MANIFEST__UPDATE(dt)
   local sim = ac.getSim()
   local player = ac.getCar(0)
 
-  for i = 1, (sim.carsCount or 0) - 1 do
-    local car = ac.getCar(i)
+  for carIndex = 1, (sim.carsCount or 0) - 1 do
+    local car = ac.getCar(carIndex)
     if
       car and
       car.isAIControlled and  -- only run the yielding logic on ai cars
-      not CarManager.cars_evacuating[i] -- don't run yielding logic if car is evacuating
+      not CarManager.cars_evacuating[carIndex] -- don't run yielding logic if car is evacuating
     then
-      CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
+      CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
-      local targetSplineOffset_meters, distanceFromPlayerCarToAICar, prog, sideMax, reason = CarOperations.desiredOffsetFor(car, player, CarManager.cars_currentlyYielding[i])
+      local targetSplineOffset_meters, distanceFromPlayerCarToAICar, prog, sideMax, reason = CarOperations.desiredOffsetFor(car, player, CarManager.cars_currentlyYielding[carIndex])
 
-      CarManager.cars_distanceFromPlayerToCar[i] = distanceFromPlayerCarToAICar or CarManager.cars_distanceFromPlayerToCar[i] or 0
-      CarManager.cars_prog[i] = prog or -1
-      CarManager.cars_maxRight[i] = sideMax or 0
-      CarManager.cars_reason[i] = reason or '-'
+      CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar or CarManager.cars_distanceFromPlayerToCar[carIndex] or 0
+      CarManager.cars_prog[carIndex] = prog or -1
+      CarManager.cars_maxRight[carIndex] = sideMax or 0
+      CarManager.cars_reason[carIndex] = reason or '-'
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local carReturningBackToNormal = false
-      if CarManager.cars_currentlyYielding[i] and CarOperations.playerIsClearlyAhead(car, player, storage.clearAhead_meters) then
+      if CarManager.cars_currentlyYielding[carIndex] and CarOperations.playerIsClearlyAhead(car, player, storage.clearAhead_meters) then
         carReturningBackToNormal = true
       end
 
@@ -142,50 +142,50 @@ function script.MANIFEST__UPDATE(dt)
       local intendsSideMove = targetSplineOffset_meters and math.abs(targetSplineOffset_meters) > 0.01
       local isTargetSideBlocked, blockerCarIndex = false, nil
       if intendsSideMove then
-        isTargetSideBlocked, blockerCarIndex = CarOperations.isTargetSideBlocked(i, sideSign)
+        isTargetSideBlocked, blockerCarIndex = CarOperations.isTargetSideBlocked(carIndex, sideSign)
       end
-      CarManager.cars_blocked[i] = isTargetSideBlocked
-      CarManager.cars_blocker[i] = blockerCarIndex
+      CarManager.cars_blocked[carIndex] = isTargetSideBlocked
+      CarManager.cars_blocker[carIndex] = blockerCarIndex
 
       local targetSplineOffset
       if isTargetSideBlocked and not carReturningBackToNormal then
         -- keep indicators on, but don’t move laterally yet
-        targetSplineOffset = MathHelpers.approach((CarManager.cars_targetSplineOffset[i] or targetSplineOffset_meters or 0), 0.0, storage.rampRelease_mps * dt)
+        targetSplineOffset = MathHelpers.approach((CarManager.cars_targetSplineOffset[carIndex] or targetSplineOffset_meters or 0), 0.0, storage.rampRelease_mps * dt)
       elseif carReturningBackToNormal then
         -- TODO: Is there a bug here because this line is exactly the same as above?
         -- TODO: Is there a bug here because this line is exactly the same as above?
         -- TODO: Is there a bug here because this line is exactly the same as above?
-        targetSplineOffset = MathHelpers.approach((CarManager.cars_targetSplineOffset[i] or targetSplineOffset_meters or 0), 0.0, storage.rampRelease_mps * dt)
+        targetSplineOffset = MathHelpers.approach((CarManager.cars_targetSplineOffset[carIndex] or targetSplineOffset_meters or 0), 0.0, storage.rampRelease_mps * dt)
       else
         targetSplineOffset = targetSplineOffset_meters or 0
       end
 
-      CarManager.cars_targetSplineOffset[i] = targetSplineOffset
+      CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 
       -- Keep yielding (blinkers) while blocked to signal intent
       local willYield = (isTargetSideBlocked and intendsSideMove) or (math.abs(targetSplineOffset) > 0.01)
-      if willYield then CarManager.cars_yieldTime[i] = (CarManager.cars_yieldTime[i] or 0) + dt end
-      CarManager.cars_currentlyYielding[i] = willYield
+      if willYield then CarManager.cars_yieldTime[carIndex] = (CarManager.cars_yieldTime[carIndex] or 0) + dt end
+      CarManager.cars_currentlyYielding[carIndex] = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
       local stepMps = (carReturningBackToNormal or isTargetSideBlocked) and storage.rampRelease_mps or storage.rampSpeed_mps
-      CarManager.cars_currentSplineOffset[i] = MathHelpers.approach(CarManager.cars_currentSplineOffset[i], targetSplineOffset, stepMps * dt)
-      physics.setAISplineAbsoluteOffset(i, CarManager.cars_currentSplineOffset[i], true)
+      CarManager.cars_currentSplineOffset[carIndex] = MathHelpers.approach(CarManager.cars_currentSplineOffset[carIndex], targetSplineOffset, stepMps * dt)
+      physics.setAISplineAbsoluteOffset(carIndex, CarManager.cars_currentSplineOffset[carIndex], true)
 
       -- TODO: also try using physics.setAICaution(...)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if isTargetSideBlocked and intendsSideMove then
         local cap = math.max((car.speedKmh or 0) - storage.blockSlowdownKmh, 5)
-        physics.setAITopSpeed(i, cap)
-        physics.setAIThrottleLimit(i, storage.blockThrottleLimit)
-        CarManager.cars_reason[i] = 'Blocked by car on side'
+        physics.setAITopSpeed(carIndex, cap)
+        physics.setAIThrottleLimit(carIndex, storage.blockThrottleLimit)
+        CarManager.cars_reason[carIndex] = 'Blocked by car on side'
       else
-        physics.setAITopSpeed(i, 1e9)
-        physics.setAIThrottleLimit(i, 1)
+        physics.setAITopSpeed(carIndex, 1e9)
+        physics.setAIThrottleLimit(carIndex, 1)
       end
 
-      CarOperations.applyIndicators(i, willYield, car)
+      CarOperations.applyIndicators(carIndex, willYield, car)
     end
   end
 end

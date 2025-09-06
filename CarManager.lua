@@ -54,9 +54,9 @@ local function setInitializedDefaults(carIndex)
     ac.setTargetCar(carIndex)
 
     -- Turn off any turning lights
-    if car.hasTurningLights then
+    -- if car.hasTurningLights then
         ac.setTurningLights(ac.TurningLights.None)
-    end
+    -- end
   end
 end
 

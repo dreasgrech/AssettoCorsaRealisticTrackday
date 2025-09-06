@@ -96,28 +96,23 @@ function CarOperations.desiredOffsetFor(aiCar, playerCar, aiCarCurrentlyYielding
     return clampedTargetSplineOffset_meters, distanceFromPlayerCarToAICar, normalizedTrackProgress, sideMax, 'ok'
 end
 
-local function indModeForYielding(willYield)
-    local storage = StorageManager.getStorage()
-    -- local turningLights = ac.TurningLights
-    if not willYield then
-        return ac.TurningLights.None
-    end
-
-    -- return ((storage.yieldToLeft and turningLights.Left) or turningLights.Right) or ((storage.yieldToLeft and 1) or 2)
-    if storage.yieldToLeft then
-        return ac.TurningLights.Left
-    else
-        return ac.TurningLights.Right
-    end
-end
-
 function CarOperations.applyIndicators(carIndex, carYielding, car)
-    local mode = indModeForYielding(carYielding)
-    if ac.setTargetCar(carIndex) then
-        ac.setTurningLights(mode)
-        ac.setTargetCar(0)
-        CarManager.cars_blink[carIndex] = mode
+    local storage = StorageManager.getStorage()
+    local turningLights;
+    if not carYielding then
+        turningLights = ac.TurningLights.None
+    elseif storage.yieldToLeft then
+        turningLights = ac.TurningLights.Left
+    else
+        turningLights = ac.TurningLights.Right
     end
+
+    if ac.setTargetCar(carIndex) then
+        ac.setTurningLights(turningLights)
+        -- ac.setTargetCar(0)
+        CarManager.cars_blink[carIndex] = turningLights
+    end
+
     CarManager.cars_indLeft[carIndex] = car.turningLeftLights or false
     CarManager.cars_indRight[carIndex] = car.turningRightLights or false
     CarManager.cars_indPhase[carIndex] = car.turningLightsActivePhase or false
