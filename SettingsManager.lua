@@ -129,7 +129,7 @@ function SettingsManager.saveINIFile()
     SettingsManager.settings_write(w)
     f:close()
     SettingsManager.lastSaveOk, SettingsManager.lastSaveErr = true, ''
-    ac.log(('AC_AICarsOvertake: saved %s'):format(SettingsManager.CFG_PATH))
+    Logger.log(('saved %s'):format(SettingsManager.CFG_PATH))
 end
 
 -- Returns absolute path to our INI or nil; also sets CFG_RESOLVE_NOTE
