@@ -64,6 +64,12 @@ SettingsManager._dirty = false
 
 local _lazyResolved = false
 
+function SettingsManager.shouldAppRun()
+    return
+        Constants.CAN_APP_RUN
+        and SettingsManager.enabled
+end
+
 function SettingsManager._ensureConfig()
     if _lazyResolved and SettingsManager.CFG_PATH then return end
     if not SettingsManager.CFG_PATH then

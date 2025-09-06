@@ -93,7 +93,6 @@ function UIManager.draw3DOverheadText()
       end
     end
   end
-
 end
 
 function UIManager.drawControls()
