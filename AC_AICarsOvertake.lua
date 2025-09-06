@@ -9,7 +9,9 @@ UIManager = require("UIManager")
 CarOperations = require("CarOperations")
 CarManager = require("CarManager")
 
+---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
+---
 local function awake()
   if (not Constants.CAN_APP_RUN) then
     Logger.log('App can not run.  Online? ' .. tostring(Constants.IS_ONLINE))
@@ -27,8 +29,10 @@ local function awake()
 end
 awake()
 
+---
 -- Function defined in manifest.ini
 -- wiki: function to be called each frame to draw window content
+---
 function script.MANIFEST__FUNCTION_MAIN(dt)
   if (not SettingsManager.shouldAppRun()) then
     ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(SettingsManager.enabled), tostring(Constants.IS_ONLINE)))
@@ -100,8 +104,10 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   end
 end
 
+---
 -- wiki: Called each frame after world matrix traversal ends for each app, even if none of its windows are active. 
 -- wiki: Please make sure to not do anything too computationally expensive there (unless app needs it for some reason).
+---
 function script.update(dt)
   if (not SettingsManager.shouldAppRun()) then return end
 
@@ -121,12 +127,14 @@ function script.update(dt)
   end
 end
 
+---
 -- wiki: called after a whole simulation update
+---
 function script.MANIFEST__UPDATE(dt)
   if (not SettingsManager.shouldAppRun()) then return end
 
-  local sim = ac.getSim(); if not sim then return end
-  local player = ac.getCar(0); if not player then return end
+  local sim = ac.getSim()
+  local player = ac.getCar(0)
 
   for i = 1, (sim.carsCount or 0) - 1 do
     local c = ac.getCar(i)
@@ -203,13 +211,18 @@ function script.MANIFEST__UPDATE(dt)
   end
 end
 
+---
 -- wiki: called when transparent objects are finished rendering
+---
 function script.MANIFEST__TRANSPARENT(dt)
   if (not SettingsManager.shouldAppRun()) then return end
   UIManager.draw3DOverheadText()
   render.setDepthMode(render.DepthMode.Normal)
 end
 
+---
+-- wiki: function to be called to draw content of corresponding settings window (only with “SETTINGS” flag)
+---
 function script.MANIFEST__FUNCTION_SETTINGS()
   if (not Constants.CAN_APP_RUN) then return end
 
@@ -222,11 +235,13 @@ function script.MANIFEST__FUNCTION_SETTINGS()
     ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.configResolveNote or '?'))
   end
 
-  UIManager.drawControls()
+  UIManager.drawOptionsUIControls()
 end
 
+---
 -- Save when window is closed/hidden as a last resort
 -- wiki: function to be called once when window closes
+---
 function script.MANIFEST__FUNCTION_ON_HIDE()
   if (not SettingsManager.shouldAppRun()) then return end
   if SettingsManager.settingsCurrentlyDirty then SettingsManager.saveNIFile(); SettingsManager.settingsCurrentlyDirty = false end

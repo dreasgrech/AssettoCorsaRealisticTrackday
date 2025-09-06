@@ -67,7 +67,7 @@ end
 
 function UIManager.draw3DOverheadText()
   if not SettingsManager.debugDraw then return end
-  local sim = ac.getSim(); if not sim then return end
+  local sim = ac.getSim()
   if SettingsManager.drawOnTop then
     -- draw over everything (no depth testing)
     render.setDepthMode(render.DepthMode.Off)
@@ -95,7 +95,7 @@ function UIManager.draw3DOverheadText()
   end
 end
 
-function UIManager.drawControls()
+function UIManager.drawOptionsUIControls()
     for _, e in ipairs(UI_ELEMENTS) do
         local spec = SettingsManager.SETTINGS_SPEC_BY_KEY[e.k]
         if spec then
