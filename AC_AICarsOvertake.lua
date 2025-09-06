@@ -9,6 +9,7 @@ UIManager = require("UIManager")
 CarOperations = require("CarOperations")
 CarManager = require("CarManager")
 
+--[=====[ 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
 ---
@@ -21,6 +22,7 @@ local function awake()
   -- Logger.log('Initializing')
 end
 awake()
+--]=====]
 
 local function shouldAppRun()
     local storage = StorageManager.getStorage()
@@ -118,7 +120,6 @@ function script.MANIFEST__UPDATE(dt)
     if
       car and 
       car.isAIControlled and  -- only run the yielding logic on ai cars
-      -- not CarManager.isCarEvacuating(i) -- don't run yielding logic if car is evacuating
       not CarManager.cars_evacuating[i] -- don't run yielding logic if car is evacuating
     then
       CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
