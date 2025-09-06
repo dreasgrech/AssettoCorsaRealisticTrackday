@@ -56,7 +56,6 @@ local function setInitializedDefaults(carIndex)
     end
   end
 
-  -- evacuating[carIndex] = false
   CarManager.cars_evacuating[carIndex] = false
 end
 
@@ -67,10 +66,6 @@ function CarManager.ensureDefaults(carIndex)
 
   setInitializedDefaults(carIndex)
 end
-
--- function CarManager.isCarEvacuating(carIndex)
---     return evacuating[carIndex]
--- end
 
 -- Monitor flood ai cars cycle event so that we also reset our state
 ac.onCarJumped(-1, function(carIndex)
