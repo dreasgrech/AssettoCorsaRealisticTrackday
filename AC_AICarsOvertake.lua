@@ -181,7 +181,7 @@ function script.MANIFEST__UPDATE(dt)
       CarManager.cars_yielding[i] = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
-      local stepMps = (releasing or isTargetSideBlocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.RAMP_SPEED_MPS
+      local stepMps = (releasing or isTargetSideBlocked) and SettingsManager.RAMP_RELEASE_MPS or SettingsManager.rampSpeedMps
       CarManager.cars_offset[i] = MathHelpers.approach(CarManager.cars_offset[i], targetDesired, stepMps * dt)
       physics.setAISplineAbsoluteOffset(i, CarManager.cars_offset[i], true)
 
