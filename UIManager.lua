@@ -37,17 +37,17 @@ function UIManager.draw3DOverheadText()
   for i = 1, (sim.carsCount or 0) - 1 do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
     if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_offset[i] or 0) > 0.02 or CarManager.cars_blocked[i]) then
-      local c = ac.getCar(i)
-      if c then
+      local car = ac.getCar(i)
+      if car then
         local txt = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
-          i, CarManager.cars_dist[i], math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0
+          i, CarManager.cars_dist[i], math.floor(car.speedKmh or 0), CarManager.cars_offset[i] or 0
         )
         do
-          local indTxt = UIManager.indicatorStatusText(i)
-          txt = txt .. string.format("  ind=%s", indTxt)
+          local indicatorStatusText = UIManager.indicatorStatusText(i)
+          txt = txt .. string.format("  ind=%s", indicatorStatusText)
         end
-        render.debugText(c.position + vec3(0, 2.0, 0), txt)
+        render.debugText(car.position + vec3(0, 2.0, 0), txt)
       end
     end
   end

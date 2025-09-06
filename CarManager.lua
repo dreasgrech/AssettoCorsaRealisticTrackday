@@ -16,9 +16,10 @@ CarManager.cars_indLeft = {}
 CarManager.cars_indRight = {}
 CarManager.cars_indPhase = {}
 CarManager.cars_hasTL = {}
+CarManager.cars_evacuating = {}
 
--- evacuate state so we don’t re-trigger while a car is already evacuating
-local evacuating = {}
+-- -- evacuate state so we don’t re-trigger while a car is already evacuating
+-- local evacuating = {}
 
 local function setInitializedDefaults(carIndex)
   CarManager.cars_initialized[carIndex] = true
@@ -37,6 +38,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_indRight[carIndex] = false
   CarManager.cars_indPhase[carIndex] = false
   CarManager.cars_hasTL[carIndex] = false
+  CarManager.cars_evacuating[carIndex] = false
 
   -- remove speed limitations which could have occured during an accident
   physics.setAIThrottleLimit(carIndex, 1)
@@ -54,7 +56,8 @@ local function setInitializedDefaults(carIndex)
     end
   end
 
-  evacuating[carIndex] = false
+  -- evacuating[carIndex] = false
+  CarManager.cars_evacuating[carIndex] = false
 end
 
 function CarManager.ensureDefaults(carIndex)
@@ -65,9 +68,9 @@ function CarManager.ensureDefaults(carIndex)
   setInitializedDefaults(carIndex)
 end
 
-function CarManager.isCarEvacuating(carIndex)
-    return evacuating[carIndex]
-end
+-- function CarManager.isCarEvacuating(carIndex)
+--     return evacuating[carIndex]
+-- end
 
 -- Monitor flood ai cars cycle event so that we also reset our state
 ac.onCarJumped(-1, function(carIndex)
@@ -141,7 +144,7 @@ end
 -- Monitor collisions
 ac.onCarCollision(-1, function (carIndex)
   local car = ac.getCar(carIndex)
-  if not car or evacuating[carIndex] then return end
+  if not car or CarManager.cars_evacuating[carIndex] then return end
 
   -- hazard lights
   ac.setTargetCar(carIndex)
@@ -158,7 +161,7 @@ ac.onCarCollision(-1, function (carIndex)
   physics.setAISplineOffset(carIndex, edgeOffsetNorm, true)                     -- override AI awareness       :contentReference[oaicite:10]{index=10}
 
   -- brief settle, then push onto grass if still near racing line
-  evacuating[carIndex] = true
+  CarManager.cars_evacuating[carIndex] = true
   physics.setAIStopCounter(carIndex, 0.4)                                       -- momentary pause              :contentReference[oaicite:11]{index=11}
   physics.setGentleStop(carIndex, true)                                         -- smooth decel                 :contentReference[oaicite:12]{index=12}
 
@@ -188,7 +191,7 @@ ac.onCarCollision(-1, function (carIndex)
       physics.setAITopSpeed(carIndex, math.huge)
       physics.setAIThrottleLimit(carIndex, 1)
       if car.hasTurningLights then ac.setTurningLights(ac.TurningLights.None) end
-      evacuating[carIndex] = nil
+      CarManager.cars_evacuating[carIndex] = nil
     end, 6.0)
 --]=====]
   end, 0.6)

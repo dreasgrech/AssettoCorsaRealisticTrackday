@@ -59,10 +59,10 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   -- sort cars by distance to player for clearer list
   local order = {}
   for i = 1, totalAI do
-    local c = ac.getCar(i)
-    if c and CarManager.cars_initialized[i] then
+    local car = ac.getCar(i)
+    if car and CarManager.cars_initialized[i] then
       local d = CarManager.cars_dist[i]
-      if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, c.position)) end
+      if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, car.position)) end
       table.insert(order, { i = i, d = d })
     end
   end
@@ -70,14 +70,14 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
 
   for n = 1, #order do
     local i = order[n].i
-    local c = ac.getCar(i)
-    if c and CarManager.cars_initialized[i] then
+    local car = ac.getCar(i)
+    if car and CarManager.cars_initialized[i] then
       local distShown = order[n].d or CarManager.cars_dist[i] or 0
       local show = (storage.listRadiusFilter_meters <= 0) or (distShown <= storage.listRadiusFilter_meters)
       if show then
         local base = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
-          i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
+          i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
         )
         do
           local indTxt = UIManager.indicatorStatusText(i)
@@ -114,15 +114,16 @@ function script.MANIFEST__UPDATE(dt)
   local player = ac.getCar(0)
 
   for i = 1, (sim.carsCount or 0) - 1 do
-    local c = ac.getCar(i)
+    local car = ac.getCar(i)
     if
-      c and 
-      c.isAIControlled and  -- only run the yielding logic on ai cars
-      not CarManager.isCarEvacuating(i) -- don't run yielding logic if car is evacuating
+      car and 
+      car.isAIControlled and  -- only run the yielding logic on ai cars
+      -- not CarManager.isCarEvacuating(i) -- don't run yielding logic if car is evacuating
+      not CarManager.cars_evacuating[i] -- don't run yielding logic if car is evacuating
     then
       CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
 
-      local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(c, player, CarManager.cars_yielding[i])
+      local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(car, player, CarManager.cars_yielding[i])
 
       CarManager.cars_dist[i] = dist or CarManager.cars_dist[i] or 0
       CarManager.cars_prog[i] = prog or -1
@@ -131,7 +132,7 @@ function script.MANIFEST__UPDATE(dt)
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
-      if CarManager.cars_yielding[i] and CarOperations.playerIsClearlyAhead(c, player, storage.clearAhead_meters) then
+      if CarManager.cars_yielding[i] and CarOperations.playerIsClearlyAhead(car, player, storage.clearAhead_meters) then
         releasing = true
       end
 
@@ -174,7 +175,7 @@ function script.MANIFEST__UPDATE(dt)
 
       -- Temporarily cap speed if blocked to create a gap; remove caps otherwise
       if isTargetSideBlocked and intendsSideMove then
-        local cap = math.max((c.speedKmh or 0) - storage.blockSlowdownKmh, 5)
+        local cap = math.max((car.speedKmh or 0) - storage.blockSlowdownKmh, 5)
         physics.setAITopSpeed(i, cap)
         physics.setAIThrottleLimit(i, storage.blockThrottleLimit)
         CarManager.cars_reason[i] = 'Blocked by car on side'
@@ -183,7 +184,7 @@ function script.MANIFEST__UPDATE(dt)
         physics.setAIThrottleLimit(i, 1)
       end
 
-      CarOperations.applyIndicators(i, willYield, c)
+      CarOperations.applyIndicators(i, willYield, car)
     end
   end
 end
