@@ -23,23 +23,22 @@ SettingsManager.blockSideLongitudinal_meters     = 5.5   -- longitudinal window 
 SettingsManager.blockSlowdownKmh    = 12.0  -- temporary speed reduction while blocked
 SettingsManager.blockThrottleLimit  = 0.92  -- soft throttle cap while blocked (1 = no cap)
 
-
 local SETTINGS_SPEC = {
-    { k = 'enabled',              get = function() return SettingsManager.enabled end,              set = function(v) SettingsManager.enabled = v end },
-    { k = 'debugDraw',            get = function() return SettingsManager.debugDraw end,            set = function(v) SettingsManager.debugDraw = v end },
-    { k = 'drawOnTop',            get = function() return SettingsManager.drawOnTop end,            set = function(v) SettingsManager.drawOnTop = v end },
-    { k = 'detectInner_meters',       get = function() return SettingsManager.detectInner_meters end,       set = function(v) SettingsManager.detectInner_meters = v end },
-    { k = 'detectHysteresis_meters',  get = function() return SettingsManager.detectHysteresis_meters end,  set = function(v) SettingsManager.detectHysteresis_meters = v end },
+    { k = 'enabled', get = function() return SettingsManager.enabled end, set = function(v) SettingsManager.enabled = v end },
+    { k = 'debugDraw', get = function() return SettingsManager.debugDraw end, set = function(v) SettingsManager.debugDraw = v end },
+    { k = 'drawOnTop', get = function() return SettingsManager.drawOnTop end, set = function(v) SettingsManager.drawOnTop = v end },
+    { k = 'detectInner_meters', get = function() return SettingsManager.detectInner_meters end, set = function(v) SettingsManager.detectInner_meters = v end },
+    { k = 'detectHysteresis_meters', get = function() return SettingsManager.detectHysteresis_meters end, set = function(v) SettingsManager.detectHysteresis_meters = v end },
     { k = 'minPlayerSpeed_kmh', get = function() return SettingsManager.minPlayerSpeed_kmh end, set = function(v) SettingsManager.minPlayerSpeed_kmh = v end },
-    { k = 'minSpeedDelta_kmh',  get = function() return SettingsManager.minSpeedDelta_kmh end,  set = function(v) SettingsManager.minSpeedDelta_kmh = v end },
-    { k = 'yieldOffset_meters',       get = function() return SettingsManager.yieldOffset_meters end,       set = function(v) SettingsManager.yieldOffset_meters = v end },
-    { k = 'rampSpeedMps',       get = function() return SettingsManager.rampSpeedMps end,       set = function(v) SettingsManager.rampSpeedMps = v end },
-    { k = 'rampRelease_mps',     get = function() return SettingsManager.rampRelease_mps end,     set = function(v) SettingsManager.rampRelease_mps = v end },
-    { k = 'clearAhead_meters',        get = function() return SettingsManager.clearAhead_meters end,        set = function(v) SettingsManager.clearAhead_meters = v end },
-    { k = 'rightMargin_meters',       get = function() return SettingsManager.rightMargin_meters end,       set = function(v) SettingsManager.rightMargin_meters = v end },
+    { k = 'minSpeedDelta_kmh', get = function() return SettingsManager.minSpeedDelta_kmh end, set = function(v) SettingsManager.minSpeedDelta_kmh = v end },
+    { k = 'yieldOffset_meters', get = function() return SettingsManager.yieldOffset_meters end, set = function(v) SettingsManager.yieldOffset_meters = v end },
+    { k = 'rampSpeedMps', get = function() return SettingsManager.rampSpeedMps end, set = function(v) SettingsManager.rampSpeedMps = v end },
+    { k = 'rampRelease_mps', get = function() return SettingsManager.rampRelease_mps end, set = function(v) SettingsManager.rampRelease_mps = v end },
+    { k = 'clearAhead_meters', get = function() return SettingsManager.clearAhead_meters end, set = function(v) SettingsManager.clearAhead_meters = v end },
+    { k = 'rightMargin_meters', get = function() return SettingsManager.rightMargin_meters end, set = function(v) SettingsManager.rightMargin_meters = v end },
     { k = 'listRadiusFilter_meters', get = function() return SettingsManager.listRadiusFilter_meters end, set = function(v) SettingsManager.listRadiusFilter_meters = v end },
-    { k = 'minAISpeed_kmh',     get = function() return SettingsManager.minAISpeed_kmh end,     set = function(v) SettingsManager.minAISpeed_kmh = v end },
-    { k = 'yieldToLeft',        get = function() return SettingsManager.yieldToLeft end,        set = function(v) SettingsManager.yieldToLeft = v end },
+    { k = 'minAISpeed_kmh', get = function() return SettingsManager.minAISpeed_kmh end, set = function(v) SettingsManager.minAISpeed_kmh = v end },
+    { k = 'yieldToLeft', get = function() return SettingsManager.yieldToLeft end, set = function(v) SettingsManager.yieldToLeft = v end },
 }
 
 -- Fast lookup by key for UI code
