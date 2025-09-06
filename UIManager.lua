@@ -41,7 +41,7 @@ function UIManager.draw3DOverheadText()
       if car then
         local txt = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
-          i, CarManager.cars_dist[i], math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset[i] or 0
+          i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset[i] or 0
         )
         do
           local indicatorStatusText = UIManager.indicatorStatusText(i)

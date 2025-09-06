@@ -38,26 +38,26 @@ end
 ----------------------------------------------------------------------
 -- Trackside clamping
 ----------------------------------------------------------------------
-function CarOperations.clampSideOffsetMeters(carPosition, targetSplineOffset_meters, sideSign)
+local function clampSideOffsetMeters(carPosition, targetSplineOffset_meters, sideSign)
     local storage = StorageManager.getStorage()
     local normalizedTrackProgress = ac.worldCoordinateToTrackProgress(carPosition)
     if normalizedTrackProgress < 0 then return targetSplineOffset_meters end
     local sides = ac.getTrackAISplineSides(normalizedTrackProgress) -- vec2(left, right)
     if sideSign > 0 then
         local maxRight = math.max(0, (sides.y or 0) - storage.rightMargin_meters)
-        local clamped  = math.max(0, math.min(targetSplineOffset_meters, maxRight))
-        return clamped, normalizedTrackProgress, maxRight
+        local clampedTargetSplineOffset_meters  = math.max(0, math.min(targetSplineOffset_meters, maxRight))
+        return clampedTargetSplineOffset_meters, normalizedTrackProgress, maxRight
     else
         local maxLeft  = math.max(0, (sides.x or 0) - storage.rightMargin_meters)
-        local clamped  = math.min(0, math.max(targetSplineOffset_meters, -maxLeft))
-        return clamped, normalizedTrackProgress, maxLeft
+        local clampedTargetSplineOffset_meters  = math.min(0, math.max(targetSplineOffset_meters, -maxLeft))
+        return clampedTargetSplineOffset_meters, normalizedTrackProgress, maxLeft
     end
 end
 
 ----------------------------------------------------------------------
 -- Decision
 ----------------------------------------------------------------------
-function CarOperations.desiredOffsetFor(aiCar, playerCar, wasYielding)
+function CarOperations.desiredOffsetFor(aiCar, playerCar, aiCarCurrentlyYielding)
     local storage = StorageManager.getStorage()
     if playerCar.speedKmh < storage.minPlayerSpeed_kmh then return 0, nil, nil, nil, 'Player below minimum speed' end
 
@@ -66,7 +66,7 @@ function CarOperations.desiredOffsetFor(aiCar, playerCar, wasYielding)
     local behind = CarOperations.isBehind(aiCar, playerCar)
     local aheadClear = CarOperations.playerIsClearlyAhead(aiCar, playerCar, storage.clearAhead_meters)
     local sideBySide = (not behind) and (not aheadClear)
-    local ignoreDelta = sideBySide or (wasYielding and not aheadClear)
+    local ignoreDelta = sideBySide or (aiCarCurrentlyYielding and not aheadClear)
 
     if not ignoreDelta and (playerCar.speedKmh - aiCar.speedKmh) < storage.minSpeedDelta_kmh then
         return 0, nil, nil, nil, 'No closing speed vs AI'
@@ -74,13 +74,13 @@ function CarOperations.desiredOffsetFor(aiCar, playerCar, wasYielding)
 
     if aiCar.speedKmh < storage.minAISpeed_kmh then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
 
-    local radius = wasYielding and (storage.detectInner_meters + storage.detectHysteresis_meters) or storage.detectInner_meters
+    local radius = aiCarCurrentlyYielding and (storage.detectInner_meters + storage.detectHysteresis_meters) or storage.detectInner_meters
     local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, aiCar.position))
     if distanceFromPlayerCarToAICar > radius then return 0, distanceFromPlayerCarToAICar, nil, nil, 'Too far (outside detect radius)' end
 
     -- Keep yielding even if the player pulls alongside; only stop once the player is clearly ahead.
     if not behind then
-        if wasYielding and not aheadClear then
+        if aiCarCurrentlyYielding and not aheadClear then
             -- continue yielding through the pass; fall through to compute side offset
         else
             return 0, distanceFromPlayerCarToAICar, nil, nil, 'Player not behind (clear)'
@@ -89,34 +89,39 @@ function CarOperations.desiredOffsetFor(aiCar, playerCar, wasYielding)
 
     local sideSign = storage.yieldToLeft and -1 or 1
     local targetSplineOffset_meters   = sideSign * storage.yieldOffset_meters
-    local clamped, normalizedTrackProgress, sideMax = CarOperations.clampSideOffsetMeters(aiCar.position, targetSplineOffset_meters, sideSign)
-    if (sideSign > 0 and (clamped or 0) <= 0.01) or (sideSign < 0 and (clamped or 0) >= -0.01) then
+    local clampedTargetSplineOffset_meters, normalizedTrackProgress, sideMax = clampSideOffsetMeters(aiCar.position, targetSplineOffset_meters, sideSign)
+    if (sideSign > 0 and (clampedTargetSplineOffset_meters or 0) <= 0.01) or (sideSign < 0 and (clampedTargetSplineOffset_meters or 0) >= -0.01) then
         return 0, distanceFromPlayerCarToAICar, normalizedTrackProgress, sideMax, 'No room on chosen side'
     end
-    return clamped, distanceFromPlayerCarToAICar, normalizedTrackProgress, sideMax, 'ok'
+    return clampedTargetSplineOffset_meters, distanceFromPlayerCarToAICar, normalizedTrackProgress, sideMax, 'ok'
 end
 
 local function indModeForYielding(willYield)
     local storage = StorageManager.getStorage()
-    local TL = ac and ac.TurningLights
-    if willYield then
-        return TL and ((storage.yieldToLeft and TL.Left) or TL.Right) or ((storage.yieldToLeft and 1) or 2)
+    -- local turningLights = ac.TurningLights
+    if not willYield then
+        return ac.TurningLights.None
     end
-    return TL and TL.None or 0
+
+    -- return ((storage.yieldToLeft and turningLights.Left) or turningLights.Right) or ((storage.yieldToLeft and 1) or 2)
+    if storage.yieldToLeft then
+        return ac.TurningLights.Left
+    else
+        return ac.TurningLights.Right
+    end
 end
 
-function CarOperations.applyIndicators(i, willYield, car)
-    -- if not (ac and ac.setTurningLights and ac.setTargetCar) then return end
-    local mode = indModeForYielding(willYield)
-    if ac.setTargetCar(i) then
+function CarOperations.applyIndicators(carIndex, carYielding, car)
+    local mode = indModeForYielding(carYielding)
+    if ac.setTargetCar(carIndex) then
         ac.setTurningLights(mode)
         ac.setTargetCar(0)
-        CarManager.cars_blink[i] = mode
+        CarManager.cars_blink[carIndex] = mode
     end
-    CarManager.cars_indLeft[i] = car.turningLeftLights or false
-    CarManager.cars_indRight[i] = car.turningRightLights or false
-    CarManager.cars_indPhase[i] = car.turningLightsActivePhase or false
-    CarManager.cars_hasTL[i] = car.hasTurningLights or false
+    CarManager.cars_indLeft[carIndex] = car.turningLeftLights or false
+    CarManager.cars_indRight[carIndex] = car.turningRightLights or false
+    CarManager.cars_indPhase[carIndex] = car.turningLightsActivePhase or false
+    CarManager.cars_hasTL[carIndex] = car.hasTurningLights or false
 end
 
 return CarOperations
