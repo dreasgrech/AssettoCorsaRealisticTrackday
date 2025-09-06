@@ -41,64 +41,60 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
 
   ui.separator()
   local sim = ac.getSim()
-  local totalAI, yieldingCount = 0, 0
-  if sim then
-    totalAI = math.max(0, (sim.carsCount or 1) - 1)
-    for i = 1, totalAI do
-      if CarManager.cars_yielding[i] then
-        yieldingCount = yieldingCount + 1
-      end
+  local yieldingCount = 0
+  local totalAI = math.max(0, (sim.carsCount or 1) - 1)
+  for i = 1, totalAI do
+    if CarManager.cars_yielding[i] then
+      yieldingCount = yieldingCount + 1
     end
   end
   ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
   ui.text('Cars:')
   local player = ac.getCar(0)
-  if sim and player then
-    -- sort cars by distance to player for clearer list
-    local order = {}
-    for i = 1, totalAI do
-      local c = ac.getCar(i)
-      if c and CarManager.cars_initialized[i] then
-        local d = CarManager.cars_dist[i]
-        if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, c.position)) end
-        table.insert(order, { i = i, d = d })
-      end
+  -- sort cars by distance to player for clearer list
+  local order = {}
+  for i = 1, totalAI do
+    local c = ac.getCar(i)
+    if c and CarManager.cars_initialized[i] then
+      local d = CarManager.cars_dist[i]
+      if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, c.position)) end
+      table.insert(order, { i = i, d = d })
     end
-    table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
+  end
+  table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
 
-    for n = 1, #order do
-      local i = order[n].i
-      local c = ac.getCar(i)
-      if c and CarManager.cars_initialized[i] then
-        local distShown = order[n].d or CarManager.cars_dist[i] or 0
-        local show = (SettingsManager.LIST_RADIUS_FILTER_M <= 0) or (distShown <= SettingsManager.LIST_RADIUS_FILTER_M)
-        if show then
-          local base = string.format(
-            -- "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
-            "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
-            -- i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
-            i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
-          )
-          do
-            local indTxt = UIManager.indicatorStatusText(i)
-            base = base .. string.format("  ind=%s", indTxt)
-          end
-          if CarManager.cars_yielding[i] then
-            if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
-              ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
-              ui.text(base)
-              ui.popStyleColor()
-            elseif ui.textColored then
-              ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
-            else
-              ui.text(base)
-            end
-            ui.sameLine(); ui.text(string.format("  (yield %.1fs)", CarManager.cars_yieldTime[i] or 0))
+  for n = 1, #order do
+    local i = order[n].i
+    local c = ac.getCar(i)
+    if c and CarManager.cars_initialized[i] then
+      local distShown = order[n].d or CarManager.cars_dist[i] or 0
+      local show = (SettingsManager.LIST_RADIUS_FILTER_M <= 0) or (distShown <= SettingsManager.LIST_RADIUS_FILTER_M)
+      if show then
+        local base = string.format(
+          -- "#%02d  v=%3dkm/h  d=%5.1fm  off=%4.1f  des=%4.1f  max=%4.1f  prog=%.3f",
+          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
+          -- i, math.floor(c.speedKmh or 0), distShown, st.offset or 0, st.desired or 0, st.maxRight or 0, st.prog or -1
+          i, distShown, math.floor(c.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
+        )
+        do
+          local indTxt = UIManager.indicatorStatusText(i)
+          base = base .. string.format("  ind=%s", indTxt)
+        end
+        if CarManager.cars_yielding[i] then
+          if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
+            ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
+            ui.text(base)
+            ui.popStyleColor()
+          elseif ui.textColored then
+            ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
           else
-            local reason = CarManager.cars_reason[i] or '-'
-            ui.text(string.format("%s  reason: %s", base, reason))
+            ui.text(base)
           end
+          ui.sameLine(); ui.text(string.format("  (yield %.1fs)", CarManager.cars_yieldTime[i] or 0))
+        else
+          local reason = CarManager.cars_reason[i] or '-'
+          ui.text(string.format("%s  reason: %s", base, reason))
         end
       end
     end
