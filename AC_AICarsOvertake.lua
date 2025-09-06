@@ -50,7 +50,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   local yieldingCount = 0
   local totalAI = math.max(0, (sim.carsCount or 1) - 1)
   for i = 1, totalAI do
-    if CarManager.cars_yielding[i] then
+    if CarManager.cars_currentlyYielding[i] then
       yieldingCount = yieldingCount + 1
     end
   end
@@ -79,13 +79,13 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
       if show then
         local base = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
-          i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_offset[i] or 0, CarManager.cars_desired[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
+          i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset[i] or 0, CarManager.cars_targetSplineOffset[i] or 0, CarManager.cars_maxRight[i] or 0, CarManager.cars_prog[i] or -1
         )
         do
           local indTxt = UIManager.indicatorStatusText(i)
           base = base .. string.format("  ind=%s", indTxt)
         end
-        if CarManager.cars_yielding[i] then
+        if CarManager.cars_currentlyYielding[i] then
           if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
             ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
             ui.text(base)
@@ -124,16 +124,16 @@ function script.MANIFEST__UPDATE(dt)
     then
       CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
 
-      local desired, dist, prog, sideMax, reason = CarOperations.desiredOffsetFor(car, player, CarManager.cars_yielding[i])
+      local desired, distanceFromPlayerCarToAICar, prog, sideMax, reason = CarOperations.desiredOffsetFor(car, player, CarManager.cars_currentlyYielding[i])
 
-      CarManager.cars_dist[i] = dist or CarManager.cars_dist[i] or 0
+      CarManager.cars_dist[i] = distanceFromPlayerCarToAICar or CarManager.cars_dist[i] or 0
       CarManager.cars_prog[i] = prog or -1
       CarManager.cars_maxRight[i] = sideMax or 0
       CarManager.cars_reason[i] = reason or '-'
 
       -- Release logic: ease desired to 0 once the player is clearly ahead
       local releasing = false
-      if CarManager.cars_yielding[i] and CarOperations.playerIsClearlyAhead(car, player, storage.clearAhead_meters) then
+      if CarManager.cars_currentlyYielding[i] and CarOperations.playerIsClearlyAhead(car, player, storage.clearAhead_meters) then
         releasing = true
       end
 
@@ -150,27 +150,27 @@ function script.MANIFEST__UPDATE(dt)
       local targetDesired
       if isTargetSideBlocked and not releasing then
         -- keep indicators on, but don’t move laterally yet
-        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, storage.rampRelease_mps * dt)
+        targetDesired = MathHelpers.approach((CarManager.cars_targetSplineOffset[i] or desired or 0), 0.0, storage.rampRelease_mps * dt)
       elseif releasing then
         -- TODO: Is there a bug here because this line is exactly the same as above?
         -- TODO: Is there a bug here because this line is exactly the same as above?
         -- TODO: Is there a bug here because this line is exactly the same as above?
-        targetDesired = MathHelpers.approach((CarManager.cars_desired[i] or desired or 0), 0.0, storage.rampRelease_mps * dt)
+        targetDesired = MathHelpers.approach((CarManager.cars_targetSplineOffset[i] or desired or 0), 0.0, storage.rampRelease_mps * dt)
       else
         targetDesired = desired or 0
       end
 
-      CarManager.cars_desired[i] = targetDesired
+      CarManager.cars_targetSplineOffset[i] = targetDesired
 
       -- Keep yielding (blinkers) while blocked to signal intent
       local willYield = (isTargetSideBlocked and intendsSideMove) or (math.abs(targetDesired) > 0.01)
       if willYield then CarManager.cars_yieldTime[i] = (CarManager.cars_yieldTime[i] or 0) + dt end
-      CarManager.cars_yielding[i] = willYield
+      CarManager.cars_currentlyYielding[i] = willYield
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
       local stepMps = (releasing or isTargetSideBlocked) and storage.rampRelease_mps or storage.rampSpeed_mps
-      CarManager.cars_offset[i] = MathHelpers.approach(CarManager.cars_offset[i], targetDesired, stepMps * dt)
-      physics.setAISplineAbsoluteOffset(i, CarManager.cars_offset[i], true)
+      CarManager.cars_currentSplineOffset[i] = MathHelpers.approach(CarManager.cars_currentSplineOffset[i], targetDesired, stepMps * dt)
+      physics.setAISplineAbsoluteOffset(i, CarManager.cars_currentSplineOffset[i], true)
 
       -- TODO: also try using physics.setAICaution(...)
 

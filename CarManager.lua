@@ -4,10 +4,10 @@ local CarManager = {}
 local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 
 CarManager.cars_initialized = {}
-CarManager.cars_offset = {}
-CarManager.cars_yielding = {}
+CarManager.cars_currentSplineOffset = {}
+CarManager.cars_currentlyYielding = {}
 CarManager.cars_dist = {}
-CarManager.cars_desired = {}
+CarManager.cars_targetSplineOffset = {}
 CarManager.cars_maxRight = {}
 CarManager.cars_prog = {}
 CarManager.cars_reason = {}
@@ -26,10 +26,10 @@ CarManager.cars_evacuating = {}
 
 local function setInitializedDefaults(carIndex)
   CarManager.cars_initialized[carIndex] = true
-  CarManager.cars_offset[carIndex] = 0
-  CarManager.cars_yielding[carIndex] = false
+  CarManager.cars_currentSplineOffset[carIndex] = 0
+  CarManager.cars_currentlyYielding[carIndex] = false
   CarManager.cars_dist[carIndex] = 0
-  CarManager.cars_desired[carIndex] = 0
+  CarManager.cars_targetSplineOffset[carIndex] = 0
   CarManager.cars_maxRight[carIndex] = 0
   CarManager.cars_prog[carIndex] = -1
   CarManager.cars_reason[carIndex] = '-'
@@ -166,7 +166,7 @@ ac.onCarCollision(-1, function (carIndex)
   CarManager.cars_reason[carIndex] = ("Just collided.  Evacuating %s side at spline=%.3f") 
                                 :format(goRight and "RIGHT" or "LEFT", car.splinePosition)
 
-  CarManager.cars_yielding[carIndex] = false
+  CarManager.cars_currentlyYielding[carIndex] = false
 
   setTimeout(function()
     physics.setAIStopCounter(carIndex, 0)
