@@ -1,5 +1,6 @@
 ﻿local SettingsManager = {}
 
+--[=====[ 
 -- SettingsManager.enabled = true
 -- SettingsManager.debugDraw = false
 -- SettingsManager.drawOnTop = false
@@ -227,5 +228,6 @@ end
 function SettingsManager.settings_write(writekv)
     for _, s in ipairs(SETTINGS_SPEC) do writekv(s.k, s.get()) end
 end
+--]=====]
 
 return SettingsManager;

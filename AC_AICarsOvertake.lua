@@ -20,7 +20,7 @@ ac.log('after change storage.  myAddress=' .. tostring(dreasStorage.myAddress) .
 Constants = require("Constants")
 Logger = require("Logger")
 StorageManager = require("StorageManager")
-SettingsManager = require("SettingsManager")
+-- SettingsManager = require("SettingsManager")
 MathHelpers = require("MathHelpers")
 UIManager = require("UIManager")
 CarOperations = require("CarOperations")
@@ -36,15 +36,22 @@ local function awake()
   end
 
   -- Logger.log('Initializing')
-  SettingsManager.loadINIFile()
+  -- SettingsManager.loadINIFile()
 
   -- Apply values from INI and storage (keeps UI in sync on start)
-  SettingsManager.settings_apply(SettingsManager.SETTINGS)
-  SettingsManager.settings_apply(SettingsManager.P)
+  -- SettingsManager.settings_apply(SettingsManager.SETTINGS)
+  -- SettingsManager.settings_apply(SettingsManager.P)
 
-  SettingsManager.CurrentlyBootloading = false
+  -- SettingsManager.CurrentlyBootloading = false
 end
 awake()
+
+local function shouldAppRun()
+    local storage = StorageManager.getStorage()
+    return
+        Constants.CAN_APP_RUN
+        and storage.enabled
+end
 
 ---
 -- Function defined in manifest.ini
@@ -52,13 +59,13 @@ awake()
 ---
 function script.MANIFEST__FUNCTION_MAIN(dt)
   local storage = StorageManager.getStorage()
-  if (not SettingsManager.shouldAppRun()) then
+  if (not shouldAppRun()) then
     -- ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(SettingsManager.enabled), tostring(Constants.IS_ONLINE)))
     ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(storage.enabled), tostring(Constants.IS_ONLINE)))
     return
   end
 
-  SettingsManager._ensureConfig()
+  -- SettingsManager._ensureConfig()
 
   ui.text(string.format('AI cars yielding to the %s', (storage.yieldToLeft and 'LEFT') or 'RIGHT'))
 
@@ -128,12 +135,13 @@ end
 -- wiki: Please make sure to not do anything too computationally expensive there (unless app needs it for some reason).
 ---
 function script.update(dt)
-  if (not SettingsManager.shouldAppRun()) then return end
+  if (not shouldAppRun()) then return end
 
   -- TODO: We probably don't need these settings checks in here
 
-  SettingsManager._ensureConfig()
+  -- SettingsManager._ensureConfig()
 
+--[=====[ 
   -- Debounced autosave: write once after no changes for SAVE_INTERVAL
   if not SettingsManager.CurrentlyBootloading and SettingsManager.configFilePath then
     if SettingsManager.settingsCurrentlyDirty then
@@ -144,6 +152,7 @@ function script.update(dt)
       end
     end
   end
+--]=====]
 end
 
 ---
@@ -151,7 +160,7 @@ end
 ---
 function script.MANIFEST__UPDATE(dt)
   local storage = StorageManager.getStorage()
-  if (not SettingsManager.shouldAppRun()) then return end
+  if (not shouldAppRun()) then return end
 
   local sim = ac.getSim()
   local player = ac.getCar(0)
@@ -235,7 +244,7 @@ end
 -- wiki: called when transparent objects are finished rendering
 ---
 function script.MANIFEST__TRANSPARENT(dt)
-  if (not SettingsManager.shouldAppRun()) then return end
+  if (not shouldAppRun()) then return end
   UIManager.draw3DOverheadText()
   render.setDepthMode(render.DepthMode.Normal)
 end
@@ -246,6 +255,7 @@ end
 function script.MANIFEST__FUNCTION_SETTINGS()
   if (not Constants.CAN_APP_RUN) then return end
 
+--[=====[ 
   if SettingsManager.configFilePath then
     ui.text(string.format('Config: %s  [via %s] %s',
       SettingsManager.configFilePath, SettingsManager.configResolveNote or '?',
@@ -254,6 +264,7 @@ function script.MANIFEST__FUNCTION_SETTINGS()
   else
     ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.configResolveNote or '?'))
   end
+--]=====]
 
   UIManager.renderUIOptionsControls()
   -- UIManager.drawOptionsUIControls()
@@ -264,6 +275,6 @@ end
 -- wiki: function to be called once when window closes
 ---
 function script.MANIFEST__FUNCTION_ON_HIDE()
-  if (not SettingsManager.shouldAppRun()) then return end
-  if SettingsManager.settingsCurrentlyDirty then SettingsManager.saveNIFile(); SettingsManager.settingsCurrentlyDirty = false end
+  if (not shouldAppRun()) then return end
+  -- if SettingsManager.settingsCurrentlyDirty then SettingsManager.saveNIFile(); SettingsManager.settingsCurrentlyDirty = false end
 end

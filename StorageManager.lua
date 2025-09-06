@@ -83,8 +83,6 @@ local storageTable = {
 
 local storage = ac.storage(storageTable)
 
--- storage['enabled'] = true
-
 function StorageManager.getStorage()
     return storage
 end
