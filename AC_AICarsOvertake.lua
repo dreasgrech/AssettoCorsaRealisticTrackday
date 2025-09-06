@@ -1,8 +1,25 @@
 -- AC_AICarsOvertake.lua
 -- Nudge AI to one side so the player can pass on the other (Trackday / AI Flood).
 
+---
+--[=====[ 
+local dreasStorage = ac.storage{
+  myAddress = 'default home',
+  myName = 'Default Jeronimo',
+}
+
+ac.log('before change storage.  myAddress=' .. tostring(dreasStorage.myAddress) .. ', myName=' .. tostring(dreasStorage.myName))
+
+dreasStorage.myAddress = '123 Main St'
+dreasStorage.myName = 'Karl'
+
+ac.log('after change storage.  myAddress=' .. tostring(dreasStorage.myAddress) .. ', myName=' .. tostring(dreasStorage.myName))
+--]=====]
+---
+
 Constants = require("Constants")
 Logger = require("Logger")
+StorageManager = require("StorageManager")
 SettingsManager = require("SettingsManager")
 MathHelpers = require("MathHelpers")
 UIManager = require("UIManager")
@@ -235,7 +252,8 @@ function script.MANIFEST__FUNCTION_SETTINGS()
     ui.text(string.format('Config: <unresolved>  [via %s]', SettingsManager.configResolveNote or '?'))
   end
 
-  UIManager.drawOptionsUIControls()
+  UIManager.renderUIOptionsControls()
+  -- UIManager.drawOptionsUIControls()
 end
 
 ---
