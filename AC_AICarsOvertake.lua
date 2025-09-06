@@ -125,6 +125,8 @@ end
 function script.update(dt)
   if not runApp then return end
 
+  -- TODO: We probably don't need these settings checks in here
+
   SettingsManager._ensureConfig()
 
   -- Debounced autosave: write once after no changes for SAVE_INTERVAL
@@ -137,6 +139,11 @@ function script.update(dt)
       end
     end
   end
+end
+
+-- wiki: called after a whole simulation update
+function script.MANIFEST__UPDATE(dt)
+  if not runApp then return end
 
   if not SettingsManager.enabled then return end
   local sim = ac.getSim(); if not sim then return end
