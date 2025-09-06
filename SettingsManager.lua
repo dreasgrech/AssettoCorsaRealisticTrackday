@@ -9,7 +9,7 @@ SettingsManager.detectHysteresis_meters   = 60.0
 SettingsManager.minPlayerSpeed_kmh  = 0.0
 SettingsManager.minSpeedDelta_kmh   = 5.0
 SettingsManager.yieldOffset_meters        = 2.5
-SettingsManager.rampSpeedMps        = 2.0
+SettingsManager.rampSpeed_mps        = 2.0
 SettingsManager.rampRelease_mps      = 1.6  -- slower return to center to avoid “snap back” once player is clearly ahead
 SettingsManager.clearAhead_meters         = 6.0
 SettingsManager.rightMargin_meters        = 0.6
@@ -32,7 +32,7 @@ local SETTINGS_SPEC = {
     { k = 'minPlayerSpeed_kmh', get = function() return SettingsManager.minPlayerSpeed_kmh end, set = function(v) SettingsManager.minPlayerSpeed_kmh = v end },
     { k = 'minSpeedDelta_kmh', get = function() return SettingsManager.minSpeedDelta_kmh end, set = function(v) SettingsManager.minSpeedDelta_kmh = v end },
     { k = 'yieldOffset_meters', get = function() return SettingsManager.yieldOffset_meters end, set = function(v) SettingsManager.yieldOffset_meters = v end },
-    { k = 'rampSpeedMps', get = function() return SettingsManager.rampSpeedMps end, set = function(v) SettingsManager.rampSpeedMps = v end },
+    { k = 'rampSpeed_mps', get = function() return SettingsManager.rampSpeed_mps end, set = function(v) SettingsManager.rampSpeed_mps = v end },
     { k = 'rampRelease_mps', get = function() return SettingsManager.rampRelease_mps end, set = function(v) SettingsManager.rampRelease_mps = v end },
     { k = 'clearAhead_meters', get = function() return SettingsManager.clearAhead_meters end, set = function(v) SettingsManager.clearAhead_meters = v end },
     { k = 'rightMargin_meters', get = function() return SettingsManager.rightMargin_meters end, set = function(v) SettingsManager.rightMargin_meters = v end },

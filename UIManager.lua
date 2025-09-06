@@ -11,8 +11,8 @@ local UI_ELEMENTS = {
     { kind='slider',   k='rightMargin_meters', label='Edge margin (m)', min=0.3, max=1.2, tip='Safety gap from the outer edge on the chosen side.' },
     { kind='slider',   k='minPlayerSpeed_kmh', label='Min player speed (km/h)', min=0, max=160, tip='Ignore very low-speed approaches (pit exits, traffic jams).' },
     { kind='slider',   k='minSpeedDelta_kmh',  label='Min speed delta (km/h)', min=0,  max=30, tip='Require some closing speed before asking AI to yield.' },
-    { kind='slider',   k='rampSpeedMps', label='Offset ramp (m/s)', min=1.0, max=10.0, tip='Ramp speed of offset change.' },
-    { kind='slider',   k='rampReleaseMps', label='Offset release (m/s)', min=0.2, max=6.0, tip='How quickly offset returns to center once you’re past the AI.' },
+    { kind='slider',   k='rampSpeed_mps', label='Offset ramp (m/s)', min=1.0, max=10.0, tip='Ramp speed of offset change.' },
+    { kind='slider',   k='rampRelease_mps', label='Offset release (m/s)', min=0.2, max=6.0, tip='How quickly offset returns to center once you’re past the AI.' },
     { kind='slider',   k='listRadiusFilter_meters', label='List radius filter (m)', min=0, max=1000, tip='Only show cars within this distance in the list (0 = show all).' },
     { kind='slider',   k='minAISpeed_kmh', label='Min AI speed (km/h)', min=0, max=120, tip='Don’t ask AI to yield if its own speed is below this (corners/traffic).' },
 }
