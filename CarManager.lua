@@ -1,13 +1,23 @@
 local CarManager = {}
 
+local CarStateType = {
+  None = 0,
+  YieldingToTheSide = 1 << 0,
+  StayingOnYieldingLane = 1 << 1,
+  EasingOutYield = 1 << 2,
+  WaitingAfterAccident = 1 << 3,
+}
+
+CarManager.CarStateType = CarStateType
+
 -- Andreas: used while still writing the accident system
 local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 
 CarManager.cars_initialized = {}
 CarManager.cars_currentlyYielding = {}
 
-CarManager.cars_currentSplineOffset_meters = {}
-CarManager.cars_targetSplineOffset_meters = {}
+CarManager.cars_currentSplineOffset_meters = {} -- used in old system which used meters instead of normalized
+CarManager.cars_targetSplineOffset_meters = {} -- used in old system which used meters instead of normalized
 
 CarManager.cars_currentSplineOffset = {}
 CarManager.cars_targetSplineOffset = {}
@@ -25,6 +35,7 @@ CarManager.cars_indRight = {}
 CarManager.cars_indPhase = {}
 CarManager.cars_hasTL = {}
 CarManager.cars_evacuating = {}
+CarManager.cars_state = {}
 
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
@@ -42,7 +53,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_distanceFromPlayerToCar[carIndex] = 0
   CarManager.cars_maxSideMargin[carIndex] = 0
   CarManager.cars_currentNormalizedTrackProgress[carIndex] = -1
-  CarManager.cars_reason[carIndex] = '-'
+  CarManager.cars_reason[carIndex] = ''
   CarManager.cars_yieldTime[carIndex] = 0
   CarManager.cars_currentTurningLights[carIndex] = nil
   CarManager.cars_isSideBlocked[carIndex] = false
@@ -52,6 +63,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_indPhase[carIndex] = false
   CarManager.cars_hasTL[carIndex] = false
   CarManager.cars_evacuating[carIndex] = false
+  CarManager.cars_state[carIndex] = CarManager.CarStateType.None
 
   -- remove speed limitations which could have occured during an accident
   physics.setAIThrottleLimit(carIndex, 1)
