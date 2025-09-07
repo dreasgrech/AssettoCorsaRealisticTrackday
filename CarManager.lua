@@ -74,6 +74,7 @@ local function setInitializedDefaults(carIndex)
   physics.setAITopSpeed(carIndex, math.huge)
   physics.setAIStopCounter(carIndex, 0)
   physics.setGentleStop(carIndex, false)
+  physics.setAICaution(carIndex, 0)
 
   local car = ac.getCar(carIndex)
   if car then
