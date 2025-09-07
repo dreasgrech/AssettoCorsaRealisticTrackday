@@ -37,7 +37,7 @@ function UIManager.draw3DOverheadText()
   for i = 1, (sim.carsCount or 0) - 1 do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
     -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
-    if CarManager.cars_initialized[i] and CarManager.cars_state[i] ~= CarManager.CarStateType.DrivingNormally then
+    if CarManager.cars_initialized[i] and CarManager.cars_state[i] ~= CarManager.CarStateType.DRIVING_NORMALLY then
       local car = ac.getCar(i)
       if car then
         local txt = string.format(

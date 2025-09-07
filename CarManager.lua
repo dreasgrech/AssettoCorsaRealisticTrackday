@@ -2,8 +2,8 @@ local CarManager = {}
 
 -- [Flags]
 local CarStateType = {
-  TryingToStartDrivingNormally = 0,
-  DrivingNormally = 1,
+  TRYING_TO_START_DRIVING_NORMALLY = 0,
+  DRIVING_NORMALLY = 1,
   TryingToStartYieldingToTheSide = 2,
   YieldingToTheSide = 4,
   StayingOnYieldingLane = 8,
@@ -67,7 +67,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_indPhase[carIndex] = false
   CarManager.cars_hasTL[carIndex] = false
   CarManager.cars_evacuating[carIndex] = false
-  CarManager.cars_state[carIndex] = CarManager.CarStateType.DrivingNormally
+  CarManager.cars_state[carIndex] = CarManager.CarStateType.DRIVING_NORMALLY
 
   -- remove speed limitations which could have occured during an accident
   physics.setAIThrottleLimit(carIndex, 1)

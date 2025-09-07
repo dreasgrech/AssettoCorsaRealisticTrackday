@@ -4,7 +4,7 @@ local CarStateMachine = {}
 local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
 local carStateMachine = {
-  [CarManager.CarStateType.TryingToStartDrivingNormally] = function (carIndex, dt, car, playerCar, storage)
+  [CarManager.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
 
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
@@ -14,7 +14,7 @@ local carStateMachine = {
       CarOperations.toggleTurningLights(carIndex, car, ac.TurningLights.None)
       
     -- start driving normally
-      CarManager.cars_state[carIndex] = CarManager.CarStateType.DrivingNormally
+      CarManager.cars_state[carIndex] = CarManager.CarStateType.DRIVING_NORMALLY
 
       -- reset the ai car caution back to normal
       physics.setAICaution(carIndex, 1)
@@ -22,7 +22,7 @@ local carStateMachine = {
       -- remove the ai car throttle limit since we will now be driving normally
       physics.setAIThrottleLimit(carIndex, 1)
   end,
-  [CarManager.CarStateType.DrivingNormally] = function (carIndex, dt, car, playerCar, storage)
+  [CarManager.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "DrivingNormally")) end
 
       -- If this car is not close to the player car, do nothing
@@ -192,7 +192,7 @@ local carStateMachine = {
 
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
-        CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartDrivingNormally
+        CarManager.cars_state[carIndex] = CarManager.CarStateType.TRYING_TO_START_DRIVING_NORMALLY
         return
       end
   end
