@@ -74,13 +74,13 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
     local i = order[n].i
     local car = ac.getCar(i)
     if car and CarManager.cars_initialized[i] then
-      local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i] or 0
-      local show = (storage.listRadiusFilter_meters <= 0) or (distShown <= storage.listRadiusFilter_meters)
-      if show then
+      local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i]
+      -- local show = (storage.listRadiusFilter_meters <= 0) or (distShown <= storage.listRadiusFilter_meters)
+      -- if show then
         local base = string.format(
           -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
           -- i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset_meters[i] or 0, CarManager.cars_targetSplineOffset_meters[i] or 0, CarManager.cars_maxSideMargin[i] or 0, CarManager.cars_currentNormalizedTrackProgress[i] or -1
-          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f state=%s",
+          "#%02d d=%6.3fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
           i, distShown, math.floor(car.speedKmh),
           CarManager.cars_currentSplineOffset[i],
           CarManager.cars_targetSplineOffset[i],
@@ -105,7 +105,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
           local reason = CarManager.cars_reason[i] or '-'
           ui.text(string.format("%s  reason: %s", base, reason))
         end
-      end
+      -- end
     end
   end
 end
@@ -190,16 +190,17 @@ local function doCarYieldingLogic_old(dt)
   end
 end
 
-local logCarStateMachineInCSPLog = false
+-- local LOG_CAR_STATEMACHINE_IN_CSP_LOG = true
+local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
 local carStateMachine = {
   [CarManager.CarStateType.DrivingNormally] = function (carIndex, dt, car, playerCar, storage)
-      if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "DrivingNormally")) end
+      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "DrivingNormally")) end
 
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
-      CarManager.cars_currentlyYielding[carIndex] = false
+      -- CarManager.cars_currentlyYielding[carIndex] = false
 
       -- If this car is not close to the player car, do nothing
       local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
@@ -207,6 +208,12 @@ local carStateMachine = {
       local isAICarCloseToPlayerCar = distanceFromPlayerCarToAICar <= radius
       if not isAICarCloseToPlayerCar then
         CarManager.cars_reason[carIndex] = 'Too far (outside detect radius) so not yielding'
+        return
+      end
+
+      local isPlayerCarBehindAICar = CarOperations.isBehind(car, playerCar)
+      if not isPlayerCarBehindAICar then
+        CarManager.cars_reason[carIndex] = 'Player not behind (clear) so not yielding'
         return
       end
 
@@ -233,13 +240,13 @@ local carStateMachine = {
       CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartYieldingToTheSide
   end,
   [CarManager.CarStateType.TryingToStartYieldingToTheSide] = function (carIndex, dt, car, playerCar, storage)
-      if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartYieldingToTheSide")) end
+      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartYieldingToTheSide")) end
 
       -- for now go directly to yielding to the side
       CarManager.cars_state[carIndex] = CarManager.CarStateType.YieldingToTheSide
   end,
   [CarManager.CarStateType.YieldingToTheSide] = function (carIndex, dt, car, playerCar, storage)
-      if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "YieldingToTheSide")) end
+      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "YieldingToTheSide")) end
 
       -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
       local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
@@ -275,13 +282,13 @@ local carStateMachine = {
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
   end,
   [CarManager.CarStateType.TryingToStartEasingOutYield] = function (carIndex, dt, car, playerCar, storage)
-        if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartEasingOutYield")) end
+        if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartEasingOutYield")) end
 
         -- for now go directly to easing out yield
         CarManager.cars_state[carIndex] = CarManager.CarStateType.EasingOutYield
   end,
   [CarManager.CarStateType.EasingOutYield] = function (carIndex, dt, car, playerCar, storage)
-      if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "EasingOutYield")) end
+      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "EasingOutYield")) end
 
       -- local sideSign = storage.yieldToLeft and -1 or 1
       local targetSplineOffset = 0
@@ -289,9 +296,9 @@ local carStateMachine = {
       local splineOffsetTransitionSpeed = storage.rampRelease_mps
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
-      if math.abs(currentSplineOffset) <= 0.01 then
-        currentSplineOffset = 0
-      end
+      -- if math.abs(currentSplineOffset) <= 0.01 then
+        -- currentSplineOffset = 0
+      -- end
 
       -- set the spline offset on the ai car
       local overrideAiAwareness = true -- TODO: check what this does

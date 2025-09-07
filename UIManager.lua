@@ -36,12 +36,18 @@ function UIManager.draw3DOverheadText()
 
   for i = 1, (sim.carsCount or 0) - 1 do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
-    if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
+    -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
+    if CarManager.cars_initialized[i] and CarManager.cars_state[i] ~= CarManager.CarStateType.DrivingNormally then
       local car = ac.getCar(i)
       if car then
         local txt = string.format(
-          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
-          i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset_meters[i] or 0
+          -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
+          -- i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset_meters[i] or 0
+          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
+          i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh),
+          CarManager.cars_currentSplineOffset[i],
+          CarManager.cars_targetSplineOffset[i],
+          CarManager.cars_state[i]
         )
         do
           local indicatorStatusText = UIManager.indicatorStatusText(i)
