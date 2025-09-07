@@ -3,6 +3,7 @@
 
 DequeManager = require("DequeManager")
 StackManager = require("StackManager")
+QueueManager = require("QueueManager")
 Constants = require("Constants")
 Logger = require("Logger")
 StorageManager = require("StorageManager")
