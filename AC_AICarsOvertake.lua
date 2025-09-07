@@ -212,7 +212,6 @@ local function doCarYieldingLogic_STATEMACHINE(dt)
       CarStateMachine.update(carIndex, dt, car, playerCar, storage)
 
       local carState = CarManager.cars_state[carIndex]
-      -- local aiCarCurrentlyYielding = not (carState == CarManager.CarStateType.DrivingNormally)
       local aiCarCurrentlyYielding = (carState == CarManager.CarStateType.YieldingToTheSide) or (carState == CarManager.CarStateType.StayingOnYieldingLane)
 
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding

@@ -81,13 +81,18 @@ local carStateMachine = {
       -- Since the player car is still close, we must continue yielding
       local sideSign = storage.yieldToLeft and -1 or 1
 
+--[=====[ 
       -- TODO: I haven't yet seen this "blocked" code working in practice, need to test more
       -- check if the side the car is yielding to is blocked by another car
       local isTargetSideBlocked, blockerCarIndex = CarOperations.isTargetSideBlocked(carIndex, sideSign)
+      CarManager.cars_isSideBlocked[carIndex] = isTargetSideBlocked
+      CarManager.cars_sideBlockedCarIndex[carIndex] = blockerCarIndex
+
       if isTargetSideBlocked then
         CarManager.cars_reason[carIndex] = 'Target side blocked by another car so not yielding'
         return
       end
+--]=====]
 
       local targetSplineOffset = sideSign
       local splineOffsetTransitionSpeed = storage.rampSpeed_mps
