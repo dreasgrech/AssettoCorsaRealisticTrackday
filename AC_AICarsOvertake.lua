@@ -85,7 +85,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
           i, distShown, math.floor(car.speedKmh),
           CarManager.cars_currentSplineOffset[i],
           CarManager.cars_targetSplineOffset[i],
-          CarManager.cars_state[i]
+          CarStateMachine.getCurrentState(i)
         )
         -- do
           -- local indTxt = UIManager.indicatorStatusText(i)
@@ -211,7 +211,7 @@ local function doCarYieldingLogic_STATEMACHINE(dt)
       -- execute the state machine for this car
       CarStateMachine.update(carIndex, dt, car, playerCar, storage)
 
-      local carState = CarManager.cars_state[carIndex]
+      local carState = CarStateMachine.getCurrentState(carIndex)
       local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
 
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding

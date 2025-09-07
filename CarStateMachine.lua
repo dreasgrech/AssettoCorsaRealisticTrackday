@@ -15,7 +15,23 @@ local CarStateType = {
   WAITING_AFTER_ACCIDENT = 64,
 }
 
+local cars_previousState = {}
+local cars_state = {}
+
 CarStateMachine.CarStateType = CarStateType
+
+CarStateMachine.changeState = function(carIndex, newState)
+    -- save a reference to the current state before changing it
+    local currentState = CarStateMachine.getCurrentState(carIndex)
+    cars_previousState[carIndex] = currentState
+
+    -- change to the new state
+    cars_state[carIndex] = newState
+end
+
+CarStateMachine.getCurrentState = function(carIndex)
+    return cars_state[carIndex]
+end
 
 local carStateMachine = {
   [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
@@ -28,7 +44,7 @@ local carStateMachine = {
       CarOperations.toggleTurningLights(carIndex, car, ac.TurningLights.None)
       
     -- start driving normally
-      CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.DRIVING_NORMALLY
+      CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 
       -- reset the ai car caution back to normal
       physics.setAICaution(carIndex, 1)
@@ -75,7 +91,7 @@ local carStateMachine = {
       end
 
       -- Since all the checks have passed, the ai car can now start to yield
-      CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE
+      CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE)
   end,
   [CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartYieldingToTheSide")) end
@@ -85,7 +101,7 @@ local carStateMachine = {
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       -- for now go directly to yielding to the side
-      CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE
+      CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE)
   end,
   [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "YieldingToTheSide")) end
@@ -132,7 +148,7 @@ local carStateMachine = {
         -- CarManager.cars_reason[carIndex] = 'Player clearly ahead, so easing out yield'
 
         -- go to trying to start easing out yield state
-        CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
 
         return
       end
@@ -140,7 +156,7 @@ local carStateMachine = {
       -- once we have reached the target offset, we can go to the next state
       local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
       if arrivedAtTargetOffset then
-        CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
         return
       end
   end,
@@ -161,7 +177,7 @@ local carStateMachine = {
         -- CarManager.cars_reason[carIndex] = 'Player clearly ahead, so easing out yield'
 
         -- go to trying to start easing out yield state
-        CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
 
         return
       end
@@ -183,7 +199,7 @@ local carStateMachine = {
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       -- for now go directly to easing out yield
-      CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.EASING_OUT_YIELD
+      CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.EASING_OUT_YIELD)
   end,
   [CarStateMachine.CarStateType.EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "EasingOutYield")) end
@@ -206,14 +222,14 @@ local carStateMachine = {
 
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
-        CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY)
         return
       end
   end
 }
 
 function CarStateMachine.update(carIndex, dt, car, playerCar, storage)
-    local state = CarManager.cars_state[carIndex]
+    local state = CarStateMachine.getCurrentState(carIndex)
 
     -- execute the state machine for this car
     carStateMachine[state](carIndex, dt, car, playerCar, storage)
