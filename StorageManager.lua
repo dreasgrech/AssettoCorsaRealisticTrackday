@@ -14,8 +14,8 @@ local storageTable = {
     rampSpeed_mps = 2.0,
     rampRelease_mps = 1.6,
 
-    rampSpeed = 2.0,
-    rampRelease = 1.6,
+    -- rampSpeed = 2.0,
+    -- rampRelease = 1.6,
 
     clearAhead_meters = 6.0,
     rightMargin_meters = 0.6,

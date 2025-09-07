@@ -78,13 +78,18 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
       local show = (storage.listRadiusFilter_meters <= 0) or (distShown <= storage.listRadiusFilter_meters)
       if show then
         local base = string.format(
-          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
-          i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset_meters[i] or 0, CarManager.cars_targetSplineOffset_meters[i] or 0, CarManager.cars_maxSideMargin[i] or 0, CarManager.cars_currentNormalizedTrackProgress[i] or -1
+          -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
+          -- i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset_meters[i] or 0, CarManager.cars_targetSplineOffset_meters[i] or 0, CarManager.cars_maxSideMargin[i] or 0, CarManager.cars_currentNormalizedTrackProgress[i] or -1
+          "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f state=%s",
+          i, distShown, math.floor(car.speedKmh),
+          CarManager.cars_currentSplineOffset[i],
+          CarManager.cars_targetSplineOffset[i],
+          CarManager.cars_state[i]
         )
-        do
-          local indTxt = UIManager.indicatorStatusText(i)
-          base = base .. string.format("  ind=%s", indTxt)
-        end
+        -- do
+          -- local indTxt = UIManager.indicatorStatusText(i)
+          -- base = base .. string.format("  ind=%s", indTxt)
+        -- end
         if CarManager.cars_currentlyYielding[i] then
           if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
             ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
@@ -185,18 +190,64 @@ local function doCarYieldingLogic_old(dt)
   end
 end
 
+local logCarStateMachineInCSPLog = false
+
 local carStateMachine = {
-  [CarManager.CarStateType.DrivingNormally] = function (carIndex)
+  [CarManager.CarStateType.DrivingNormally] = function (carIndex, dt, car, playerCar, storage)
+      if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "DrivingNormally")) end
+
+      CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
+      CarManager.cars_currentlyYielding[carIndex] = false
+
+      -- If this car is not close to the player car, do nothing
+      local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
+      local radius = storage.detectInner_meters + storage.detectHysteresis_meters
+      local isAICarCloseToPlayerCar = distanceFromPlayerCarToAICar <= radius
+      if not isAICarCloseToPlayerCar then
+        CarManager.cars_reason[carIndex] = 'Too far (outside detect radius) so not yielding'
+        return
+      end
+
+      -- Check if the player car is above the minimum speed
+      local isPlayerAboveMinSpeed = playerCar.speedKmh >= storage.minPlayerSpeed_kmh
+      if not isPlayerAboveMinSpeed then
+        CarManager.cars_reason[carIndex] = 'Player below minimum speed so not yielding'
+        return
+      end
+
+      -- Check if the player car is currently faster than the ai car 
+      local playerCarHasClosingSpeedToAiCar = (playerCar.speedKmh - car.speedKmh) >= storage.minSpeedDelta_kmh
+      if not playerCarHasClosingSpeedToAiCar then
+        CarManager.cars_reason[carIndex] = 'Player does not have closing speed so not yielding'
+      end
+
+      -- Check if the ai car is above the minimum speed
+      local isAICarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh
+      if not isAICarAboveMinSpeed then
+        CarManager.cars_reason[carIndex] = 'AI speed too low (corner/traffic) so not yielding'
+      end
+
+      -- Since all the checks have passed, the ai car can now start to yield
+      CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartYieldingToTheSide
   end,
-  [CarManager.CarStateType.YieldingToTheSide] = function (carIndex, car, playerCar, storage)
+  [CarManager.CarStateType.TryingToStartYieldingToTheSide] = function (carIndex, dt, car, playerCar, storage)
+      if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartYieldingToTheSide")) end
+
+      -- for now go directly to yielding to the side
+      CarManager.cars_state[carIndex] = CarManager.CarStateType.YieldingToTheSide
+  end,
+  [CarManager.CarStateType.YieldingToTheSide] = function (carIndex, dt, car, playerCar, storage)
+      if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "YieldingToTheSide")) end
 
       -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
       local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
       if isPlayerClearlyAheadOfAICar then
         CarManager.cars_reason[carIndex] = 'Player clearly ahead, so easing out yield'
 
+        -- reset the yield time counter
+        CarManager.cars_yieldTime[carIndex] = 0
         CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartEasingOutYield
 
         return
@@ -204,17 +255,43 @@ local carStateMachine = {
 
       -- Since the player car is still close, we must continue yielding
 
+      local sideSign = storage.yieldToLeft and -1 or 1
+      local targetSplineOffset = sideSign
+      -- local splineOffsetTransitionSpeed = storage.rampSpeed
+      local splineOffsetTransitionSpeed = storage.rampSpeed_mps
+      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
+
+      -- set the spline offset on the ai car
+      local overrideAiAwareness = true -- TODO: check what this does
+      physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
+
+      -- todo: implement the turning lights logic here
+      -- CarOperations.applyIndicators(carIndex, willYield, car)
+
+      CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
+      CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
+
+      CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
   end,
-  [CarManager.CarStateType.TryingToStartEasingOutYield] = function (carIndex)
+  [CarManager.CarStateType.TryingToStartEasingOutYield] = function (carIndex, dt, car, playerCar, storage)
+        if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartEasingOutYield")) end
+
         -- for now go directly to easing out yield
         CarManager.cars_state[carIndex] = CarManager.CarStateType.EasingOutYield
   end,
-  [CarManager.CarStateType.EasingOutYield] = function (carIndex, dt,storage)
+  [CarManager.CarStateType.EasingOutYield] = function (carIndex, dt, car, playerCar, storage)
+      if logCarStateMachineInCSPLog then Logger.log(string.format("Car %d: In state: %s", carIndex, "EasingOutYield")) end
+
       -- local sideSign = storage.yieldToLeft and -1 or 1
       local targetSplineOffset = 0
-      local splineOffsetTransitionSpeed = storage.rampRelease
+      -- local splineOffsetTransitionSpeed = storage.rampRelease
+      local splineOffsetTransitionSpeed = storage.rampRelease_mps
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
+      if math.abs(currentSplineOffset) <= 0.01 then
+        currentSplineOffset = 0
+      end
 
       -- set the spline offset on the ai car
       local overrideAiAwareness = true -- TODO: check what this does
@@ -223,7 +300,7 @@ local carStateMachine = {
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 
-      local arrivedBackToNormal = math.abs(currentSplineOffset) <= 0.01
+      local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
         CarManager.cars_state[carIndex] = CarManager.CarStateType.DrivingNormally
         return
@@ -231,7 +308,39 @@ local carStateMachine = {
   end
 }
 
-local function doCarYieldingLogic(dt)
+local function doCarYieldingLogic_STATEMACHINE(dt)
+  local storage = StorageManager.getStorage()
+  local sim = ac.getSim()
+  local playerCar = ac.getCar(0)
+  if not playerCar then return end
+
+  -- TODO: ac.iterateCars.ordered could be useful when we start applying the overtaking/yielding logic to ai cars too instead of just the local player
+
+  for carIndex = 1, (sim.carsCount or 0) - 1 do
+    local car = ac.getCar(carIndex)
+    if
+      car and
+      car.isAIControlled and  -- only run the yielding logic on ai cars
+      not CarManager.cars_evacuating[carIndex] -- don't run yielding logic if car is evacuating
+    then
+      CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
+
+      -- execute the state machine for this car
+      carStateMachine[CarManager.cars_state[carIndex]](carIndex, dt, car, playerCar, storage)
+
+      local carState = CarManager.cars_state[carIndex]
+      -- local aiCarCurrentlyYielding = not (carState == CarManager.CarStateType.DrivingNormally)
+      local aiCarCurrentlyYielding = carState == CarManager.CarStateType.YieldingToTheSide
+
+      CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
+
+      local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
+      CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar
+    end
+  end
+end
+
+local function doCarYieldingLogic_BOOLEANS(dt)
   local storage = StorageManager.getStorage()
   local sim = ac.getSim()
   local playerCar = ac.getCar(0)
@@ -345,7 +454,8 @@ end
 function script.MANIFEST__UPDATE(dt)
   if (not shouldAppRun()) then return end
   -- doCarYieldingLogic_old(dt)
-  doCarYieldingLogic(dt)
+  -- doCarYieldingLogic_BOOLEANS(dt)
+  doCarYieldingLogic_STATEMACHINE(dt)
 end
 
 ---
