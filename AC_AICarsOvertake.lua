@@ -185,6 +185,52 @@ local function doCarYieldingLogic_old(dt)
   end
 end
 
+local carStateMachine = {
+  [CarManager.CarStateType.DrivingNormally] = function (carIndex)
+      CarManager.cars_currentSplineOffset[carIndex] = 0
+      CarManager.cars_targetSplineOffset[carIndex] = 0
+  end,
+  [CarManager.CarStateType.YieldingToTheSide] = function (carIndex, car, playerCar, storage)
+
+      -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
+      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
+      if isPlayerClearlyAheadOfAICar then
+        CarManager.cars_reason[carIndex] = 'Player clearly ahead, so easing out yield'
+
+        CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartEasingOutYield
+
+        return
+      end
+
+      -- Since the player car is still close, we must continue yielding
+
+  end,
+  [CarManager.CarStateType.TryingToStartEasingOutYield] = function (carIndex)
+        -- for now go directly to easing out yield
+        CarManager.cars_state[carIndex] = CarManager.CarStateType.EasingOutYield
+  end,
+  [CarManager.CarStateType.EasingOutYield] = function (carIndex, dt,storage)
+      -- local sideSign = storage.yieldToLeft and -1 or 1
+      local targetSplineOffset = 0
+      local splineOffsetTransitionSpeed = storage.rampRelease
+      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
+
+      -- set the spline offset on the ai car
+      local overrideAiAwareness = true -- TODO: check what this does
+      physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
+
+      CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
+      CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
+
+      local arrivedBackToNormal = math.abs(currentSplineOffset) <= 0.01
+      if arrivedBackToNormal then
+        CarManager.cars_state[carIndex] = CarManager.CarStateType.DrivingNormally
+        return
+      end
+  end
+}
+
 local function doCarYieldingLogic(dt)
   local storage = StorageManager.getStorage()
   local sim = ac.getSim()
