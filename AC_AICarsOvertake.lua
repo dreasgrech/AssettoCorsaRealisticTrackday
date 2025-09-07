@@ -9,6 +9,7 @@ UIManager = require("UIManager")
 CarOperations = require("CarOperations")
 CarManager = require("CarManager")
 CarStateMachine = require("CarStateMachine")
+AccidentManager = require("AccidentManager")
 
 --[=====[ 
 ---
@@ -31,6 +32,11 @@ local function shouldAppRun()
         Constants.CAN_APP_RUN
         and storage.enabled
 end
+
+-- Monitor car collisions so we can register an accident
+ac.onCarCollision(-1, function (carIndex)
+    AccidentManager.registerCollision(carIndex)
+end)
 
 ---
 -- Function defined in manifest.ini
