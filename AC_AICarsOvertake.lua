@@ -281,7 +281,7 @@ local carStateMachine = {
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
 
       -- set the spline offset on the ai car
-      local overrideAiAwareness = true -- TODO: check what this does
+      local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
       -- keep the turning lights on while yielding
@@ -317,7 +317,7 @@ local carStateMachine = {
       -- end
 
       -- set the spline offset on the ai car
-      local overrideAiAwareness = true -- TODO: check what this does
+      local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
       -- keep inverted turning lights on while easing out yield (inverted yield direction since the car is now going back to center)

@@ -74,6 +74,9 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Yield to LEFT (instead of RIGHT)', storage.yieldToLeft) then storage.yieldToLeft = not storage.yieldToLeft end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI moves left to let you pass on the right. Otherwise AI moves right so you pass on the left.') end
 
+    if ui.checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily.') end
+
     storage.detectInner_meters =  ui.slider('Detect radius (m)', storage.detectInner_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is within this distance AND behind the AI car.') end
 
