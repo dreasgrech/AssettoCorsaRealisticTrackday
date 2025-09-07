@@ -207,7 +207,7 @@ local carStateMachine = {
       CarManager.cars_state[carIndex] = CarManager.CarStateType.DrivingNormally
 
       -- reset the ai car caution back to normal
-      physics.setAICaution(carIndex, 0)
+      physics.setAICaution(carIndex, 1)
 
       -- remove the ai car throttle limit since we will now be driving normally
       physics.setAIThrottleLimit(carIndex, 1)
@@ -292,9 +292,6 @@ local carStateMachine = {
       local turningLights = storage.yieldToLeft and ac.TurningLights.Left or ac.TurningLights.Right
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
-      -- make the ai car leave more space in between the care in front while yielding
-      physics.setAICaution(carIndex, 1)
-
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 
@@ -322,7 +319,7 @@ local carStateMachine = {
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "StayingOnYieldingLane")) end
 
       -- make the ai car leave more space in between the care in front while driving on the yielding lane
-      physics.setAICaution(carIndex, 1)
+      physics.setAICaution(carIndex, 2)
 
       -- limit the ai car throttle while driving on the yielding lane
       physics.setAIThrottleLimit(carIndex, 0.4)
@@ -350,7 +347,7 @@ local carStateMachine = {
       physics.setAIThrottleLimit(carIndex, 1)
 
       -- reset the ai car caution back to normal
-      physics.setAICaution(carIndex, 0)
+      physics.setAICaution(carIndex, 1)
 
       -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
       local turningLights = (not storage.yieldToLeft) and ac.TurningLights.Left or ac.TurningLights.Right
@@ -394,7 +391,7 @@ local function doCarYieldingLogic_STATEMACHINE(dt)
 
   -- TODO: ac.iterateCars.ordered could be useful when we start applying the overtaking/yielding logic to ai cars too instead of just the local player
 
-  for carIndex = 1, (sim.carsCount or 0) - 1 do
+  for carIndex = 1, sim.carsCount - 1 do
     local car = ac.getCar(carIndex)
     if
       car and
