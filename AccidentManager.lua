@@ -38,6 +38,9 @@ AccidentManager.registerCollision = function(carIndex)
     accidents_collidedWithCarIndex[accidentIndex] = collidedWith
     accidents_resolved[accidentIndex] = false
 
+    -- now we need to inform the state machine that a car has collided so that the state machine can then change state in the next update
+
+
     Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", carIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), lastAccidentIndexCreated, #accidents_carIndex))
 end
 
