@@ -202,7 +202,7 @@ local function doCarYieldingLogic(dt)
     then
       CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
-      local carStatusText = '-'
+      local carStatusText = CarManager.cars_reason[carIndex]
       local aiCarCurrentlyYielding = CarManager.cars_currentlyYielding[carIndex]
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
@@ -287,8 +287,8 @@ local function doCarYieldingLogic(dt)
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
       CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar
       CarManager.cars_reason[carIndex] = carStatusText
-      CarManager.cars.currentSplineOffset[carIndex] = currentSplineOffset
-      CarManager.cars.targetSplineOffset[carIndex] = targetSplineOffset
+      CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
+      CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
     end
   end
 end
