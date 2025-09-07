@@ -480,6 +480,10 @@ end
 ---
 function script.MANIFEST__UPDATE(dt)
   if (not shouldAppRun()) then return end
+
+  local sim = ac.getSim()
+  if sim.isPaused then return end
+
   -- doCarYieldingLogic_old(dt)
   -- doCarYieldingLogic_BOOLEANS(dt)
   doCarYieldingLogic_STATEMACHINE(dt)
