@@ -2,13 +2,14 @@ local CarManager = {}
 
 -- [Flags]
 local CarStateType = {
-  DrivingNormally = 0,
-  TryingToStartYieldingToTheSide = 1,
-  YieldingToTheSide = 2,
-  StayingOnYieldingLane = 4,
-  TryingToStartEasingOutYield = 8,
-  EasingOutYield = 16,
-  WaitingAfterAccident = 32,
+  TryingToStartDrivingNormally = 0,
+  DrivingNormally = 1,
+  TryingToStartYieldingToTheSide = 2,
+  YieldingToTheSide = 4,
+  StayingOnYieldingLane = 8,
+  TryingToStartEasingOutYield = 16,
+  EasingOutYield = 32,
+  WaitingAfterAccident = 64,
 }
 
 CarManager.CarStateType = CarStateType

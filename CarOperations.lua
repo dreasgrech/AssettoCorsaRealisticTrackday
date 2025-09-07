@@ -97,6 +97,7 @@ function CarOperations.desiredAbsoluteOffsetFor(aiCar, playerCar, aiCarCurrently
     return clampedTargetSplineOffset_meters, distanceFromPlayerCarToAICar, normalizedTrackProgress, maxSideMargin_meters, 'ok'
 end
 
+--- old obsolete
 function CarOperations.applyIndicators(carIndex, carYielding, car)
     local storage = StorageManager.getStorage()
     local turningLights;
@@ -118,6 +119,20 @@ function CarOperations.applyIndicators(carIndex, carYielding, car)
     CarManager.cars_indRight[carIndex] = car.turningRightLights or false
     CarManager.cars_indPhase[carIndex] = car.turningLightsActivePhase or false
     CarManager.cars_hasTL[carIndex] = car.hasTurningLights or false
+end
+
+---@param turningLights ac.TurningLights
+function CarOperations.toggleTurningLights(carIndex, car, turningLights)
+    if ac.setTargetCar(carIndex) then
+        ac.setTurningLights(turningLights)
+    end
+
+    -- TODO: we don't need all of these
+    CarManager.cars_currentTurningLights[carIndex] = turningLights
+    CarManager.cars_indLeft[carIndex] = car.turningLeftLights
+    CarManager.cars_indRight[carIndex] = car.turningRightLights
+    CarManager.cars_indPhase[carIndex] = car.turningLightsActivePhase
+    CarManager.cars_hasTL[carIndex] = car.hasTurningLights
 end
 
 return CarOperations

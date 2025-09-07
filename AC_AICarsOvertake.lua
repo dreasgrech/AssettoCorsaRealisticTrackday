@@ -194,13 +194,20 @@ end
 local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
 local carStateMachine = {
-  [CarManager.CarStateType.DrivingNormally] = function (carIndex, dt, car, playerCar, storage)
-      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "DrivingNormally")) end
+  [CarManager.CarStateType.TryingToStartDrivingNormally] = function (carIndex, dt, car, playerCar, storage)
 
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
-      -- CarManager.cars_currentlyYielding[carIndex] = false
+
+      -- turn off turning lights
+      CarOperations.toggleTurningLights(carIndex, car, ac.TurningLights.None)
+      
+    -- start driving normally
+      CarManager.cars_state[carIndex] = CarManager.CarStateType.DrivingNormally
+  end,
+  [CarManager.CarStateType.DrivingNormally] = function (carIndex, dt, car, playerCar, storage)
+      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "DrivingNormally")) end
 
       -- If this car is not close to the player car, do nothing
       local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
@@ -242,6 +249,10 @@ local carStateMachine = {
   [CarManager.CarStateType.TryingToStartYieldingToTheSide] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartYieldingToTheSide")) end
 
+      -- turn on turning lights
+      local turningLights = storage.yieldToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+
       -- for now go directly to yielding to the side
       CarManager.cars_state[carIndex] = CarManager.CarStateType.YieldingToTheSide
   end,
@@ -273,8 +284,9 @@ local carStateMachine = {
       local overrideAiAwareness = true -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
-      -- todo: implement the turning lights logic here
-      -- CarOperations.applyIndicators(carIndex, willYield, car)
+      -- keep the turning lights on while yielding
+      local turningLights = storage.yieldToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
@@ -283,6 +295,10 @@ local carStateMachine = {
   end,
   [CarManager.CarStateType.TryingToStartEasingOutYield] = function (carIndex, dt, car, playerCar, storage)
         if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartEasingOutYield")) end
+
+      -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
+      local turningLights = (not storage.yieldToLeft) and ac.TurningLights.Left or ac.TurningLights.Right
+      CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
         -- for now go directly to easing out yield
         CarManager.cars_state[carIndex] = CarManager.CarStateType.EasingOutYield
@@ -304,12 +320,16 @@ local carStateMachine = {
       local overrideAiAwareness = true -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
+      -- keep inverted turning lights on while easing out yield (inverted yield direction since the car is now going back to center)
+      local turningLights = (not storage.yieldToLeft) and ac.TurningLights.Left or ac.TurningLights.Right
+      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
-        CarManager.cars_state[carIndex] = CarManager.CarStateType.DrivingNormally
+        CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartDrivingNormally
         return
       end
   end
