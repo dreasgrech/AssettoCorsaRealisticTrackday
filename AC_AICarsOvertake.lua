@@ -224,16 +224,14 @@ local function doCarYieldingLogic(dt)
       -- The ai car is currently close to the player car
 
       if aiCarCurrentlyYielding then -- The ai car is currently yielding
-        
-
+        -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
         if isPlayerClearlyAheadOfAICar then
-          -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
           carStatusText = 'Player clearly ahead, so easing out yield'
           targetSplineOffset = 0
           goto continue
         end
 
-        -- The player car is NOT clearly ahead of the ai car
+        -- Since the player car is still close, we must continue yielding
         carStatusText = 'Continuing to yield'
         targetSplineOffset = sideSign
         goto continue
@@ -255,6 +253,7 @@ local function doCarYieldingLogic(dt)
           goto continue
         end
 
+        -- Check if the ai car is above the minimum speed
         local isAICarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh
         if not isAICarAboveMinSpeed then
           carStatusText = 'AI speed too low (corner/traffic) so not yielding'
@@ -262,6 +261,10 @@ local function doCarYieldingLogic(dt)
           goto continue
         end
 
+        -- Since all the checks have passed, the ai car can now start to yield
+        carStatusText = 'Starting to yield'
+        targetSplineOffset = sideSign
+        goto continue
       end
 
 
@@ -278,6 +281,8 @@ local function doCarYieldingLogic(dt)
       local overrideAiAwareness = true -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
+      -- todo: implement the turning lights logic here
+      -- CarOperations.applyIndicators(carIndex, willYield, car)
 
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
       CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar
