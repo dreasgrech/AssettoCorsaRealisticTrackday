@@ -218,6 +218,7 @@ local carStateMachine = {
         return
       end
 
+      -- Check if the player car is behind the ai car
       local isPlayerCarBehindAICar = CarOperations.isBehind(car, playerCar)
       if not isPlayerCarBehindAICar then
         CarManager.cars_reason[carIndex] = 'Player not behind (clear) so not yielding'
@@ -266,6 +267,8 @@ local carStateMachine = {
 
         -- reset the yield time counter
         CarManager.cars_yieldTime[carIndex] = 0
+
+        -- go to trying to start easing out yield state
         CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartEasingOutYield
 
         return
@@ -306,15 +309,10 @@ local carStateMachine = {
   [CarManager.CarStateType.EasingOutYield] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "EasingOutYield")) end
 
-      -- local sideSign = storage.yieldToLeft and -1 or 1
       local targetSplineOffset = 0
-      -- local splineOffsetTransitionSpeed = storage.rampRelease
       local splineOffsetTransitionSpeed = storage.rampRelease_mps
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
-      -- if math.abs(currentSplineOffset) <= 0.01 then
-        -- currentSplineOffset = 0
-      -- end
 
       -- set the spline offset on the ai car
       local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
