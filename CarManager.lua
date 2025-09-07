@@ -6,7 +6,7 @@ local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 CarManager.cars_initialized = {}
 CarManager.cars_currentlyYielding = {}
 
-CarManager.cars_currentSplineOffset = {}
+CarManager.cars_currentSplineOffset_meters = {}
 CarManager.cars_targetSplineOffset_meters = {}
 
 CarManager.cars_distanceFromPlayerToCar = {}
@@ -30,7 +30,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_initialized[carIndex] = true
   CarManager.cars_currentlyYielding[carIndex] = false
 
-  CarManager.cars_currentSplineOffset[carIndex] = 0
+  CarManager.cars_currentSplineOffset_meters[carIndex] = 0
   CarManager.cars_targetSplineOffset_meters[carIndex] = 0
   
   CarManager.cars_distanceFromPlayerToCar[carIndex] = 0

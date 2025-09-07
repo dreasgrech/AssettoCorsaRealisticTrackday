@@ -79,7 +79,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
       if show then
         local base = string.format(
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
-          i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset[i] or 0, CarManager.cars_targetSplineOffset_meters[i] or 0, CarManager.cars_maxSideMargin[i] or 0, CarManager.cars_currentNormalizedTrackProgress[i] or -1
+          i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset_meters[i] or 0, CarManager.cars_targetSplineOffset_meters[i] or 0, CarManager.cars_maxSideMargin[i] or 0, CarManager.cars_currentNormalizedTrackProgress[i] or -1
         )
         do
           local indTxt = UIManager.indicatorStatusText(i)
@@ -164,8 +164,8 @@ local function doCarYieldingLogic_old(dt)
 
       -- Apply offset with appropriate ramp (slower when releasing or blocked)
       local stepMps = (carReturningBackToNormal or isTargetSideBlocked) and storage.rampRelease_mps or storage.rampSpeed_mps
-      CarManager.cars_currentSplineOffset[carIndex] = MathHelpers.approach(CarManager.cars_currentSplineOffset[carIndex], currentSplineOffset_meters, stepMps * dt)
-      physics.setAISplineAbsoluteOffset(carIndex, CarManager.cars_currentSplineOffset[carIndex], true)
+      CarManager.cars_currentSplineOffset_meters[carIndex] = MathHelpers.approach(CarManager.cars_currentSplineOffset_meters[carIndex], currentSplineOffset_meters, stepMps * dt)
+      physics.setAISplineAbsoluteOffset(carIndex, CarManager.cars_currentSplineOffset_meters[carIndex], true)
 
       -- TODO: also try using physics.setAICaution(...)
 
