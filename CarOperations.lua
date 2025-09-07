@@ -1,9 +1,9 @@
 ﻿local CarOperations = {}
 
 function CarOperations.isBehind(aiCar, playerCar)
-    local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
+    local aiCarFwd = aiCar.look or aiCar.forward or vec3(0,0,1)
     local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
-    return MathHelpers.dot(fwd, rel) < 0
+    return MathHelpers.dot(aiCarFwd, rel) < 0
 end
 
 function CarOperations.playerIsClearlyAhead(aiCar, playerCar, meters)
@@ -58,30 +58,30 @@ end
 ----------------------------------------------------------------------
 -- Decision
 ----------------------------------------------------------------------
-function CarOperations.desiredOffsetFor(aiCar, playerCar, aiCarCurrentlyYielding)
+function CarOperations.desiredAbsoluteOffsetFor(aiCar, playerCar, aiCarCurrentlyYielding)
     local storage = StorageManager.getStorage()
-    if playerCar.speedKmh < storage.minPlayerSpeed_kmh then return 0, nil, nil, nil, 'Player below minimum speed' end
+    local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, aiCar.position))
+    if playerCar.speedKmh < storage.minPlayerSpeed_kmh then return 0, distanceFromPlayerCarToAICar, nil, nil, 'Player below minimum speed' end
 
     -- If cars are abeam (neither clearly behind nor clearly ahead), or we’re already yielding and
     -- player isn’t clearly ahead yet, ignore closing-speed — yielding must persist mid-pass.
-    local behind = CarOperations.isBehind(aiCar, playerCar)
-    local aheadClear = CarOperations.playerIsClearlyAhead(aiCar, playerCar, storage.clearAhead_meters)
-    local sideBySide = (not behind) and (not aheadClear)
-    local ignoreDelta = sideBySide or (aiCarCurrentlyYielding and not aheadClear)
+    local isPlayerCarBehindAICar = CarOperations.isBehind(aiCar, playerCar)
+    local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(aiCar, playerCar, storage.clearAhead_meters)
+    local areCarsSideBySide = (not isPlayerCarBehindAICar) and (not isPlayerClearlyAheadOfAICar)
+    local ignoreDelta = areCarsSideBySide or (aiCarCurrentlyYielding and not isPlayerClearlyAheadOfAICar)
 
     if not ignoreDelta and (playerCar.speedKmh - aiCar.speedKmh) < storage.minSpeedDelta_kmh then
-        return 0, nil, nil, nil, 'No closing speed vs AI'
+        return 0, distanceFromPlayerCarToAICar, nil, nil, 'No closing speed vs AI'
     end
 
-    if aiCar.speedKmh < storage.minAISpeed_kmh then return 0, nil, nil, nil, 'AI speed too low (corner/traffic)' end
+    if aiCar.speedKmh < storage.minAISpeed_kmh then return 0, distanceFromPlayerCarToAICar, nil, nil, 'AI speed too low (corner/traffic)' end
 
     local radius = aiCarCurrentlyYielding and (storage.detectInner_meters + storage.detectHysteresis_meters) or storage.detectInner_meters
-    local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, aiCar.position))
     if distanceFromPlayerCarToAICar > radius then return 0, distanceFromPlayerCarToAICar, nil, nil, 'Too far (outside detect radius)' end
 
     -- Keep yielding even if the player pulls alongside; only stop once the player is clearly ahead.
-    if not behind then
-        if aiCarCurrentlyYielding and not aheadClear then
+    if not isPlayerCarBehindAICar then
+        if aiCarCurrentlyYielding and not isPlayerClearlyAheadOfAICar then
             -- continue yielding through the pass; fall through to compute side offset
         else
             return 0, distanceFromPlayerCarToAICar, nil, nil, 'Player not behind (clear)'

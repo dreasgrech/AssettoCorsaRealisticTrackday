@@ -4,10 +4,12 @@ local CarManager = {}
 local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 
 CarManager.cars_initialized = {}
-CarManager.cars_currentSplineOffset = {}
 CarManager.cars_currentlyYielding = {}
+
+CarManager.cars_currentSplineOffset = {}
+CarManager.cars_targetSplineOffset_meters = {}
+
 CarManager.cars_distanceFromPlayerToCar = {}
-CarManager.cars_targetSplineOffset = {}
 CarManager.cars_maxSideMargin = {}
 CarManager.cars_currentNormalizedTrackProgress = {}
 CarManager.cars_reason = {}
@@ -26,10 +28,12 @@ CarManager.cars_evacuating = {}
 
 local function setInitializedDefaults(carIndex)
   CarManager.cars_initialized[carIndex] = true
-  CarManager.cars_currentSplineOffset[carIndex] = 0
   CarManager.cars_currentlyYielding[carIndex] = false
+
+  CarManager.cars_currentSplineOffset[carIndex] = 0
+  CarManager.cars_targetSplineOffset_meters[carIndex] = 0
+  
   CarManager.cars_distanceFromPlayerToCar[carIndex] = 0
-  CarManager.cars_targetSplineOffset[carIndex] = 0
   CarManager.cars_maxSideMargin[carIndex] = 0
   CarManager.cars_currentNormalizedTrackProgress[carIndex] = -1
   CarManager.cars_reason[carIndex] = '-'
