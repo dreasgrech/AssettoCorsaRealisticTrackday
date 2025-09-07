@@ -4,12 +4,12 @@ local CarManager = {}
 local CarStateType = {
   TRYING_TO_START_DRIVING_NORMALLY = 0,
   DRIVING_NORMALLY = 1,
-  TryingToStartYieldingToTheSide = 2,
-  YieldingToTheSide = 4,
-  StayingOnYieldingLane = 8,
-  TryingToStartEasingOutYield = 16,
-  EasingOutYield = 32,
-  WaitingAfterAccident = 64,
+  TRYING_TO_START_YIELDING_TO_THE_SIDE = 2,
+  YIELDING_TO_THE_SIDE = 4, 
+  STAYING_ON_YIELDING_LANE = 8,
+  TRYING_TO_START_EASING_OUT_YIELD = 16,
+  EASING_OUT_YIELD = 32,
+  WAITING_AFTER_ACCIDENT = 64,
 }
 
 CarManager.CarStateType = CarStateType

@@ -61,9 +61,9 @@ local carStateMachine = {
       end
 
       -- Since all the checks have passed, the ai car can now start to yield
-      CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartYieldingToTheSide
+      CarManager.cars_state[carIndex] = CarManager.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE
   end,
-  [CarManager.CarStateType.TryingToStartYieldingToTheSide] = function (carIndex, dt, car, playerCar, storage)
+  [CarManager.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartYieldingToTheSide")) end
 
       -- turn on turning lights
@@ -71,9 +71,9 @@ local carStateMachine = {
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       -- for now go directly to yielding to the side
-      CarManager.cars_state[carIndex] = CarManager.CarStateType.YieldingToTheSide
+      CarManager.cars_state[carIndex] = CarManager.CarStateType.YIELDING_TO_THE_SIDE
   end,
-  [CarManager.CarStateType.YieldingToTheSide] = function (carIndex, dt, car, playerCar, storage)
+  [CarManager.CarStateType.YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "YieldingToTheSide")) end
 
       -- CarManager.cars_reason[carIndex] = 'Driving on yielding lane'
@@ -118,7 +118,7 @@ local carStateMachine = {
         -- CarManager.cars_reason[carIndex] = 'Player clearly ahead, so easing out yield'
 
         -- go to trying to start easing out yield state
-        CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartEasingOutYield
+        CarManager.cars_state[carIndex] = CarManager.CarStateType.TRYING_TO_START_EASING_OUT_YIELD
 
         return
       end
@@ -126,11 +126,11 @@ local carStateMachine = {
       -- once we have reached the target offset, we can go to the next state
       local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
       if arrivedAtTargetOffset then
-        CarManager.cars_state[carIndex] = CarManager.CarStateType.StayingOnYieldingLane
+        CarManager.cars_state[carIndex] = CarManager.CarStateType.STAYING_ON_YIELDING_LANE
         return
       end
   end,
-  [CarManager.CarStateType.StayingOnYieldingLane] = function (carIndex, dt, car, playerCar, storage)
+  [CarManager.CarStateType.STAYING_ON_YIELDING_LANE] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "StayingOnYieldingLane")) end
 
       -- make the ai car leave more space in between the care in front while driving on the yielding lane
@@ -147,12 +147,12 @@ local carStateMachine = {
         -- CarManager.cars_reason[carIndex] = 'Player clearly ahead, so easing out yield'
 
         -- go to trying to start easing out yield state
-        CarManager.cars_state[carIndex] = CarManager.CarStateType.TryingToStartEasingOutYield
+        CarManager.cars_state[carIndex] = CarManager.CarStateType.TRYING_TO_START_EASING_OUT_YIELD
 
         return
       end
   end,
-  [CarManager.CarStateType.TryingToStartEasingOutYield] = function (carIndex, dt, car, playerCar, storage)
+  [CarManager.CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartEasingOutYield")) end
 
       -- reset the yield time counter
@@ -169,9 +169,9 @@ local carStateMachine = {
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       -- for now go directly to easing out yield
-      CarManager.cars_state[carIndex] = CarManager.CarStateType.EasingOutYield
+      CarManager.cars_state[carIndex] = CarManager.CarStateType.EASING_OUT_YIELD
   end,
-  [CarManager.CarStateType.EasingOutYield] = function (carIndex, dt, car, playerCar, storage)
+  [CarManager.CarStateType.EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "EasingOutYield")) end
 
       local targetSplineOffset = 0
