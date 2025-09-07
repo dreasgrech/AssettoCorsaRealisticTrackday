@@ -9,6 +9,9 @@ CarManager.cars_currentlyYielding = {}
 CarManager.cars_currentSplineOffset_meters = {}
 CarManager.cars_targetSplineOffset_meters = {}
 
+CarManager.cars_currentSplineOffset = {}
+CarManager.cars_targetSplineOffset = {}
+
 CarManager.cars_distanceFromPlayerToCar = {}
 CarManager.cars_maxSideMargin = {}
 CarManager.cars_currentNormalizedTrackProgress = {}
@@ -32,7 +35,10 @@ local function setInitializedDefaults(carIndex)
 
   CarManager.cars_currentSplineOffset_meters[carIndex] = 0
   CarManager.cars_targetSplineOffset_meters[carIndex] = 0
-  
+
+  CarManager.cars_currentSplineOffset[carIndex] = 0
+  CarManager.cars_targetSplineOffset[carIndex] = 0
+
   CarManager.cars_distanceFromPlayerToCar[carIndex] = 0
   CarManager.cars_maxSideMargin[carIndex] = 0
   CarManager.cars_currentNormalizedTrackProgress[carIndex] = -1

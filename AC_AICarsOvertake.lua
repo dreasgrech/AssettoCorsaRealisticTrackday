@@ -204,23 +204,86 @@ local function doCarYieldingLogic(dt)
 
       local carStatusText = '-'
       local aiCarCurrentlyYielding = CarManager.cars_currentlyYielding[carIndex]
-      -- local targetSplineOffset = CarManager.cars_currentNormalizedTrackProgress
+      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
 
       local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
       local isPlayerCarBehindAICar = CarOperations.isBehind(car, playerCar)
+      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
+
+      local sideSign = storage.yieldToLeft and -1 or 1
 
       local radius = storage.detectInner_meters + storage.detectHysteresis_meters
       local isAICarCloseToPlayerCar = distanceFromPlayerCarToAICar <= radius
       if not isAICarCloseToPlayerCar then
-        carStatusText = 'Too far (outside detect radius)'
-        aiCarCurrentlyYielding = false
-
+        carStatusText = 'Too far (outside detect radius) so not yielding'
+        targetSplineOffset = 0
         goto continue
       end
 
+      -- The ai car is currently close to the player car
+
+      if aiCarCurrentlyYielding then -- The ai car is currently yielding
+        
+
+        if isPlayerClearlyAheadOfAICar then
+          -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
+          carStatusText = 'Player clearly ahead, so easing out yield'
+          targetSplineOffset = 0
+          goto continue
+        end
+
+        -- The player car is NOT clearly ahead of the ai car
+        carStatusText = 'Continuing to yield'
+        targetSplineOffset = sideSign
+        goto continue
+      else -- The ai car is currently NOT yielding
+
+        -- Check if the player car is above the minimum speed
+        local isPlayerAboveMinSpeed = playerCar.speedKmh >= storage.minPlayerSpeed_kmh
+        if not isPlayerAboveMinSpeed then
+          carStatusText = 'Player below minimum speed so not yielding'
+          targetSplineOffset = 0
+          goto continue
+        end
+
+        -- Check if the player car is currently faster than the ai car 
+        local playerCarHasClosingSpeedToAiCar = (playerCar.speedKmh - car.speedKmh) >= storage.minSpeedDelta_kmh
+        if not playerCarHasClosingSpeedToAiCar then
+          carStatusText = 'Player does not have closing speed so not yielding'
+          targetSplineOffset = 0
+          goto continue
+        end
+
+        local isAICarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh
+        if not isAICarAboveMinSpeed then
+          carStatusText = 'AI speed too low (corner/traffic) so not yielding'
+          targetSplineOffset = 0
+          goto continue
+        end
+
+      end
+
+
+      ::continue::
+
+      -- calculate spline offset
+      local splineOffsetTransitionSpeed = currentSplineOffset < targetSplineOffset and storage.rampSpeed or storage.rampRelease
+      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
+
+      -- aiCarCurrentlyYielding = not (targetSplineOffset == 0)
+      aiCarCurrentlyYielding = not (currentSplineOffset == 0)
+
+      -- set the spline offset on the ai car
+      local overrideAiAwareness = true -- TODO: check what this does
+      physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
+
+
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
       CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar
-      ::continue::
+      CarManager.cars_reason[carIndex] = carStatusText
+      CarManager.cars.currentSplineOffset[carIndex] = currentSplineOffset
+      CarManager.cars.targetSplineOffset[carIndex] = targetSplineOffset
     end
   end
 end
