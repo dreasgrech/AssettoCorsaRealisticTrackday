@@ -1,19 +1,5 @@
 local CarManager = {}
 
--- [Flags]
-local CarStateType = {
-  TRYING_TO_START_DRIVING_NORMALLY = 0,
-  DRIVING_NORMALLY = 1,
-  TRYING_TO_START_YIELDING_TO_THE_SIDE = 2,
-  YIELDING_TO_THE_SIDE = 4, 
-  STAYING_ON_YIELDING_LANE = 8,
-  TRYING_TO_START_EASING_OUT_YIELD = 16,
-  EASING_OUT_YIELD = 32,
-  WAITING_AFTER_ACCIDENT = 64,
-}
-
-CarManager.CarStateType = CarStateType
-
 -- Andreas: used while still writing the accident system
 local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 
@@ -67,7 +53,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_indPhase[carIndex] = false
   CarManager.cars_hasTL[carIndex] = false
   CarManager.cars_evacuating[carIndex] = false
-  CarManager.cars_state[carIndex] = CarManager.CarStateType.DRIVING_NORMALLY
+  CarManager.cars_state[carIndex] = CarStateMachine.CarStateType.DRIVING_NORMALLY
 
   -- remove speed limitations which could have occured during an accident
   physics.setAIThrottleLimit(carIndex, 1)
