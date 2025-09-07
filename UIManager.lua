@@ -1,6 +1,6 @@
 ﻿local UIManager = {}
 
-function UIManager.indicatorStatusText(i)
+UIManager.indicatorStatusText = function(i)
     local l = CarManager.cars_indLeft[i]
     local r = CarManager.cars_indRight[i]
     local ph = CarManager.cars_indPhase[i]
@@ -42,18 +42,18 @@ function UIManager.draw3DOverheadText()
       local car = ac.getCar(i)
       if car then
         local txt = string.format(
-          -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f",
-          -- i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset_meters[i] or 0
           "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
           i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh),
           CarManager.cars_currentSplineOffset[i],
           CarManager.cars_targetSplineOffset[i],
           carState
         )
-        do
-          local indicatorStatusText = UIManager.indicatorStatusText(i)
-          txt = txt .. string.format("  ind=%s", indicatorStatusText)
-        end
+        -- do
+        --   local indicatorStatusText = UIManager.indicatorStatusText(i)
+        --   txt = txt .. string.format("  ind=%s", indicatorStatusText)
+        -- end
+
+        -- render the text slightly above the car
         render.debugText(car.position + vec3(0, 2.0, 0), txt)
       end
     end

@@ -79,8 +79,6 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
       -- local show = (storage.listRadiusFilter_meters <= 0) or (distShown <= storage.listRadiusFilter_meters)
       -- if show then
         local base = string.format(
-          -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.1f  targetOffset=%4.1f  max=%4.1f  prog=%.3f",
-          -- i, distShown, math.floor(car.speedKmh or 0), CarManager.cars_currentSplineOffset_meters[i] or 0, CarManager.cars_targetSplineOffset_meters[i] or 0, CarManager.cars_maxSideMargin[i] or 0, CarManager.cars_currentNormalizedTrackProgress[i] or -1
           "#%02d d=%6.3fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
           i, distShown, math.floor(car.speedKmh),
           CarManager.cars_currentSplineOffset[i],
@@ -195,7 +193,7 @@ local function doCarYieldingLogic_STATEMACHINE(dt)
   local storage = StorageManager.getStorage()
   local sim = ac.getSim()
   local playerCar = ac.getCar(0)
-  if not playerCar then return end
+  -- if not playerCar then return end
 
   -- TODO: ac.iterateCars.ordered could be useful when we start applying the overtaking/yielding logic to ai cars too instead of just the local player
 
@@ -203,8 +201,8 @@ local function doCarYieldingLogic_STATEMACHINE(dt)
     local car = ac.getCar(carIndex)
     if
       car and
-      car.isAIControlled and  -- only run the yielding logic on ai cars
-      not CarManager.cars_evacuating[carIndex] -- don't run yielding logic if car is evacuating
+      car.isAIControlled -- only run the yielding logic on ai cars
+      -- and not CarManager.cars_evacuating[carIndex] -- don't run yielding logic if car is evacuating
     then
       CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
