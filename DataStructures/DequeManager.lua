@@ -6,7 +6,7 @@ local lastCreatedDequeIndex = 0
 
 local deques = {}
 
---- A double-ended queue (deque) is an abstract data type that generalizes a queue, for which elements can be added to or removed from either the front (head) or back (tail).
+--- Wikipedia: A double-ended queue (deque) is an abstract data type that generalizes a queue, for which elements can be added to or removed from either the front (head) or back (tail).
 ---@return integer
 function DequeManager.createNewDeque()
     lastCreatedDequeIndex = lastCreatedDequeIndex + 1
