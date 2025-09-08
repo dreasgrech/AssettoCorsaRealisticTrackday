@@ -13,6 +13,7 @@ CarOperations = require("CarOperations")
 CarManager = require("CarManager")
 CarStateMachine = require("CarStateMachine")
 AccidentManager = require("AccidentManager")
+RaceFlagManager = require("RaceFlagManager")
 
 --[=====[ 
 ---
@@ -200,6 +201,13 @@ local function doCarYieldingLogic_STATEMACHINE(dt)
   -- if not playerCar then return end
 
   -- TODO: ac.iterateCars.ordered could be useful when we start applying the overtaking/yielding logic to ai cars too instead of just the local player
+
+  local isPlayerComingUpToAccident = AccidentManager.isCarComingUpToAccident(playerCar)
+  if isPlayerComingUpToAccident then
+    RaceFlagManager.setRaceFlag(ac.FlagType.Caution)
+  else
+    RaceFlagManager.removeRaceFlag()
+  end
 
   for carIndex = 1, sim.carsCount - 1 do
     local car = ac.getCar(carIndex)

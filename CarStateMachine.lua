@@ -254,6 +254,12 @@ local carStateMachine = {
     stopCarAfterAccident(carIndex)
 
     CarManager.cars_reason[carIndex] = 'Another car collided into me so we are stopped'
+
+    local carInput = ac.overrideCarControls(carIndex)
+    if carInput then
+      carInput.horn = true
+    end
+
   end,
 }
 
