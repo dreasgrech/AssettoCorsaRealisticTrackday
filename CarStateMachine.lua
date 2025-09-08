@@ -36,6 +36,17 @@ CarStateMachine.getCurrentState = function(carIndex)
     return cars_state[carIndex]
 end
 
+local stopCarAfterAccident = function(carIndex)
+    -- stop the car
+    physics.setAIThrottleLimit(carIndex, 0)
+    physics.setAITopSpeed(carIndex, 0)
+    physics.setAIStopCounter(carIndex, 1)
+    physics.setGentleStop(carIndex, true)
+    physics.setAICaution(carIndex, 16) -- be very cautious
+
+    physics.preventAIFromRetiring(carIndex)
+end
+
 local carStateMachine = {
   [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
 
@@ -230,25 +241,26 @@ local carStateMachine = {
       end
   end,
   [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = function (carIndex, dt, car, playerCar, storage)
-    -- stop the car
-    physics.setAIThrottleLimit(carIndex, 0)
-    physics.setAITopSpeed(carIndex, 0)
-    physics.setAIStopCounter(carIndex, 1)
-    physics.setGentleStop(carIndex, true)
-    physics.setAICaution(carIndex, 16) -- be very cautious
-
-    physics.preventAIFromRetiring(carIndex)
+    stopCarAfterAccident(carIndex)
 
     CarManager.cars_reason[carIndex] = 'Collided with track so we are stopped'
   end,
   [CarStateMachine.CarStateType.COLLIDED_WITH_CAR] = function (carIndex, dt, car, playerCar, storage)
+    stopCarAfterAccident(carIndex)
+
+    CarManager.cars_reason[carIndex] = 'Collided with another car so we are stopped'
   end,
   [CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = function (carIndex, dt, car, playerCar, storage)
+    stopCarAfterAccident(carIndex)
+
+    CarManager.cars_reason[carIndex] = 'Another car collided into me so we are stopped'
   end,
 }
 
 -- todo: wip
 local queuedCollidedWithTrackAccidents = QueueManager.createQueue()
+local queuedCollidedWithCarAccidents = QueueManager.createQueue()
+local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()
 
 CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
@@ -256,6 +268,20 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
         
         Logger.log(string.format("CarStateMachine: Car %d collided with track, switching to COLLIDED_WITH_TRACK state", carIndex))
         CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_TRACK)
+    end
+
+    while QueueManager.queueLength(queuedCollidedWithCarAccidents) > 0 do
+        local carIndex = QueueManager.dequeue(queuedCollidedWithCarAccidents)
+        
+        Logger.log(string.format("CarStateMachine: Car %d collided with another car, switching to COLLIDED_WITH_CAR state", carIndex))
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_CAR)
+    end
+
+    while QueueManager.queueLength(queuedCarCollidedWithMeAccidents) > 0 do
+        local carIndex = QueueManager.dequeue(queuedCarCollidedWithMeAccidents)
+
+        Logger.log(string.format("CarStateMachine: Car %d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", carIndex))
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
     end
 
     local state = CarStateMachine.getCurrentState(carIndex)
@@ -271,6 +297,10 @@ CarStateMachine.informAboutAccident = function(accidentIndex)
 
     if collidedWithTrack then
         QueueManager.enqueue(queuedCollidedWithTrackAccidents, carIndex)
+    else
+        -- if the car collided with another car, we need to inform both cars
+        QueueManager.enqueue(queuedCollidedWithCarAccidents, carIndex)
+        QueueManager.enqueue(queuedCarCollidedWithMeAccidents, collidedWithCarIndex)
     end
 end
 
