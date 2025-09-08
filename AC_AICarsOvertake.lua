@@ -38,7 +38,9 @@ end
 
 -- Monitor car collisions so we can register an accident
 ac.onCarCollision(-1, function (carIndex)
-    AccidentManager.registerCollision(carIndex)
+    local accidentIndex = AccidentManager.registerCollision(carIndex)
+
+    CarStateMachine.informAboutAccident(accidentIndex)
 end)
 
 ---
@@ -99,16 +101,9 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
           -- base = base .. string.format("  ind=%s", indTxt)
         -- end
         if CarManager.cars_currentlyYielding[i] then
-          if ui.pushStyleColor and ui.StyleColor and ui.popStyleColor then
-            ui.pushStyleColor(ui.StyleColor.Text, rgbm(0.2, 0.95, 0.2, 1.0))
-            ui.text(base)
-            ui.popStyleColor()
-          elseif ui.textColored then
             ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
-          else
-            ui.text(base)
-          end
-          ui.sameLine(); ui.text(string.format("  (yield %.1fs)", CarManager.cars_yieldTime[i] or 0))
+          ui.sameLine()
+          ui.text(string.format("  (yield %.1fs)", CarManager.cars_yieldTime[i] or 0))
         else
           local reason = CarManager.cars_reason[i] or '-'
           ui.text(string.format("%s  reason: %s", base, reason))

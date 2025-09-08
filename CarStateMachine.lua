@@ -228,14 +228,50 @@ local carStateMachine = {
         CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY)
         return
       end
-  end
+  end,
+  [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = function (carIndex, dt, car, playerCar, storage)
+    -- stop the car
+    physics.setAIThrottleLimit(carIndex, 0)
+    physics.setAITopSpeed(carIndex, 0)
+    physics.setAIStopCounter(carIndex, 1)
+    physics.setGentleStop(carIndex, true)
+    physics.setAICaution(carIndex, 16) -- be very cautious
+
+    physics.preventAIFromRetiring(carIndex)
+
+    CarManager.cars_reason[carIndex] = 'Collided with track so we are stopped'
+  end,
+  [CarStateMachine.CarStateType.COLLIDED_WITH_CAR] = function (carIndex, dt, car, playerCar, storage)
+  end,
+  [CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = function (carIndex, dt, car, playerCar, storage)
+  end,
 }
 
-function CarStateMachine.update(carIndex, dt, car, playerCar, storage)
+-- todo: wip
+local queuedCollidedWithTrackAccidents = QueueManager.createQueue()
+
+CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
+    while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
+        local carIndex = QueueManager.dequeue(queuedCollidedWithTrackAccidents)
+        
+        Logger.log(string.format("CarStateMachine: Car %d collided with track, switching to COLLIDED_WITH_TRACK state", carIndex))
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_TRACK)
+    end
+
     local state = CarStateMachine.getCurrentState(carIndex)
 
     -- execute the state machine for this car
     carStateMachine[state](carIndex, dt, car, playerCar, storage)
+end
+
+CarStateMachine.informAboutAccident = function(accidentIndex)
+    local collidedWithTrack = AccidentManager.accidents_collidedWithTrack[accidentIndex]
+    local carIndex = AccidentManager.accidents_carIndex[accidentIndex]
+    local collidedWithCarIndex = AccidentManager.accidents_collidedWithCarIndex[accidentIndex]
+
+    if collidedWithTrack then
+        QueueManager.enqueue(queuedCollidedWithTrackAccidents, carIndex)
+    end
 end
 
 return CarStateMachine

@@ -8,7 +8,7 @@ local deques = {}
 
 --- Wikipedia: A double-ended queue (deque) is an abstract data type that generalizes a queue, for which elements can be added to or removed from either the front (head) or back (tail).
 ---@return integer
-function DequeManager.createNewDeque()
+function DequeManager.createDeque()
     lastCreatedDequeIndex = lastCreatedDequeIndex + 1
     deques[lastCreatedDequeIndex] = {first = 0, last = -1}
     return lastCreatedDequeIndex

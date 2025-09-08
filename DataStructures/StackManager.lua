@@ -4,9 +4,9 @@ local lastCreatedStackIndex = 0
 
 local stacks = {}
 
-function StackManager.createNewStack()
+function StackManager.createStack()
     lastCreatedStackIndex = lastCreatedStackIndex + 1
-    stacks[lastCreatedStackIndex] = DequeManager.createNewDeque()
+    stacks[lastCreatedStackIndex] = DequeManager.createDeque()
     return lastCreatedStackIndex
 end
 

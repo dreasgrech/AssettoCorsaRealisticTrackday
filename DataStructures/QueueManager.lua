@@ -4,9 +4,9 @@ local lastCreatedQueueIndex = 0
 
 local queues = {}
 
-function QueueManager.createNewQueue()
+function QueueManager.createQueue()
     lastCreatedQueueIndex = lastCreatedQueueIndex + 1
-    queues[lastCreatedQueueIndex] = DequeManager.createNewDeque()
+    queues[lastCreatedQueueIndex] = DequeManager.createDeque()
     return lastCreatedQueueIndex
 end
 

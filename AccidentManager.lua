@@ -2,11 +2,11 @@ local AccidentManager = {}
 
 local lastAccidentIndexCreated = 0
 
-local accidents_carIndex = {}
-local accidents_worldPosition = {}
-local accidents_collidedWithTrack = {}
-local accidents_collidedWithCarIndex = {}
-local accidents_resolved = {}
+AccidentManager.accidents_carIndex = {}
+AccidentManager.accidents_worldPosition = {}
+AccidentManager.accidents_collidedWithTrack = {}
+AccidentManager.accidents_collidedWithCarIndex = {}
+AccidentManager.accidents_resolved = {}
 
 AccidentManager.registerCollision = function(carIndex)
     local car = ac.getCar(carIndex)
@@ -32,16 +32,16 @@ AccidentManager.registerCollision = function(carIndex)
     lastAccidentIndexCreated = lastAccidentIndexCreated + 1
     local accidentIndex = lastAccidentIndexCreated
 
-    accidents_carIndex[accidentIndex] = carIndex
-    accidents_worldPosition[accidentIndex] = car.position
-    accidents_collidedWithTrack[accidentIndex] = collidedWithTrack
-    accidents_collidedWithCarIndex[accidentIndex] = collidedWith
-    accidents_resolved[accidentIndex] = false
+    -- todo: also save the track spline progress
+    AccidentManager.accidents_carIndex[accidentIndex] = carIndex
+    AccidentManager.accidents_worldPosition[accidentIndex] = car.position
+    AccidentManager.accidents_collidedWithTrack[accidentIndex] = collidedWithTrack
+    AccidentManager.accidents_collidedWithCarIndex[accidentIndex] = collidedWith
+    AccidentManager.accidents_resolved[accidentIndex] = false
 
-    -- now we need to inform the state machine that a car has collided so that the state machine can then change state in the next update
+    Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", carIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), lastAccidentIndexCreated, #AccidentManager.accidents_carIndex))
 
-
-    Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", carIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), lastAccidentIndexCreated, #accidents_carIndex))
+    return accidentIndex
 end
 
 return AccidentManager
