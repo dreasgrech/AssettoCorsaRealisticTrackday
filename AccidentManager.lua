@@ -9,8 +9,16 @@ AccidentManager.accidents_collidedWithTrack = {}
 AccidentManager.accidents_collidedWithCarIndex = {}
 AccidentManager.accidents_resolved = {}
 
+-- TODO: when a car jumped (resets in ai flood or pits), we should also clear any accidents it was involved in
+-- TODO: when a car jumped (resets in ai flood or pits), we should also clear any accidents it was involved in
+-- TODO: when a car jumped (resets in ai flood or pits), we should also clear any accidents it was involved in
+-- TODO: when a car jumped (resets in ai flood or pits), we should also clear any accidents it was involved in
+
 AccidentManager.registerCollision = function(carIndex)
-    -- if true then return end
+    local storage = StorageManager.getStorage()
+    if not storage.handleAccidents then
+        return
+    end
 
     local car = ac.getCar(carIndex)
     -- if not car or not car.isAIControlled then return end

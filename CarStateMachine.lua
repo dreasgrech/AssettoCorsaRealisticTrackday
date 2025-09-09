@@ -123,8 +123,12 @@ local carStateMachine = {
       -- CarManager.cars_reason[carIndex] = 'Driving on yielding lane'
 
       -- Since the player car is still close, we must continue yielding
-      local sideSign = storage.yieldToLeft and -1 or 1
+      -- local sideSign = storage.yieldToLeft and -1 or 1
+      local sideSign = storage.yieldToLeft and -0.8 or 0.8
 
+        -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
+        -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
+        -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
 --[=====[ 
       -- TODO: I haven't yet seen this "blocked" code working in practice, need to test more
       -- check if the side the car is yielding to is blocked by another car
@@ -257,7 +261,7 @@ local carStateMachine = {
 
     local carInput = ac.overrideCarControls(carIndex)
     if carInput then
-      carInput.horn = true
+      -- carInput.horn = true
     end
 
   end,
@@ -268,27 +272,30 @@ local queuedCollidedWithTrackAccidents = QueueManager.createQueue()
 local queuedCollidedWithCarAccidents = QueueManager.createQueue()
 local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()
 
+Logger.log("[CarStateMachine] Initialized 3 queues: "..queuedCollidedWithTrackAccidents..", "..queuedCollidedWithCarAccidents..", "..queuedCarCollidedWithMeAccidents)
+
 CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
-    while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
-        local carIndex = QueueManager.dequeue(queuedCollidedWithTrackAccidents)
+    -- while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
+        -- local carIndex = QueueManager.dequeue(queuedCollidedWithTrackAccidents)
         
-        Logger.log(string.format("CarStateMachine: Car %d collided with track, switching to COLLIDED_WITH_TRACK state", carIndex))
-        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_TRACK)
-    end
+        -- Logger.log(string.format("CarStateMachine: Car %d collided with track, switching to COLLIDED_WITH_TRACK state", carIndex))
+        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_TRACK)
+    -- end
 
-    while QueueManager.queueLength(queuedCollidedWithCarAccidents) > 0 do
-        local carIndex = QueueManager.dequeue(queuedCollidedWithCarAccidents)
+    -- while QueueManager.queueLength(queuedCollidedWithCarAccidents) > 0 do
+        -- local carIndex = QueueManager.dequeue(queuedCollidedWithCarAccidents)
         
-        Logger.log(string.format("CarStateMachine: Car %d collided with another car, switching to COLLIDED_WITH_CAR state", carIndex))
-        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_CAR)
-    end
+        -- Logger.log(string.format("CarStateMachine: Car %d collided with another car, switching to COLLIDED_WITH_CAR state", carIndex))
+        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_CAR)
+    -- end
 
-    while QueueManager.queueLength(queuedCarCollidedWithMeAccidents) > 0 do
-        local carIndex = QueueManager.dequeue(queuedCarCollidedWithMeAccidents)
+    -- while QueueManager.queueLength(queuedCarCollidedWithMeAccidents) > 0 do
+        -- local carIndex = QueueManager.dequeue(queuedCarCollidedWithMeAccidents)
 
-        Logger.log(string.format("CarStateMachine: Car %d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", carIndex))
-        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
-    end
+        -- -- Logger.log(string.format("CarStateMachine: Car %d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", carIndex))
+        -- Logger.log(string.format("%d ", QueueManager.queueLength(queuedCarCollidedWithMeAccidents)))
+        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
+    -- end
 
     local state = CarStateMachine.getCurrentState(carIndex)
 

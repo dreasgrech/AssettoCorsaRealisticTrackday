@@ -6,6 +6,7 @@ local storageTable = {
     drawOnTop = false,
     yieldToLeft = false,
     overrideAiAwareness = false,
+    handleAccidents = true,
     detectInner_meters = 66,
     detectHysteresis_meters = 60.0,
     minPlayerSpeed_kmh = 0,

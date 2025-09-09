@@ -202,6 +202,7 @@ local function doCarYieldingLogic_STATEMACHINE(dt)
 
   -- TODO: ac.iterateCars.ordered could be useful when we start applying the overtaking/yielding logic to ai cars too instead of just the local player
 
+  -- check if the player is coming up to an accident so we can set a caution flag
   local isPlayerComingUpToAccident = AccidentManager.isCarComingUpToAccident(playerCar)
   if isPlayerComingUpToAccident then
     RaceFlagManager.setRaceFlag(ac.FlagType.Caution)

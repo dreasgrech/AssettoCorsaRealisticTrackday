@@ -78,6 +78,9 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily.') end
 
+    if ui.checkbox('Handle accidents', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
+
     storage.detectInner_meters =  ui.slider('Detect radius (m)', storage.detectInner_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is within this distance AND behind the AI car.') end
 
