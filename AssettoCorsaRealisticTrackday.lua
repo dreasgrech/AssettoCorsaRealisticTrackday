@@ -102,7 +102,8 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
         if CarManager.cars_currentlyYielding[i] then
             ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
           ui.sameLine()
-          ui.text(string.format("  (yield %.1fs)", CarManager.cars_yieldTime[i] or 0))
+          local reason = CarManager.cars_reasonWhyCantYield[i] or '-'
+          ui.text(string.format(" (%s) (yield %.1fs)", reason, CarManager.cars_yieldTime[i] or 0))
         else
           local reason = CarManager.cars_reasonWhyCantYield[i] or '-'
           ui.text(string.format("%s  reason: %s", base, reason))
