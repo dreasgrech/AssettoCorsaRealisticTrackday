@@ -84,7 +84,7 @@ local carStateMachine = {
 
       -- If this car is not close to the player car, do nothing
       local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
-      local radius = storage.detectInner_meters + storage.detectHysteresis_meters
+      local radius = storage.detectInner_meters
       local isAICarCloseToPlayerCar = distanceFromPlayerCarToAICar <= radius
       if not isAICarCloseToPlayerCar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Too far (outside detect radius) so not yielding'

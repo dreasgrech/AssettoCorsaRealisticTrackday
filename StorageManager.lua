@@ -8,7 +8,6 @@ local storageTable = {
     overrideAiAwareness = false,
     handleAccidents = false,
     detectInner_meters = 20,
-    detectHysteresis_meters = 60.0,
     minPlayerSpeed_kmh = 0,
     minSpeedDelta_kmh = 5.0,
     yieldMaxOffset_normalized = 0.8,

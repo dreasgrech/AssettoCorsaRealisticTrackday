@@ -84,9 +84,6 @@ function UIManager.renderUIOptionsControls()
     storage.detectInner_meters =  ui.slider('Detect radius (m)', storage.detectInner_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is within this distance AND behind the AI car.') end
 
-    storage.detectHysteresis_meters =  ui.slider('Hysteresis (m)', storage.detectHysteresis_meters, 20, 120)
-    if ui.itemHovered() then ui.setTooltip('Extra distance while yielding so AI doesn’t flicker on/off near threshold.') end
-
     storage.yieldMaxOffset_normalized =  ui.slider('Side offset', storage.yieldMaxOffset_normalized, 0.1, 1.0)
     if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding (0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
 
