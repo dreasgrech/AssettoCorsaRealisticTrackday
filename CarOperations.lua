@@ -64,29 +64,38 @@ end
 --- Assumptions:
 ---   • Running under CSP (ac.* APIs available)
 ---   • 0-based car indices
+-- Assumes: CarOperations table exists; running under CSP (ac.* available)
 function CarOperations.findCarAlongside(carIndex, ignoreCarIndex)
-  -- Tunables (keep these small and conservative)
-  local SEARCH_RADIUS_M  = 50.0   -- skip far cars early
-  local LAT_MARGIN_M     = 0.30   -- extra width so minor jitter doesn’t drop detection
-  local LONG_MARGIN_M    = 0.80   -- extra length for bumpers/overhang beyond wheels
+  -- Tunables
+  local SEARCH_RADIUS_M       = 25.0   -- broad-phase cull
+  local LAT_MARGIN_M          = 0.25   -- lateral jitter allowance
+  local LONG_MARGIN_M         = 0.60   -- length allowance beyond wheels
+  local HEADING_MAX_DEG       = 40     -- max heading delta to be considered “driving next to”
+  local MIN_OVERLAP_FRAC      = 0.20   -- require at least 20% overlap of the shorter car
 
-  -- Small helpers (no dependencies)
+  -- Math helpers
   local function dot(ax, ay, az, bx, by, bz) return ax*bx + ay*by + az*bz end
   local function abs(x) return x < 0 and -x or x end
   local function max(a, b) return a > b and a or b end
+  local function min(a, b) return a < b and a or b end
+  local function normalize(x, y, z)
+    local n = math.sqrt(x*x + y*y + z*z)
+    if n == 0 then return x, y, z end
+    return x/n, y/n, z/n
+  end
 
-  -- Estimate car lateral/longitudinal half-extents from wheel positions (+tyre width).
-  -- Uses world positions projected on the car’s local side/forward axes.
+  local HEADING_COS = math.cos(math.rad(HEADING_MAX_DEG))
+
+  -- Extents from wheels, projected onto *normalized* local axes
   local function computeExtents(car)
     local px, py, pz = car.position.x, car.position.y, car.position.z
-    local sx, sy, sz = car.side.x, car.side.y, car.side.z
-    local lx, ly, lz = car.look.x, car.look.y, car.look.z
+    local sx, sy, sz = normalize(car.side.x, car.side.y, car.side.z)
+    local lx, ly, lz = normalize(car.look.x, car.look.y, car.look.z)
 
     local halfW = 0.0
     local frontZ = -1e9
     local rearZ  =  1e9
 
-    -- Wheels are indexed 0..3 in CSP; use both axles for robust size estimation.
     for i = 0, 3 do
       local w = car.wheels[i]
       local rx = w.position.x - px
@@ -101,47 +110,56 @@ function CarOperations.findCarAlongside(carIndex, ignoreCarIndex)
       if z < rearZ  then rearZ  = z end
     end
 
-    local halfL = max(abs(frontZ), abs(rearZ)) + LONG_MARGIN_M
+    -- Use half of span plus a margin (more accurate than max(|front|, |rear|))
+    local halfL = 0.5 * (frontZ - rearZ) + LONG_MARGIN_M
+    if halfL < 0 then halfL = -halfL end
     return halfW, halfL
   end
 
-  local me       = ac.getCar(carIndex)
-  local mePos    = me.position
-  local meLook   = me.look
-  local meSide   = me.side
+  local me    = ac.getCar(carIndex)
+  local mePos = me.position
+  local msx, msy, msz = normalize(me.side.x, me.side.y, me.side.z)
+  local mlx, mly, mlz = normalize(me.look.x, me.look.y, me.look.z)
   local meHalfW, meHalfL = computeExtents(me)
 
   local bestIdx, bestGap, bestSide = -1, 1e9, nil
 
-  -- Broad-phase: iterate all cars (CSP 0-based) and discard non-candidates quickly
   for otherIdx, other in ac.iterateCars() do
     if otherIdx ~= carIndex and otherIdx ~= ignoreCarIndex then
       local dx = other.position.x - mePos.x
       local dy = other.position.y - mePos.y
       local dz = other.position.z - mePos.z
 
-      -- Early distance cull
-      if dx*dx + dy*dy + dz*dz <= SEARCH_RADIUS_M * SEARCH_RADIUS_M then
-        -- Project relative vector into my local axes
-        local lat = dot(meSide.x, meSide.y, meSide.z, dx, dy, dz)     -- +right / −left
-        local fwd = dot(meLook.x, meLook.y, meLook.z, dx, dy, dz)     -- +ahead / −behind
+      -- Broad-phase (horizontal distance is fine; vertical differences don’t help here)
+      local d2 = dx*dx + dz*dz
+      if d2 <= SEARCH_RADIUS_M * SEARCH_RADIUS_M then
+        -- Heading alignment (parallel-ish cars only)
+        local olx, oly, olz = normalize(other.look.x, other.look.y, other.look.z)
+        if dot(mlx, mly, mlz, olx, oly, olz) >= HEADING_COS then
+          -- Project relative vector into my local frame
+          local lat = dot(msx, msy, msz, dx, dy, dz)   -- +right / −left
+          local fwd = dot(mlx, mly, mlz, dx, dy, dz)   -- +ahead / −behind
 
-        -- Compute other car extents only for close candidates
-        local otHalfW, otHalfL = computeExtents(other)
+          -- Extents for the other car (only now, after broad-phase + heading)
+          local otHalfW, otHalfL = computeExtents(other)
 
-        -- Longitudinal overlap?
-        local longOverlap = abs(fwd) <= (max(meHalfL, otHalfL))
-
-        if longOverlap then
-          local latAbs = abs(lat)
-          local allowed = meHalfW + otHalfW + LAT_MARGIN_M
-
-          if latAbs <= allowed then
-            local gap = latAbs - (meHalfW + otHalfW)
-            if gap < bestGap then
-              bestGap  = gap
-              bestIdx  = otherIdx
-              bestSide = (lat < 0) and 'left' or 'right'
+          -- Longitudinal overlap: use SUM of half-lengths (correct), not max
+          local totalHalfL = meHalfL + otHalfL
+          local overlapL = totalHalfL - abs(fwd)
+          if overlapL >= 0 then
+            -- Require a minimum fraction of longitudinal overlap (avoid corner kisses)
+            if overlapL >= MIN_OVERLAP_FRAC * min(meHalfL, otHalfL) then
+              -- Lateral proximity
+              local latAbs = abs(lat)
+              local allowed = meHalfW + otHalfW + LAT_MARGIN_M
+              if latAbs <= allowed then
+                local gap = latAbs - (meHalfW + otHalfW) -- negative => body overlap
+                if gap < bestGap then
+                  bestGap  = gap
+                  bestIdx  = otherIdx
+                  bestSide = (lat < 0) and 'left' or 'right'
+                end
+              end
             end
           end
         end
@@ -150,13 +168,13 @@ function CarOperations.findCarAlongside(carIndex, ignoreCarIndex)
   end
 
   if bestIdx ~= -1 then
-    -- Return clamped gap (no negative distances); negative means overlap
     local gapM = bestGap < 0 and 0 or bestGap
     return true, bestSide, bestIdx, gapM
   else
     return false, nil, -1, math.huge
   end
 end
+
 
 
 return CarOperations

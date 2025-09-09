@@ -141,17 +141,23 @@ local carStateMachine = {
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
-      local distanceToNearestCarInBlindSpot = ac.getCarBlindSpot(carIndex)
-      if (not (distanceToNearestCarInBlindSpot == nil)) and distanceToNearestCarInBlindSpot > 0 then
-          CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot) .. 'm'
+      local distanceToNearestCarInBlindSpot_L, distanceToNearestCarInBlindSpot_R = ac.getCarBlindSpot(carIndex)
+      local isSideBlocked_L = (not (distanceToNearestCarInBlindSpot_L == nil))-- and distanceToNearestCarInBlindSpot_L > 0
+      local isSideBlocked_R = (not (distanceToNearestCarInBlindSpot_R == nil))-- and distanceToNearestCarInBlindSpot_R > 0
+
+      if (isSideBlocked_L or isSideBlocked_R) then
+          Logger.log(string.format("Car %d: Blindspot L=%.2f  R=%.2f", carIndex, distanceToNearestCarInBlindSpot_L or -1, distanceToNearestCarInBlindSpot_R or -1))
+          CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot_L) .. 'm'
           return
       end
 
+--[=====[ 
       local isCarAlongSide, carSide, carIndexAlongSide, carDistance = CarOperations.findCarAlongside(carIndex, 0)
       if isCarAlongSide then
           CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (V2): ' .. carSide .. '  #' .. tostring(carIndexAlongSide) .. '  gap=' .. string.format('%.2f', carDistance) .. 'm'
           return
       end
+--]=====]
 --[=====[ 
       -- TODO: I haven't yet seen this "blocked" code working in practice, need to test more
       -- check if the side the car is yielding to is blocked by another car
