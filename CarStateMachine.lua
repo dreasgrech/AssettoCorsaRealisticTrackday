@@ -74,34 +74,34 @@ local carStateMachine = {
       local radius = storage.detectInner_meters + storage.detectHysteresis_meters
       local isAICarCloseToPlayerCar = distanceFromPlayerCarToAICar <= radius
       if not isAICarCloseToPlayerCar then
-        CarManager.cars_reason[carIndex] = 'Too far (outside detect radius) so not yielding'
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Too far (outside detect radius) so not yielding'
         return
       end
 
       -- Check if the player car is behind the ai car
       local isPlayerCarBehindAICar = CarOperations.isBehind(car, playerCar)
       if not isPlayerCarBehindAICar then
-        CarManager.cars_reason[carIndex] = 'Player not behind (clear) so not yielding'
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player not behind (clear) so not yielding'
         return
       end
 
       -- Check if the player car is above the minimum speed
       local isPlayerAboveMinSpeed = playerCar.speedKmh >= storage.minPlayerSpeed_kmh
       if not isPlayerAboveMinSpeed then
-        CarManager.cars_reason[carIndex] = 'Player below minimum speed so not yielding'
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player below minimum speed so not yielding'
         return
       end
 
       -- Check if the player car is currently faster than the ai car 
       local playerCarHasClosingSpeedToAiCar = (playerCar.speedKmh - car.speedKmh) >= storage.minSpeedDelta_kmh
       if not playerCarHasClosingSpeedToAiCar then
-        CarManager.cars_reason[carIndex] = 'Player does not have closing speed so not yielding'
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player does not have closing speed so not yielding'
       end
 
       -- Check if the ai car is above the minimum speed
       local isAICarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh
       if not isAICarAboveMinSpeed then
-        CarManager.cars_reason[carIndex] = 'AI speed too low (corner/traffic) so not yielding'
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'AI speed too low (corner/traffic) so not yielding'
       end
 
       -- Since all the checks have passed, the ai car can now start to yield
@@ -130,7 +130,7 @@ local carStateMachine = {
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
       local distanceToNearestCarInBlindSpot = ac.getCarBlindSpot(carIndex)
       if (not (distanceToNearestCarInBlindSpot == nil)) and distanceToNearestCarInBlindSpot > 0 then
-          CarManager.cars_reason[carIndex] = 'Target side blocked by another car so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot) .. 'm'
+          CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot) .. 'm'
           return
       end
 --[=====[ 
@@ -251,17 +251,17 @@ local carStateMachine = {
   [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = function (carIndex, dt, car, playerCar, storage)
     stopCarAfterAccident(carIndex)
 
-    CarManager.cars_reason[carIndex] = 'Collided with track so we are stopped'
+    CarManager.cars_reasonWhyCantYield[carIndex] = 'Collided with track so we are stopped'
   end,
   [CarStateMachine.CarStateType.COLLIDED_WITH_CAR] = function (carIndex, dt, car, playerCar, storage)
     stopCarAfterAccident(carIndex)
 
-    CarManager.cars_reason[carIndex] = 'Collided with another car so we are stopped'
+    CarManager.cars_reasonWhyCantYield[carIndex] = 'Collided with another car so we are stopped'
   end,
   [CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = function (carIndex, dt, car, playerCar, storage)
     stopCarAfterAccident(carIndex)
 
-    CarManager.cars_reason[carIndex] = 'Another car collided into me so we are stopped'
+    CarManager.cars_reasonWhyCantYield[carIndex] = 'Another car collided into me so we are stopped'
 
     local carInput = ac.overrideCarControls(carIndex)
     if carInput then

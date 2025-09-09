@@ -106,7 +106,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
           ui.sameLine()
           ui.text(string.format("  (yield %.1fs)", CarManager.cars_yieldTime[i] or 0))
         else
-          local reason = CarManager.cars_reason[i] or '-'
+          local reason = CarManager.cars_reasonWhyCantYield[i] or '-'
           ui.text(string.format("%s  reason: %s", base, reason))
         end
       -- end
