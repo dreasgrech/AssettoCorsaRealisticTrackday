@@ -101,9 +101,6 @@ function UIManager.renderUIOptionsControls()
 
     storage.minAISpeed_kmh =  ui.slider('Min AI speed (km/h)', storage.minAISpeed_kmh, 0, 120)
     if ui.itemHovered() then ui.setTooltip('Don’t ask AI to yield if its own speed is below this (corners/traffic).') end
-    
-    storage.listRadiusFilter_meters =  ui.slider('List radius filter (m)', storage.listRadiusFilter_meters, 0, 1000)
-    if ui.itemHovered() then ui.setTooltip('Only show cars within this distance in the list (0 = show all).') end
 end
 
 return UIManager

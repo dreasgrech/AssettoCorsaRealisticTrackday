@@ -14,7 +14,6 @@ local storageTable = {
     rampSpeed_mps = 2.0,
     rampRelease_mps = 1.6,
     clearAhead_meters = 6.0,
-    listRadiusFilter_meters = 400.0,
     minAISpeed_kmh = 35.0,
     blockSideLateral_meters = 2.2,
     blockSideLongitudinal_meters = 5.5,

@@ -88,8 +88,6 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
     local car = ac.getCar(i)
     if car and CarManager.cars_initialized[i] then
       local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i]
-      -- local show = (storage.listRadiusFilter_meters <= 0) or (distShown <= storage.listRadiusFilter_meters)
-      -- if show then
         local base = string.format(
           "#%02d d=%6.3fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
           i, distShown, math.floor(car.speedKmh),
@@ -109,7 +107,6 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
           local reason = CarManager.cars_reasonWhyCantYield[i] or '-'
           ui.text(string.format("%s  reason: %s", base, reason))
         end
-      -- end
     end
   end
 end
