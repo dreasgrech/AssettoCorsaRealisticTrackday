@@ -87,11 +87,8 @@ function UIManager.renderUIOptionsControls()
     storage.detectHysteresis_meters =  ui.slider('Hysteresis (m)', storage.detectHysteresis_meters, 20, 120)
     if ui.itemHovered() then ui.setTooltip('Extra distance while yielding so AI doesn’t flicker on/off near threshold.') end
 
-    storage.yieldOffset_meters =  ui.slider('Side offset (m)', storage.yieldOffset_meters, 0.5, 4.0)
-    if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding.') end
-
-    storage.rightMargin_meters =  ui.slider('Edge margin (m)', storage.rightMargin_meters, 0.3, 1.2)
-    if ui.itemHovered() then ui.setTooltip('Safety gap from the outer edge on the chosen side.') end
+    storage.yieldMaxOffset_normalized =  ui.slider('Side offset', storage.yieldMaxOffset_normalized, 0.1, 1.0)
+    if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding (0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
 
     storage.minPlayerSpeed_kmh =  ui.slider('Min player speed (km/h)', storage.minPlayerSpeed_kmh, 0, 160)
     if ui.itemHovered() then ui.setTooltip('Ignore very low-speed approaches (pit exits, traffic jams).') end

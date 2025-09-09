@@ -123,12 +123,16 @@ local carStateMachine = {
       -- CarManager.cars_reason[carIndex] = 'Driving on yielding lane'
 
       -- Since the player car is still close, we must continue yielding
-      -- local sideSign = storage.yieldToLeft and -1 or 1
-      local sideSign = storage.yieldToLeft and -0.8 or 0.8
+      local sideSign = storage.yieldToLeft and -1 or 1
 
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
+      local distanceToNearestCarInBlindSpot = ac.getCarBlindSpot(carIndex)
+      if (not (distanceToNearestCarInBlindSpot == nil)) and distanceToNearestCarInBlindSpot > 0 then
+          CarManager.cars_reason[carIndex] = 'Target side blocked by another car so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot) .. 'm'
+          return
+      end
 --[=====[ 
       -- TODO: I haven't yet seen this "blocked" code working in practice, need to test more
       -- check if the side the car is yielding to is blocked by another car
@@ -142,7 +146,7 @@ local carStateMachine = {
       end
 --]=====]
 
-      local targetSplineOffset = sideSign
+      local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
       local splineOffsetTransitionSpeed = storage.rampSpeed_mps
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
