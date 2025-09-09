@@ -146,6 +146,12 @@ local carStateMachine = {
           CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot) .. 'm'
           return
       end
+
+      local isCarAlongSide, carSide, carIndexAlongSide, carDistance = CarOperations.findCarAlongside(carIndex, 0)
+      if isCarAlongSide then
+          CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (V2): ' .. carSide .. '  #' .. tostring(carIndexAlongSide) .. '  gap=' .. string.format('%.2f', carDistance) .. 'm'
+          return
+      end
 --[=====[ 
       -- TODO: I haven't yet seen this "blocked" code working in practice, need to test more
       -- check if the side the car is yielding to is blocked by another car
