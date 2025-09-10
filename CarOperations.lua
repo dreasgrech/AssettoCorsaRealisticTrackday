@@ -26,6 +26,9 @@ function CarOperations.toggleTurningLights(carIndex, car, turningLights)
     CarManager.cars_hasTL[carIndex] = car.hasTurningLights
 end
 
+local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
+
+
 -- Returns the six lateral anchor points plus some helpers
 ---@param car ac.StateCar
 ---@return table
@@ -131,6 +134,32 @@ CarOperations.isTargetSideBlocked = function(carIndex)
     return true, CarOperations.CarDirections.RearRight, hitDistance
   end
 
+  -- Angled left rays (45° towards forward)
+  local leftAngledDir = carAnchorPoints.leftDirection * INV_SQRT2 + carAnchorPoints.forwardDirection * INV_SQRT2
+
+  hitCar, hitDistance = checkForOtherCars(carAnchorPoints.frontLeft, leftAngledDir, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.FrontLeftAngled, hitDistance
+  end
+
+  hitCar, hitDistance = checkForOtherCars(carAnchorPoints.rearLeft, leftAngledDir, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.RearLeftAngled, hitDistance
+  end
+
+  -- Angled right rays (45° towards forward)
+  local rightAngledDir = carAnchorPoints.rightDirection * INV_SQRT2 + carAnchorPoints.forwardDirection * INV_SQRT2
+
+  hitCar, hitDistance = checkForOtherCars(carAnchorPoints.frontRight, rightAngledDir, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.FrontRightAngled, hitDistance
+  end
+
+  hitCar, hitDistance = checkForOtherCars(carAnchorPoints.rearRight, rightAngledDir, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.RearRightAngled, hitDistance
+  end
+
   return false
 end
 
@@ -160,6 +189,10 @@ CarOperations.CarDirections = {
   FrontRight = 4,
   CenterRight = 5,
   RearRight = 6,
+  FrontLeftAngled = 7,
+  RearLeftAngled = 8,
+  FrontRightAngled = 9,
+  RearRightAngled = 10,
 }
 
 CarOperations.CarDirectionsStrings = {
@@ -170,6 +203,10 @@ CarOperations.CarDirectionsStrings = {
   [CarOperations.CarDirections.FrontRight] = "FrontRight",
   [CarOperations.CarDirections.CenterRight] = "CenterRight",
   [CarOperations.CarDirections.RearRight] = "RearRight",
+  [CarOperations.CarDirections.FrontLeftAngled] = "FrontLeftAngled",
+  [CarOperations.CarDirections.RearLeftAngled] = "RearLeftAngled",
+  [CarOperations.CarDirections.FrontRightAngled] = "FrontRightAngled",
+  [CarOperations.CarDirections.RearRightAngled] = "RearRightAngled",
 }
 
 CarOperations.logCarAnchorPoints = function(carIndex, carAnchorPoints)
@@ -211,6 +248,17 @@ CarOperations.renderCarBlockCheckRays = function(carIndex)
   render.debugLine(carAnchorPoints.frontRight,  carAnchorPoints.frontRight  + carAnchorPoints.rightDirection * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
   render.debugLine(carAnchorPoints.centerRight, carAnchorPoints.centerRight + carAnchorPoints.rightDirection * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
   render.debugLine(carAnchorPoints.rearRight,   carAnchorPoints.rearRight   + carAnchorPoints.rightDirection * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
+
+  -- Angled fork rays (45° towards forward)
+  local leftAngledDir  = carAnchorPoints.leftDirection  * INV_SQRT2 + carAnchorPoints.forwardDirection * INV_SQRT2
+  local rightAngledDir = carAnchorPoints.rightDirection * INV_SQRT2 + carAnchorPoints.forwardDirection * INV_SQRT2
+
+  render.debugLine(carAnchorPoints.frontLeft,  carAnchorPoints.frontLeft  + leftAngledDir  * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)
+  render.debugLine(carAnchorPoints.rearLeft,   carAnchorPoints.rearLeft   + leftAngledDir  * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)
+
+  render.debugLine(carAnchorPoints.frontRight, carAnchorPoints.frontRight + rightAngledDir * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
+  render.debugLine(carAnchorPoints.rearRight,  carAnchorPoints.rearRight  + rightAngledDir * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
+
 end
 
 CarOperations.drawSideAnchorPoints = function(carIndex)
