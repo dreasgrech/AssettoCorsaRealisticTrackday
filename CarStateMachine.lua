@@ -94,8 +94,6 @@ local carStateMachine = {
       physics.setAIThrottleLimit(carIndex, 1)
   end,
   [CarStateMachine.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
-      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "DrivingNormally")) end
-
       -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
 
       -- DEBUG DEBUG DEBUG
@@ -149,8 +147,6 @@ local carStateMachine = {
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE)
   end,
   [CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
-      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartYieldingToTheSide")) end
-
       -- turn on turning lights
       local turningLights = storage.yieldToLeft and ac.TurningLights.Left or ac.TurningLights.Right
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
@@ -159,10 +155,9 @@ local carStateMachine = {
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE)
   end,
   [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
-      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "YieldingToTheSide")) end
-
       local yieldingToLeft = storage.yieldToLeft
 
+      -- check if there's a care on our side
       local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
       if isCarOnSide then
           -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
@@ -175,13 +170,11 @@ local carStateMachine = {
             return
           end
       end
-
-      -- Since the player car is still close, we must continue yielding
+      
       local sideSign = yieldingToLeft and -1 or 1
 
-        -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
-        -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
-        -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
+      -- Check car blind spot
+      -- Andreas: I've never seen this code working yet...
       local distanceToNearestCarInBlindSpot_L, distanceToNearestCarInBlindSpot_R = ac.getCarBlindSpot(carIndex)
       local isSideBlocked_L = (not (distanceToNearestCarInBlindSpot_L == nil))-- and distanceToNearestCarInBlindSpot_L > 0
       local isSideBlocked_R = (not (distanceToNearestCarInBlindSpot_R == nil))-- and distanceToNearestCarInBlindSpot_R > 0
@@ -191,31 +184,6 @@ local carStateMachine = {
           CarManager.cars_reasonWhyCantYield[carIndex] = 'Car in blind spot so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot_L) .. 'm'
           return
       end
-
-      -- local anyHit, rays = CarOperations.simpleSideRaycasts(carIndex, 10.0)
-      -- if anyHit then
-          -- -- Logger.log(string.format("Car %d: Side raycast hit something, not yielding", carIndex))
-          -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (raycast)'
-          -- return
-      -- end
-
-      -- local isCarAlongSide, carSide, carIndexAlongSide, carDistance = CarOperations.findCarAlongside(carIndex, 0)
-      -- if isCarAlongSide then
-          -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (V2): ' .. carSide .. '  #' .. tostring(carIndexAlongSide) .. '  gap=' .. string.format('%.2f', carDistance) .. 'm'
-          -- return
-      -- end
---[=====[ 
-      -- TODO: I haven't yet seen this "blocked" code working in practice, need to test more
-      -- check if the side the car is yielding to is blocked by another car
-      local isTargetSideBlocked, blockerCarIndex = CarOperations.isTargetSideBlocked(carIndex, sideSign)
-      CarManager.cars_isSideBlocked[carIndex] = isTargetSideBlocked
-      CarManager.cars_sideBlockedCarIndex[carIndex] = blockerCarIndex
-
-      if isTargetSideBlocked then
-        CarManager.cars_reason[carIndex] = 'Target side blocked by another car so not yielding'
-        return
-      end
---]=====]
 
       local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
       local splineOffsetTransitionSpeed = storage.rampSpeed_mps
@@ -254,8 +222,6 @@ local carStateMachine = {
       end
   end,
   [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = function (carIndex, dt, car, playerCar, storage)
-      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "StayingOnYieldingLane")) end
-
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       -- make the ai car leave more space in between the care in front while driving on the yielding lane
@@ -278,8 +244,6 @@ local carStateMachine = {
       end
   end,
   [CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
-      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "TryingToStartEasingOutYield")) end
-
       -- reset the yield time counter
       CarManager.cars_yieldTime[carIndex] = 0
 
@@ -297,8 +261,6 @@ local carStateMachine = {
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.EASING_OUT_YIELD)
   end,
   [CarStateMachine.CarStateType.EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
-      if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "EasingOutYield")) end
-
       local targetSplineOffset = 0
       local splineOffsetTransitionSpeed = storage.rampRelease_mps
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
@@ -379,6 +341,7 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     local state = CarStateMachine.getCurrentState(carIndex)
 
     -- execute the state machine for this car
+    if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, CarStateMachine.CarStateTypeStrings[state])) end
     carStateMachine[state](carIndex, dt, car, playerCar, storage)
 
     timeInStates[state] = timeInStates[state] + dt
