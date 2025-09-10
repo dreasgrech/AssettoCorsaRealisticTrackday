@@ -29,8 +29,10 @@ end
 -- Returns the six lateral anchor points plus some helpers
 ---@param car ac.StateCar
 ---@return table
-CarOperations.getSideAnchorPoints = function(carIndex, car)
-  local carForward, carLeft, carUp = car.look, car.side, car.up  -- all normalized
+-- CarOperations.getSideAnchorPoints = function(carIndex, car)
+-- CarOperations.getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)
+local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)
+  -- local carForward, carLeft, carUp = car.look, car.side, car.up  -- all normalized
 
   -- Half-extents from AABB (x=width, y=height, z=length)
   -- local carAABBSize = car.aabbSize
@@ -39,14 +41,14 @@ CarOperations.getSideAnchorPoints = function(carIndex, car)
   -- local carHalfHeight = carAABBSize.y * 0.5
   -- local carHalfLength = carAABBSize.z * 0.5
 
-  local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
+  -- local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
   -- local halfAABBSize = car.aabbSize * 0.5
   local carHalfWidth = halfAABBSize.x
   local carHalfHeight = halfAABBSize.y
   local carHalfLength = halfAABBSize.z
 
   -- Center at mid-height
-  local carCenterWorldPosition = car.position + carUp * carHalfHeight
+  local carCenterWorldPosition = carPosition + carUp * carHalfHeight
 
   local carRight = -carLeft
 
@@ -91,7 +93,12 @@ CarOperations.isTargetSideBlocked = function(carIndex)
 
   -- local storage = StorageManager.getStorage()
 
-  local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
+  -- local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
+  local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
+  if not carAnchorPoints then
+    Logger.log(string.format("CarOperations.isTargetSideBlocked: Car %d has no anchor points calculated", carIndex))
+    return false
+  end
   -- CarOperations.logCarAnchorPoints(carIndex, carAnchorPoints)
 
   local hitCar, hitDistance = checkForOtherCars(carAnchorPoints.frontLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
@@ -123,7 +130,27 @@ CarOperations.isTargetSideBlocked = function(carIndex)
   if hitCar then
     return true, CarOperations.CarDirections.RearRight, hitDistance
   end
+
+  return false
 end
+
+CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints = function(carIndex)
+    local car = ac.getCar(carIndex)
+    if not car then return false end
+
+    local carPosition = car.position
+    local carForward = car.look
+    local carLeft = car.side
+    local carUp = car.up
+    local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
+
+    local carAnchorPoints = getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)
+    CarManager.cars_anchorPoints[carIndex] = carAnchorPoints
+
+    local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.isTargetSideBlocked(carIndex)
+    return isCarOnSide, carOnSideDirection, carOnSideDistance
+end
+
 
 CarOperations.CarDirections = {
   None = 0,
@@ -168,7 +195,13 @@ CarOperations.renderCarBlockCheckRays = function(carIndex)
   local car = ac.getCar(carIndex)
   if not car then return end
 
-  local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
+  -- local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
+  local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
+  if not carAnchorPoints then
+    Logger.log(string.format("CarOperations.renderCarBlockCheckRays: Car %d has no anchor points calculated", carIndex))
+    return
+  end
+
   -- CarOperations.logCarAnchorPoints(carIndex, carAnchorPoints)
 
   render.debugLine(carAnchorPoints.frontLeft,  carAnchorPoints.frontLeft  + carAnchorPoints.leftDirection  * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)
@@ -186,7 +219,12 @@ CarOperations.drawSideAnchorPoints = function(carIndex)
     return
   end
 
-  local p = CarOperations.getSideAnchorPoints(carIndex, car)
+  -- local p = CarOperations.getSideAnchorPoints(carIndex, car)
+  local p = CarManager.cars_anchorPoints[carIndex]
+  if not p then
+    Logger.log(string.format("CarOperations.drawSideAnchorPoints: Car %d has no anchor points calculated", carIndex))
+    return
+  end
 
   local gizmoColor_left = rgbm(0,0,1,1) -- blue
   local gizmoColor_right = rgbm(1,0,0,1) -- right

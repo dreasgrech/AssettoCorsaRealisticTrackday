@@ -25,6 +25,7 @@ CarManager.cars_indRight = {}
 CarManager.cars_indPhase = {}
 CarManager.cars_hasTL = {}
 CarManager.cars_evacuating = {}
+CarManager.cars_anchorPoints = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -55,6 +56,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_indPhase[carIndex] = false
   CarManager.cars_hasTL[carIndex] = false
   CarManager.cars_evacuating[carIndex] = false
+  CarManager.cars_anchorPoints[carIndex] = nil
   CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 
   -- remove speed limitations which could have occured during an accident

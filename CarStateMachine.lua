@@ -145,6 +145,12 @@ local carStateMachine = {
 
       -- CarManager.cars_reason[carIndex] = 'Driving on yielding lane'
 
+      local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
+      if isCarOnSide then
+          Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
+          return
+      end
+
       -- Since the player car is still close, we must continue yielding
       local sideSign = storage.yieldToLeft and -1 or 1
 
@@ -342,6 +348,8 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
         -- Logger.log(string.format("%d ", QueueManager.queueLength(queuedCarCollidedWithMeAccidents)))
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
     -- end
+
+    CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
 
     local state = CarStateMachine.getCurrentState(carIndex)
 
