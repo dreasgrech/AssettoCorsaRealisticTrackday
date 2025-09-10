@@ -170,6 +170,32 @@ end
 function script.MANIFEST__TRANSPARENT(dt)
   if (not shouldAppRun()) then return end
   UIManager.draw3DOverheadText()
+
+  -- local playerCar = ac.getCar(0)
+  -- local playerCarPositionWorld = playerCar.position -- vec3 world position: bottom center of the car
+  -- local playerCarForward = playerCar.look -- vec3 facing forward
+  -- local playerCarSide = playerCar.side
+  -- local playerCarAABBSize = playerCar.aabbSize -- vec3
+  -- Logger.log(string.format(
+    -- "playerCarPositionWorld=x=%.2f y=%.2f z=%.2f, playerCarAABBSize: x=%.2f y=%.2f z=%.2f, playerCarForward = x=%.2f y=%.2f z=%.2f, playerCarSide = x=%.2f y=%.2f z=%.2f",
+      -- playerCarPositionWorld.x, playerCarPositionWorld.y, playerCarPositionWorld.z,
+      -- playerCarAABBSize.x, playerCarAABBSize.y, playerCarAABBSize.z,
+      -- playerCarForward.x, playerCarForward.y, playerCarForward.z,
+      -- playerCarSide.x, playerCarSide.y, playerCarSide.z
+  -- ))
+
+  -- todo: continue working on these
+  -- todo: continue working on these
+  -- todo: continue working on these
+  -- render.debugSphere(playerCarPosition, 1, rgbm(1, 0, 0, 1))
+  -- render.debugBox(playerCarPosition + vec3(0, 1, 0), vec3(1, 1, 1), rgbm(0, 1, 0, 1))
+  -- render.debugCross(playerCarPosition + vec3(0, 2, 0), 1.0, rgbm(0, 0, 1, 1))
+  -- render.debugArrow(playerCarPosition + vec3(0, 3, 0), playerCarPosition + vec3(0, 3, 5), 0.7, rgbm(0.2, 0.2, 1.0, 1))
+  -- render.debugLine(playerCarPosition + vec3(0, 1, 0), playerCarPosition + vec3(0, 1, 5), rgbm(1.0, 0.2, 0.2, 1))
+  -- render.debugLine(playerCarPosition + vec3(0, 0, 0), playerCarPosition + (playerCarSide * 2), rgbm(1.0, 0.2, 0.2, 1))
+
+  CarOperations.drawSideAnchorPoints(0)
+
   render.setDepthMode(render.DepthMode.Normal)
 end
 

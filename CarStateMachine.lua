@@ -82,6 +82,16 @@ local carStateMachine = {
   [CarStateMachine.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "DrivingNormally")) end
 
+      -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
+
+      -- DEBUG DEBUG DEBUG
+      -- local anyHit, rays = CarOperations.simpleSideRaycasts(carIndex, 10.0)
+      -- if anyHit then
+          -- -- Logger.log(string.format("Car %d: Side raycast hit something, not yielding", carIndex))
+          -- -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (raycast)'
+      -- end
+      -- DEBUG DEBUG DEBUG
+
       -- If this car is not close to the player car, do nothing
       local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
       local radius = storage.detectInner_meters
@@ -151,13 +161,18 @@ local carStateMachine = {
           return
       end
 
---[=====[ 
-      local isCarAlongSide, carSide, carIndexAlongSide, carDistance = CarOperations.findCarAlongside(carIndex, 0)
-      if isCarAlongSide then
-          CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (V2): ' .. carSide .. '  #' .. tostring(carIndexAlongSide) .. '  gap=' .. string.format('%.2f', carDistance) .. 'm'
-          return
-      end
---]=====]
+      -- local anyHit, rays = CarOperations.simpleSideRaycasts(carIndex, 10.0)
+      -- if anyHit then
+          -- -- Logger.log(string.format("Car %d: Side raycast hit something, not yielding", carIndex))
+          -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (raycast)'
+          -- return
+      -- end
+
+      -- local isCarAlongSide, carSide, carIndexAlongSide, carDistance = CarOperations.findCarAlongside(carIndex, 0)
+      -- if isCarAlongSide then
+          -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (V2): ' .. carSide .. '  #' .. tostring(carIndexAlongSide) .. '  gap=' .. string.format('%.2f', carDistance) .. 'm'
+          -- return
+      -- end
 --[=====[ 
       -- TODO: I haven't yet seen this "blocked" code working in practice, need to test more
       -- check if the side the car is yielding to is blocked by another car
