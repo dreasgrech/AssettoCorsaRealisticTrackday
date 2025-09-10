@@ -50,6 +50,8 @@ CarOperations.getSideAnchorPoints = function(carIndex, car)
 
   local carRight = -carLeft
 
+  -- todo: ideally I don't calculate everything here since we probably dont need all of them in the calculations
+
   local frontLeftWorldPosition   = carCenterWorldPosition + carForward *  carHalfLength + carLeft * carHalfWidth
   local centerLeftWorldPosition  = carCenterWorldPosition + carLeft * carHalfWidth
   local rearLeftWorldPosition    = carCenterWorldPosition - carForward *  carHalfLength + carLeft * carHalfWidth
@@ -78,16 +80,9 @@ local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling,
 
 local checkForOtherCars = function(worldPosition, direction, distance)
   local carRay = render.createRay(worldPosition,  direction, distance)
-  local instersectionDistance = carRay:cars(BACKFACE_CULLING_FOR_BLOCKING)
-  -- render.debugLine(carRay.pos, carRay.dir * carRay.length, rgbm(1,1,0,1)) -- cant be drawn here
-  local rayHit = not (instersectionDistance == -1)
-  return rayHit, instersectionDistance
-end
-
-local isOtherCarPresentAtDirection = function(worldPosition, direction, distance)
-  local rayHit, instersectionDistance = checkForOtherCars(worldPosition, direction, distance)
-
-  return rayHit, instersectionDistance
+  local raycastHitDistance = carRay:cars(BACKFACE_CULLING_FOR_BLOCKING)
+  local rayHit = not (raycastHitDistance == -1)
+  return rayHit, raycastHitDistance
 end
 
 CarOperations.isTargetSideBlocked = function(carIndex)
@@ -99,32 +94,32 @@ CarOperations.isTargetSideBlocked = function(carIndex)
   local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
   -- CarOperations.logCarAnchorPoints(carIndex, carAnchorPoints)
 
-  local hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.frontLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  local hitCar, hitDistance = checkForOtherCars(carAnchorPoints.frontLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
   if hitCar then
     return true, CarOperations.CarDirections.FrontLeft, hitDistance
   end
 
-  local hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.centerLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  local hitCar, hitDistance = checkForOtherCars(carAnchorPoints.centerLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
   if hitCar then
     return true, CarOperations.CarDirections.CenterLeft, hitDistance
   end
 
-  hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.rearLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  hitCar, hitDistance = checkForOtherCars(carAnchorPoints.rearLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
   if hitCar then
     return true, CarOperations.CarDirections.RearLeft, hitDistance
   end
 
-  hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.frontRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  hitCar, hitDistance = checkForOtherCars(carAnchorPoints.frontRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
   if hitCar then
     return true, CarOperations.CarDirections.FrontRight, hitDistance
   end
 
-  hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.centerRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  hitCar, hitDistance = checkForOtherCars(carAnchorPoints.centerRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
   if hitCar then
     return true, CarOperations.CarDirections.CenterRight, hitDistance
   end
 
-  hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.rearRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  hitCar, hitDistance = checkForOtherCars(carAnchorPoints.rearRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
   if hitCar then
     return true, CarOperations.CarDirections.RearRight, hitDistance
   end

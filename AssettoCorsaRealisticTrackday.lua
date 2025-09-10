@@ -204,7 +204,7 @@ function script.MANIFEST__TRANSPARENT(dt)
 
 -- CarOperations.isTargetSideBlocked(0)
 
-  render.setDepthMode(render.DepthMode.Normal)
+  -- render.setDepthMode(render.DepthMode.Normal)
 end
 
 ---

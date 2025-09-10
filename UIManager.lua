@@ -26,6 +26,7 @@ function UIManager.draw3DOverheadText()
   local storage = StorageManager.getStorage()
   if not storage.debugDraw then return end
   local sim = ac.getSim()
+  local depthModeBeforeModification = render.DepthMode
   if storage.drawOnTop then
     -- draw over everything (no depth testing)
     render.setDepthMode(render.DepthMode.Off)
@@ -58,6 +59,8 @@ function UIManager.draw3DOverheadText()
       end
     end
   end
+
+  render.setDepthMode(depthModeBeforeModification)
 end
 
 function UIManager.renderUIOptionsControls()
