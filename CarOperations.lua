@@ -77,7 +77,7 @@ local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, ha
   }
 end
 
-local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 5.0
+local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 2.0
 local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
 
 local checkForOtherCars = function(worldPosition, direction, distance)
