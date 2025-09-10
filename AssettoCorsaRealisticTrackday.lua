@@ -118,7 +118,13 @@ function script.MANIFEST__UPDATE(dt)
   if (not shouldAppRun()) then return end
 
   ----------------------------------------------------------------
-  CarOperations.isTargetSideBlocked(0)
+  local isBlocked, direction, distance = CarOperations.isTargetSideBlocked(0)
+  if isBlocked then
+    -- ui.textColored(string.format("Player car side is BLOCKED on %s (distance %.2f m)", tostring(direction), distance or -1), rgbm(1.0, 0.2, 0.2, 1.0))
+    Logger.log(string.format("Car %d left side is BLOCKED (hit at %s, distance %.2f m)", 0, CarOperations.CarDirectionsStrings[direction], distance or -1))
+  else
+    -- ui.textColored("Player car side is clear", rgbm(0.2, 1.0, 0.2, 1.0))
+  end
   ----------------------------------------------------------------
 
   local sim = ac.getSim()

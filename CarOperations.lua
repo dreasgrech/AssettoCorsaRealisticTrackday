@@ -84,11 +84,8 @@ local checkForOtherCars = function(worldPosition, direction, distance)
   return rayHit, instersectionDistance
 end
 
-local isOtherCarPresentAtDirection = function(directionName, worldPosition, direction, distance)
+local isOtherCarPresentAtDirection = function(worldPosition, direction, distance)
   local rayHit, instersectionDistance = checkForOtherCars(worldPosition, direction, distance)
-  if rayHit then
-    Logger.log(string.format("Ray hit at %s direction, distance: %.2f m", directionName, instersectionDistance))
-  end
 
   return rayHit, instersectionDistance
 end
@@ -102,14 +99,56 @@ CarOperations.isTargetSideBlocked = function(carIndex)
   local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
   -- CarOperations.logCarAnchorPoints(carIndex, carAnchorPoints)
 
-  isOtherCarPresentAtDirection("frontLeft", carAnchorPoints.frontLeft,  carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
-  isOtherCarPresentAtDirection("centerLeft", carAnchorPoints.centerLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
-  isOtherCarPresentAtDirection("rearLeft", carAnchorPoints.rearLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
-  isOtherCarPresentAtDirection("frontRight", carAnchorPoints.frontRight,  carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
-  isOtherCarPresentAtDirection("centerRight", carAnchorPoints.centerRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
-  isOtherCarPresentAtDirection("rearRight", carAnchorPoints.rearRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  local hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.frontLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.FrontLeft, hitDistance
+  end
 
+  local hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.centerLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.CenterLeft, hitDistance
+  end
+
+  hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.rearLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.RearLeft, hitDistance
+  end
+
+  hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.frontRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.FrontRight, hitDistance
+  end
+
+  hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.centerRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.CenterRight, hitDistance
+  end
+
+  hitCar, hitDistance = isOtherCarPresentAtDirection(carAnchorPoints.rearRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  if hitCar then
+    return true, CarOperations.CarDirections.RearRight, hitDistance
+  end
 end
+
+CarOperations.CarDirections = {
+  None = 0,
+  FrontLeft = 1,
+  CenterLeft = 2,
+  RearLeft = 3,
+  FrontRight = 4,
+  CenterRight = 5,
+  RearRight = 6,
+}
+
+CarOperations.CarDirectionsStrings = {
+  [CarOperations.CarDirections.None] = "None",
+  [CarOperations.CarDirections.FrontLeft] = "FrontLeft",
+  [CarOperations.CarDirections.CenterLeft] = "CenterLeft",
+  [CarOperations.CarDirections.RearLeft] = "RearLeft",
+  [CarOperations.CarDirections.FrontRight] = "FrontRight",
+  [CarOperations.CarDirections.CenterRight] = "CenterRight",
+  [CarOperations.CarDirections.RearRight] = "RearRight",
+}
 
 CarOperations.logCarAnchorPoints = function(carIndex, carAnchorPoints)
   Logger.log(string.format(
