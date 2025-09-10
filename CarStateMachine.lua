@@ -161,16 +161,23 @@ local carStateMachine = {
   [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, "YieldingToTheSide")) end
 
-      -- CarManager.cars_reason[carIndex] = 'Driving on yielding lane'
+      local yieldingToLeft = storage.yieldToLeft
 
       local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
       if isCarOnSide then
-          Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
-          return
+          -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
+          local isSideCarOnTheSameSideAsYielding = 
+          yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.LEFT) or 
+          (not yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.RIGHT))
+          if isSideCarOnTheSameSideAsYielding then
+            -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
+            CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding: ' .. CarOperations.CarDirectionsStrings[carOnSideDirection] .. '  gap=' .. string.format('%.2f', carOnSideDistance) .. 'm'
+            return
+          end
       end
 
       -- Since the player car is still close, we must continue yielding
-      local sideSign = storage.yieldToLeft and -1 or 1
+      local sideSign = yieldingToLeft and -1 or 1
 
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
         -- TODO: Maybe ac.getCarBlindspot() could help in detecting cars on the side maybe
@@ -181,7 +188,7 @@ local carStateMachine = {
 
       if (isSideBlocked_L or isSideBlocked_R) then
           Logger.log(string.format("Car %d: Blindspot L=%.2f  R=%.2f", carIndex, distanceToNearestCarInBlindSpot_L or -1, distanceToNearestCarInBlindSpot_R or -1))
-          CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot_L) .. 'm'
+          CarManager.cars_reasonWhyCantYield[carIndex] = 'Car in blind spot so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot_L) .. 'm'
           return
       end
 
