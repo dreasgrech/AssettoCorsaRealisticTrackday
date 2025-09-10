@@ -96,10 +96,10 @@ function UIManager.renderUIOptionsControls()
     storage.minSpeedDelta_kmh =  ui.slider('Min speed delta (km/h)', storage.minSpeedDelta_kmh, 0, 30)
     if ui.itemHovered() then ui.setTooltip('Require some closing speed before asking AI to yield.') end
 
-    storage.rampSpeed_mps =  ui.slider('Offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 10.0)
+    storage.rampSpeed_mps =  ui.slider('Offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('Ramp speed of offset change.') end
 
-    storage.rampRelease_mps =  ui.slider('Offset release (m/s)', storage.rampRelease_mps, 0.1, 10.0)
+    storage.rampRelease_mps =  ui.slider('Offset release (m/s)', storage.rampRelease_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly offset returns to center once you’re past the AI.') end
 
     storage.minAISpeed_kmh =  ui.slider('Min AI speed (km/h)', storage.minAISpeed_kmh, 0, 120)

@@ -18,6 +18,20 @@ local CarStateType = {
   ANOTHER_CAR_COLLIDED_INTO_ME = 512,
 }
 
+CarStateMachine.CarStateTypeStrings = {
+  [CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = "TryingToStartDrivingNormally",
+  [CarStateType.DRIVING_NORMALLY] = "DrivingNormally",
+  [CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = "TryingToStartYieldingToTheSide",
+  [CarStateType.YIELDING_TO_THE_SIDE] = "YieldingToTheSide",
+  [CarStateType.STAYING_ON_YIELDING_LANE] = "StayingOnYieldingLane",
+  [CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = "TryingToStartEasingOutYield",
+  [CarStateType.EASING_OUT_YIELD] = "EasingOutYield",
+  [CarStateType.WAITING_AFTER_ACCIDENT] = "WaitingAfterAccident",
+  [CarStateType.COLLIDED_WITH_TRACK] = "CollidedWithTrack",
+  [CarStateType.COLLIDED_WITH_CAR] = "CollidedWithCar",
+  [CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = "AnotherCarCollidedIntoMe",
+}
+
 local cars_previousState = {}
 local cars_state = {}
 
@@ -92,6 +106,8 @@ local carStateMachine = {
       -- end
       -- DEBUG DEBUG DEBUG
 
+        CarManager.cars_reasonWhyCantYield[carIndex] = nil
+
       -- If this car is not close to the player car, do nothing
       local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
       local radius = storage.detectInner_meters
@@ -126,6 +142,8 @@ local carStateMachine = {
       if not isAICarAboveMinSpeed then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'AI speed too low (corner/traffic) so not yielding'
       end
+
+      CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       -- Since all the checks have passed, the ai car can now start to yield
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE)
