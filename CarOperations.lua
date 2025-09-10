@@ -29,14 +29,21 @@ end
 -- Returns the six lateral anchor points plus some helpers
 ---@param car ac.StateCar
 ---@return table
-CarOperations.getSideAnchorPoints = function(car)
+CarOperations.getSideAnchorPoints = function(carIndex, car)
   local carForward, carLeft, carUp = car.look, car.side, car.up  -- all normalized
 
   -- Half-extents from AABB (x=width, y=height, z=length)
-  local carAABBSize = car.aabbSize
-  local carHalfWidth = carAABBSize.x * 0.5
-  local carHalfHeight = carAABBSize.y * 0.5
-  local carHalfLength = carAABBSize.z * 0.5
+  -- local carAABBSize = car.aabbSize
+  -- local carAABBSize = CarManager.cars_AABBSIZE[carIndex]
+  -- local carHalfWidth = carAABBSize.x * 0.5
+  -- local carHalfHeight = carAABBSize.y * 0.5
+  -- local carHalfLength = carAABBSize.z * 0.5
+
+  local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
+  -- local halfAABBSize = car.aabbSize * 0.5
+  local carHalfWidth = halfAABBSize.x
+  local carHalfHeight = halfAABBSize.y
+  local carHalfLength = halfAABBSize.z
 
   -- Center at mid-height
   local carCenterWorldPosition = car.position + carUp * carHalfHeight
@@ -52,15 +59,91 @@ CarOperations.getSideAnchorPoints = function(car)
   local rearRightWorldPosition   = carCenterWorldPosition - carForward *  carHalfLength + carRight * carHalfWidth
 
   return {
-    frontLeft   = frontLeftWorldPosition,
-    centerLeft  = centerLeftWorldPosition,
-    rearLeft    = rearLeftWorldPosition,
-    frontRight  = frontRightWorldPosition,
+    frontLeft = frontLeftWorldPosition,
+    centerLeft = centerLeftWorldPosition,
+    rearLeft = rearLeftWorldPosition,
+    frontRight = frontRightWorldPosition,
     centerRight = centerRightWorldPosition,
-    rearRight   = rearRightWorldPosition,
-    center      = carCenterWorldPosition,
-    dirs        = { forward = carForward, left = carLeft, up = carUp }
+    rearRight = rearRightWorldPosition,
+    center = carCenterWorldPosition,
+    forwardDirection = carForward,
+    leftDirection = carLeft,
+    rightDirection = carRight,
+    upDirection = carUp,
   }
+end
+
+local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 5.0
+local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
+
+local checkForOtherCars = function(worldPosition, direction, distance)
+  local carRay = render.createRay(worldPosition,  direction, distance)
+  local instersectionDistance = carRay:cars(BACKFACE_CULLING_FOR_BLOCKING)
+  -- render.debugLine(carRay.pos, carRay.dir * carRay.length, rgbm(1,1,0,1)) -- cant be drawn here
+  local rayHit = not (instersectionDistance == -1)
+  return rayHit, instersectionDistance
+end
+
+local isOtherCarPresentAtDirection = function(directionName, worldPosition, direction, distance)
+  local rayHit, instersectionDistance = checkForOtherCars(worldPosition, direction, distance)
+  if rayHit then
+    Logger.log(string.format("Ray hit at %s direction, distance: %.2f m", directionName, instersectionDistance))
+  end
+
+  return rayHit, instersectionDistance
+end
+
+CarOperations.isTargetSideBlocked = function(carIndex)
+  local car = ac.getCar(carIndex)
+  if not car then return false end
+
+  -- local storage = StorageManager.getStorage()
+
+  local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
+  -- CarOperations.logCarAnchorPoints(carIndex, carAnchorPoints)
+
+  isOtherCarPresentAtDirection("frontLeft", carAnchorPoints.frontLeft,  carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  isOtherCarPresentAtDirection("centerLeft", carAnchorPoints.centerLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  isOtherCarPresentAtDirection("rearLeft", carAnchorPoints.rearLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  isOtherCarPresentAtDirection("frontRight", carAnchorPoints.frontRight,  carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  isOtherCarPresentAtDirection("centerRight", carAnchorPoints.centerRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+  isOtherCarPresentAtDirection("rearRight", carAnchorPoints.rearRight, carAnchorPoints.rightDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
+
+end
+
+CarOperations.logCarAnchorPoints = function(carIndex, carAnchorPoints)
+  Logger.log(string.format(
+    "Car %d anchor points: frontLeft=(%.2f, %.2f, %.2f), centerLeft=(%.2f, %.2f, %.2f), rearLeft=(%.2f, %.2f, %.2f), frontRight=(%.2f, %.2f, %.2f), centerRight=(%.2f, %.2f, %.2f), rearRight=(%.2f, %.2f, %.2f), forwardDirection=(%.2f, %.2f, %.2f), leftDirection=(%.2f, %.2f, %.2f), upDirection=(%.2f, %.2f, %.2f)",
+    carIndex,
+    carAnchorPoints.frontLeft.x, carAnchorPoints.frontLeft.y, carAnchorPoints.frontLeft.z,
+    carAnchorPoints.centerLeft.x, carAnchorPoints.centerLeft.y, carAnchorPoints.centerLeft.z,
+    carAnchorPoints.rearLeft.x, carAnchorPoints.rearLeft.y, carAnchorPoints.rearLeft.z,
+    carAnchorPoints.frontRight.x, carAnchorPoints.frontRight.y, carAnchorPoints.frontRight.z,
+    carAnchorPoints.centerRight.x, carAnchorPoints.centerRight.y, carAnchorPoints.centerRight.z,
+    carAnchorPoints.rearRight.x, carAnchorPoints.rearRight.y, carAnchorPoints.rearRight.z,
+    carAnchorPoints.forwardDirection.x, carAnchorPoints.forwardDirection.y, carAnchorPoints.forwardDirection.z,
+    carAnchorPoints.leftDirection.x, carAnchorPoints.leftDirection.y, carAnchorPoints.leftDirection.z,
+    carAnchorPoints.upDirection.x, carAnchorPoints.upDirection.y, carAnchorPoints.upDirection.z
+  ))
+end
+
+local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
+local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
+
+CarOperations.renderCarBlockCheckRays = function(carIndex)
+  local car = ac.getCar(carIndex)
+  if not car then return end
+
+  local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
+  -- CarOperations.logCarAnchorPoints(carIndex, carAnchorPoints)
+
+  render.debugLine(carAnchorPoints.frontLeft,  carAnchorPoints.frontLeft  + carAnchorPoints.leftDirection  * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)
+  render.debugLine(carAnchorPoints.centerLeft, carAnchorPoints.centerLeft + carAnchorPoints.leftDirection  * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)
+  render.debugLine(carAnchorPoints.rearLeft,   carAnchorPoints.rearLeft   + carAnchorPoints.leftDirection  * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)
+
+  render.debugLine(carAnchorPoints.frontRight,  carAnchorPoints.frontRight  + carAnchorPoints.rightDirection * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
+  render.debugLine(carAnchorPoints.centerRight, carAnchorPoints.centerRight + carAnchorPoints.rightDirection * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
+  render.debugLine(carAnchorPoints.rearRight,   carAnchorPoints.rearRight   + carAnchorPoints.rightDirection * SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
 end
 
 CarOperations.drawSideAnchorPoints = function(carIndex)
@@ -69,12 +152,11 @@ CarOperations.drawSideAnchorPoints = function(carIndex)
     return
   end
 
-  local p = CarOperations.getSideAnchorPoints(car)
+  local p = CarOperations.getSideAnchorPoints(carIndex, car)
 
   local gizmoColor_left = rgbm(0,0,1,1) -- blue
   local gizmoColor_right = rgbm(1,0,0,1) -- right
 
-  -- Color legend: Left=red, Right=blue, Center=green
   render.debugSphere(p.frontLeft,   0.15, gizmoColor_left)
   render.debugSphere(p.centerLeft,  0.15, gizmoColor_left)
   render.debugSphere(p.rearLeft,    0.15, gizmoColor_left)
@@ -86,9 +168,9 @@ CarOperations.drawSideAnchorPoints = function(carIndex)
   render.debugSphere(p.center,      0.12, rgbm(0,1,0,1))
 
   -- Optional: draw short axis arrows to verify directions in-game
-  render.debugLine(p.center, p.center + p.dirs.forward * 2.0, rgbm(0,1,0,1)) -- forward
-  render.debugLine(p.center, p.center + -p.dirs.left   * 2.0, rgbm(0,0,1,1)) -- left
-  render.debugLine(p.center, p.center + p.dirs.up      * 2.0, rgbm(1,1,0,1)) -- up
+  -- render.debugLine(p.center, p.center + p.forwardDirection * 2.0, rgbm(0,1,0,1)) -- forward
+  -- render.debugLine(p.center, p.center + -p.leftDirection   * 2.0, rgbm(0,0,1,1)) -- left
+  -- render.debugLine(p.center, p.center + p.upDirection      * 2.0, rgbm(1,1,0,1)) -- up
 end
 
 

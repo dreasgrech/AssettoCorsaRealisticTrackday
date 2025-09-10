@@ -15,7 +15,6 @@ CarStateMachine = require("CarStateMachine")
 AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
 
---[=====[ 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
 ---
@@ -26,9 +25,9 @@ local function awake()
   end
 
   -- Logger.log('Initializing')
+  CarManager.ensureDefaults(0) -- ensure defaults on local player car
 end
 awake()
---]=====]
 
 local function shouldAppRun()
     local storage = StorageManager.getStorage()
@@ -112,7 +111,20 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   end
 end
 
-local function doCarYieldingLogic_STATEMACHINE(dt)
+---
+-- wiki: called after a whole simulation update
+---
+function script.MANIFEST__UPDATE(dt)
+  if (not shouldAppRun()) then return end
+
+  ----------------------------------------------------------------
+  CarOperations.isTargetSideBlocked(0)
+  ----------------------------------------------------------------
+
+  local sim = ac.getSim()
+  if sim.isPaused then return end
+
+  -- doCarYieldingLogic_old(dt)
   local storage = StorageManager.getStorage()
   local sim = ac.getSim()
   local playerCar = ac.getCar(0)
@@ -152,19 +164,6 @@ local function doCarYieldingLogic_STATEMACHINE(dt)
 end
 
 ---
--- wiki: called after a whole simulation update
----
-function script.MANIFEST__UPDATE(dt)
-  if (not shouldAppRun()) then return end
-
-  local sim = ac.getSim()
-  if sim.isPaused then return end
-
-  -- doCarYieldingLogic_old(dt)
-  doCarYieldingLogic_STATEMACHINE(dt)
-end
-
----
 -- wiki: called when transparent objects are finished rendering
 ---
 function script.MANIFEST__TRANSPARENT(dt)
@@ -195,6 +194,9 @@ function script.MANIFEST__TRANSPARENT(dt)
   -- render.debugLine(playerCarPosition + vec3(0, 0, 0), playerCarPosition + (playerCarSide * 2), rgbm(1.0, 0.2, 0.2, 1))
 
   CarOperations.drawSideAnchorPoints(0)
+  CarOperations.renderCarBlockCheckRays(0)
+
+-- CarOperations.isTargetSideBlocked(0)
 
   render.setDepthMode(render.DepthMode.Normal)
 end

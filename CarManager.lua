@@ -26,6 +26,9 @@ CarManager.cars_indPhase = {}
 CarManager.cars_hasTL = {}
 CarManager.cars_evacuating = {}
 
+CarManager.cars_AABBSIZE = {}
+CarManager.cars_HALF_AABSIZE = {}
+
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
 
@@ -63,12 +66,12 @@ local function setInitializedDefaults(carIndex)
 
   local car = ac.getCar(carIndex)
   if car then
-    ac.setTargetCar(carIndex)
+    CarManager.cars_AABBSIZE[carIndex] = car.aabbSize
+    CarManager.cars_HALF_AABSIZE[carIndex] = car.aabbSize * 0.5
 
     -- Turn off any turning lights
-    -- if car.hasTurningLights then
-        ac.setTurningLights(ac.TurningLights.None)
-    -- end
+    ac.setTargetCar(carIndex)
+    ac.setTurningLights(ac.TurningLights.None)
   end
 end
 
