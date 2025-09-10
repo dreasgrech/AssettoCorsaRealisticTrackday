@@ -108,7 +108,7 @@ local carStateMachine = {
 
       -- If this car is not close to the player car, do nothing
       local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
-      local radius = storage.detectInner_meters
+      local radius = storage.detectCarBehind_meters
       local isAICarCloseToPlayerCar = distanceFromPlayerCarToAICar <= radius
       if not isAICarCloseToPlayerCar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Too far (outside detect radius) so not yielding'
@@ -210,7 +210,6 @@ local carStateMachine = {
 
         -- go to trying to start easing out yield state
         CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
-
         return
       end
 
@@ -224,6 +223,22 @@ local carStateMachine = {
   [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = function (carIndex, dt, car, playerCar, storage)
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
+      -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
+      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
+      if isPlayerClearlyAheadOfAICar then
+        -- go to trying to start easing out yield state
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
+        return
+      end
+
+      -- if the player is far enough back, then we can begin easing out
+      local isPlayerClearlyBehindAICar = CarOperations.playerIsClearlyBehind(car, playerCar, storage.detectCarBehind_meters)
+      if isPlayerClearlyBehindAICar then
+        -- go to trying to start easing out yield state
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
+        return
+      end
+
       -- make the ai car leave more space in between the care in front while driving on the yielding lane
       physics.setAICaution(carIndex, 2)
 
@@ -231,17 +246,6 @@ local carStateMachine = {
       physics.setAIThrottleLimit(carIndex, 0.4)
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
-
-      -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
-      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
-      if isPlayerClearlyAheadOfAICar then
-        -- CarManager.cars_reason[carIndex] = 'Player clearly ahead, so easing out yield'
-
-        -- go to trying to start easing out yield state
-        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
-
-        return
-      end
   end,
   [CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
       -- reset the yield time counter

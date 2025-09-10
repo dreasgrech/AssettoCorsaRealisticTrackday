@@ -185,21 +185,26 @@ function script.MANIFEST__TRANSPARENT(dt)
   -- render.debugLine(playerCarPosition + vec3(0, 1, 0), playerCarPosition + vec3(0, 1, 5), rgbm(1.0, 0.2, 0.2, 1))
   -- render.debugLine(playerCarPosition + vec3(0, 0, 0), playerCarPosition + (playerCarSide * 2), rgbm(1.0, 0.2, 0.2, 1))
 
-  ----------------------------------------------------------------
-  -- CarOperations.drawSideAnchorPoints(0)
-  CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(0)
-  CarOperations.renderCarBlockCheckRays(0)
-  ----------------------------------------------------------------
+
+  -- ----------------------------------------------------------------
+  -- -- CarOperations.drawSideAnchorPoints(0)
+  -- local carBlocked, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(0)
+  -- if carBlocked then
+    -- -- ui.textColored(string.format("Player car side is BLOCKED on %s (distance %.2f m)", tostring(carOnSideDirection), carOnSideDistance or -1), rgbm(1.0, 0.2, 0.2, 1.0))
+    -- Logger.log(string.format("Player Car left side is BLOCKED (hit at %s, distance %.2f m)", CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
+  -- end
+  -- CarOperations.renderCarBlockCheckRays(0)
+  -- ----------------------------------------------------------------
+  
+
   local sim = ac.getSim()
   for carIndex = 1, sim.carsCount - 1 do
     local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
     if carAnchorPoints then
-      CarOperations.drawSideAnchorPoints(carIndex)
+      -- CarOperations.drawSideAnchorPoints(carIndex)
       CarOperations.renderCarBlockCheckRays(carIndex)
     end
   end
-
--- CarOperations.isTargetSideBlocked(0)
 
   -- render.setDepthMode(render.DepthMode.Normal)
 end

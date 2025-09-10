@@ -12,6 +12,12 @@ function CarOperations.playerIsClearlyAhead(aiCar, playerCar, meters)
     return MathHelpers.dot(fwd, rel) > meters
 end
 
+function CarOperations.playerIsClearlyBehind(aiCar, playerCar, meters)
+    local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
+    local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
+    return MathHelpers.dot(fwd, rel) < -meters
+end
+
 ---@param turningLights ac.TurningLights
 function CarOperations.toggleTurningLights(carIndex, car, turningLights)
     if ac.setTargetCar(carIndex) then
@@ -80,7 +86,7 @@ local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, ha
   }
 end
 
-local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 2.0
+local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 4.0
 local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
 
 local checkForOtherCars = function(worldPosition, direction, distance)
