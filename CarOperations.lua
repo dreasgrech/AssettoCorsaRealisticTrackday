@@ -1,5 +1,41 @@
 ﻿local CarOperations = {}
 
+CarOperations.CarDirections = {
+  None = 0,
+  FrontLeft = 1,
+  CenterLeft = 2,
+  RearLeft = 3,
+  FrontRight = 4,
+  CenterRight = 5,
+  RearRight = 6,
+  FrontLeftAngled = 7,
+  RearLeftAngled = 8,
+  FrontRightAngled = 9,
+  RearRightAngled = 10,
+}
+
+CarOperations.CarDirectionsStrings = {
+  [CarOperations.CarDirections.None] = "None",
+  [CarOperations.CarDirections.FrontLeft] = "FrontLeft",
+  [CarOperations.CarDirections.CenterLeft] = "CenterLeft",
+  [CarOperations.CarDirections.RearLeft] = "RearLeft",
+  [CarOperations.CarDirections.FrontRight] = "FrontRight",
+  [CarOperations.CarDirections.CenterRight] = "CenterRight",
+  [CarOperations.CarDirections.RearRight] = "RearRight",
+  [CarOperations.CarDirections.FrontLeftAngled] = "FrontLeftAngled",
+  [CarOperations.CarDirections.RearLeftAngled] = "RearLeftAngled",
+  [CarOperations.CarDirections.FrontRightAngled] = "FrontRightAngled",
+  [CarOperations.CarDirections.RearRightAngled] = "RearRightAngled",
+}
+
+local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 4.0
+local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
+
+local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
+
+local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
+local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
+
 function CarOperations.isBehind(aiCar, playerCar)
     local aiCarFwd = aiCar.look or aiCar.forward or vec3(0,0,1)
     local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
@@ -31,8 +67,6 @@ function CarOperations.toggleTurningLights(carIndex, car, turningLights)
     CarManager.cars_indPhase[carIndex] = car.turningLightsActivePhase
     CarManager.cars_hasTL[carIndex] = car.hasTurningLights
 end
-
-local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
 
 -- Returns the six lateral anchor points plus some helpers
 ---@param car ac.StateCar
@@ -84,9 +118,6 @@ local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, ha
     upDirection = carUp,
   }
 end
-
-local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 4.0
-local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
 
 local checkForOtherCars = function(worldPosition, direction, distance)
   local carRay = render.createRay(worldPosition,  direction, distance)
@@ -196,35 +227,6 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints = function(carI
     return isCarOnSide, carOnSideDirection, carOnSideDistance
 end
 
-
-CarOperations.CarDirections = {
-  None = 0,
-  FrontLeft = 1,
-  CenterLeft = 2,
-  RearLeft = 3,
-  FrontRight = 4,
-  CenterRight = 5,
-  RearRight = 6,
-  FrontLeftAngled = 7,
-  RearLeftAngled = 8,
-  FrontRightAngled = 9,
-  RearRightAngled = 10,
-}
-
-CarOperations.CarDirectionsStrings = {
-  [CarOperations.CarDirections.None] = "None",
-  [CarOperations.CarDirections.FrontLeft] = "FrontLeft",
-  [CarOperations.CarDirections.CenterLeft] = "CenterLeft",
-  [CarOperations.CarDirections.RearLeft] = "RearLeft",
-  [CarOperations.CarDirections.FrontRight] = "FrontRight",
-  [CarOperations.CarDirections.CenterRight] = "CenterRight",
-  [CarOperations.CarDirections.RearRight] = "RearRight",
-  [CarOperations.CarDirections.FrontLeftAngled] = "FrontLeftAngled",
-  [CarOperations.CarDirections.RearLeftAngled] = "RearLeftAngled",
-  [CarOperations.CarDirections.FrontRightAngled] = "FrontRightAngled",
-  [CarOperations.CarDirections.RearRightAngled] = "RearRightAngled",
-}
-
 ---comment
 ---@param carDirection CarOperations.CarDirections
 CarOperations.getTrackSideFromCarDirection = function(carDirection)
@@ -244,25 +246,6 @@ CarOperations.getTrackSideFromCarDirection = function(carDirection)
 
   return nil
 end
-
-CarOperations.logCarAnchorPoints = function(carIndex, carAnchorPoints)
-  Logger.log(string.format(
-    "Car %d anchor points: frontLeft=(%.2f, %.2f, %.2f), centerLeft=(%.2f, %.2f, %.2f), rearLeft=(%.2f, %.2f, %.2f), frontRight=(%.2f, %.2f, %.2f), centerRight=(%.2f, %.2f, %.2f), rearRight=(%.2f, %.2f, %.2f), forwardDirection=(%.2f, %.2f, %.2f), leftDirection=(%.2f, %.2f, %.2f), upDirection=(%.2f, %.2f, %.2f)",
-    carIndex,
-    carAnchorPoints.frontLeft.x, carAnchorPoints.frontLeft.y, carAnchorPoints.frontLeft.z,
-    carAnchorPoints.centerLeft.x, carAnchorPoints.centerLeft.y, carAnchorPoints.centerLeft.z,
-    carAnchorPoints.rearLeft.x, carAnchorPoints.rearLeft.y, carAnchorPoints.rearLeft.z,
-    carAnchorPoints.frontRight.x, carAnchorPoints.frontRight.y, carAnchorPoints.frontRight.z,
-    carAnchorPoints.centerRight.x, carAnchorPoints.centerRight.y, carAnchorPoints.centerRight.z,
-    carAnchorPoints.rearRight.x, carAnchorPoints.rearRight.y, carAnchorPoints.rearRight.z,
-    carAnchorPoints.forwardDirection.x, carAnchorPoints.forwardDirection.y, carAnchorPoints.forwardDirection.z,
-    carAnchorPoints.leftDirection.x, carAnchorPoints.leftDirection.y, carAnchorPoints.leftDirection.z,
-    carAnchorPoints.upDirection.x, carAnchorPoints.upDirection.y, carAnchorPoints.upDirection.z
-  ))
-end
-
-local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
-local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
 
 CarOperations.renderCarBlockCheckRays = function(carIndex)
   local car = ac.getCar(carIndex)
@@ -329,6 +312,22 @@ CarOperations.drawSideAnchorPoints = function(carIndex)
   -- render.debugLine(p.center, p.center + p.forwardDirection * 2.0, rgbm(0,1,0,1)) -- forward
   -- render.debugLine(p.center, p.center + -p.leftDirection   * 2.0, rgbm(0,0,1,1)) -- left
   -- render.debugLine(p.center, p.center + p.upDirection      * 2.0, rgbm(1,1,0,1)) -- up
+end
+
+CarOperations.logCarAnchorPoints = function(carIndex, carAnchorPoints)
+  Logger.log(string.format(
+    "Car %d anchor points: frontLeft=(%.2f, %.2f, %.2f), centerLeft=(%.2f, %.2f, %.2f), rearLeft=(%.2f, %.2f, %.2f), frontRight=(%.2f, %.2f, %.2f), centerRight=(%.2f, %.2f, %.2f), rearRight=(%.2f, %.2f, %.2f), forwardDirection=(%.2f, %.2f, %.2f), leftDirection=(%.2f, %.2f, %.2f), upDirection=(%.2f, %.2f, %.2f)",
+    carIndex,
+    carAnchorPoints.frontLeft.x, carAnchorPoints.frontLeft.y, carAnchorPoints.frontLeft.z,
+    carAnchorPoints.centerLeft.x, carAnchorPoints.centerLeft.y, carAnchorPoints.centerLeft.z,
+    carAnchorPoints.rearLeft.x, carAnchorPoints.rearLeft.y, carAnchorPoints.rearLeft.z,
+    carAnchorPoints.frontRight.x, carAnchorPoints.frontRight.y, carAnchorPoints.frontRight.z,
+    carAnchorPoints.centerRight.x, carAnchorPoints.centerRight.y, carAnchorPoints.centerRight.z,
+    carAnchorPoints.rearRight.x, carAnchorPoints.rearRight.y, carAnchorPoints.rearRight.z,
+    carAnchorPoints.forwardDirection.x, carAnchorPoints.forwardDirection.y, carAnchorPoints.forwardDirection.z,
+    carAnchorPoints.leftDirection.x, carAnchorPoints.leftDirection.y, carAnchorPoints.leftDirection.z,
+    carAnchorPoints.upDirection.x, carAnchorPoints.upDirection.y, carAnchorPoints.upDirection.z
+  ))
 end
 
 return CarOperations
