@@ -1,5 +1,92 @@
 ﻿local UIManager = {}
 
+local CARSTATES_TO_UICOLOR = {
+  [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = ColorManager.RGBM_Colors.Gray,
+  [CarStateMachine.CarStateType.DRIVING_NORMALLY] = ColorManager.RGBM_Colors.White,
+  [CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = ColorManager.RGBM_Colors.DarkGreen,
+  [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = ColorManager.RGBM_Colors.LimeGreen,
+  [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = ColorManager.RGBM_Colors.YellowGreen,
+  [CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = ColorManager.RGBM_Colors.Orange,
+  [CarStateMachine.CarStateType.EASING_OUT_YIELD] = ColorManager.RGBM_Colors.Yellow,
+  [CarStateMachine.CarStateType.WAITING_AFTER_ACCIDENT] = ColorManager.RGBM_Colors.Red,
+  [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = ColorManager.RGBM_Colors.DarkRed,
+  [CarStateMachine.CarStateType.COLLIDED_WITH_CAR] = ColorManager.RGBM_Colors.Rose,
+  [CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = ColorManager.RGBM_Colors.OrangeRed,
+}
+
+UIManager.drawMainWindowContent = function()
+  local storage = StorageManager.getStorage()
+  ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
+
+  ui.separator()
+
+  local sim = ac.getSim()
+  local yieldingCount = 0
+  local totalAI = math.max(0, (sim.carsCount or 1) - 1)
+  for i = 1, totalAI do
+    if CarManager.cars_currentlyYielding[i] then
+      yieldingCount = yieldingCount + 1
+    end
+  end
+  ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
+
+  ui.text('Cars:')
+  local player = ac.getCar(0)
+  -- sort cars by distance to player for clearer list
+  local order = {}
+  for i = 1, totalAI do
+    local car = ac.getCar(i)
+    if car and CarManager.cars_initialized[i] then
+      local d = CarManager.cars_distanceFromPlayerToCar[i]
+      if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, car.position)) end
+      table.insert(order, { i = i, d = d })
+    end
+  end
+  table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
+
+  for n = 1, #order do
+    local i = order[n].i
+    local car = ac.getCar(i)
+    if car and CarManager.cars_initialized[i] then
+      local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i]
+        local state = CarStateMachine.getCurrentState(i)
+        local throttleLimitString = (not (CarManager.cars_throttleLimit[i] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[i]) or 'none'
+        local base = string.format(
+          "#%02d d=%6.3fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f, throttleLimit=%s, state=%s",
+          i, distShown, math.floor(car.speedKmh),
+          CarManager.cars_currentSplineOffset[i],
+          CarManager.cars_targetSplineOffset[i],
+          throttleLimitString,
+          CarStateMachine.CarStateTypeStrings[state]
+        )
+        -- do
+          -- local indTxt = UIManager.indicatorStatusText(i)
+          -- base = base .. string.format("  ind=%s", indTxt)
+        -- end
+        local reason = CarManager.cars_reasonWhyCantYield[i] or ''
+        local fullString
+        if CarManager.cars_currentlyYielding[i] then
+            -- ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
+
+          -- ui.textColored(base, uiColor)
+          -- ui.sameLine()
+          -- ui.text(string.format(" (%s) (yield %.1fs)", reason, CarManager.cars_yieldTime[i]))
+
+          -- ui.textColored(string.format("%s (%s) (yield %.1fs)", base, reason, CarManager.cars_yieldTime[i]), uiColor)
+          fullString = string.format("%s (%s) (yield %.1fs)", base, reason, CarManager.cars_yieldTime[i])
+        else
+          -- ui.text(string.format("%s  reason: %s", base, reason))
+          -- ui.textColored(string.format("%s  reason: %s", base, reason), uiColor)
+          fullString = string.format("%s  reason: %s", base, reason)
+        end
+
+        local uiColor = CARSTATES_TO_UICOLOR[state]
+        ui.textColored(fullString, uiColor)
+    end
+  end
+
+end
+
 UIManager.indicatorStatusText = function(i)
     local l = CarManager.cars_indLeft[i]
     local r = CarManager.cars_indRight[i]
