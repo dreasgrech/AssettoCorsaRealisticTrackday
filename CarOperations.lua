@@ -174,9 +174,14 @@ CarOperations.isTargetSideBlocked = function(carIndex)
   return false
 end
 
+---comment
+---@param carIndex number
+---@return boolean
+---@return CarOperations.CarDirections
+---@return number|nil
 CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints = function(carIndex)
     local car = ac.getCar(carIndex)
-    if not car then return false end
+    if not car then return false, CarOperations.CarDirections.None, -1 end
 
     local carPosition = car.position
     local carForward = car.look
@@ -219,6 +224,26 @@ CarOperations.CarDirectionsStrings = {
   [CarOperations.CarDirections.FrontRightAngled] = "FrontRightAngled",
   [CarOperations.CarDirections.RearRightAngled] = "RearRightAngled",
 }
+
+---comment
+---@param carDirection CarOperations.CarDirections
+CarOperations.getTrackSideFromCarDirection = function(carDirection)
+  if carDirection == CarOperations.CarDirections.FrontLeft
+  or carDirection == CarOperations.CarDirections.CenterLeft
+  or carDirection == CarOperations.CarDirections.RearLeft
+  or carDirection == CarOperations.CarDirections.FrontLeftAngled
+  or carDirection == CarOperations.CarDirections.RearLeftAngled then
+    return RaceTrackManager.TrackSide.LEFT
+  elseif carDirection == CarOperations.CarDirections.FrontRight
+  or carDirection == CarOperations.CarDirections.CenterRight
+  or carDirection == CarOperations.CarDirections.RearRight
+  or carDirection == CarOperations.CarDirections.FrontRightAngled
+  or carDirection == CarOperations.CarDirections.RearRightAngled then
+    return RaceTrackManager.TrackSide.RIGHT
+  end
+
+  return nil
+end
 
 CarOperations.logCarAnchorPoints = function(carIndex, carAnchorPoints)
   Logger.log(string.format(

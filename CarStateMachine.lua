@@ -74,16 +74,25 @@ local stopCarAfterAccident = function(carIndex)
     physics.preventAIFromRetiring(carIndex)
 end
 
-local isSafeToDriveToTheSide = function(carIndex, side)
-    local yieldingToLeft = side == RaceTrackManager.TrackSide.LEFT
+---comment
+---@param carIndex number
+---@param drivingToSide TraceTrackManager.TrackSide
+---@return boolean
+local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
+    -- local yieldingToLeft = side == RaceTrackManager.TrackSide.LEFT
 
     -- check if there's a car on our side
     local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
     if isCarOnSide then
         -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
-        local isSideCarOnTheSameSideAsYielding = 
-        yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.LEFT) or 
-        (not yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.RIGHT))
+        --todo: bug: not checking all directions (frontLeft, etc) + it's written in caps...
+        local trackSideOfBlockingCar = CarOperations.getTrackSideFromCarDirection(carOnSideDirection)
+        local isSideCarOnTheSameSideAsYielding = drivingToSide == trackSideOfBlockingCar
+        -- local isSideCarOnTheSameSideAsYielding = 
+        -- -- yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.LEFT) or 
+        -- yieldingToLeft and (trackSideFromCarDirection == RaceTrackManager.TrackSide.LEFT) or 
+        -- -- (not yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.RIGHT))
+        -- (not yieldingToLeft and (trackSideFromCarDirection == RaceTrackManager.TrackSide.RIGHT))
         if isSideCarOnTheSameSideAsYielding then
           -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
           CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not driving to the side: ' .. CarOperations.CarDirectionsStrings[carOnSideDirection] .. '  gap=' .. string.format('%.2f', carOnSideDistance) .. 'm'
@@ -193,9 +202,12 @@ local carStateMachine = {
       local yieldSide = storage.yieldSide
       local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, yieldSide)
       if not isSideSafeToYield then
-        CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not yielding', RaceTrackManager.TrackSideStrings[yieldSide])
+        -- isSafeToDriveToTheSide already logs the reason why we can't yield
+        -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not yielding', RaceTrackManager.TrackSideStrings[yieldSide])
         return
       end
+
+      CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
       local sideSign = yieldingToLeft and -1 or 1
@@ -286,7 +298,8 @@ local carStateMachine = {
       local easeOutYieldSide = (yieldSide == RaceTrackManager.TrackSide.LEFT) and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
       local sideSafeToYield = isSafeToDriveToTheSide(carIndex, easeOutYieldSide)
       if not sideSafeToYield then
-        CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
+        -- isSafeToDriveToTheSide already logs the reason why we can't yield
+        -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
         return
       end
 
