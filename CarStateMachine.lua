@@ -163,11 +163,20 @@ local carStateMachine = {
         return
       end
 
-      -- Check if the player car is currently faster than the ai car 
-      local playerCarHasClosingSpeedToAiCar = (playerCar.speedKmh - car.speedKmh) >= storage.minSpeedDelta_kmh
-      if not playerCarHasClosingSpeedToAiCar then
-        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player does not have closing speed so not yielding'
+      local carSpeedKmh = car.speedKmh
+      local overtakingCarSpeedKmh = playerCar.speedKmh
+
+      -- Check if we're faster than the overtaking car
+      local areWeSlowerThanCarTryingToOvertake = carSpeedKmh < overtakingCarSpeedKmh
+      if not areWeSlowerThanCarTryingToOvertake then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'We are faster than the car behind so not yielding'
+        return
       end
+
+      -- local playerCarHasClosingSpeedToAiCar = (overtakingCarSpeedKmh - carSpeedKmh) >= storage.minSpeedDelta_kmh
+      -- if not playerCarHasClosingSpeedToAiCar then
+        -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Player does not have closing speed so not yielding'
+      -- end
 
       -- Check if the ai car is above the minimum speed
       local isAICarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh

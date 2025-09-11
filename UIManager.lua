@@ -67,8 +67,8 @@ UIManager.drawMainWindowContent = function()
     if car and CarManager.cars_initialized[i] then
       local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i]
       local state = CarStateMachine.getCurrentState(i)
-      local throttleLimitString = (not (CarManager.cars_throttleLimit[i] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[i]) or 'none'
-      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[i] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[i]) or 'none'
+      local throttleLimitString = (not (CarManager.cars_throttleLimit[i] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[i]) or 'no limit'
+      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[i] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[i]) or 'no limit'
       local reason = CarManager.cars_reasonWhyCantYield[i] or ''
       local uiColor = CARSTATES_TO_UICOLOR[state] or ColorManager.RGBM_Colors.White
 
@@ -192,8 +192,8 @@ function UIManager.renderUIOptionsControls()
     storage.minPlayerSpeed_kmh =  ui.slider('Min player speed (km/h)', storage.minPlayerSpeed_kmh, 0, 160)
     if ui.itemHovered() then ui.setTooltip('Ignore very low-speed approaches (pit exits, traffic jams).') end
 
-    storage.minSpeedDelta_kmh =  ui.slider('Min speed delta (km/h)', storage.minSpeedDelta_kmh, 0, 30)
-    if ui.itemHovered() then ui.setTooltip('Require some closing speed before asking AI to yield.') end
+    -- storage.minSpeedDelta_kmh =  ui.slider('Min speed delta (km/h)', storage.minSpeedDelta_kmh, 0, 30)
+    -- if ui.itemHovered() then ui.setTooltip('Require some closing speed before asking AI to yield.') end
 
     storage.rampSpeed_mps =  ui.slider('Offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when yielding.') end
