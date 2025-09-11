@@ -44,12 +44,11 @@ UIManager.drawMainWindowContent = function()
   end
   table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
 
-  -- Draw as a table: columns with headings (so cells don’t need inline keys)
-  -- Columns: # | d (m) | v (km/h) | offset | target | throttle | caution | top (km/h) | stopCtr | gentle | state | yielding | reason
+  -- Draw as a table: columns with headings
   local COLS = 13
   ui.columns(COLS, true)
   ui.columnSortingHeader('#', 0)
-  ui.columnSortingHeader('Distance (m)', 0)
+  ui.columnSortingHeader('Distance (m)', -1)
   ui.columnSortingHeader('Velocity (km/h)', 0)
   ui.columnSortingHeader('Offset', 0)
   ui.columnSortingHeader('TargetOffset', 0)
