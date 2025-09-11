@@ -5,6 +5,7 @@ DequeManager = require("DataStructures.DequeManager")
 StackManager = require("DataStructures.StackManager")
 QueueManager = require("DataStructures.QueueManager")
 Constants = require("Constants")
+ColorManager = require("ColorManager")
 Logger = require("Logger")
 StorageManager = require("StorageManager")
 MathHelpers = require("MathHelpers")
@@ -42,6 +43,20 @@ ac.onCarCollision(-1, function (carIndex)
 
     CarStateMachine.informAboutAccident(accidentIndex)
 end)
+
+local CARSTATES_TO_UICOLOR = {
+  [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = ColorManager.RGBM_Colors.Gray,
+  [CarStateMachine.CarStateType.DRIVING_NORMALLY] = ColorManager.RGBM_Colors.White,
+  [CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = ColorManager.RGBM_Colors.DarkGreen,
+  [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = ColorManager.RGBM_Colors.LimeGreen,
+  [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = ColorManager.RGBM_Colors.YellowGreen,
+  [CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = ColorManager.RGBM_Colors.Orange,
+  [CarStateMachine.CarStateType.EASING_OUT_YIELD] = ColorManager.RGBM_Colors.Yellow,
+  [CarStateMachine.CarStateType.WAITING_AFTER_ACCIDENT] = ColorManager.RGBM_Colors.Red,
+  [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = ColorManager.RGBM_Colors.DarkRed,
+  [CarStateMachine.CarStateType.COLLIDED_WITH_CAR] = ColorManager.RGBM_Colors.Rose,
+  [CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = ColorManager.RGBM_Colors.OrangeRed,
+}
 
 ---
 -- Function defined in manifest.ini
@@ -100,14 +115,17 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
           -- local indTxt = UIManager.indicatorStatusText(i)
           -- base = base .. string.format("  ind=%s", indTxt)
         -- end
+        local uiColor = CARSTATES_TO_UICOLOR[state]
         if CarManager.cars_currentlyYielding[i] then
-            ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
+            -- ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
+          ui.textColored(base, uiColor)
           ui.sameLine()
           local reason = CarManager.cars_reasonWhyCantYield[i] or '-'
           ui.text(string.format(" (%s) (yield %.1fs)", reason, CarManager.cars_yieldTime[i] or 0))
         else
           local reason = CarManager.cars_reasonWhyCantYield[i] or '-'
-          ui.text(string.format("%s  reason: %s", base, reason))
+          -- ui.text(string.format("%s  reason: %s", base, reason))
+          ui.textColored(string.format("%s  reason: %s", base, reason), uiColor)
         end
     end
   end
@@ -187,7 +205,8 @@ function script.MANIFEST__TRANSPARENT(dt)
 
 
   -- ----------------------------------------------------------------
-  -- -- CarOperations.drawSideAnchorPoints(0)
+  -- -- Draw car block check rays for player car for debugging purposes
+  -- CarOperations.drawSideAnchorPoints(0)
   -- local carBlocked, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(0)
   -- if carBlocked then
     -- -- ui.textColored(string.format("Player car side is BLOCKED on %s (distance %.2f m)", tostring(carOnSideDirection), carOnSideDistance or -1), rgbm(1.0, 0.2, 0.2, 1.0))
