@@ -125,13 +125,13 @@ function UIManager.draw3DOverheadText()
   if not storage.debugDraw then return end
   local sim = ac.getSim()
   local depthModeBeforeModification = render.DepthMode
-  if storage.drawOnTop then
-    -- draw over everything (no depth testing)
-    render.setDepthMode(render.DepthMode.Off)
-  else
-    -- respect existing depth, don’t write to depth (debug text won’t “punch holes”)
-    render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
-  end
+  -- if storage.drawOnTop then
+    -- -- draw over everything (no depth testing)
+    -- render.setDepthMode(render.DepthMode.Off)
+  -- else
+    -- -- respect existing depth, don’t write to depth (debug text won’t “punch holes”)
+    -- render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
+  -- end
 
   for i = 1, (sim.carsCount or 0) - 1 do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
@@ -170,8 +170,8 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Debug markers (3D)', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
     if ui.itemHovered() then ui.setTooltip('Shows floating text above AI cars currently yielding.') end
 
-    if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
-    if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
+    -- if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
+    -- if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
 
     local comboValueChanged
     storage.yieldSide, comboValueChanged = ui.combo('YIELD Side', storage.yieldSide, ui.ComboFlags.NoPreview, RaceTrackManager.TrackSideStrings)
