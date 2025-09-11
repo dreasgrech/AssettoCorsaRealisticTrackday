@@ -34,7 +34,6 @@ end
 
 local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
 
-
 -- Returns the six lateral anchor points plus some helpers
 ---@param car ac.StateCar
 ---@return table
@@ -109,6 +108,10 @@ CarOperations.isTargetSideBlocked = function(carIndex)
     return false
   end
   -- CarOperations.logCarAnchorPoints(carIndex, carAnchorPoints)
+
+  -- TODO: we can probably reduce the number of rays and do a sort of criss cross on the side instead of the rays shooting directly straight
+
+  -- TODO: another idea could be sphere casting if the api provides it instead of many line rays
 
   local hitCar, hitDistance = checkForOtherCars(carAnchorPoints.frontLeft, carAnchorPoints.leftDirection, SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING)
   if hitCar then

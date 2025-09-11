@@ -74,6 +74,40 @@ local stopCarAfterAccident = function(carIndex)
     physics.preventAIFromRetiring(carIndex)
 end
 
+local isSafeToDriveToTheSide = function(carIndex, storage)
+    local yieldingToLeft = storage.yieldToLeft
+
+    -- check if there's a car on our side
+    local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
+    if isCarOnSide then
+        -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
+        local isSideCarOnTheSameSideAsYielding = 
+        yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.LEFT) or 
+        (not yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.RIGHT))
+        if isSideCarOnTheSameSideAsYielding then
+          -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
+          CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not driving to the side: ' .. CarOperations.CarDirectionsStrings[carOnSideDirection] .. '  gap=' .. string.format('%.2f', carOnSideDistance) .. 'm'
+          return false
+        end
+    end
+    
+    local sideSign = yieldingToLeft and -1 or 1
+
+    -- Check car blind spot
+    -- Andreas: I've never seen this code working yet...
+    local distanceToNearestCarInBlindSpot_L, distanceToNearestCarInBlindSpot_R = ac.getCarBlindSpot(carIndex)
+    local isSideBlocked_L = (not (distanceToNearestCarInBlindSpot_L == nil))-- and distanceToNearestCarInBlindSpot_L > 0
+    local isSideBlocked_R = (not (distanceToNearestCarInBlindSpot_R == nil))-- and distanceToNearestCarInBlindSpot_R > 0
+
+    if (isSideBlocked_L or isSideBlocked_R) then
+        Logger.log(string.format("Car %d: Blindspot L=%.2f  R=%.2f", carIndex, distanceToNearestCarInBlindSpot_L or -1, distanceToNearestCarInBlindSpot_R or -1))
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Car in blind spot so not driving to the side: ' ..tostring(distanceToNearestCarInBlindSpot_L) .. 'm'
+        return false
+    end
+
+    return true
+end
+
 local carStateMachine = {
   [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
 
@@ -155,35 +189,13 @@ local carStateMachine = {
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE)
   end,
   [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
+      local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, storage)
+      if not isSideSafeToYield then
+        return
+      end
+
       local yieldingToLeft = storage.yieldToLeft
-
-      -- check if there's a care on our side
-      local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
-      if isCarOnSide then
-          -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
-          local isSideCarOnTheSameSideAsYielding = 
-          yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.LEFT) or 
-          (not yieldingToLeft and (carOnSideDirection == CarOperations.CarDirections.RIGHT))
-          if isSideCarOnTheSameSideAsYielding then
-            -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
-            CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding: ' .. CarOperations.CarDirectionsStrings[carOnSideDirection] .. '  gap=' .. string.format('%.2f', carOnSideDistance) .. 'm'
-            return
-          end
-      end
-      
       local sideSign = yieldingToLeft and -1 or 1
-
-      -- Check car blind spot
-      -- Andreas: I've never seen this code working yet...
-      local distanceToNearestCarInBlindSpot_L, distanceToNearestCarInBlindSpot_R = ac.getCarBlindSpot(carIndex)
-      local isSideBlocked_L = (not (distanceToNearestCarInBlindSpot_L == nil))-- and distanceToNearestCarInBlindSpot_L > 0
-      local isSideBlocked_R = (not (distanceToNearestCarInBlindSpot_R == nil))-- and distanceToNearestCarInBlindSpot_R > 0
-
-      if (isSideBlocked_L or isSideBlocked_R) then
-          Logger.log(string.format("Car %d: Blindspot L=%.2f  R=%.2f", carIndex, distanceToNearestCarInBlindSpot_L or -1, distanceToNearestCarInBlindSpot_R or -1))
-          CarManager.cars_reasonWhyCantYield[carIndex] = 'Car in blind spot so not yielding: ' ..tostring(distanceToNearestCarInBlindSpot_L) .. 'm'
-          return
-      end
 
       local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
       local splineOffsetTransitionSpeed = storage.rampSpeed_mps
@@ -265,6 +277,17 @@ local carStateMachine = {
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.EASING_OUT_YIELD)
   end,
   [CarStateMachine.CarStateType.EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
+
+      -- TODO: this is not good because it needs to check the different side (not the one we're yielding to, since now we're going back to center)
+      -- TODO: this is not good because it needs to check the different side (not the one we're yielding to, since now we're going back to center)
+      -- TODO: this is not good because it needs to check the different side (not the one we're yielding to, since now we're going back to center)
+      -- TODO: I probably need a yield-direction enum (Left, Right)
+      local sideSafeToYield = isSafeToDriveToTheSide(carIndex, storage)
+      if not sideSafeToYield then
+        return
+      end
+
+      -- todo move the targetsplineoffset assignment to trying to start easing out yield state?
       local targetSplineOffset = 0
       local splineOffsetTransitionSpeed = storage.rampRelease_mps
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
