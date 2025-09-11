@@ -74,8 +74,11 @@ local stopCarAfterAccident = function(carIndex)
     physics.preventAIFromRetiring(carIndex)
 end
 
+-- TODO: Continue here to change use to TrackManager.TrackSide
+-- local isSafeToDriveToTheSide = function(carIndex, trackSide,storage)
 local isSafeToDriveToTheSide = function(carIndex, storage)
-    local yieldingToLeft = storage.yieldToLeft
+    -- local yieldingToLeft = storage.yieldToLeft
+    local yieldingToLeft = storage.yieldSide == RaceTrackManager.TrackSide.LEFT
 
     -- check if there's a car on our side
     local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
@@ -182,19 +185,23 @@ local carStateMachine = {
   end,
   [CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       -- turn on turning lights
-      local turningLights = storage.yieldToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      -- local turningLights = storage.yieldToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       -- for now go directly to yielding to the side
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE)
   end,
   [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
+      -- local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, storage)
+      -- local yieldingToTrackSide = storage.yieldToLeft and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
       local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, storage)
       if not isSideSafeToYield then
         return
       end
 
-      local yieldingToLeft = storage.yieldToLeft
+      -- local yieldingToLeft = storage.yieldToLeft
+      local yieldingToLeft = storage.yieldSide == RaceTrackManager.TrackSide.LEFT
       local sideSign = yieldingToLeft and -1 or 1
 
       local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
@@ -207,7 +214,8 @@ local carStateMachine = {
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
       -- keep the turning lights on while yielding
-      local turningLights = storage.yieldToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      -- local turningLights = storage.yieldToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      local turningLights = yieldingToLeft and ac.TurningLights.Left or ac.TurningLights.Right
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
@@ -270,7 +278,8 @@ local carStateMachine = {
       physics.setAICaution(carIndex, 1)
 
       -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
-      local turningLights = (not storage.yieldToLeft) and ac.TurningLights.Left or ac.TurningLights.Right
+      -- local turningLights = (not storage.yieldToLeft) and ac.TurningLights.Left or ac.TurningLights.Right
+      local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       -- for now go directly to easing out yield
@@ -298,7 +307,8 @@ local carStateMachine = {
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
       -- keep inverted turning lights on while easing out yield (inverted yield direction since the car is now going back to center)
-      local turningLights = (not storage.yieldToLeft) and ac.TurningLights.Left or ac.TurningLights.Right
+      --local turningLights = (not storage.yieldToLeft) and ac.TurningLights.Left or ac.TurningLights.Right
+      local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset

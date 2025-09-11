@@ -75,8 +75,8 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
     if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
 
-    if ui.checkbox('Yield to LEFT (instead of RIGHT)', storage.yieldToLeft) then storage.yieldToLeft = not storage.yieldToLeft end
-    if ui.itemHovered() then ui.setTooltip('If enabled, AI moves left to let you pass on the right. Otherwise AI moves right so you pass on the left.') end
+    -- if ui.checkbox('Yield to LEFT (instead of RIGHT)', storage.yieldToLeft) then storage.yieldToLeft = not storage.yieldToLeft end
+    -- if ui.itemHovered() then ui.setTooltip('If enabled, AI moves left to let you pass on the right. Otherwise AI moves right so you pass on the left.') end
 
     local comboValueChanged
     storage.yieldSide, comboValueChanged = ui.combo('YIELD Side', storage.yieldSide, ui.ComboFlags.NoPreview, RaceTrackManager.TrackSideStrings)

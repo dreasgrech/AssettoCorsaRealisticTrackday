@@ -70,7 +70,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
     return
   end
 
-  ui.text(string.format('AI cars yielding to the %s', (storage.yieldToLeft and 'LEFT') or 'RIGHT'))
+  ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
 
   ui.separator()
 
