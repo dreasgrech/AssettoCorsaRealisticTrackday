@@ -32,7 +32,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'State', orderDirection = 0, width = 150, tooltip='Current state' },
-  { name = 'Yielding', orderDirection = 0, width = 60, tooltip='Yielding status' },
+  { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Reason', orderDirection = 0, width = 800, tooltip='Reason for current state' },
 }
 
