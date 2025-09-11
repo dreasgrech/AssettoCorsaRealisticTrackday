@@ -5,6 +5,7 @@ local storageTable = {
     debugDraw = false,
     drawOnTop = false,
     yieldToLeft = false,
+    yieldSide = RaceTrackManager.TrackSide.RIGHT,
     overrideAiAwareness = false,
     handleAccidents = false,
     detectCarBehind_meters = 70,

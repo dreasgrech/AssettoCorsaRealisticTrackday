@@ -78,6 +78,10 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Yield to LEFT (instead of RIGHT)', storage.yieldToLeft) then storage.yieldToLeft = not storage.yieldToLeft end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI moves left to let you pass on the right. Otherwise AI moves right so you pass on the left.') end
 
+    local comboValueChanged
+    storage.yieldSide, comboValueChanged = ui.combo('YIELD Side', storage.yieldSide, ui.ComboFlags.NoPreview, RaceTrackManager.TrackSideStrings)
+    if ui.itemHovered() then ui.setTooltip('The track side which AI will yield to when you approach from the rear.') end
+
     if ui.checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily.') end
 
