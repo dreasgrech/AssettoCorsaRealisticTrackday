@@ -36,6 +36,14 @@ local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
 local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
 local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
 
+---Limits AI throttle pedal.
+---@param carIndex integer @0-based car index.
+---@param limit number @0 for limit gas pedal to 0, 1 to remove limitation.
+CarOperations.setAIThrottleLimit = function(carIndex, limit)
+    physics.setAIThrottleLimit(carIndex, limit)
+    CarManager.cars_throttleLimit[carIndex] = limit
+end
+
 function CarOperations.isBehind(aiCar, playerCar)
     local aiCarFwd = aiCar.look or aiCar.forward or vec3(0,0,1)
     local rel = MathHelpers.vsub(playerCar.position, aiCar.position)

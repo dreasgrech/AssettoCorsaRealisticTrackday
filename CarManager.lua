@@ -26,6 +26,7 @@ CarManager.cars_indPhase = {}
 CarManager.cars_hasTL = {}
 CarManager.cars_evacuating = {}
 CarManager.cars_anchorPoints = {}
+CarManager.cars_throttleLimit = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -60,7 +61,7 @@ local function setInitializedDefaults(carIndex)
   CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 
   -- remove speed limitations which could have occured during an accident
-  physics.setAIThrottleLimit(carIndex, 1)
+  CarOperations.setAIThrottleLimit(carIndex, 1)
   physics.setAITopSpeed(carIndex, math.huge)
   physics.setAIStopCounter(carIndex, 0)
   physics.setGentleStop(carIndex, false)
@@ -117,7 +118,7 @@ end)
 
   -- -- cap pace while evacuating
   -- physics.setAITopSpeed(carIndex, 15)                     -- 15 km/h crawl   :contentReference[oaicite:1]{index=1}
-  -- physics.setAIThrottleLimit(carIndex, 0.25)
+  -- CarOperations.setAIThrottleLimit(carIndex, 0.25)
 
   -- -- Let tyres-out be OK globally in modes; prevents penalties while off track (optional)
   -- physics.setAllowedTyresOut(-1)
@@ -150,7 +151,7 @@ end)
     -- CarManager.cars_reason[carIndex] = "Stopping shove to restore things later"
     -- physics.disableCarCollisions(carIndex, false)         -- restore collisions
     -- physics.setAITopSpeed(carIndex, math.huge)
-    -- physics.setAIThrottleLimit(carIndex, 1)
+    -- CarOperations.setAIThrottleLimit(carIndex, 1)
   -- end, seconds or 1.2)
 -- end
 
@@ -204,7 +205,7 @@ end)
     --- setTimeout(function()
       --- physics.setAISplineOffset(carIndex, 0, true)
       --- physics.setAITopSpeed(carIndex, math.huge)
-      --- physics.setAIThrottleLimit(carIndex, 1)
+      --- CarOperations.setAIThrottleLimit(carIndex, 1)
       --- if car.hasTurningLights then ac.setTurningLights(ac.TurningLights.None) end
       --- CarManager.cars_evacuating[carIndex] = nil
     --- end, 6.0)

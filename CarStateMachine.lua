@@ -65,7 +65,7 @@ end
 
 local stopCarAfterAccident = function(carIndex)
     -- stop the car
-    physics.setAIThrottleLimit(carIndex, 0)
+    CarOperations.setAIThrottleLimit(carIndex, 0)
     physics.setAITopSpeed(carIndex, 0)
     physics.setAIStopCounter(carIndex, 1)
     physics.setGentleStop(carIndex, true)
@@ -125,7 +125,7 @@ local carStateMachine = {
       physics.setAICaution(carIndex, 1)
 
       -- remove the ai car throttle limit since we will now be driving normally
-      physics.setAIThrottleLimit(carIndex, 1)
+      CarOperations.setAIThrottleLimit(carIndex, 1)
   end,
   [CarStateMachine.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
       -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
@@ -196,13 +196,13 @@ local carStateMachine = {
         -- isSafeToDriveToTheSide already logs the reason why we can't yield
         -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not yielding', RaceTrackManager.TrackSideStrings[yieldSide])
         -- reduce the car speed so that we can find a gap
-        physics.setAIThrottleLimit(carIndex, 0.4)
+        CarOperations.setAIThrottleLimit(carIndex, 0.4)
 
         return
       end
 
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
-      physics.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap
+      CarOperations.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap
 
       local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
       local sideSign = yieldingToLeft and -1 or 1
@@ -265,7 +265,7 @@ local carStateMachine = {
       physics.setAICaution(carIndex, 2)
 
       -- limit the ai car throttle while driving on the yielding lane
-      physics.setAIThrottleLimit(carIndex, 0.9)
+      CarOperations.setAIThrottleLimit(carIndex, 0.9)
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
   end,
@@ -274,7 +274,7 @@ local carStateMachine = {
       CarManager.cars_yieldTime[carIndex] = 0
 
       -- remove the ai car throttle limit since we will now start easing out the yield
-      physics.setAIThrottleLimit(carIndex, 1)
+      CarOperations.setAIThrottleLimit(carIndex, 1)
 
       -- reset the ai car caution back to normal
       physics.setAICaution(carIndex, 1)

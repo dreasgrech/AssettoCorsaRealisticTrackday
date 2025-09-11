@@ -104,11 +104,13 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
     if car and CarManager.cars_initialized[i] then
       local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i]
         local state = CarStateMachine.getCurrentState(i)
+        local throttleLimitString = (not (CarManager.cars_throttleLimit[i] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[i]) or 'none'
         local base = string.format(
-          "#%02d d=%6.3fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
+          "#%02d d=%6.3fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f, throttleLimit=%s, state=%s",
           i, distShown, math.floor(car.speedKmh),
           CarManager.cars_currentSplineOffset[i],
           CarManager.cars_targetSplineOffset[i],
+          throttleLimitString,
           CarStateMachine.CarStateTypeStrings[state]
         )
         -- do
