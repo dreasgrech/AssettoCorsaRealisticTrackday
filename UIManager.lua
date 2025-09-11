@@ -17,22 +17,23 @@ local CARSTATES_TO_UICOLOR = {
 local carTableColumns_name = { }
 local carTableColumns_orderDirection = { }
 local carTableColumns_width = { }
+local carTableColumns_tooltip = { }
 
 -- this table is only used to set the data to the actual data holders i.e. the tables named carTableColumns_xxx
 local carTableColumns_dataBeforeDoD = {
-  { name = '#', orderDirection = 0, width = 40 },
-  { name = 'Distance (m)', orderDirection = -1, width = 100 },
-  { name = 'Velocity (km/h)', orderDirection = 0, width = 105 },
-  { name = 'Offset', orderDirection = 0, width = 60 },
-  { name = 'TargetOffset', orderDirection = 0, width = 90 },
-  { name = 'ThrottleLimit', orderDirection = 0, width = 90 },
-  { name = 'AICaution', orderDirection = 0, width = 80 },
-  { name = 'AITopSpeed', orderDirection = 0, width = 90 },
-  { name = 'AIStopCounter', orderDirection = 0, width = 105 },
-  { name = 'GentleStop', orderDirection = 0, width = 85 },
-  { name = 'State', orderDirection = 0, width = 150 },
-  { name = 'Yielding', orderDirection = 0, width = 60 },
-  { name = 'Reason', orderDirection = 0, width = 800 },
+  { name = '#', orderDirection = 0, width = 40, tooltip='Car ID' },
+  { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
+  { name = 'Velocity (km/h)', orderDirection = 0, width = 105, tooltip='Current velocity' },
+  { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
+  { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
+  { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
+  { name = 'AICaution', orderDirection = 0, width = 80, tooltip='AI caution level' },
+  { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
+  { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
+  { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
+  { name = 'State', orderDirection = 0, width = 150, tooltip='Current state' },
+  { name = 'Yielding', orderDirection = 0, width = 60, tooltip='Yielding status' },
+  { name = 'Reason', orderDirection = 0, width = 800, tooltip='Reason for current state' },
 }
 
 -- add the car table columns data to the actual data holders
@@ -40,6 +41,7 @@ for i, col in ipairs(carTableColumns_dataBeforeDoD) do
   carTableColumns_name[i] = col.name
   carTableColumns_orderDirection[i] = col.orderDirection
   carTableColumns_width[i] = col.width
+  carTableColumns_tooltip[i] = col.tooltip
 end
 
 UIManager.drawMainWindowContent = function()
@@ -110,6 +112,7 @@ UIManager.drawMainWindowContent = function()
 
       -- Row cells
       ui.textColored(string.format("#%02d", i), uiColor); ui.nextColumn()
+      -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
       ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.cars_currentSplineOffset[i] or 0), uiColor); ui.nextColumn()
