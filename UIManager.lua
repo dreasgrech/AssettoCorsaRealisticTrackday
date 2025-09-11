@@ -44,42 +44,59 @@ UIManager.drawMainWindowContent = function()
   end
   table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
 
+  -- Draw as a table: columns with headings (so cells don’t need inline keys)
+  -- Columns: # | d (m) | v (km/h) | offset | target | throttle | caution | top (km/h) | stopCtr | gentle | state | yielding | reason
+  local COLS = 13
+  ui.columns(COLS, true)
+  ui.columnSortingHeader('#', 0)
+  ui.columnSortingHeader('Distance (m)', 0)
+  ui.columnSortingHeader('Velocity (km/h)', 0)
+  ui.columnSortingHeader('Offset', 0)
+  ui.columnSortingHeader('TargetOffset', 0)
+  ui.columnSortingHeader('ThrottleLimit', 0)
+  ui.columnSortingHeader('AICaution', 0)
+  ui.columnSortingHeader('AITopSpeed', 0)
+  ui.columnSortingHeader('AIStopCounter', 0)
+  ui.columnSortingHeader('GentleStop', 0)
+  ui.columnSortingHeader('State', 0)
+  ui.columnSortingHeader('Yielding', 0)
+  ui.columnSortingHeader('Reason', 0)
+
   for n = 1, #order do
     local i = order[n].i
     local car = ac.getCar(i)
     if car and CarManager.cars_initialized[i] then
       local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i]
-        local state = CarStateMachine.getCurrentState(i)
-        local throttleLimitString = (not (CarManager.cars_throttleLimit[i] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[i]) or 'none'
-        local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[i] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[i]) or 'none'
-        local base = string.format(
-          "#%02d d=%6.3fm,v=%3dkm/h,offset=%4.3f,targetOffset=%4.3f,throttleLimit=%s,aiCaution=%d,aiTopSpeed=%s,aiStopCounter=%d,gentleStop=%s,state=%s",
-          i, distShown, math.floor(car.speedKmh),
-          CarManager.cars_currentSplineOffset[i],
-          CarManager.cars_targetSplineOffset[i],
-          throttleLimitString,
-          CarManager.cars_aiCaution[i],
-          aiTopSpeedString,
-          CarManager.cars_aiStopCounter[i],
-          tostring(CarManager.cars_gentleStop[i]),
-          CarStateMachine.CarStateTypeStrings[state]
-        )
-        -- do
-          -- local indTxt = UIManager.indicatorStatusText(i)
-          -- base = base .. string.format("  ind=%s", indTxt)
-        -- end
-        local reason = CarManager.cars_reasonWhyCantYield[i] or ''
-        local fullString
-        if CarManager.cars_currentlyYielding[i] then
-          fullString = string.format("%s (%s) (yield %.1fs)", base, reason, CarManager.cars_yieldTime[i])
-        else
-          fullString = string.format("%s  reason: %s", base, reason)
-        end
+      local state = CarStateMachine.getCurrentState(i)
+      local throttleLimitString = (not (CarManager.cars_throttleLimit[i] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[i]) or 'none'
+      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[i] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[i]) or 'none'
+      local reason = CarManager.cars_reasonWhyCantYield[i] or ''
+      local uiColor = CARSTATES_TO_UICOLOR[state] or ColorManager.RGBM_Colors.White
 
-        local uiColor = CARSTATES_TO_UICOLOR[state]
-        ui.textColored(fullString, uiColor)
+      -- Row cells
+      ui.textColored(string.format("#%02d", i), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%d", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", CarManager.cars_currentSplineOffset[i] or 0), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[i] or 0), uiColor); ui.nextColumn()
+      ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
+      ui.textColored(tostring(CarManager.cars_aiCaution[i] or 0), uiColor); ui.nextColumn()
+      ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
+      ui.textColored(tostring(CarManager.cars_aiStopCounter[i] or 0), uiColor); ui.nextColumn()
+      ui.textColored(tostring(CarManager.cars_gentleStop[i]), uiColor); ui.nextColumn()
+      ui.textColored(CarStateMachine.CarStateTypeStrings[state] or tostring(state), uiColor); ui.nextColumn()
+      if CarManager.cars_currentlyYielding[i] then
+        ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
+      else
+        ui.textColored("no", uiColor)
+      end
+      ui.nextColumn()
+      ui.textColored(reason, uiColor); ui.nextColumn()
     end
   end
+
+  -- reset columns
+  ui.columns(1, false)
 end
 
 UIManager.indicatorStatusText = function(i)

@@ -322,6 +322,10 @@ local carStateMachine = {
       end
   end,
   [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = function (carIndex, dt, car, playerCar, storage)
+    -- todo: look at ac.SetDriverMouthOpened() lmao
+    -- todo: look at ac.setDriverDoorOpen(carIndex, isOpen, instant)
+    -- todo: look at ac.setBodyDirt(carIndex, dirt)
+    -- todo: look at ac.overrideTyreSmoke(tyreIndex, intensity, thickness, surfaceHeat)
     stopCarAfterAccident(carIndex)
 
     CarManager.cars_reasonWhyCantYield[carIndex] = 'Collided with track so we are stopped'
