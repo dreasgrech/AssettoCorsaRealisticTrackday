@@ -14,6 +14,34 @@ local CARSTATES_TO_UICOLOR = {
   [CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = ColorManager.RGBM_Colors.OrangeRed,
 }
 
+local carTableColumns_name = { }
+local carTableColumns_orderDirection = { }
+local carTableColumns_width = { }
+
+-- this table is only used to set the data to the actual data holders i.e. the tables named carTableColumns_xxx
+local carTableColumns_dataBeforeDoD = {
+  { name = '#', orderDirection = 0, width = 40 },
+  { name = 'Distance (m)', orderDirection = -1, width = 100 },
+  { name = 'Velocity (km/h)', orderDirection = 0, width = 105 },
+  { name = 'Offset', orderDirection = 0, width = 60 },
+  { name = 'TargetOffset', orderDirection = 0, width = 90 },
+  { name = 'ThrottleLimit', orderDirection = 0, width = 90 },
+  { name = 'AICaution', orderDirection = 0, width = 80 },
+  { name = 'AITopSpeed', orderDirection = 0, width = 90 },
+  { name = 'AIStopCounter', orderDirection = 0, width = 105 },
+  { name = 'GentleStop', orderDirection = 0, width = 85 },
+  { name = 'State', orderDirection = 0, width = 150 },
+  { name = 'Yielding', orderDirection = 0, width = 60 },
+  { name = 'Reason', orderDirection = 0, width = 800 },
+}
+
+-- add the car table columns data to the actual data holders
+for i, col in ipairs(carTableColumns_dataBeforeDoD) do
+  carTableColumns_name[i] = col.name
+  carTableColumns_orderDirection[i] = col.orderDirection
+  carTableColumns_width[i] = col.width
+end
+
 UIManager.drawMainWindowContent = function()
   local storage = StorageManager.getStorage()
   ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
@@ -45,21 +73,29 @@ UIManager.drawMainWindowContent = function()
   table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
 
   -- Draw as a table: columns with headings
-  local COLS = 13
+  -- local COLS = 13
+  local COLS = #carTableColumns_name
   ui.columns(COLS, true)
-  ui.columnSortingHeader('#', 0)
-  ui.columnSortingHeader('Distance (m)', -1)
-  ui.columnSortingHeader('Velocity (km/h)', 0)
-  ui.columnSortingHeader('Offset', 0)
-  ui.columnSortingHeader('TargetOffset', 0)
-  ui.columnSortingHeader('ThrottleLimit', 0)
-  ui.columnSortingHeader('AICaution', 0)
-  ui.columnSortingHeader('AITopSpeed', 0)
-  ui.columnSortingHeader('AIStopCounter', 0)
-  ui.columnSortingHeader('GentleStop', 0)
-  ui.columnSortingHeader('State', 0)
-  ui.columnSortingHeader('Yielding', 0)
-  ui.columnSortingHeader('Reason', 0)
+  -- ui.columnSortingHeader('#', 0)
+  -- ui.columnSortingHeader('Distance (m)', -1)
+  -- ui.columnSortingHeader('Velocity (km/h)', 0)
+  -- ui.columnSortingHeader('Offset', 0)
+  -- ui.columnSortingHeader('TargetOffset', 0)
+  -- ui.columnSortingHeader('ThrottleLimit', 0)
+  -- ui.columnSortingHeader('AICaution', 0)
+  -- ui.columnSortingHeader('AITopSpeed', 0)
+  -- ui.columnSortingHeader('AIStopCounter', 0)
+  -- ui.columnSortingHeader('GentleStop', 0)
+  -- ui.columnSortingHeader('State', 0)
+  -- ui.columnSortingHeader('Yielding', 0)
+  -- ui.columnSortingHeader('Reason', 0)
+
+  -- draw the column headers including setting the width
+  for col = 1, COLS do
+  -- for col = 0, COLS+1 do
+    ui.columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
+    ui.setColumnWidth(col-1, carTableColumns_width[col])
+  end
 
   for n = 1, #order do
     local i = order[n].i
