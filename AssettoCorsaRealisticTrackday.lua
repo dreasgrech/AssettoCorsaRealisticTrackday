@@ -121,6 +121,7 @@ end
 ---
 function script.MANIFEST__TRANSPARENT(dt)
   if (not shouldAppRun()) then return end
+  local storage = StorageManager.getStorage()
   UIManager.draw3DOverheadText()
 
   -- render.debugSphere(playerCarPosition, 1, rgbm(1, 0, 0, 1))
@@ -143,12 +144,15 @@ function script.MANIFEST__TRANSPARENT(dt)
   -- ----------------------------------------------------------------
   
 
-  local sim = ac.getSim()
-  for carIndex = 1, sim.carsCount - 1 do
-    local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
-    if carAnchorPoints then
-      -- CarOperations.drawSideAnchorPoints(carIndex)
-      CarOperations.renderCarBlockCheckRays(carIndex)
+
+  if storage.debugDraw then
+    local sim = ac.getSim()
+    for carIndex = 1, sim.carsCount - 1 do
+      local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
+      if carAnchorPoints then
+        -- CarOperations.drawSideAnchorPoints(carIndex)
+        CarOperations.renderCarBlockCheckRays(carIndex)
+      end
     end
   end
 

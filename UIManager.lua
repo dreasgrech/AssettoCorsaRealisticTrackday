@@ -167,9 +167,6 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Enabled', storage.enabled) then storage.enabled = not storage.enabled end
     if ui.itemHovered() then ui.setTooltip('Master switch for this app.') end
 
-    if ui.checkbox('Debug markers (3D)', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
-    if ui.itemHovered() then ui.setTooltip('Shows floating text above AI cars currently yielding.') end
-
     -- if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
     -- if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
 
@@ -178,10 +175,13 @@ function UIManager.renderUIOptionsControls()
     if ui.itemHovered() then ui.setTooltip('The track side which AI will yield to when you approach from the rear.') end
 
     if ui.checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
-    if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily.') end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily. (EXPERIMENTAL)') end
 
     if ui.checkbox('Handle accidents', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
+
+    if ui.checkbox('Draw Debug Gizmos', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
+    if ui.itemHovered() then ui.setTooltip('Shows 3D debug information about the cars') end
 
     storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
@@ -196,10 +196,10 @@ function UIManager.renderUIOptionsControls()
     if ui.itemHovered() then ui.setTooltip('Require some closing speed before asking AI to yield.') end
 
     storage.rampSpeed_mps =  ui.slider('Offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
-    if ui.itemHovered() then ui.setTooltip('Ramp speed of offset change.') end
+    if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when yielding.') end
 
     storage.rampRelease_mps =  ui.slider('Offset release (m/s)', storage.rampRelease_mps, 0.1, 3.0)
-    if ui.itemHovered() then ui.setTooltip('How quickly offset returns to center once you’re past the AI.') end
+    if ui.itemHovered() then ui.setTooltip('How quickly the side offset returns to normal once an overtaking car has fully driven past the yielding car.') end
 
     storage.minAISpeed_kmh =  ui.slider('Min AI speed (km/h)', storage.minAISpeed_kmh, 0, 120)
     if ui.itemHovered() then ui.setTooltip('Don’t ask AI to yield if its own speed is below this (corners/traffic).') end
