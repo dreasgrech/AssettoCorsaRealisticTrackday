@@ -255,7 +255,7 @@ local carStateMachine = {
       physics.setAICaution(carIndex, 2)
 
       -- limit the ai car throttle while driving on the yielding lane
-      physics.setAIThrottleLimit(carIndex, 0.4)
+      physics.setAIThrottleLimit(carIndex, 0.9)
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
   end,
