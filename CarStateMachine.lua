@@ -150,7 +150,8 @@ local carStateMachine = {
       end
 
       -- Check if the player car is behind the ai car
-      local isPlayerCarBehindAICar = CarOperations.isBehind(car, playerCar)
+      -- local isPlayerCarBehindAICar = CarOperations.isFirstCarBehindSecondCar(car, playerCar)
+      local isPlayerCarBehindAICar = CarOperations.isFirstCarBehindSecondCar(playerCar, car)
       if not isPlayerCarBehindAICar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Player not behind (clear) so not yielding'
         return

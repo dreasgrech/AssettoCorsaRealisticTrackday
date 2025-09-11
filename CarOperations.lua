@@ -64,10 +64,12 @@ CarOperations.setGentleStop = function(carIndex, gentleStop)
     CarManager.cars_gentleStop[carIndex] = gentleStop
 end
 
-function CarOperations.isBehind(aiCar, playerCar)
-    local aiCarFwd = aiCar.look or aiCar.forward or vec3(0,0,1)
-    local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
-    return MathHelpers.dot(aiCarFwd, rel) < 0
+function CarOperations.isFirstCarBehindSecondCar(firstCar, secondCar)
+  return firstCar.splinePosition < secondCar.splinePosition
+
+    -- local aiCarFwd = aiCar.look or aiCar.forward or vec3(0,0,1)
+    -- local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
+    -- return MathHelpers.dot(aiCarFwd, rel) < 0
 end
 
 function CarOperations.playerIsClearlyAhead(aiCar, playerCar, meters)
