@@ -104,29 +104,35 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
       local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i]
         local state = CarStateMachine.getCurrentState(i)
         local base = string.format(
-          "#%02d d=%6.3fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=(%d) %s",
+          "#%02d d=%6.3fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
           i, distShown, math.floor(car.speedKmh),
           CarManager.cars_currentSplineOffset[i],
           CarManager.cars_targetSplineOffset[i],
-          state,
           CarStateMachine.CarStateTypeStrings[state]
         )
         -- do
           -- local indTxt = UIManager.indicatorStatusText(i)
           -- base = base .. string.format("  ind=%s", indTxt)
         -- end
-        local uiColor = CARSTATES_TO_UICOLOR[state]
+        local reason = CarManager.cars_reasonWhyCantYield[i] or ''
+        local fullString
         if CarManager.cars_currentlyYielding[i] then
             -- ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
-          ui.textColored(base, uiColor)
-          ui.sameLine()
-          local reason = CarManager.cars_reasonWhyCantYield[i] or '-'
-          ui.text(string.format(" (%s) (yield %.1fs)", reason, CarManager.cars_yieldTime[i] or 0))
+
+          -- ui.textColored(base, uiColor)
+          -- ui.sameLine()
+          -- ui.text(string.format(" (%s) (yield %.1fs)", reason, CarManager.cars_yieldTime[i]))
+
+          -- ui.textColored(string.format("%s (%s) (yield %.1fs)", base, reason, CarManager.cars_yieldTime[i]), uiColor)
+          fullString = string.format("%s (%s) (yield %.1fs)", base, reason, CarManager.cars_yieldTime[i])
         else
-          local reason = CarManager.cars_reasonWhyCantYield[i] or '-'
           -- ui.text(string.format("%s  reason: %s", base, reason))
-          ui.textColored(string.format("%s  reason: %s", base, reason), uiColor)
+          -- ui.textColored(string.format("%s  reason: %s", base, reason), uiColor)
+          fullString = string.format("%s  reason: %s", base, reason)
         end
+
+        local uiColor = CARSTATES_TO_UICOLOR[state]
+        ui.textColored(fullString, uiColor)
     end
   end
 end
@@ -152,7 +158,6 @@ function script.MANIFEST__UPDATE(dt)
 
   -- doCarYieldingLogic_old(dt)
   local storage = StorageManager.getStorage()
-  local sim = ac.getSim()
   local playerCar = ac.getCar(0)
   -- if not playerCar then return end
 
