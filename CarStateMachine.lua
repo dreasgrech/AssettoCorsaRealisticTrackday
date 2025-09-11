@@ -74,10 +74,8 @@ local stopCarAfterAccident = function(carIndex)
     physics.preventAIFromRetiring(carIndex)
 end
 
--- TODO: Continue here to change use to TrackManager.TrackSide
--- local isSafeToDriveToTheSide = function(carIndex, trackSide,storage)
-local isSafeToDriveToTheSide = function(carIndex, storage)
-    local yieldingToLeft = storage.yieldSide == RaceTrackManager.TrackSide.LEFT
+local isSafeToDriveToTheSide = function(carIndex, side)
+    local yieldingToLeft = side == RaceTrackManager.TrackSide.LEFT
 
     -- check if there's a car on our side
     local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
@@ -93,7 +91,7 @@ local isSafeToDriveToTheSide = function(carIndex, storage)
         end
     end
     
-    local sideSign = yieldingToLeft and -1 or 1
+    -- local sideSign = yieldingToLeft and -1 or 1
 
     -- Check car blind spot
     -- Andreas: I've never seen this code working yet...
@@ -192,13 +190,14 @@ local carStateMachine = {
   end,
   [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       -- local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, storage)
-      -- local yieldingToTrackSide = storage.yieldToLeft and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
-      local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, storage)
+      local yieldSide = storage.yieldSide
+      local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, yieldSide)
       if not isSideSafeToYield then
+        CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not yielding', RaceTrackManager.TrackSideStrings[yieldSide])
         return
       end
 
-      local yieldingToLeft = storage.yieldSide == RaceTrackManager.TrackSide.LEFT
+      local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
       local sideSign = yieldingToLeft and -1 or 1
 
       local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
@@ -282,12 +281,12 @@ local carStateMachine = {
   end,
   [CarStateMachine.CarStateType.EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
 
-      -- TODO: this is not good because it needs to check the different side (not the one we're yielding to, since now we're going back to center)
-      -- TODO: this is not good because it needs to check the different side (not the one we're yielding to, since now we're going back to center)
-      -- TODO: this is not good because it needs to check the different side (not the one we're yielding to, since now we're going back to center)
-      -- TODO: I probably need a yield-direction enum (Left, Right)
-      local sideSafeToYield = isSafeToDriveToTheSide(carIndex, storage)
+      local yieldSide = storage.yieldSide
+      -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
+      local easeOutYieldSide = (yieldSide == RaceTrackManager.TrackSide.LEFT) and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
+      local sideSafeToYield = isSafeToDriveToTheSide(carIndex, easeOutYieldSide)
       if not sideSafeToYield then
+        CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
         return
       end
 
