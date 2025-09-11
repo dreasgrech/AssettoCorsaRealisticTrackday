@@ -27,6 +27,10 @@ CarManager.cars_hasTL = {}
 CarManager.cars_evacuating = {}
 CarManager.cars_anchorPoints = {}
 CarManager.cars_throttleLimit = {}
+CarManager.cars_aiCaution = {}
+CarManager.cars_aiTopSpeed = {}
+CarManager.cars_aiStopCounter = {}
+CarManager.cars_gentleStop = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -62,10 +66,10 @@ local function setInitializedDefaults(carIndex)
 
   -- remove speed limitations which could have occured during an accident
   CarOperations.setAIThrottleLimit(carIndex, 1)
-  physics.setAITopSpeed(carIndex, math.huge)
-  physics.setAIStopCounter(carIndex, 0)
-  physics.setGentleStop(carIndex, false)
-  physics.setAICaution(carIndex, 1)
+  CarOperations.setAITopSpeed(carIndex, math.huge)
+  CarOperations.setAIStopCounter(carIndex, 0)
+  CarOperations.setGentleStop(carIndex, false)
+  CarOperations.setAICaution(carIndex, 1)
 
   local car = ac.getCar(carIndex)
   if car then

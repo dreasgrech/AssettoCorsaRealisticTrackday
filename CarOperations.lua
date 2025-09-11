@@ -44,6 +44,26 @@ CarOperations.setAIThrottleLimit = function(carIndex, limit)
     CarManager.cars_throttleLimit[carIndex] = limit
 end
 
+CarOperations.setAICaution = function(carIndex, caution)
+    physics.setAICaution(carIndex, caution)
+    CarManager.cars_aiCaution[carIndex] = caution
+end
+
+CarOperations.setAITopSpeed = function(carIndex, topSpeed)
+    physics.setAITopSpeed(carIndex, topSpeed)
+    CarManager.cars_aiTopSpeed[carIndex] = topSpeed
+end
+
+CarOperations.setAIStopCounter = function(carIndex, stopCounter)
+    physics.setAIStopCounter(carIndex, stopCounter)
+    CarManager.cars_aiStopCounter[carIndex] = stopCounter
+end
+
+CarOperations.setGentleStop = function(carIndex, gentleStop)
+    physics.setGentleStop(carIndex, gentleStop)
+    CarManager.cars_gentleStop[carIndex] = gentleStop
+end
+
 function CarOperations.isBehind(aiCar, playerCar)
     local aiCarFwd = aiCar.look or aiCar.forward or vec3(0,0,1)
     local rel = MathHelpers.vsub(playerCar.position, aiCar.position)

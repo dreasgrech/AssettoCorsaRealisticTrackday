@@ -66,10 +66,10 @@ end
 local stopCarAfterAccident = function(carIndex)
     -- stop the car
     CarOperations.setAIThrottleLimit(carIndex, 0)
-    physics.setAITopSpeed(carIndex, 0)
-    physics.setAIStopCounter(carIndex, 1)
-    physics.setGentleStop(carIndex, true)
-    physics.setAICaution(carIndex, 16) -- be very cautious
+    CarOperations.setAITopSpeed(carIndex, 0)
+    CarOperations.setAIStopCounter(carIndex, 1)
+    CarOperations.setGentleStop(carIndex, true)
+    CarOperations.setAICaution(carIndex, 16) -- be very cautious
 
     physics.preventAIFromRetiring(carIndex)
 end
@@ -122,7 +122,7 @@ local carStateMachine = {
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 
       -- reset the ai car caution back to normal
-      physics.setAICaution(carIndex, 1)
+      CarOperations.setAICaution(carIndex, 1)
 
       -- remove the ai car throttle limit since we will now be driving normally
       CarOperations.setAIThrottleLimit(carIndex, 1)
@@ -262,7 +262,7 @@ local carStateMachine = {
       end
 
       -- make the ai car leave more space in between the care in front while driving on the yielding lane
-      physics.setAICaution(carIndex, 2)
+      CarOperations.setAICaution(carIndex, 2)
 
       -- limit the ai car throttle while driving on the yielding lane
       CarOperations.setAIThrottleLimit(carIndex, 0.9)
@@ -277,7 +277,7 @@ local carStateMachine = {
       CarOperations.setAIThrottleLimit(carIndex, 1)
 
       -- reset the ai car caution back to normal
-      physics.setAICaution(carIndex, 1)
+      CarOperations.setAICaution(carIndex, 1)
 
       -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
       local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
