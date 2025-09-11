@@ -71,17 +71,8 @@ UIManager.drawMainWindowContent = function()
         local reason = CarManager.cars_reasonWhyCantYield[i] or ''
         local fullString
         if CarManager.cars_currentlyYielding[i] then
-            -- ui.textColored(base, rgbm(0.2, 0.95, 0.2, 1.0))
-
-          -- ui.textColored(base, uiColor)
-          -- ui.sameLine()
-          -- ui.text(string.format(" (%s) (yield %.1fs)", reason, CarManager.cars_yieldTime[i]))
-
-          -- ui.textColored(string.format("%s (%s) (yield %.1fs)", base, reason, CarManager.cars_yieldTime[i]), uiColor)
           fullString = string.format("%s (%s) (yield %.1fs)", base, reason, CarManager.cars_yieldTime[i])
         else
-          -- ui.text(string.format("%s  reason: %s", base, reason))
-          -- ui.textColored(string.format("%s  reason: %s", base, reason), uiColor)
           fullString = string.format("%s  reason: %s", base, reason)
         end
 
@@ -89,7 +80,6 @@ UIManager.drawMainWindowContent = function()
         ui.textColored(fullString, uiColor)
     end
   end
-
 end
 
 UIManager.indicatorStatusText = function(i)
