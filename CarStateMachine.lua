@@ -480,10 +480,17 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     -- Logger.log(string.format("CarStateMachine: Car %d updateFunction of state %s: ", carIndex, CarStateMachine.CarStateTypeStrings[state]) .. tostring(CarStateMachine.states_updateFunctions[carIndex]))
     CarStateMachine.states_updateFunctions[state](carIndex, dt, car, playerCar, storage)
 
-    -- TODO: Here we need to check for the minimum time that the car has to stay in the state before we can transition out
-    -- TODO: Here we need to check for the minimum time that the car has to stay in the state before we can transition out
-    -- TODO: Here we need to check for the minimum time that the car has to stay in the state before we can transition out
-    -- TODO: Here we need to check for the minimum time that the car has to stay in the state before we can transition out
+    local currentTimeInState = timeInStates[carIndex]
+
+    -- increase the time spent in this state
+    timeInStates[carIndex] = currentTimeInState + dt
+
+    -- make sure we have spent the minimum required time in this state before we can transition out of it
+    local minimumTimeInState = CarStateMachine.states_minimumTimeInState[state]
+    if currentTimeInState < minimumTimeInState then
+      -- we haven't spent enough time in this state yet, so we cannot transition out of it
+      return
+    end
 
     -- check if we need to transition out of the state by executing the state's transition check function
     local newState = CarStateMachine.states_transitionFunctions[state](carIndex, dt, car, playerCar, storage)
@@ -506,8 +513,6 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     -- carStateMachine[state](carIndex, dt, car, playerCar, storage)
     executeStateMachineUpdate_OLD(carIndex, state, dt, car, playerCar, storage)
 --]=====]
-
-    timeInStates[carIndex] = timeInStates[carIndex] + dt
 end
 
 CarStateMachine.informAboutAccident = function(accidentIndex)
