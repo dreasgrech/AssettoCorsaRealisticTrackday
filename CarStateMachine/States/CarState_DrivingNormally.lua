@@ -39,36 +39,35 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       -- end
       -- DEBUG DEBUG DEBUG
 
-      -- If this car is not close to the player car, do nothing
-      local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
+      -- If this car is not close to the overtaking car, do nothing
+      local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
       local radius = storage.detectCarBehind_meters
-      local isAICarCloseToPlayerCar = distanceFromPlayerCarToAICar <= radius
-      if not isAICarCloseToPlayerCar then
+      local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCar <= radius
+      if not isYieldingCarCloseToOvertakingCar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Too far (outside detect radius) so not yielding'
         return
       end
 
-      -- Check if the player car is behind the ai car
-      -- local isPlayerCarBehindAICar = CarOperations.isFirstCarBehindSecondCar(car, playerCar)
-      local isPlayerCarBehindAICar = CarOperations.isFirstCarBehindSecondCar(playerCar, car)
-      if not isPlayerCarBehindAICar then
-        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player not behind (clear) so not yielding'
+      -- Check if the overtaking car is behind the yielding car
+      local isOvertakingCarBehindYieldingCar = CarOperations.isFirstCarBehindSecondCar(playerCar, car)
+      if not isOvertakingCarBehindYieldingCar then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car not behind (clear) so not yielding'
         return
       end
 
-      -- Check if the player car is above the minimum speed
-      local isPlayerAboveMinSpeed = playerCar.speedKmh >= storage.minPlayerSpeed_kmh
-      if not isPlayerAboveMinSpeed then
-        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player below minimum speed so not yielding'
+      -- Check if the overtaking car is above the minimum speed
+      local isOvertakingCarAboveMinSpeed = playerCar.speedKmh >= storage.minPlayerSpeed_kmh
+      if not isOvertakingCarAboveMinSpeed then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car below minimum speed so not yielding'
         return
       end
 
-      local carSpeedKmh = car.speedKmh
+      local yieldingCarSpeedKmh = car.speedKmh
       local overtakingCarSpeedKmh = playerCar.speedKmh
 
       -- Check if we're faster than the overtaking car
-      local areWeSlowerThanCarTryingToOvertake = carSpeedKmh < overtakingCarSpeedKmh
-      if not areWeSlowerThanCarTryingToOvertake then
+      local isYieldingCarSlowerThanOvertakingCar = yieldingCarSpeedKmh < overtakingCarSpeedKmh
+      if not isYieldingCarSlowerThanOvertakingCar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'We are faster than the car behind so not yielding'
         return
       end
