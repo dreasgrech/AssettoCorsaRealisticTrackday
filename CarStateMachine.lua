@@ -43,15 +43,19 @@ CarStateMachine.changeState = function(carIndex, newState)
     -- save a reference to the current state before changing it
     local currentState = CarStateMachine.getCurrentState(carIndex)
     local isFirstState = currentState == nil -- is this the first state we're setting for this car?
+    if not isFirstState and currentState == newState then
+        Logger.warn(string.format("Car %d: Tried to change to the same state: %s", carIndex, CarStateMachine.CarStateTypeStrings[newState]))
+        return
+    end
+
     if isFirstState then
       currentState = newState
     end
 
     cars_previousState[carIndex] = currentState
 
-    -- reset timers for both states
-    timeInStates[currentState] = 0
-    timeInStates[newState] = 0
+    -- reset the time in state counter
+    timeInStates[carIndex] = 0
 
     -- Logger.log(string.format("Car %d: Changing state (%d) from %s to %s", carIndex, currentState))
 
@@ -432,7 +436,7 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, CarStateMachine.CarStateTypeStrings[state])) end
     carStateMachine[state](carIndex, dt, car, playerCar, storage)
 
-    timeInStates[state] = timeInStates[state] + dt
+    timeInStates[carIndex] = timeInStates[carIndex] + dt
 end
 
 CarStateMachine.informAboutAccident = function(accidentIndex)
