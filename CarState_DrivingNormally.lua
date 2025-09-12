@@ -85,7 +85,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       -- Since all the checks have passed, the ai car can now start to yield
-      -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE)
       return CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE
 end
 

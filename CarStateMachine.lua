@@ -5,12 +5,9 @@ local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
 -- [Flags]
 local CarStateType = {
-  -- TRYING_TO_START_DRIVING_NORMALLY = 0,
   DRIVING_NORMALLY = 1,
-  -- TRYING_TO_START_YIELDING_TO_THE_SIDE = 2,
   YIELDING_TO_THE_SIDE = 4, 
   STAYING_ON_YIELDING_LANE = 8,
-  -- TRYING_TO_START_EASING_OUT_YIELD = 16,
   EASING_OUT_YIELD = 32,
   WAITING_AFTER_ACCIDENT = 64,
   COLLIDED_WITH_TRACK = 128,
@@ -19,12 +16,9 @@ local CarStateType = {
 }
 
 CarStateMachine.CarStateTypeStrings = {
-  -- [CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = "TryingToStartDrivingNormally",
   [CarStateType.DRIVING_NORMALLY] = "DrivingNormally",
-  -- [CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = "TryingToStartYieldingToTheSide",
   [CarStateType.YIELDING_TO_THE_SIDE] = "YieldingToTheSide",
   [CarStateType.STAYING_ON_YIELDING_LANE] = "StayingOnYieldingLane",
-  -- [CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = "TryingToStartEasingOutYield",
   [CarStateType.EASING_OUT_YIELD] = "EasingOutYield",
   [CarStateType.WAITING_AFTER_ACCIDENT] = "WaitingAfterAccident",
   [CarStateType.COLLIDED_WITH_TRACK] = "CollidedWithTrack",
@@ -33,12 +27,9 @@ CarStateMachine.CarStateTypeStrings = {
 }
 
 local minimumTimesInState = {
-  -- [CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = 0,
   -- [CarStateType.DRIVING_NORMALLY] = 0,
-  -- [CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = 0,
   -- [CarStateType.YIELDING_TO_THE_SIDE] = 0,
   [CarStateType.STAYING_ON_YIELDING_LANE] = 4, -- minimum time to stay on yielding lane before we can start easing out
-  -- [CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = 0,
   -- [CarStateType.EASING_OUT_YIELD] = 0,
   -- [CarStateType.WAITING_AFTER_ACCIDENT] = 3, -- wait at least this many seconds after an accident before trying to drive normally again
   -- [CarStateType.COLLIDED_WITH_TRACK] = 3,

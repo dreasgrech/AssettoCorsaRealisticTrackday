@@ -30,7 +30,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
       if isPlayerClearlyAheadOfAICar then
         -- go to trying to start easing out yield state
-        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -38,7 +37,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       local isPlayerClearlyBehindAICar = CarOperations.playerIsClearlyBehind(car, playerCar, storage.detectCarBehind_meters)
       if isPlayerClearlyBehindAICar then
         -- go to trying to start easing out yield state
-        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -47,7 +45,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       if areWeFasterThanCarTryingToOvertake then
         -- go to trying to start easing out yield state
         CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
-        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 end

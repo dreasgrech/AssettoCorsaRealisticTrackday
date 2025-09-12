@@ -55,7 +55,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Player clearly ahead, so easing out yield'
 
         -- go to trying to start easing out yield state
-        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -64,8 +63,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       -- if areWeFasterThanCarTryingToOvertake then
         -- -- go to trying to start easing out yield state
         -- CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
-        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
-        -- return
+        -- return CarStateMachine.CarStateType.EASING_OUT_YIELD
       -- end
 
       -- if we have reached the target offset, we can go to the next state
