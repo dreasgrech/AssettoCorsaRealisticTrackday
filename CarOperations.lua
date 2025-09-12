@@ -54,6 +54,10 @@ CarOperations.setAITopSpeed = function(carIndex, topSpeed)
     CarManager.cars_aiTopSpeed[carIndex] = topSpeed
 end
 
+CarOperations.removeAITopSpeed = function(carIndex)
+  CarOperations.setAITopSpeed(carIndex, math.huge)
+end
+
 CarOperations.setAIStopCounter = function(carIndex, stopCounter)
     physics.setAIStopCounter(carIndex, stopCounter)
     CarManager.cars_aiStopCounter[carIndex] = stopCounter
@@ -70,6 +74,10 @@ function CarOperations.isFirstCarBehindSecondCar(firstCar, secondCar)
     -- local aiCarFwd = aiCar.look or aiCar.forward or vec3(0,0,1)
     -- local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
     -- return MathHelpers.dot(aiCarFwd, rel) < 0
+end
+
+function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCar)
+  return firstCar.speedKmh > secondCar.speedKmh
 end
 
 function CarOperations.playerIsClearlyAhead(aiCar, playerCar, meters)

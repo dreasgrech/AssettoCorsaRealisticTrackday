@@ -66,7 +66,7 @@ local function setInitializedDefaults(carIndex)
 
   -- remove speed limitations which could have occured during an accident
   CarOperations.setAIThrottleLimit(carIndex, 1)
-  CarOperations.setAITopSpeed(carIndex, math.huge)
+  CarOperations.removeAITopSpeed(carIndex)
   CarOperations.setAIStopCounter(carIndex, 0)
   CarOperations.setGentleStop(carIndex, false)
   CarOperations.setAICaution(carIndex, 1)

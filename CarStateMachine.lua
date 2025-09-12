@@ -108,6 +108,21 @@ local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
     return true
 end
 
+---limits the ramp up speed of the spline offset when the car is driving at high speed
+---@param carSpeedKmh any
+---@param rampSpeed any
+---@return unknown
+local limitSplitOffsetRampUpSpeed = function(carSpeedKmh, rampSpeed)
+  if carSpeedKmh > 300 then
+    return rampSpeed * 0.1
+  elseif carSpeedKmh > 200 then
+    return rampSpeed * 0.25
+  elseif carSpeedKmh > 100 then
+    return rampSpeed * 0.5
+  end
+  return rampSpeed
+end
+
 local carStateMachine = {
   [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
 
@@ -199,12 +214,42 @@ local carStateMachine = {
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE)
   end,
   [CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
-      -- local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, storage)
       local yieldSide = storage.yieldSide
+
+      -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
+      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
+      if isPlayerClearlyAheadOfAICar then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player clearly ahead, so easing out yield'
+
+        -- go to trying to start easing out yield state
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
+        return
+      end
+
+      --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
+      local areWeFasterThanCarTryingToOvertake = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar)
+      if areWeFasterThanCarTryingToOvertake then
+        -- go to trying to start easing out yield state
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
+        return
+      end
+
+      local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
+      local sideSign = yieldingToLeft and -1 or 1
+      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
+
+      -- if we have reached the target offset, we can go to the next state
+      local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
+      if arrivedAtTargetOffset then
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
+        return
+      end
+
+      -- make sure there isn't any car on the side we're trying to yield to so we don't crash into it
       local isSideSafeToYield = isSafeToDriveToTheSide(carIndex, yieldSide)
       if not isSideSafeToYield then
-        -- isSafeToDriveToTheSide already logs the reason why we can't yield
-        -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not yielding', RaceTrackManager.TrackSideStrings[yieldSide])
         -- reduce the car speed so that we can find a gap
         CarOperations.setAIThrottleLimit(carIndex, 0.4)
 
@@ -214,12 +259,9 @@ local carStateMachine = {
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
       CarOperations.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap
 
-      local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
-      local sideSign = yieldingToLeft and -1 or 1
+      -- if we are driving at high speed, we need to increase the ramp speed slower so that our car doesn't jolt out of control
+      local splineOffsetTransitionSpeed = limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
 
-      local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
-      local splineOffsetTransitionSpeed = storage.rampSpeed_mps
-      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
 
       -- set the spline offset on the ai car
@@ -234,23 +276,6 @@ local carStateMachine = {
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
-
-      -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
-      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
-      if isPlayerClearlyAheadOfAICar then
-        -- CarManager.cars_reason[carIndex] = 'Player clearly ahead, so easing out yield'
-
-        -- go to trying to start easing out yield state
-        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
-        return
-      end
-
-      -- once we have reached the target offset, we can go to the next state
-      local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
-      if arrivedAtTargetOffset then
-        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
-        return
-      end
   end,
   [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = function (carIndex, dt, car, playerCar, storage)
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
@@ -271,11 +296,21 @@ local carStateMachine = {
         return
       end
 
+      --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
+      local areWeFasterThanCarTryingToOvertake = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar)
+      if areWeFasterThanCarTryingToOvertake then
+        -- go to trying to start easing out yield state
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
+        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
+        return
+      end
+
       -- make the ai car leave more space in between the care in front while driving on the yielding lane
       CarOperations.setAICaution(carIndex, 2)
 
       -- limit the ai car throttle while driving on the yielding lane
-      CarOperations.setAIThrottleLimit(carIndex, 0.9)
+      CarOperations.setAIThrottleLimit(carIndex, 0.5)
+      CarOperations.setAITopSpeed(carIndex, playerCar.speedKmh*0.1) -- limit the ai car top speed to half the player car speed while driving on the yielding lane
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
   end,
@@ -285,6 +320,7 @@ local carStateMachine = {
 
       -- remove the ai car throttle limit since we will now start easing out the yield
       CarOperations.setAIThrottleLimit(carIndex, 1)
+      CarOperations.removeAITopSpeed(carIndex)
 
       -- reset the ai car caution back to normal
       CarOperations.setAICaution(carIndex, 1)
