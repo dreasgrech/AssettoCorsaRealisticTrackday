@@ -141,9 +141,15 @@ local limitSplitOffsetRampUpSpeed = function(carSpeedKmh, rampSpeed)
   return rampSpeed
 end
 
-local carStateMachine = {
-  [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
+-- CarStateMachine.StateProgress = {
+  -- Entry = 0,
+  -- Update = 1,
+  -- Transition
+  -- Exit = 2,
+-- }
 
+local carStateMachine_NEWWITHSUBSTATES__entryFunctions = {
+  [CarStateMachine.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
@@ -152,14 +158,23 @@ local carStateMachine = {
       CarOperations.toggleTurningLights(carIndex, car, ac.TurningLights.None)
       
     -- start driving normally
-      CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
+    -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 
       -- reset the ai car caution back to normal
       CarOperations.setAICaution(carIndex, 1)
 
       -- remove the ai car throttle limit since we will now be driving normally
       CarOperations.setAIThrottleLimit(carIndex, 1)
-  end,
+  end
+}
+
+local carStateMachine_NEWWITHSUBSTATES__updateFunctions = {
+  [CarStateMachine.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
+
+  end
+}
+
+local carStateMachine_NEWWITHSUBSTATES__transitionCheckFunctions = {
   [CarStateMachine.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
       -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
 
@@ -170,8 +185,6 @@ local carStateMachine = {
           -- -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (raycast)'
       -- end
       -- DEBUG DEBUG DEBUG
-
-        CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       -- If this car is not close to the player car, do nothing
       local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
@@ -216,6 +229,102 @@ local carStateMachine = {
       local isAICarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh
       if not isAICarAboveMinSpeed then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'AI speed too low (corner/traffic) so not yielding'
+        return
+      end
+
+      -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
+
+      -- Since all the checks have passed, the ai car can now start to yield
+      -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE)
+      return CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE
+  end
+}
+
+local carStateMachine_NEWWITHSUBSTATES__exitFunctions = {
+  [CarStateMachine.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
+      CarManager.cars_reasonWhyCantYield[carIndex] = nil
+  end
+}
+
+
+
+
+
+
+local carStateMachine = {
+  [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
+
+      CarManager.cars_yieldTime[carIndex] = 0
+      CarManager.cars_currentSplineOffset[carIndex] = 0
+      CarManager.cars_targetSplineOffset[carIndex] = 0
+
+      -- turn off turning lights
+      CarOperations.toggleTurningLights(carIndex, car, ac.TurningLights.None)
+      
+    -- start driving normally
+      CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
+
+      -- reset the ai car caution back to normal
+      CarOperations.setAICaution(carIndex, 1)
+
+      -- remove the ai car throttle limit since we will now be driving normally
+      CarOperations.setAIThrottleLimit(carIndex, 1)
+  end,
+  [CarStateMachine.CarStateType.DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
+      -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
+
+      -- DEBUG DEBUG DEBUG
+      -- local anyHit, rays = CarOperations.simpleSideRaycasts(carIndex, 10.0)
+      -- if anyHit then
+          -- -- Logger.log(string.format("Car %d: Side raycast hit something, not yielding", carIndex))
+          -- -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (raycast)'
+      -- end
+      -- DEBUG DEBUG DEBUG
+
+      -- If this car is not close to the player car, do nothing
+      local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
+      local radius = storage.detectCarBehind_meters
+      local isAICarCloseToPlayerCar = distanceFromPlayerCarToAICar <= radius
+      if not isAICarCloseToPlayerCar then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Too far (outside detect radius) so not yielding'
+        return
+      end
+
+      -- Check if the player car is behind the ai car
+      -- local isPlayerCarBehindAICar = CarOperations.isFirstCarBehindSecondCar(car, playerCar)
+      local isPlayerCarBehindAICar = CarOperations.isFirstCarBehindSecondCar(playerCar, car)
+      if not isPlayerCarBehindAICar then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player not behind (clear) so not yielding'
+        return
+      end
+
+      -- Check if the player car is above the minimum speed
+      local isPlayerAboveMinSpeed = playerCar.speedKmh >= storage.minPlayerSpeed_kmh
+      if not isPlayerAboveMinSpeed then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player below minimum speed so not yielding'
+        return
+      end
+
+      local carSpeedKmh = car.speedKmh
+      local overtakingCarSpeedKmh = playerCar.speedKmh
+
+      -- Check if we're faster than the overtaking car
+      local areWeSlowerThanCarTryingToOvertake = carSpeedKmh < overtakingCarSpeedKmh
+      if not areWeSlowerThanCarTryingToOvertake then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'We are faster than the car behind so not yielding'
+        return
+      end
+
+      -- local playerCarHasClosingSpeedToAiCar = (overtakingCarSpeedKmh - carSpeedKmh) >= storage.minSpeedDelta_kmh
+      -- if not playerCarHasClosingSpeedToAiCar then
+        -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Player does not have closing speed so not yielding'
+      -- end
+
+      -- Check if the ai car is above the minimum speed
+      local isAICarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh
+      if not isAICarAboveMinSpeed then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'AI speed too low (corner/traffic) so not yielding'
+        return
       end
 
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
@@ -424,6 +533,15 @@ local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()
 
 Logger.log("[CarStateMachine] Initialized 3 queues: "..queuedCollidedWithTrackAccidents..", "..queuedCollidedWithCarAccidents..", "..queuedCarCollidedWithMeAccidents)
 
+local executeStateMachineUpdate_OLD = function(carIndex, state, dt, car, playerCar, storage)
+    -- execute the state machine for this car
+    if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, CarStateMachine.CarStateTypeStrings[state])) end
+    carStateMachine[state](carIndex, dt, car, playerCar, storage)
+end
+
+-- a dictionary which holds, if available, the state to transition to next in the upcoming frame
+local queuedStatesToTransitionInto = {}
+
 CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     -- while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
         -- local carIndex = QueueManager.dequeue(queuedCollidedWithTrackAccidents)
@@ -449,11 +567,47 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
 
     CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
 
+    ------------------------------------------------------------------------
+    -- NEW STATE MACHINE CODE
+    ------------------------------------------------------------------------
+    -- check if there's a new state we need to transition into
+    local newStateToTransitionIntoThisFrame = queuedStatesToTransitionInto[carIndex]
+    local shouldTransitionIntoNewState = not newStateToTransitionIntoThisFrame == nil
+    
+    -- If there's a state we need to transition into, do it now
+    if shouldTransitionIntoNewState then
+      -- clear the queued transition since we're now taking care of it
+      queuedStatesToTransitionInto[carIndex] = nil
+
+      -- change to the new state
+      CarStateMachine.changeState(carIndex, newStateToTransitionIntoThisFrame)
+
+      -- execute the state's entry function
+      carStateMachine_NEWWITHSUBSTATES__entryFunctions[newStateToTransitionIntoThisFrame](carIndex, dt, car, playerCar, storage)
+    end
+
     local state = CarStateMachine.getCurrentState(carIndex)
+    -- run the state loop
+    carStateMachine_NEWWITHSUBSTATES__updateFunctions[state](carIndex, dt, car, playerCar, storage)
+
+    -- check if we need to transition out of the state by executing the state's transition check function
+    local newState = carStateMachine_NEWWITHSUBSTATES__transitionCheckFunctions[state](carIndex, dt, car, playerCar, storage)
+    local shouldTransitionToNextState = not newState == nil
+    if shouldTransitionToNextState then
+      -- execute the state's exit function
+      carStateMachine_NEWWITHSUBSTATES__exitFunctions[state](carIndex, dt, car, playerCar, storage)
+      queuedStatesToTransitionInto[carIndex] = newState
+    end
+
+    ------------------------------------------------------------------------
+    -- END: NEW STATE MACHINE CODE
+    ------------------------------------------------------------------------
+
 
     -- execute the state machine for this car
-    if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, CarStateMachine.CarStateTypeStrings[state])) end
-    carStateMachine[state](carIndex, dt, car, playerCar, storage)
+    -- if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, CarStateMachine.CarStateTypeStrings[state])) end
+    -- carStateMachine[state](carIndex, dt, car, playerCar, storage)
+    executeStateMachineUpdate_OLD(carIndex, state, dt, car, playerCar, storage)
 
     timeInStates[carIndex] = timeInStates[carIndex] + dt
 end
