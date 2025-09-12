@@ -4,7 +4,7 @@ CarStateMachine.CarStateTypeStrings[STATE] = "DrivingNormally"
 CarStateMachine.states_minimumTimeInState[STATE] = 2
 
 -- ENTRY FUNCTION
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
@@ -23,12 +23,12 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, play
 end
 
 -- UPDATE FUNCTION
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
 
 end
 
 -- TRANSITION FUNCTION
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, overtakingCar, storage)
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
       -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
 
       -- DEBUG DEBUG DEBUG
@@ -39,13 +39,13 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       -- end
       -- DEBUG DEBUG DEBUG
 
-      if not overtakingCar then
+      if not carBehind then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'No overtaking car so not yielding'
         return
       end
 
       -- If this car is not close to the overtaking car, do nothing
-      local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(overtakingCar.position, car.position))
+      local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
       local radius = storage.detectCarBehind_meters
       local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCar <= radius
       if not isYieldingCarCloseToOvertakingCar then
@@ -54,21 +54,21 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       end
 
       -- Check if the overtaking car is behind the yielding car
-      local isOvertakingCarBehindYieldingCar = CarOperations.isFirstCarBehindSecondCar(overtakingCar, car)
+      local isOvertakingCarBehindYieldingCar = CarOperations.isFirstCarBehindSecondCar(carBehind, car)
       if not isOvertakingCarBehindYieldingCar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car not behind (clear) so not yielding'
         return
       end
 
       -- Check if the overtaking car is above the minimum speed
-      local isOvertakingCarAboveMinSpeed = overtakingCar.speedKmh >= storage.minPlayerSpeed_kmh
+      local isOvertakingCarAboveMinSpeed = carBehind.speedKmh >= storage.minPlayerSpeed_kmh
       if not isOvertakingCarAboveMinSpeed then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car below minimum speed so not yielding'
         return
       end
 
       local yieldingCarSpeedKmh = car.speedKmh
-      local overtakingCarSpeedKmh = overtakingCar.speedKmh
+      local overtakingCarSpeedKmh = carBehind.speedKmh
 
       -- Check if we're faster than the overtaking car
       local isYieldingCarSlowerThanOvertakingCar = yieldingCarSpeedKmh < overtakingCarSpeedKmh
@@ -96,6 +96,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
 end
 
 -- EXIT FUNCTION
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
 end

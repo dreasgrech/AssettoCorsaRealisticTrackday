@@ -6,13 +6,13 @@ CarStateMachine.states_minimumTimeInState[STATE] = 2
 local OVERTAKING_CAR_FASTER_LEEWAY = 20 -- the leeway given to the yielding car to be considered "faster" than the car trying to overtake it.  This means that the yielding car needs to be at least this much faster than the car behind it to consider it faster
 
 -- ENTRY FUNCTION
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
 
 end
 
 -- UPDATE FUNCTION
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, overtakingCar, storage)
-      if not overtakingCar then
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+      if not carBehind then
         return
       end
 
@@ -25,7 +25,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, ove
 
       -- limit the yielding car throttle while driving on the yielding lane
       CarOperations.setAIThrottleLimit(carIndex, 0.5)
-      CarOperations.setAITopSpeed(carIndex, overtakingCar.speedKmh*0.1) -- limit the yielding car top speed to half the overtaking car speed while driving on the yielding lane
+      CarOperations.setAITopSpeed(carIndex, carBehind.speedKmh*0.1) -- limit the yielding car top speed to half the overtaking car speed while driving on the yielding lane
 
       -- make sure we spend enough time in this state before opening the possibility to ease out
       -- if timeInStates[carIndex] < minimumTimesInState[CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] then
@@ -34,29 +34,29 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, ove
 end
 
 -- TRANSITION FUNCTION
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, overtakingCar, storage)
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
       -- if we don't have an overtaking car anymore, we can ease out our yielding
-      if not overtakingCar then
+      if not carBehind then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'No overtaking car so not staying on yielding lane'
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       -- If the yielding car is yielding and the overtaking car is now clearly ahead, we can ease out our yielding
-      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, overtakingCar, storage.clearAhead_meters)
+      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
       if isOvertakingCarClearlyAheadOfYieldingCar then
         -- go to trying to start easing out yield state
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       -- if the overtaking car is far enough back, then we can begin easing out
-      local isOvertakingCarClearlyBehindYieldingCar = CarOperations.isSecondCarClearlyBehindFirstCar(car, overtakingCar, storage.detectCarBehind_meters)
+      local isOvertakingCarClearlyBehindYieldingCar = CarOperations.isSecondCarClearlyBehindFirstCar(car, carBehind, storage.detectCarBehind_meters)
       if isOvertakingCarClearlyBehindYieldingCar then
         -- go to trying to start easing out yield state
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
-      local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, overtakingCar, OVERTAKING_CAR_FASTER_LEEWAY)
+      local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, carBehind, OVERTAKING_CAR_FASTER_LEEWAY)
       if isYieldingCarFasterThanOvertakingCar then
         -- go to trying to start easing out yield state
         CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
@@ -65,6 +65,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
 end
 
 -- EXIT FUNCTION
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
 
 end
