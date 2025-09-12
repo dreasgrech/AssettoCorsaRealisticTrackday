@@ -25,8 +25,13 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, pla
         -- reduce the car speed so that we can find a gap
         CarOperations.setAIThrottleLimit(carIndex, 0.4)
 
+        -- set the brake pedal to something low to help slow down the car while waiting for a gap
+        CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.2)
+
         return
       end
+
+      CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
 
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
       CarOperations.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap

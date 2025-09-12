@@ -36,7 +36,46 @@ local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
 local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
 local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
 
+CarOperations.CarPedals = {
+  Gas = 1,
+  Brake = 2,
+  Clutch = 3,
+}
+
+---Value from 0 to 1. Final value will be the maximum of original and this.
+---(For clutch: 1 is for clutch pedal fully depressed, 0 for pressed).
+---@param carIndex integer
+---@param carPedal CarOperations.CarPedals | integer
+---@param pedalPosition number
+CarOperations.setPedalPosition = function(carIndex, carPedal, pedalPosition)
+  local carInput = ac.overrideCarControls(carIndex)
+  if not carInput then return end
+
+  if carPedal == CarOperations.CarPedals.Gas then
+    carInput.gas = pedalPosition
+  elseif carPedal == CarOperations.CarPedals.Brake then
+    carInput.brake = pedalPosition
+  elseif carPedal == CarOperations.CarPedals.Clutch then
+    carInput.clutch = pedalPosition
+  end
+end
+
+CarOperations.resetPedalPosition = function(carIndex, carPedal)
+  local carInput = ac.overrideCarControls(carIndex)
+  if not carInput then return end
+
+  if carPedal == CarOperations.CarPedals.Gas then
+    carInput.gas = 0
+  elseif carPedal == CarOperations.CarPedals.Brake then
+    carInput.brake = 0
+  elseif carPedal == CarOperations.CarPedals.Clutch then
+    carInput.clutch = 0
+  end
+end
+
 ---Limits AI throttle pedal.
+---Andreas: I don't think physics.setAIThrottleLimit works as intended because it doesn't seem to have any effect on the car speed.
+---Andreas: Or maybe it touches the pedal values?
 ---@param carIndex integer @0-based car index.
 ---@param limit number @0 for limit gas pedal to 0, 1 to remove limitation.
 CarOperations.setAIThrottleLimit = function(carIndex, limit)
@@ -53,6 +92,7 @@ CarOperations.setAICaution = function(carIndex, caution)
 end
 
 ---Limits AI top speed. Use `math.huge` (or just 1e9) to remove limitation.
+---Andreas: I don't think physics.setAITopSpeed works as intended because it doesn't seem to have any effect on the car speed.
 ---@param carIndex integer @0-based car index.
 ---@param limit number @Speed in km/h.
 CarOperations.setAITopSpeed = function(carIndex, limit)
@@ -89,8 +129,8 @@ function CarOperations.isFirstCarBehindSecondCar(firstCar, secondCar)
     -- return MathHelpers.dot(aiCarFwd, rel) < 0
 end
 
-function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCar)
-  return firstCar.speedKmh > secondCar.speedKmh
+function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCar, firstCarSpeedLeeway)
+  return firstCar.speedKmh > secondCar.speedKmh + firstCarSpeedLeeway
 end
 
 function CarOperations.playerIsClearlyAhead(aiCar, playerCar, meters)

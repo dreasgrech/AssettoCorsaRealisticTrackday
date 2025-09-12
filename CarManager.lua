@@ -72,6 +72,11 @@ local function setInitializedDefaults(carIndex)
   CarOperations.setGentleStop(carIndex, false)
   CarOperations.setAICaution(carIndex, 1)
 
+  -- reset any pedal positions we may have set
+  CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+  CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
+  CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Clutch )
+
   local car = ac.getCar(carIndex)
   if car then
     CarManager.cars_AABBSIZE[carIndex] = car.aabbSize

@@ -1,6 +1,3 @@
--- AC_AICarsOvertake.lua
--- Nudge AI to one side so the player can pass on the other (Trackday / AI Flood).
-
 DequeManager = require("DataStructures.DequeManager")
 StackManager = require("DataStructures.StackManager")
 QueueManager = require("DataStructures.QueueManager")

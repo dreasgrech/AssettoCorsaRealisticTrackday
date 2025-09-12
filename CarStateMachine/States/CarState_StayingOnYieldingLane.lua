@@ -3,6 +3,8 @@ local STATE = CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
 CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnYieldingLane"
 CarStateMachine.states_minimumTimeInState[STATE] = 4
 
+local OVERTAKING_CAR_FASTER_LEEWAY = 20 -- the leeway given to the yielding car to be considered "faster" than the car trying to overtake it.  This means that the yielding car needs to be at least this much faster than the car behind it to consider it faster
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
 
@@ -44,7 +46,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       end
 
       --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
-      local areWeFasterThanCarTryingToOvertake = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar)
+      local areWeFasterThanCarTryingToOvertake = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar, OVERTAKING_CAR_FASTER_LEEWAY)
       if areWeFasterThanCarTryingToOvertake then
         -- go to trying to start easing out yield state
         CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'

@@ -23,6 +23,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'Velocity (km/h)', orderDirection = 0, width = 105, tooltip='Current velocity' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
+  { name = 'Pedals (C,B,G)', orderDirection = 0, width = 100, tooltip='Pedal positions' },
   { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
   { name = 'AICaution', orderDirection = 0, width = 80, tooltip='AI caution level' },
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
@@ -107,6 +108,8 @@ UIManager.drawMainWindowContent = function()
       local reason = CarManager.cars_reasonWhyCantYield[i] or ''
       local uiColor = CARSTATES_TO_UICOLOR[state] or ColorManager.RGBM_Colors.White
 
+      local carInput = ac.overrideCarControls(i)
+
       -- Row cells
       ui.textColored(string.format("#%02d", i), uiColor); ui.nextColumn()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
@@ -114,6 +117,7 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("%d", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.cars_currentSplineOffset[i] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[i] or 0), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.1f|%.1f|%.1f", carInput.clutch, carInput.brake, carInput.gas), uiColor); ui.nextColumn()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_aiCaution[i] or 0), uiColor); ui.nextColumn()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
