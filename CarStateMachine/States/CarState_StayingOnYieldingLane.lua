@@ -16,12 +16,12 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, pla
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
 
-      -- make the ai car leave more space in between the car in front while driving on the yielding lane
+      -- make the yielding car leave more space in between the car in front while driving on the yielding lane
       CarOperations.setAICaution(carIndex, 2)
 
-      -- limit the ai car throttle while driving on the yielding lane
+      -- limit the yielding car throttle while driving on the yielding lane
       CarOperations.setAIThrottleLimit(carIndex, 0.5)
-      CarOperations.setAITopSpeed(carIndex, playerCar.speedKmh*0.1) -- limit the ai car top speed to half the player car speed while driving on the yielding lane
+      CarOperations.setAITopSpeed(carIndex, playerCar.speedKmh*0.1) -- limit the yielding car top speed to half the overtaking car speed while driving on the yielding lane
 
       -- make sure we spend enough time in this state before opening the possibility to ease out
       -- if timeInStates[carIndex] < minimumTimesInState[CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] then
@@ -31,23 +31,23 @@ end
 
 -- TRANSITION FUNCTION
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
-      -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
-      local isPlayerClearlyAheadOfAICar = CarOperations.isSecondCarClearlyAhead(car, playerCar, storage.clearAhead_meters)
-      if isPlayerClearlyAheadOfAICar then
+      -- If the yielding car is yielding and the overtaking car is now clearly ahead, we can ease out our yielding
+      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, playerCar, storage.clearAhead_meters)
+      if isOvertakingCarClearlyAheadOfYieldingCar then
         -- go to trying to start easing out yield state
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
-      -- if the player is far enough back, then we can begin easing out
-      local isPlayerClearlyBehindAICar = CarOperations.isSecondCarClearlyBehindFirstCar(car, playerCar, storage.detectCarBehind_meters)
-      if isPlayerClearlyBehindAICar then
+      -- if the overtaking car is far enough back, then we can begin easing out
+      local isOvertakingCarClearlyBehindYieldingCar = CarOperations.isSecondCarClearlyBehindFirstCar(car, playerCar, storage.detectCarBehind_meters)
+      if isOvertakingCarClearlyBehindYieldingCar then
         -- go to trying to start easing out yield state
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
-      local areWeFasterThanCarTryingToOvertake = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar, OVERTAKING_CAR_FASTER_LEEWAY)
-      if areWeFasterThanCarTryingToOvertake then
+      local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar, OVERTAKING_CAR_FASTER_LEEWAY)
+      if isYieldingCarFasterThanOvertakingCar then
         -- go to trying to start easing out yield state
         CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
