@@ -94,7 +94,7 @@ end
 
 ---comment
 ---@param carIndex number
----@param drivingToSide TraceTrackManager.TrackSide
+---@param drivingToSide TraceTrackManager.TrackSide|integer
 ---@return boolean
 -- local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
 CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
@@ -335,7 +335,6 @@ local carStateMachine = {
         return
       end
   end,
---]=====]
   [CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
       -- reset the yield time counter
       CarManager.cars_yieldTime[carIndex] = 0
@@ -389,6 +388,7 @@ local carStateMachine = {
         return
       end
   end,
+--]=====]
   [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = function (carIndex, dt, car, playerCar, storage)
     -- todo: look at ac.SetDriverMouthOpened() lmao
     -- todo: look at ac.setDriverDoorOpen(carIndex, isOpen, instant)
