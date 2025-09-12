@@ -96,7 +96,8 @@ end
 ---@param carIndex number
 ---@param drivingToSide TraceTrackManager.TrackSide
 ---@return boolean
-local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
+-- local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
+CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
     -- check if there's a car on our side
     local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
     if isCarOnSide then
@@ -124,21 +125,6 @@ local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
     end
 
     return true
-end
-
----limits the ramp up speed of the spline offset when the car is driving at high speed
----@param carSpeedKmh any
----@param rampSpeed any
----@return unknown
-local limitSplitOffsetRampUpSpeed = function(carSpeedKmh, rampSpeed)
-  if carSpeedKmh > 300 then
-    return rampSpeed * 0.1
-  elseif carSpeedKmh > 200 then
-    return rampSpeed * 0.25
-  elseif carSpeedKmh > 100 then
-    return rampSpeed * 0.5
-  end
-  return rampSpeed
 end
 
 -- CarStateMachine.StateProgress = {
@@ -235,7 +221,6 @@ local carStateMachine = {
       -- Since all the checks have passed, the ai car can now start to yield
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE)
   end,
---]=====]
   [CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       -- turn on turning lights
       local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
@@ -308,6 +293,7 @@ local carStateMachine = {
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
   end,
+--]=====]
   [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = function (carIndex, dt, car, playerCar, storage)
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
 

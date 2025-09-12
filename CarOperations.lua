@@ -92,6 +92,21 @@ function CarOperations.playerIsClearlyBehind(aiCar, playerCar, meters)
     return MathHelpers.dot(fwd, rel) < -meters
 end
 
+---limits the ramp up speed of the spline offset when the car is driving at high speed
+---@param carSpeedKmh any
+---@param rampSpeed any
+---@return unknown
+function CarOperations.limitSplitOffsetRampUpSpeed(carSpeedKmh, rampSpeed)
+  if carSpeedKmh > 300 then
+    return rampSpeed * 0.1
+  elseif carSpeedKmh > 200 then
+    return rampSpeed * 0.25
+  elseif carSpeedKmh > 100 then
+    return rampSpeed * 0.5
+  end
+  return rampSpeed
+end
+
 ---@param turningLights ac.TurningLights
 function CarOperations.toggleTurningLights(carIndex, car, turningLights)
     if ac.setTargetCar(carIndex) then

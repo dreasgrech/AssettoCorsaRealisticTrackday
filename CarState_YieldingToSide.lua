@@ -1,0 +1,87 @@
+local STATE = CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE
+
+-- ENTRY FUNCTION
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+      -- turn on turning lights
+      local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
+      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+end
+
+-- UPDATE FUNCTION
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+      local yieldSide = storage.yieldSide
+
+      local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
+      local sideSign = yieldingToLeft and -1 or 1
+      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
+
+      -- make sure there isn't any car on the side we're trying to yield to so we don't crash into it
+      local isSideSafeToYield = CarStateMachine.isSafeToDriveToTheSide(carIndex, yieldSide)
+      if not isSideSafeToYield then
+        -- reduce the car speed so that we can find a gap
+        CarOperations.setAIThrottleLimit(carIndex, 0.4)
+
+        return
+      end
+
+      CarManager.cars_reasonWhyCantYield[carIndex] = nil
+      CarOperations.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap
+
+      -- if we are driving at high speed, we need to increase the ramp speed slower so that our car doesn't jolt out of control
+      local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
+
+      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
+
+      -- set the spline offset on the ai car
+      local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
+      physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
+
+      -- keep the turning lights on while yielding
+      local turningLights = yieldingToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+
+      CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
+      CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
+
+      CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
+end
+
+-- TRANSITION FUNCTION
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+      -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
+      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
+      if isPlayerClearlyAheadOfAICar then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Player clearly ahead, so easing out yield'
+
+        -- go to trying to start easing out yield state
+        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
+        return CarStateMachine.CarStateType.EASING_OUT_YIELD
+      end
+
+      -- --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
+      -- local areWeFasterThanCarTryingToOvertake = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar)
+      -- if areWeFasterThanCarTryingToOvertake then
+        -- -- go to trying to start easing out yield state
+        -- CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
+        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
+        -- return
+      -- end
+
+      -- if we have reached the target offset, we can go to the next state
+      local yieldSide = storage.yieldSide
+      local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
+      local sideSign = yieldingToLeft and -1 or 1
+      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
+      local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
+      if arrivedAtTargetOffset then
+        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
+        return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
+      end
+end
+
+-- EXIT FUNCTION
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+
+end
