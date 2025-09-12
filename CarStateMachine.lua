@@ -15,27 +15,29 @@ local CarStateType = {
   ANOTHER_CAR_COLLIDED_INTO_ME = 512,
 }
 
-CarStateMachine.CarStateTypeStrings = {
-  [CarStateType.DRIVING_NORMALLY] = "DrivingNormally",
-  [CarStateType.YIELDING_TO_THE_SIDE] = "YieldingToTheSide",
-  [CarStateType.STAYING_ON_YIELDING_LANE] = "StayingOnYieldingLane",
-  [CarStateType.EASING_OUT_YIELD] = "EasingOutYield",
-  [CarStateType.WAITING_AFTER_ACCIDENT] = "WaitingAfterAccident",
-  [CarStateType.COLLIDED_WITH_TRACK] = "CollidedWithTrack",
-  [CarStateType.COLLIDED_WITH_CAR] = "CollidedWithCar",
-  [CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = "AnotherCarCollidedIntoMe",
-}
+CarStateMachine.CarStateTypeStrings = {}
+  -- [CarStateType.DRIVING_NORMALLY] = "DrivingNormally",
+  -- [CarStateType.YIELDING_TO_THE_SIDE] = "YieldingToTheSide",
+  -- [CarStateType.STAYING_ON_YIELDING_LANE] = "StayingOnYieldingLane",
+  -- [CarStateType.EASING_OUT_YIELD] = "EasingOutYield",
+  -- [CarStateType.WAITING_AFTER_ACCIDENT] = "WaitingAfterAccident",
+  -- [CarStateType.COLLIDED_WITH_TRACK] = "CollidedWithTrack",
+  -- [CarStateType.COLLIDED_WITH_CAR] = "CollidedWithCar",
+  -- [CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = "AnotherCarCollidedIntoMe",
+-- }
 
-local minimumTimesInState = {
-  -- [CarStateType.DRIVING_NORMALLY] = 0,
-  -- [CarStateType.YIELDING_TO_THE_SIDE] = 0,
-  [CarStateType.STAYING_ON_YIELDING_LANE] = 4, -- minimum time to stay on yielding lane before we can start easing out
-  -- [CarStateType.EASING_OUT_YIELD] = 0,
-  -- [CarStateType.WAITING_AFTER_ACCIDENT] = 3, -- wait at least this many seconds after an accident before trying to drive normally again
-  -- [CarStateType.COLLIDED_WITH_TRACK] = 3,
-  -- [CarStateType.COLLIDED_WITH_CAR] = 3,
-  -- [CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = 3,
-}
+CarStateMachine.states_minimumTimeInState = { }
+
+-- local minimumTimesInState = {
+  -- -- [CarStateType.DRIVING_NORMALLY] = 0,
+  -- -- [CarStateType.YIELDING_TO_THE_SIDE] = 0,
+  -- [CarStateType.STAYING_ON_YIELDING_LANE] = 4, -- minimum time to stay on yielding lane before we can start easing out
+  -- -- [CarStateType.EASING_OUT_YIELD] = 0,
+  -- -- [CarStateType.WAITING_AFTER_ACCIDENT] = 3, -- wait at least this many seconds after an accident before trying to drive normally again
+  -- -- [CarStateType.COLLIDED_WITH_TRACK] = 3,
+  -- -- [CarStateType.COLLIDED_WITH_CAR] = 3,
+  -- -- [CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = 3,
+-- }
 
 local cars_previousState = {}
 local cars_state = {}

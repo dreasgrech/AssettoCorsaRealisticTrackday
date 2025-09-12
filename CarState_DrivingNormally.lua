@@ -1,5 +1,8 @@
 local STATE = CarStateMachine.CarStateType.DRIVING_NORMALLY
 
+CarStateMachine.CarStateTypeStrings[STATE] = "DrivingNormally"
+CarStateMachine.states_minimumTimeInState[STATE] = 2
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
       CarManager.cars_yieldTime[carIndex] = 0

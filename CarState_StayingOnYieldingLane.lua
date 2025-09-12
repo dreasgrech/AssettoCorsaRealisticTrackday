@@ -1,5 +1,8 @@
 local STATE = CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
 
+CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnYieldingLane"
+CarStateMachine.states_minimumTimeInState[STATE] = 4
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
 

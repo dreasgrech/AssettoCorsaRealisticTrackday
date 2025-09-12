@@ -5,6 +5,9 @@ A template for creating new car states.
 
 local STATE = CarStateMachine.CarStateType.THIS_STATE
 
+CarStateMachine.CarStateTypeStrings[STATE] = "ThisState"
+CarStateMachine.states_minimumTimeInState[STATE] = 0
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
 

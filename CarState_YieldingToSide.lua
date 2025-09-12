@@ -1,5 +1,8 @@
 local STATE = CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE
 
+CarStateMachine.CarStateTypeStrings[STATE] = "YieldingToTheSide"
+CarStateMachine.states_minimumTimeInState[STATE] = 1
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
       -- turn on turning lights

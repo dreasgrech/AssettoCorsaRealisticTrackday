@@ -1,5 +1,8 @@
 local STATE = CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME
 
+CarStateMachine.CarStateTypeStrings[STATE] = "AnotherCarCollidedIntoMe"
+CarStateMachine.states_minimumTimeInState[STATE] = 10
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
     -- todo: look at ac.SetDriverMouthOpened() lmao
