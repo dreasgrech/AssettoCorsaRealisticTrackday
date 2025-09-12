@@ -107,6 +107,17 @@ function CarOperations.limitSplitOffsetRampUpSpeed(carSpeedKmh, rampSpeed)
   return rampSpeed
 end
 
+function CarOperations.stopCarAfterAccident(carIndex)
+    -- stop the car
+    CarOperations.setAIThrottleLimit(carIndex, 0)
+    CarOperations.setAITopSpeed(carIndex, 0)
+    CarOperations.setAIStopCounter(carIndex, 1)
+    CarOperations.setGentleStop(carIndex, true)
+    CarOperations.setAICaution(carIndex, 16) -- be very cautious
+
+    physics.preventAIFromRetiring(carIndex)
+end
+
 ---@param turningLights ac.TurningLights
 function CarOperations.toggleTurningLights(carIndex, car, turningLights)
     if ac.setTargetCar(carIndex) then

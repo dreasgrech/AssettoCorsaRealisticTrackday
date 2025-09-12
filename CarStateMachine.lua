@@ -81,17 +81,6 @@ CarStateMachine.getCurrentState = function(carIndex)
     return cars_state[carIndex]
 end
 
-local stopCarAfterAccident = function(carIndex)
-    -- stop the car
-    CarOperations.setAIThrottleLimit(carIndex, 0)
-    CarOperations.setAITopSpeed(carIndex, 0)
-    CarOperations.setAIStopCounter(carIndex, 1)
-    CarOperations.setGentleStop(carIndex, true)
-    CarOperations.setAICaution(carIndex, 16) -- be very cautious
-
-    physics.preventAIFromRetiring(carIndex)
-end
-
 ---comment
 ---@param carIndex number
 ---@param drivingToSide TraceTrackManager.TrackSide|integer
@@ -388,7 +377,6 @@ local carStateMachine = {
         return
       end
   end,
---]=====]
   [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = function (carIndex, dt, car, playerCar, storage)
     -- todo: look at ac.SetDriverMouthOpened() lmao
     -- todo: look at ac.setDriverDoorOpen(carIndex, isOpen, instant)
@@ -414,6 +402,7 @@ local carStateMachine = {
     end
 
   end,
+--]=====]
 }
 
 -- todo: wip
