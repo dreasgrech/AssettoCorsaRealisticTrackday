@@ -293,7 +293,6 @@ local carStateMachine = {
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
   end,
---]=====]
   [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = function (carIndex, dt, car, playerCar, storage)
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
@@ -336,6 +335,7 @@ local carStateMachine = {
         return
       end
   end,
+--]=====]
   [CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
       -- reset the yield time counter
       CarManager.cars_yieldTime[carIndex] = 0
@@ -497,6 +497,11 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     -- run the state loop
     -- Logger.log(string.format("CarStateMachine: Car %d updateFunction of state %s: ", carIndex, CarStateMachine.CarStateTypeStrings[state]) .. tostring(CarStateMachine.states_updateFunctions[carIndex]))
     CarStateMachine.states_updateFunctions[state](carIndex, dt, car, playerCar, storage)
+
+    -- TODO: Here we need to check for the minimum time that the car has to stay in the state before we can transition out
+    -- TODO: Here we need to check for the minimum time that the car has to stay in the state before we can transition out
+    -- TODO: Here we need to check for the minimum time that the car has to stay in the state before we can transition out
+    -- TODO: Here we need to check for the minimum time that the car has to stay in the state before we can transition out
 
     -- check if we need to transition out of the state by executing the state's transition check function
     local newState = CarStateMachine.states_transitionFunctions[state](carIndex, dt, car, playerCar, storage)
