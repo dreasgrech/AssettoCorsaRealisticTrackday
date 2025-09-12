@@ -54,7 +54,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY)
-        return CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY
+        return CarStateMachine.CarStateType.DRIVING_NORMALLY
       end
 end
 

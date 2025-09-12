@@ -5,12 +5,12 @@ local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
 -- [Flags]
 local CarStateType = {
-  TRYING_TO_START_DRIVING_NORMALLY = 0,
+  -- TRYING_TO_START_DRIVING_NORMALLY = 0,
   DRIVING_NORMALLY = 1,
-  TRYING_TO_START_YIELDING_TO_THE_SIDE = 2,
+  -- TRYING_TO_START_YIELDING_TO_THE_SIDE = 2,
   YIELDING_TO_THE_SIDE = 4, 
   STAYING_ON_YIELDING_LANE = 8,
-  TRYING_TO_START_EASING_OUT_YIELD = 16,
+  -- TRYING_TO_START_EASING_OUT_YIELD = 16,
   EASING_OUT_YIELD = 32,
   WAITING_AFTER_ACCIDENT = 64,
   COLLIDED_WITH_TRACK = 128,
@@ -19,12 +19,12 @@ local CarStateType = {
 }
 
 CarStateMachine.CarStateTypeStrings = {
-  [CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = "TryingToStartDrivingNormally",
+  -- [CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = "TryingToStartDrivingNormally",
   [CarStateType.DRIVING_NORMALLY] = "DrivingNormally",
-  [CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = "TryingToStartYieldingToTheSide",
+  -- [CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = "TryingToStartYieldingToTheSide",
   [CarStateType.YIELDING_TO_THE_SIDE] = "YieldingToTheSide",
   [CarStateType.STAYING_ON_YIELDING_LANE] = "StayingOnYieldingLane",
-  [CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = "TryingToStartEasingOutYield",
+  -- [CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = "TryingToStartEasingOutYield",
   [CarStateType.EASING_OUT_YIELD] = "EasingOutYield",
   [CarStateType.WAITING_AFTER_ACCIDENT] = "WaitingAfterAccident",
   [CarStateType.COLLIDED_WITH_TRACK] = "CollidedWithTrack",
@@ -410,7 +410,7 @@ local queuedCollidedWithTrackAccidents = QueueManager.createQueue()
 local queuedCollidedWithCarAccidents = QueueManager.createQueue()
 local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()
 
-Logger.log("[CarStateMachine] Initialized 3 queues: "..queuedCollidedWithTrackAccidents..", "..queuedCollidedWithCarAccidents..", "..queuedCarCollidedWithMeAccidents)
+-- Logger.log("[CarStateMachine] Initialized 3 queues: "..queuedCollidedWithTrackAccidents..", "..queuedCollidedWithCarAccidents..", "..queuedCarCollidedWithMeAccidents)
 
 local executeStateMachineUpdate_OLD = function(carIndex, state, dt, car, playerCar, storage)
     -- execute the state machine for this car
@@ -425,7 +425,7 @@ CarStateMachine.initializeCarInStateMachine = function(carIndex)
     -- Logger.log(string.format("CarStateMachine: initializeCarInStateMachine() car %d in state machine, setting initial state to DRIVING_NORMALLY", carIndex))
     -- queue up the DRIVING_NORMALLY state for the car so that it will take effect in the next frame
     queuedStatesToTransitionInto[carIndex] = CarStateMachine.CarStateType.DRIVING_NORMALLY
-    Logger.log(string.format("CarStateMachine: Car %d Just added normally state: %d", carIndex, queuedStatesToTransitionInto[carIndex]))
+    -- Logger.log(string.format("CarStateMachine: Car %d Just added normally state: %d", carIndex, queuedStatesToTransitionInto[carIndex]))
     --CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 end
 
@@ -465,7 +465,7 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     
     -- If there's a state we need to transition into, do it now
     if shouldTransitionIntoNewState then
-      Logger.log(string.format("CarStateMachine: Transitioning car %d into new state: %s", carIndex, CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame]))
+      -- Logger.log(string.format("CarStateMachine: Transitioning car %d into new state: %s", carIndex, CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame]))
       -- clear the queued transition since we're now taking care of it
       queuedStatesToTransitionInto[carIndex] = nil
 
@@ -494,17 +494,13 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
 
     -- check if we need to transition out of the state by executing the state's transition check function
     local newState = CarStateMachine.states_transitionFunctions[state](carIndex, dt, car, playerCar, storage)
-    local shouldTransitionToNextState = not newState == nil
+    -- local shouldTransitionToNextState = not (newState == nil)
+    local shouldTransitionToNextState = newState-- and newState > 0
     if shouldTransitionToNextState then
       -- execute the state's exit function
-      -- TODO: FOR NOW NOT TRANSITIONING OUT
-      -- TODO: FOR NOW NOT TRANSITIONING OUT
-      -- TODO: FOR NOW NOT TRANSITIONING OUT
-      -- TODO: FOR NOW NOT TRANSITIONING OUT
-      -- TODO: FOR NOW NOT TRANSITIONING OUT
-      -- TODO: FOR NOW NOT TRANSITIONING OUT
-      -- CarStateMachine.states_exitFunctions[state](carIndex, dt, car, playerCar, storage)
-      -- queuedStatesToTransitionInto[carIndex] = newState
+      CarStateMachine.states_exitFunctions[state](carIndex, dt, car, playerCar, storage)
+
+      queuedStatesToTransitionInto[carIndex] = newState
     end
 
     ------------------------------------------------------------------------
