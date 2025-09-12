@@ -8,11 +8,11 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, play
       -- reset the yield time counter
       CarManager.cars_yieldTime[carIndex] = 0
 
-      -- remove the ai car throttle limit since we will now start easing out the yield
+      -- remove the yielding car throttle limit since we will now start easing out the yield
       CarOperations.setAIThrottleLimit(carIndex, 1)
       CarOperations.removeAITopSpeed(carIndex)
 
-      -- reset the ai car caution back to normal
+      -- reset the yielding car caution back to normal
       CarOperations.setAICaution(carIndex, 1)
 
       -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
@@ -39,7 +39,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, pla
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
 
-      -- set the spline offset on the ai car
+      -- set the spline offset on the yielding car
       local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 

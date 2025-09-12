@@ -15,10 +15,10 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, play
     -- start driving normally
     -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 
-      -- reset the ai car caution back to normal
+      -- reset the yielding car caution back to normal
       CarOperations.setAICaution(carIndex, 1)
 
-      -- remove the ai car throttle limit since we will now be driving normally
+      -- remove the yielding car throttle limit since we will now be driving normally
       CarOperations.setAIThrottleLimit(carIndex, 1)
 end
 
@@ -77,16 +77,16 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
         -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Player does not have closing speed so not yielding'
       -- end
 
-      -- Check if the ai car is above the minimum speed
-      local isAICarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh
-      if not isAICarAboveMinSpeed then
-        CarManager.cars_reasonWhyCantYield[carIndex] = 'AI speed too low (corner/traffic) so not yielding'
+      -- Check if the yielding car is above the minimum speed
+      local isYieldingCarAboveMinSpeed = car.speedKmh >= storage.minAISpeed_kmh
+      if not isYieldingCarAboveMinSpeed then
+        CarManager.cars_reasonWhyCantYield[carIndex] = 'Yielding car speed too low (corner/traffic) so not yielding'
         return
       end
 
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
-      -- Since all the checks have passed, the ai car can now start to yield
+      -- Since all the checks have passed, the yielding car can now start to yield
       return CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE
 end
 
