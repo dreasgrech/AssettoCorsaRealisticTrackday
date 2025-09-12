@@ -69,7 +69,7 @@ CarOperations.resetPedalPosition = function(carIndex, carPedal)
   elseif carPedal == CarOperations.CarPedals.Brake then
     carInput.brake = 0
   elseif carPedal == CarOperations.CarPedals.Clutch then
-    carInput.clutch = 0
+    carInput.clutch = 1
   end
 end
 
