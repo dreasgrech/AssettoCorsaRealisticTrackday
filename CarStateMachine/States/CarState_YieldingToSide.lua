@@ -56,9 +56,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, pla
 end
 
 -- TRANSITION FUNCTION
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, overtakingCar, storage)
       -- If the yielding car is yielding and the overtaking car is now clearly ahead, we can ease out our yielding
-      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, playerCar, storage.clearAhead_meters)
+      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, overtakingCar, storage.clearAhead_meters)
       if isOvertakingCarClearlyAheadOfYieldingCar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car clearly ahead, so easing out yield'
 

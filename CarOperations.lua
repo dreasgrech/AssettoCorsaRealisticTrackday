@@ -134,6 +134,10 @@ function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCa
 end
 
 function CarOperations.isSecondCarClearlyAhead(firstCar, secondCar, meters)
+    if not secondCar then
+      return false
+    end
+
     local fwd = firstCar.look or firstCar.forward or vec3(0,0,1)
     local rel = MathHelpers.vsub(secondCar.position, firstCar.position)
     return MathHelpers.dot(fwd, rel) > meters

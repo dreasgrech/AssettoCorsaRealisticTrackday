@@ -65,6 +65,39 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   UIManager.drawMainWindowContent()
 end
 
+-- Returns car indices sorted by car.splinePosition (ascending)
+local function getCarIndicesSortedBySpline()
+  local ids = {}
+  for carIndex, car in ac.iterateCars() do
+    ids[#ids + 1] = carIndex
+  end
+  table.sort(ids, function(a, b)
+    local carA = ac.getCar(a)
+    local carB = ac.getCar(b)
+    if not carA then
+      return true
+    elseif not carB then
+      return false
+    end
+
+    return carA.splinePosition < carB.splinePosition
+  end)
+  return ids
+end
+
+local function getCarListSortedByTrackPosition()
+  local sortedCarsList = {}
+  for i, car in ac.iterateCars() do
+    sortedCarsList[#sortedCarsList + 1] = car
+  end
+
+  table.sort(sortedCarsList, function (carA, carB)
+    return carA.splinePosition > carB.splinePosition
+  end)
+
+  return sortedCarsList
+end
+
 ---
 -- wiki: called after a whole simulation update
 ---
@@ -99,25 +132,53 @@ function script.MANIFEST__UPDATE(dt)
     RaceFlagManager.removeRaceFlag()
   end
 
-  for carIndex = 1, sim.carsCount - 1 do
-    local car = ac.getCar(carIndex)
+  -- local carsString = ""
+  -- -- for carIndex, car in ac.iterateCars.ordered() do
+  -- for i, car in ac.iterateCars() do
+    -- carsString = carsString .. string.format("%d. #%d, ", i, car.index)
+  -- end
+  -- Logger.log(string.format("Cars: %s", carsString))
+
+  local sortedCars = getCarListSortedByTrackPosition()
+  -- local orderedCarsString = ""
+  -- for i = 1, #sortedCars do
+    -- local car = sortedCars[i]
+    -- if not car then break end
+    -- orderedCarsString = orderedCarsString .. string.format("%d. #%d, ", i, car.index)
+  -- end
+  -- Logger.log(string.format("Ordered: %s", orderedCarsString))
+
+  -- for carIndex, car in ac.iterateCars() do
+  -- for carIndex = 1, sim.carsCount - 1 do
+  -- for i = 1, sim.carsCount - 1 do
+  for i = 1, #sortedCars do
+    local car = sortedCars[i]
+    local carIndex = car.index
     if
-      car and
-      car.isAIControlled -- only run the yielding logic on ai cars
+      -- car and
+      carIndex ~= 0  -- skip the player car since it doesn't need to run the yielding logic
+      -- carIndex and
+      -- car.isAIControlled -- only run the yielding logic on ai cars
       -- and not CarManager.cars_evacuating[carIndex] -- don't run yielding logic if car is evacuating
     then
       CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
       -- execute the state machine for this car
-      CarStateMachine.update(carIndex, dt, car, playerCar, storage)
+      -- local carBehind = playerCar
+      local carBehind = sortedCars[i + 1]
+      CarStateMachine.update(carIndex, dt, car, carBehind, storage)
 
       local carState = CarStateMachine.getCurrentState(carIndex)
       local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
 
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
 
-      local distanceFromPlayerCarToAICar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
-      CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromPlayerCarToAICar
+      if carBehind then
+        local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
+        CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromOvertakingCarToYieldingCar
+      else
+        CarManager.cars_distanceFromPlayerToCar[carIndex] = 0
+      end
     end
   end
 end
@@ -153,7 +214,8 @@ function script.MANIFEST__TRANSPARENT(dt)
 
   if storage.debugDraw then
     local sim = ac.getSim()
-    for carIndex = 1, sim.carsCount - 1 do
+    -- for carIndex = 1, sim.carsCount - 1 do
+    for carIndex, car in ac.iterateCars() do
       local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
       if carAnchorPoints then
         -- CarOperations.drawSideAnchorPoints(carIndex)

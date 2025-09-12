@@ -62,8 +62,10 @@ UIManager.drawMainWindowContent = function()
   local player = ac.getCar(0)
   -- sort cars by distance to player for clearer list
   local order = {}
-  for i = 1, totalAI do
+  -- for i = 1, totalAI do
+  for i = 0, totalAI do
     local car = ac.getCar(i)
+  -- for i, car in ac.iterateCars() do
     if car and CarManager.cars_initialized[i] then
       local d = CarManager.cars_distanceFromPlayerToCar[i]
       if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, car.position)) end
@@ -107,6 +109,9 @@ UIManager.drawMainWindowContent = function()
       local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[i] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[i]) or 'no limit'
       local reason = CarManager.cars_reasonWhyCantYield[i] or ''
       local uiColor = CARSTATES_TO_UICOLOR[state] or ColorManager.RGBM_Colors.White
+      if car.index == 0 then
+        uiColor = ColorManager.RGBM_Colors.Violet
+      end
 
       local carInput = ac.overrideCarControls(i)
 
@@ -174,6 +179,7 @@ function UIManager.draw3DOverheadText()
   -- end
 
   for i = 1, (sim.carsCount or 0) - 1 do
+  -- for i, car in ac.iterateCars() do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
     -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
     local carState = CarStateMachine.getCurrentState(i)
