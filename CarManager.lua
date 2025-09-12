@@ -62,7 +62,8 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_hasTL[carIndex] = false
   CarManager.cars_evacuating[carIndex] = false
   CarManager.cars_anchorPoints[carIndex] = nil
-  CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
+  -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
+  CarStateMachine.initializeCarInStateMachine(carIndex)
 
   -- remove speed limitations which could have occured during an accident
   CarOperations.setAIThrottleLimit(carIndex, 1)

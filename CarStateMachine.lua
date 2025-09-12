@@ -444,6 +444,14 @@ end
 -- a dictionary which holds, if available, the state to transition to next in the upcoming frame
 local queuedStatesToTransitionInto = {}
 
+CarStateMachine.initializeCarInStateMachine = function(carIndex)
+    -- Logger.log(string.format("CarStateMachine: initializeCarInStateMachine() car %d in state machine, setting initial state to DRIVING_NORMALLY", carIndex))
+    -- queue up the DRIVING_NORMALLY state for the car so that it will take effect in the next frame
+    queuedStatesToTransitionInto[carIndex] = CarStateMachine.CarStateType.DRIVING_NORMALLY
+    Logger.log(string.format("CarStateMachine: Car %d Just added normally state: %d", carIndex, queuedStatesToTransitionInto[carIndex]))
+    --CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
+end
+
 CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     -- while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
         -- local carIndex = QueueManager.dequeue(queuedCollidedWithTrackAccidents)
@@ -474,10 +482,13 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     ------------------------------------------------------------------------
     -- check if there's a new state we need to transition into
     local newStateToTransitionIntoThisFrame = queuedStatesToTransitionInto[carIndex]
-    local shouldTransitionIntoNewState = not newStateToTransitionIntoThisFrame == nil
+    -- local shouldTransitionIntoNewState = not (newStateToTransitionIntoThisFrame == nil)
+    local shouldTransitionIntoNewState = newStateToTransitionIntoThisFrame and newStateToTransitionIntoThisFrame > 0
+    -- Logger.log(string.format("CarStateMachine: Car %d Checking queued: %d, shouldTransition: %s", carIndex, queuedStatesToTransitionInto[carIndex], tostring(shouldTransitionIntoNewState)))
     
     -- If there's a state we need to transition into, do it now
     if shouldTransitionIntoNewState then
+      Logger.log(string.format("CarStateMachine: Transitioning car %d into new state: %s", carIndex, CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame]))
       -- clear the queued transition since we're now taking care of it
       queuedStatesToTransitionInto[carIndex] = nil
 
@@ -490,7 +501,13 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
 
     local state = CarStateMachine.getCurrentState(carIndex)
 
+    if state == nil then
+      --Logger.error(string.format("CarStateMachine: #%d stat is nil!", carIndex))
+      return
+    end
+
     -- run the state loop
+    -- Logger.log(string.format("CarStateMachine: Car %d updateFunction of state %s: ", carIndex, CarStateMachine.CarStateTypeStrings[state]) .. tostring(CarStateMachine.states_updateFunctions[carIndex]))
     CarStateMachine.states_updateFunctions[state](carIndex, dt, car, playerCar, storage)
 
     -- check if we need to transition out of the state by executing the state's transition check function
@@ -498,19 +515,26 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     local shouldTransitionToNextState = not newState == nil
     if shouldTransitionToNextState then
       -- execute the state's exit function
-      CarStateMachine.states_exitFunctions[state](carIndex, dt, car, playerCar, storage)
-      queuedStatesToTransitionInto[carIndex] = newState
+      -- TODO: FOR NOW NOT TRANSITIONING OUT
+      -- TODO: FOR NOW NOT TRANSITIONING OUT
+      -- TODO: FOR NOW NOT TRANSITIONING OUT
+      -- TODO: FOR NOW NOT TRANSITIONING OUT
+      -- TODO: FOR NOW NOT TRANSITIONING OUT
+      -- TODO: FOR NOW NOT TRANSITIONING OUT
+      -- CarStateMachine.states_exitFunctions[state](carIndex, dt, car, playerCar, storage)
+      -- queuedStatesToTransitionInto[carIndex] = newState
     end
 
     ------------------------------------------------------------------------
     -- END: NEW STATE MACHINE CODE
     ------------------------------------------------------------------------
 
-
+--[=====[ 
     -- execute the state machine for this car
     -- if LOG_CAR_STATEMACHINE_IN_CSP_LOG then Logger.log(string.format("Car %d: In state: %s", carIndex, CarStateMachine.CarStateTypeStrings[state])) end
     -- carStateMachine[state](carIndex, dt, car, playerCar, storage)
     executeStateMachineUpdate_OLD(carIndex, state, dt, car, playerCar, storage)
+--]=====]
 
     timeInStates[carIndex] = timeInStates[carIndex] + dt
 end
