@@ -44,28 +44,41 @@ CarOperations.setAIThrottleLimit = function(carIndex, limit)
     CarManager.cars_throttleLimit[carIndex] = limit
 end
 
+---Changes AI caution, altering the distance it keeps from the car in front of it. Default value: `1`. Experimental.
+---@param carIndex integer @0-based car index.
+---@param caution number @AI caution from 0 to 16.
 CarOperations.setAICaution = function(carIndex, caution)
     physics.setAICaution(carIndex, caution)
     CarManager.cars_aiCaution[carIndex] = caution
 end
 
-CarOperations.setAITopSpeed = function(carIndex, topSpeed)
-    physics.setAITopSpeed(carIndex, topSpeed)
-    CarManager.cars_aiTopSpeed[carIndex] = topSpeed
+---Limits AI top speed. Use `math.huge` (or just 1e9) to remove limitation.
+---@param carIndex integer @0-based car index.
+---@param limit number @Speed in km/h.
+CarOperations.setAITopSpeed = function(carIndex, limit)
+    physics.setAITopSpeed(carIndex, limit)
+    CarManager.cars_aiTopSpeed[carIndex] = limit
 end
 
 CarOperations.removeAITopSpeed = function(carIndex)
   CarOperations.setAITopSpeed(carIndex, math.huge)
 end
 
-CarOperations.setAIStopCounter = function(carIndex, stopCounter)
-    physics.setAIStopCounter(carIndex, stopCounter)
-    CarManager.cars_aiStopCounter[carIndex] = stopCounter
+---Forces AI to brake for a specified amount of time. Originally, this mechanism is used to get AIs to brake after an incident.
+---Subsequent calls overwrite current waiting, pass 0 to get cars to move.
+---@param carIndex integer @0-based car index.
+---@param time number @Time in seconds.
+CarOperations.setAIStopCounter = function(carIndex, time)
+    physics.setAIStopCounter(carIndex, time)
+    CarManager.cars_aiStopCounter[carIndex] = time
 end
 
-CarOperations.setGentleStop = function(carIndex, gentleStop)
-    physics.setGentleStop(carIndex, gentleStop)
-    CarManager.cars_gentleStop[carIndex] = gentleStop
+---Activates or deactivates gentle stopping.
+---@param carIndex integer @0-based car index.
+---@param stop boolean? @Default value: `true`.
+CarOperations.setGentleStop = function(carIndex, stop)
+    physics.setGentleStop(carIndex, stop)
+    CarManager.cars_gentleStop[carIndex] = stop
 end
 
 function CarOperations.isFirstCarBehindSecondCar(firstCar, secondCar)
