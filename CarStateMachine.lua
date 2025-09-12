@@ -154,6 +154,7 @@ CarStateMachine.states_transitionFunctions = {}
 CarStateMachine.states_exitFunctions = {}
 
 local carStateMachine = {
+--[=====[ 
   [CarStateMachine.CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = function (carIndex, dt, car, playerCar, storage)
 
       CarManager.cars_yieldTime[carIndex] = 0
@@ -234,6 +235,7 @@ local carStateMachine = {
       -- Since all the checks have passed, the ai car can now start to yield
       CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE)
   end,
+--]=====]
   [CarStateMachine.CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = function (carIndex, dt, car, playerCar, storage)
       -- turn on turning lights
       local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
@@ -502,7 +504,7 @@ CarStateMachine.update = function(carIndex, dt, car, playerCar, storage)
     local state = CarStateMachine.getCurrentState(carIndex)
 
     if state == nil then
-      --Logger.error(string.format("CarStateMachine: #%d stat is nil!", carIndex))
+      Logger.error(string.format("CarStateMachine: #%d stat is nil!", carIndex))
       return
     end
 
