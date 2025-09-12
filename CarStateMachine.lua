@@ -32,6 +32,20 @@ CarStateMachine.CarStateTypeStrings = {
   [CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = "AnotherCarCollidedIntoMe",
 }
 
+local minimumTimesInState = {
+  -- [CarStateType.TRYING_TO_START_DRIVING_NORMALLY] = 0,
+  -- [CarStateType.DRIVING_NORMALLY] = 0,
+  -- [CarStateType.TRYING_TO_START_YIELDING_TO_THE_SIDE] = 0,
+  -- [CarStateType.YIELDING_TO_THE_SIDE] = 0,
+  [CarStateType.STAYING_ON_YIELDING_LANE] = 4, -- minimum time to stay on yielding lane before we can start easing out
+  -- [CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = 0,
+  -- [CarStateType.EASING_OUT_YIELD] = 0,
+  -- [CarStateType.WAITING_AFTER_ACCIDENT] = 3, -- wait at least this many seconds after an accident before trying to drive normally again
+  -- [CarStateType.COLLIDED_WITH_TRACK] = 3,
+  -- [CarStateType.COLLIDED_WITH_CAR] = 3,
+  -- [CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = 3,
+}
+
 local cars_previousState = {}
 local cars_state = {}
 
@@ -43,10 +57,10 @@ CarStateMachine.changeState = function(carIndex, newState)
     -- save a reference to the current state before changing it
     local currentState = CarStateMachine.getCurrentState(carIndex)
     local isFirstState = currentState == nil -- is this the first state we're setting for this car?
-    if not isFirstState and currentState == newState then
-        Logger.warn(string.format("Car %d: Tried to change to the same state: %s", carIndex, CarStateMachine.CarStateTypeStrings[newState]))
-        return
-    end
+    -- if not isFirstState and currentState == newState then
+        -- Logger.warn(string.format("Car %d: Tried to change to the same state: %s", carIndex, CarStateMachine.CarStateTypeStrings[newState]))
+        -- return
+    -- end
 
     if isFirstState then
       currentState = newState
@@ -230,14 +244,14 @@ local carStateMachine = {
         return
       end
 
-      --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
-      local areWeFasterThanCarTryingToOvertake = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar)
-      if areWeFasterThanCarTryingToOvertake then
-        -- go to trying to start easing out yield state
-        CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
-        CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
-        return
-      end
+      -- --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
+      -- local areWeFasterThanCarTryingToOvertake = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, playerCar)
+      -- if areWeFasterThanCarTryingToOvertake then
+        -- -- go to trying to start easing out yield state
+        -- CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'
+        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
+        -- return
+      -- end
 
       local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
       local sideSign = yieldingToLeft and -1 or 1
@@ -284,6 +298,20 @@ local carStateMachine = {
   [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = function (carIndex, dt, car, playerCar, storage)
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
+      CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
+
+      -- make the ai car leave more space in between the car in front while driving on the yielding lane
+      CarOperations.setAICaution(carIndex, 2)
+
+      -- limit the ai car throttle while driving on the yielding lane
+      CarOperations.setAIThrottleLimit(carIndex, 0.5)
+      CarOperations.setAITopSpeed(carIndex, playerCar.speedKmh*0.1) -- limit the ai car top speed to half the player car speed while driving on the yielding lane
+
+      -- make sure we spend enough time in this state before opening the possibility to ease out
+      if timeInStates[carIndex] < minimumTimesInState[CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] then
+        return
+      end
+
       -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
       local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
       if isPlayerClearlyAheadOfAICar then
@@ -308,15 +336,6 @@ local carStateMachine = {
         CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD)
         return
       end
-
-      -- make the ai car leave more space in between the care in front while driving on the yielding lane
-      CarOperations.setAICaution(carIndex, 2)
-
-      -- limit the ai car throttle while driving on the yielding lane
-      CarOperations.setAIThrottleLimit(carIndex, 0.5)
-      CarOperations.setAITopSpeed(carIndex, playerCar.speedKmh*0.1) -- limit the ai car top speed to half the player car speed while driving on the yielding lane
-
-      CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
   end,
   [CarStateMachine.CarStateType.TRYING_TO_START_EASING_OUT_YIELD] = function (carIndex, dt, car, playerCar, storage)
       -- reset the yield time counter
