@@ -133,15 +133,15 @@ function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCa
   return firstCar.speedKmh > secondCar.speedKmh + firstCarSpeedLeeway
 end
 
-function CarOperations.playerIsClearlyAhead(aiCar, playerCar, meters)
-    local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
-    local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
+function CarOperations.isSecondCarClearlyAhead(firstCar, secondCar, meters)
+    local fwd = firstCar.look or firstCar.forward or vec3(0,0,1)
+    local rel = MathHelpers.vsub(secondCar.position, firstCar.position)
     return MathHelpers.dot(fwd, rel) > meters
 end
 
-function CarOperations.playerIsClearlyBehind(aiCar, playerCar, meters)
-    local fwd = aiCar.look or aiCar.forward or vec3(0,0,1)
-    local rel = MathHelpers.vsub(playerCar.position, aiCar.position)
+function CarOperations.isSecondCarClearlyBehindFirstCar(firstCar, secondCar, meters)
+    local fwd = firstCar.look or firstCar.forward or vec3(0,0,1)
+    local rel = MathHelpers.vsub(secondCar.position, firstCar.position)
     return MathHelpers.dot(fwd, rel) < -meters
 end
 

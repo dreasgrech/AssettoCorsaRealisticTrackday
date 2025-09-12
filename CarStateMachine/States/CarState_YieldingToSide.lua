@@ -58,7 +58,7 @@ end
 -- TRANSITION FUNCTION
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
       -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
-      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
+      local isPlayerClearlyAheadOfAICar = CarOperations.isSecondCarClearlyAhead(car, playerCar, storage.clearAhead_meters)
       if isPlayerClearlyAheadOfAICar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Player clearly ahead, so easing out yield'
 

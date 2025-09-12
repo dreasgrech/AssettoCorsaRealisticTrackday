@@ -32,14 +32,14 @@ end
 -- TRANSITION FUNCTION
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, playerCar, storage)
       -- If the ai car is yielding and the player car is now clearly ahead, we can ease out our yielding
-      local isPlayerClearlyAheadOfAICar = CarOperations.playerIsClearlyAhead(car, playerCar, storage.clearAhead_meters)
+      local isPlayerClearlyAheadOfAICar = CarOperations.isSecondCarClearlyAhead(car, playerCar, storage.clearAhead_meters)
       if isPlayerClearlyAheadOfAICar then
         -- go to trying to start easing out yield state
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       -- if the player is far enough back, then we can begin easing out
-      local isPlayerClearlyBehindAICar = CarOperations.playerIsClearlyBehind(car, playerCar, storage.detectCarBehind_meters)
+      local isPlayerClearlyBehindAICar = CarOperations.isSecondCarClearlyBehindFirstCar(car, playerCar, storage.detectCarBehind_meters)
       if isPlayerClearlyBehindAICar then
         -- go to trying to start easing out yield state
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
