@@ -69,7 +69,7 @@ CarOperations.resetPedalPosition = function(carIndex, carPedal)
   elseif carPedal == CarOperations.CarPedals.Brake then
     carInput.brake = 0
   elseif carPedal == CarOperations.CarPedals.Clutch then
-    carInput.clutch = 1
+    carInput.clutch = 1 -- For clutch: 1 is for clutch pedal fully depressed, 0 for pressed
   end
 end
 
