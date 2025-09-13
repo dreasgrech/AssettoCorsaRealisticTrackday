@@ -6,13 +6,13 @@ CarStateMachine.states_minimumTimeInState[STATE] = 2
 local OVERTAKING_CAR_FASTER_LEEWAY = 20 -- the leeway given to the yielding car to be considered "faster" than the car trying to overtake it.  This means that the yielding car needs to be at least this much faster than the car behind it to consider it faster
 
 -- ENTRY FUNCTION
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
 
 end
 
 -- UPDATE FUNCTION
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-      local carBehind = sortedCarList[sortedCarListIndex + 1]
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       if not carBehind then
         return
       end
@@ -35,9 +35,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 end
 
 -- TRANSITION FUNCTION
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-      local car = sortedCarList[sortedCarListIndex]
-      local carBehind = sortedCarList[sortedCarListIndex + 1]
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      local car = sortedCarsList[sortedCarsListIndex]
+      local carBehind = sortedCarsList[sortedCarsListIndex + 1]
 
       -- if we don't have an overtaking car anymore, we can ease out our yielding
       if not carBehind then

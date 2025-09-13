@@ -66,6 +66,14 @@ end
 
 -- TRANSITION FUNCTION
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+
+      -- if there's a car behind us, check if we should start yielding to it
+      local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+      if newStateDueToCarBehind then
+        return newStateDueToCarBehind
+      end
+
+      -- if we're back to the center, return to normal driving
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
