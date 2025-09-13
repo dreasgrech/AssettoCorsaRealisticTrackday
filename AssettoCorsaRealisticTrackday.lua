@@ -122,8 +122,6 @@ function script.MANIFEST__UPDATE(dt)
   local playerCar = ac.getCar(0)
   -- if not playerCar then return end
 
-  -- TODO: ac.iterateCars.ordered could be useful when we start applying the overtaking/yielding logic to ai cars too instead of just the local player
-
   -- check if the player is coming up to an accident so we can set a caution flag
   local isPlayerComingUpToAccident = AccidentManager.isCarComingUpToAccident(playerCar)
   if isPlayerComingUpToAccident then
@@ -159,7 +157,6 @@ function script.MANIFEST__UPDATE(dt)
       CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
       -- execute the state machine for this car
-      local carBehind = sortedCars[i + 1]
       CarStateMachine.update(carIndex, dt, sortedCars, i, storage)
 
       local carState = CarStateMachine.getCurrentState(carIndex)
@@ -167,12 +164,14 @@ function script.MANIFEST__UPDATE(dt)
 
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
 
-      if carBehind then
-        local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
+      -- local carBehind = sortedCars[i + 1]
+      -- if carBehind then
+        -- local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
+        local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
         CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromOvertakingCarToYieldingCar
-      else
-        CarManager.cars_distanceFromPlayerToCar[carIndex] = 0
-      end
+      -- else
+        -- CarManager.cars_distanceFromPlayerToCar[carIndex] = 0
+      -- end
     end
   end
 end
