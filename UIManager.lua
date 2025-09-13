@@ -22,7 +22,7 @@ local carTableColumns_tooltip = { }
 -- this table is only used to set the data to the actual data holders i.e. the tables named carTableColumns_xxx
 local carTableColumns_dataBeforeDoD = {
   { name = '#', orderDirection = 0, width = 40, tooltip='Car ID' },
-  { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
+  -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
   { name = 'Velocity (km/h)', orderDirection = 0, width = 105, tooltip='Current velocity' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
@@ -64,9 +64,11 @@ UIManager.drawMainWindowContent = function()
   ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
   -- todo: remove this ai slop:
-  ui.text('Cars:')
+  -- ui.text('Cars:')
   local player = ac.getCar(0)
+
   -- sort cars by distance to player for clearer list
+  --[=====[
   local order = {}
   -- for i = 1, totalAI do
   for i = 0, totalAI do
@@ -79,51 +81,57 @@ UIManager.drawMainWindowContent = function()
     end
   end
   table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
+  --]=====]
 
   -- Draw as a table: columns with headings
   -- draw the column headers including setting the width
-  local COLS = #carTableColumns_name
-  ui.columns(COLS, true)
-  for col = 1, COLS do
+  local totalColumns = #carTableColumns_name
+  ui.columns(totalColumns, true)
+  for col = 1, totalColumns do
     ui.columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
     ui.setColumnWidth(col-1, carTableColumns_width[col])
   end
 
-  for n = 1, #order do
-    local i = order[n].i
-    local car = ac.getCar(i)
-    if car and CarManager.cars_initialized[i] then
-      local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[i]
-      local state = CarStateMachine.getCurrentState(i)
-      local throttleLimitString = (not (CarManager.cars_throttleLimit[i] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[i]) or 'no limit'
-      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[i] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[i]) or 'no limit'
-      local reason = CarManager.cars_reasonWhyCantYield[i] or ''
+  local sortedCarsList = CarManager.currentSortedCarsList
+
+  -- for n = 1, #order do
+  for n = 1, #sortedCarsList do
+    -- local carIndex = order[n].i
+    -- local car = ac.getCar(carIndex)
+    local car = sortedCarsList[n]
+    local carIndex = car.index
+    if car and CarManager.cars_initialized[carIndex] then
+      -- local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[carIndex]
+      local state = CarStateMachine.getCurrentState(carIndex)
+      local throttleLimitString = (not (CarManager.cars_throttleLimit[carIndex] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[carIndex]) or 'no limit'
+      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[carIndex] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[carIndex]) or 'no limit'
+      local reason = CarManager.cars_reasonWhyCantYield[carIndex] or ''
       local uiColor = CARSTATES_TO_UICOLOR[state] or ColorManager.RGBM_Colors.White
       if car.index == 0 then
         uiColor = ColorManager.RGBM_Colors.Violet
       end
 
-      local carInput = ac.overrideCarControls(i)
-      local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[i]
+      local carInput = ac.overrideCarControls(carIndex)
+      local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
       local currentlyOvertaking = currentlyOvertakingCarIndex
 
       -- Row cells
-      ui.textColored(string.format("#%02d", i), uiColor); ui.nextColumn()
+      ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
-      ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
+      -- ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", CarManager.cars_currentSplineOffset[i] or 0), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[i] or 0), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", CarManager.cars_currentSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.1f|%.1f|%.1f", carInput.clutch, carInput.brake, carInput.gas), uiColor); ui.nextColumn()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
-      ui.textColored(tostring(CarManager.cars_aiCaution[i] or 0), uiColor); ui.nextColumn()
+      ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
-      ui.textColored(tostring(CarManager.cars_aiStopCounter[i] or 0), uiColor); ui.nextColumn()
-      ui.textColored(tostring(CarManager.cars_gentleStop[i]), uiColor); ui.nextColumn()
+      ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
+      ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[state] or tostring(state), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.1fs", CarStateMachine.timeInStates[i]), uiColor); ui.nextColumn()
-      if CarManager.cars_currentlyYielding[i] then
-        ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
+      ui.textColored(string.format("%.1fs", CarStateMachine.timeInStates[carIndex]), uiColor); ui.nextColumn()
+      if CarManager.cars_currentlyYielding[carIndex] then
+        ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[carIndex] or 0), uiColor)
       else
         ui.textColored("no", uiColor)
       end

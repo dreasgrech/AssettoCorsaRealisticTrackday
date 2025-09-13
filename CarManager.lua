@@ -37,6 +37,8 @@ CarManager.cars_currentlyOvertakingCarIndex = {}
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
 
+CarManager.currentSortedCarsList = {}
+
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
 
@@ -110,6 +112,20 @@ ac.onCarJumped(-1, function(carIndex)
   -- ac.log(("Car #%d (%s) jumped/reset at spline=%.3f"):format(carIndex, car.name, car.splinePosition))
   setInitializedDefaults(carIndex) -- reset state on jump/reset
 end)
+
+
+function CarManager.getCarListSortedByTrackPosition()
+  local sortedCarsList = {}
+  for i, car in ac.iterateCars() do
+    sortedCarsList[#sortedCarsList + 1] = car
+  end
+
+  table.sort(sortedCarsList, function (carA, carB)
+    return carA.splinePosition > carB.splinePosition
+  end)
+
+  return sortedCarsList
+end
 
 -- -- Utility: compute world right-vector at a given progress on the AI spline
 -- local function trackRightAt(progress)

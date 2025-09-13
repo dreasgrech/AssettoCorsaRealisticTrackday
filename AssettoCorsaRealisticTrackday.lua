@@ -88,19 +88,6 @@ local function getCarIndicesSortedBySpline()
   return ids
 end
 
-local function getCarListSortedByTrackPosition()
-  local sortedCarsList = {}
-  for i, car in ac.iterateCars() do
-    sortedCarsList[#sortedCarsList + 1] = car
-  end
-
-  table.sort(sortedCarsList, function (carA, carB)
-    return carA.splinePosition > carB.splinePosition
-  end)
-
-  return sortedCarsList
-end
-
 ---
 -- wiki: called after a whole simulation update
 ---
@@ -120,10 +107,8 @@ function script.MANIFEST__UPDATE(dt)
   local sim = ac.getSim()
   if sim.isPaused then return end
 
-  -- doCarYieldingLogic_old(dt)
   local storage = StorageManager.getStorage()
   local playerCar = ac.getCar(0)
-  -- if not playerCar then return end
 
   -- check if the player is coming up to an accident so we can set a caution flag
   local isPlayerComingUpToAccident = AccidentManager.isCarComingUpToAccident(playerCar)
@@ -133,14 +118,10 @@ function script.MANIFEST__UPDATE(dt)
     RaceFlagManager.removeRaceFlag()
   end
 
-  -- local carsString = ""
-  -- -- for carIndex, car in ac.iterateCars.ordered() do
-  -- for i, car in ac.iterateCars() do
-    -- carsString = carsString .. string.format("%d. #%d, ", i, car.index)
-  -- end
-  -- Logger.log(string.format("Cars: %s", carsString))
+  local sortedCars = CarManager.getCarListSortedByTrackPosition()
+  -- save a reference to the current sorted cars list for other parts of the app to use
+  CarManager.currentSortedCarsList = sortedCars
 
-  local sortedCars = getCarListSortedByTrackPosition()
   -- local orderedCarsString = ""
   -- for i = 1, #sortedCars do
     -- local car = sortedCars[i]
@@ -165,8 +146,8 @@ function script.MANIFEST__UPDATE(dt)
       CarStateMachine.update(carIndex, dt, sortedCars, i, storage)
 
       local carState = CarStateMachine.getCurrentState(carIndex)
-      local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
 
+      local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
 
       -- local carBehind = sortedCars[i + 1]
