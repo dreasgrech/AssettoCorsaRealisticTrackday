@@ -190,7 +190,6 @@ function CarOperations.toggleTurningLights(carIndex, car, turningLights)
 end
 
 -- Returns the six lateral anchor points plus some helpers
----@param car ac.StateCar
 ---@return table
 -- CarOperations.getSideAnchorPoints = function(carIndex, car)
 -- CarOperations.getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)
