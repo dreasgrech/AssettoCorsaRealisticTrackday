@@ -16,6 +16,7 @@ CarManager.cars_distanceFromPlayerToCar = {}
 CarManager.cars_maxSideMargin = {}
 CarManager.cars_currentNormalizedTrackProgress = {}
 CarManager.cars_reasonWhyCantYield = {}
+CarManager.cars_reasonWhyCantOvertake = {}
 CarManager.cars_yieldTime = {}
 CarManager.cars_currentTurningLights = {}
 CarManager.cars_isSideBlocked = {}
@@ -31,6 +32,7 @@ CarManager.cars_aiCaution = {}
 CarManager.cars_aiTopSpeed = {}
 CarManager.cars_aiStopCounter = {}
 CarManager.cars_gentleStop = {}
+CarManager.cars_currentlyOvertakingCarIndex = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -52,6 +54,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_maxSideMargin[carIndex] = 0
   CarManager.cars_currentNormalizedTrackProgress[carIndex] = -1
   CarManager.cars_reasonWhyCantYield[carIndex] = ''
+  CarManager.cars_reasonWhyCantOvertake[carIndex] = ''
   CarManager.cars_yieldTime[carIndex] = 0
   CarManager.cars_currentTurningLights[carIndex] = nil
   CarManager.cars_isSideBlocked[carIndex] = false
@@ -62,6 +65,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_hasTL[carIndex] = false
   CarManager.cars_evacuating[carIndex] = false
   CarManager.cars_anchorPoints[carIndex] = nil
+  CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
   -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
   CarStateMachine.initializeCarInStateMachine(carIndex)
 

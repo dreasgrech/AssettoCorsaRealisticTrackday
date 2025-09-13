@@ -189,6 +189,41 @@ function CarOperations.toggleTurningLights(carIndex, car, turningLights)
     CarManager.cars_hasTL[carIndex] = car.hasTurningLights
 end
 
+function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMaxOffset,rampSpeed_mps, overrideAiAwareness)
+    -- make sure there isn't any car on the side we're trying to drive to so we don't crash into it
+    local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
+    if not isSideSafeToDrive then
+        -- return false since we can't drive to the side safely
+        return false
+    end
+
+      CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+
+      CarOperations.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap
+
+      -- if we are driving at high speed, we need to increase the ramp speed slower so that our car doesn't jolt out of control
+      -- local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
+      local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, rampSpeed_mps)
+
+      local yieldingToLeft = side == RaceTrackManager.TrackSide.LEFT
+      local sideSign = yieldingToLeft and -1 or 1
+      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
+      local targetSplineOffset = driveToSideMaxOffset * sideSign
+      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
+
+      -- set the spline offset on the ai car
+      -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
+      physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
+
+      -- keep the turning lights on while yielding
+      local turningLights = yieldingToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+
+      CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
+      CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
+end
+
 -- Returns the six lateral anchor points plus some helpers
 ---@return table
 -- CarOperations.getSideAnchorPoints = function(carIndex, car)

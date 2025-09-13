@@ -1,11 +1,6 @@
---[=====[ 
-A template for creating new car states. 
+local STATE = CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
 
-----------------------------------------------------------------
-
-local STATE = CarStateMachine.CarStateType.THIS_STATE
-
-CarStateMachine.CarStateTypeStrings[STATE] = "ThisState"
+CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnOvertakingLane"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 -- ENTRY FUNCTION
@@ -27,4 +22,3 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
 
 end
---]=====]

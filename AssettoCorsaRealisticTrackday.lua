@@ -18,6 +18,7 @@ CarState_EasingOutYield = require("CarStateMachine.States.CarState_EasingOutYiel
 CarState_CollidedWithCar = require("CarStateMachine.States.CarState_CollidedWithCar")
 CarState_CollidedWithTrack = require("CarStateMachine.States.CarState_CollidedWithTrack")
 CarState_AnotherCarCollidedIntoMe = require("CarStateMachine.States.CarState_AnotherCarCollidedIntoMe")
+CarState_DrivingToSideToOvertake = require("CarStateMachine.States.CarState_DrivingToSideToOvertake")
 
 AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
