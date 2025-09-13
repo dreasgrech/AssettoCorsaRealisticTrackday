@@ -32,8 +32,9 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
   { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
-  { name = 'State', orderDirection = 0, width = 150, tooltip='Current state' },
+  { name = 'State', orderDirection = 0, width = 170, tooltip='Current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
+  { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
   { name = 'Reason', orderDirection = 0, width = 800, tooltip='Reason for current state' },
 }
 
@@ -102,6 +103,8 @@ UIManager.drawMainWindowContent = function()
       end
 
       local carInput = ac.overrideCarControls(i)
+      local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[i]
+      local currentlyOvertaking = currentlyOvertakingCarIndex
 
       -- Row cells
       ui.textColored(string.format("#%02d", i), uiColor); ui.nextColumn()
@@ -119,6 +122,13 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(CarStateMachine.CarStateTypeStrings[state] or tostring(state), uiColor); ui.nextColumn()
       if CarManager.cars_currentlyYielding[i] then
         ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
+      else
+        ui.textColored("no", uiColor)
+      end
+      ui.nextColumn()
+      if currentlyOvertaking then
+        -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
+        ui.textColored(string.format("yes"), uiColor)
       else
         ui.textColored("no", uiColor)
       end
