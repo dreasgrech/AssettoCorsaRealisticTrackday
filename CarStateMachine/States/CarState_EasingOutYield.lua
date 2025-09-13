@@ -5,21 +5,27 @@ CarStateMachine.states_minimumTimeInState[STATE] = 1
 
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
-      local car = sortedCarsList[sortedCarListIndex]
+  -- make sure the state before us has saved the carIndex of the car we're yielding to
+  local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
+  if not currentlyYieldingToCarIndex then
+    Logger.error(string.format('Car %d in state EasingOutYield but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
+  end
 
-      -- reset the yield time counter
-      CarManager.cars_yieldTime[carIndex] = 0
+  local car = sortedCarsList[sortedCarListIndex]
 
-      -- remove the yielding car throttle limit since we will now start easing out the yield
-      CarOperations.setAIThrottleLimit(carIndex, 1)
-      CarOperations.removeAITopSpeed(carIndex)
+  -- reset the yield time counter
+  CarManager.cars_yieldTime[carIndex] = 0
 
-      -- reset the yielding car caution back to normal
-      CarOperations.setAICaution(carIndex, 1)
+  -- remove the yielding car throttle limit since we will now start easing out the yield
+  CarOperations.setAIThrottleLimit(carIndex, 1)
+  CarOperations.removeAITopSpeed(carIndex)
 
-      -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
-      local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
-      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+  -- reset the yielding car caution back to normal
+  CarOperations.setAICaution(carIndex, 1)
+
+  -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
+  local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
+  CarOperations.toggleTurningLights(carIndex, car, turningLights)
 end
 
 -- UPDATE FUNCTION

@@ -5,11 +5,17 @@ CarStateMachine.states_minimumTimeInState[STATE] = 1
 
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-      local car = sortedCarList[sortedCarListIndex]
+  -- make sure the state before us has saved the carIndex of the car we're yielding to
+  local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
+  if not currentlyYieldingToCarIndex then
+    Logger.error(string.format('Car %d in state EasingInYield but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
+  end
 
-      -- turn on turning lights
-      local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
-      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+  local car = sortedCarList[sortedCarListIndex]
+
+  -- turn on turning lights
+  local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
+  CarOperations.toggleTurningLights(carIndex, car, turningLights)
 end
 
 -- UPDATE FUNCTION
@@ -76,10 +82,12 @@ end
 -- TRANSITION FUNCTION
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       local car = sortedCarList[sortedCarListIndex]
-      local carBehind = sortedCarList[sortedCarListIndex + 1]
+      -- local carBehind = sortedCarList[sortedCarListIndex + 1]
+      local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
+      local carWeAreYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
 
-      -- If the yielding car is yielding and the overtaking car is now clearly ahead, we can ease out our yielding
-      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
+      -- if the car we're yielding to is now clearly ahead of us, we can ease out our yielding
+      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, carWeAreYieldingTo, storage.clearAhead_meters)
       if isOvertakingCarClearlyAheadOfYieldingCar then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car clearly ahead, so easing out yield'
 

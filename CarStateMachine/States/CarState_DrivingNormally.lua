@@ -32,7 +32,7 @@ end
 
 -- TRANSITION FUNCTION
 -- CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
 
       -- DEBUG DEBUG DEBUG
@@ -43,14 +43,14 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- end
       -- DEBUG DEBUG DEBUG
 
-      local car = sortedCarList[sortedCarListIndex]
+      local car = sortedCarsList[sortedCarsListIndex]
 
       -- if not carBehind then
         -- CarManager.cars_reasonWhyCantYield[carIndex] = 'No overtaking car so not yielding'
         -- return
       -- end
-      local carBehind = sortedCarList[sortedCarListIndex + 1]
-      local carFront = sortedCarList[sortedCarListIndex - 1]
+      local carBehind = sortedCarsList[sortedCarsListIndex + 1]
+      local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
       -- If there's a car behind us, check if we should start yielding to it
       if carBehind then

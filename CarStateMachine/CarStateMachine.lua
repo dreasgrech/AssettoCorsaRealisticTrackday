@@ -24,8 +24,6 @@ CarStateMachine.states_minimumTimeInState = { }
 local cars_previousState = {}
 local cars_state = {}
 
-CarStateMachine.timeInStates = {}
-
 CarStateMachine.CarStateType = CarStateType
 
 CarStateMachine.changeState = function(carIndex, newState)
@@ -44,7 +42,7 @@ CarStateMachine.changeState = function(carIndex, newState)
     cars_previousState[carIndex] = currentState
 
     -- reset the time in state counter
-    CarStateMachine.timeInStates[carIndex] = 0
+    CarManager.cars_timeInCurrentState[carIndex] = 0
 
     -- Logger.log(string.format("Car %d: Changing state (%d) from %s to %s", carIndex, currentState))
 
@@ -116,6 +114,13 @@ end
 
 -- CarStateMachine.update = function(carIndex, dt, car, carBehind, storage)
 CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+
+    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
+    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
+    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
+    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
+    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
+    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
     -- while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
         -- local carIndex = QueueManager.dequeue(queuedCollidedWithTrackAccidents)
         
@@ -171,10 +176,10 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
     -- Logger.log(string.format("CarStateMachine: Car %d updateFunction of state %s: ", carIndex, CarStateMachine.CarStateTypeStrings[state]) .. tostring(CarStateMachine.states_updateFunctions[carIndex]))
     CarStateMachine.states_updateFunctions[state](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
 
-    local currentTimeInState = CarStateMachine.timeInStates[carIndex]
+    local currentTimeInState = CarManager.cars_timeInCurrentState[carIndex]
 
     -- increase the time spent in this state
-    CarStateMachine.timeInStates[carIndex] = currentTimeInState + dt
+    CarManager.cars_timeInCurrentState[carIndex] = currentTimeInState + dt
 
     -- make sure we have spent the minimum required time in this state before we can transition out of it
     local minimumTimeInState = CarStateMachine.states_minimumTimeInState[state]
@@ -251,6 +256,8 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
       return
     end
 
+    local carBehindIndex = carBehind.index
+
     -- If this car is not close to the overtaking car, do nothing
     local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
     local radius = storage.detectCarBehind_meters
@@ -299,6 +306,7 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
     -- Since all the checks have passed, the yielding car can now start to yield
+    CarManager.cars_currentlyYieldingCarToIndex[carIndex] = carBehindIndex
     return CarStateMachine.CarStateType.EASING_IN_YIELD
 end
 

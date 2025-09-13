@@ -129,9 +129,10 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[state] or tostring(state), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.1fs", CarStateMachine.timeInStates[carIndex]), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.1fs", CarManager.cars_timeInCurrentState[carIndex]), uiColor); ui.nextColumn()
       if CarManager.cars_currentlyYielding[carIndex] then
-        ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[carIndex] or 0), uiColor)
+        -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[carIndex] or 0), uiColor)
+        ui.textColored(string.format("yes #%d", CarManager.cars_currentlyYieldingCarToIndex[carIndex]), uiColor)
       else
         ui.textColored("no", uiColor)
       end

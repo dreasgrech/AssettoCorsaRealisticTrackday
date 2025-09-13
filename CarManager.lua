@@ -32,7 +32,9 @@ CarManager.cars_aiCaution = {}
 CarManager.cars_aiTopSpeed = {}
 CarManager.cars_aiStopCounter = {}
 CarManager.cars_gentleStop = {}
-CarManager.cars_currentlyOvertakingCarIndex = {}
+CarManager.cars_currentlyOvertakingCarIndex = {} -- car index of the car we're currently overtaking
+CarManager.cars_currentlyYieldingCarToIndex = {} -- car index of the car we're currently yielding to
+CarManager.cars_timeInCurrentState = {} -- time spent in the current state (seconds)
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -68,11 +70,12 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_evacuating[carIndex] = false
   CarManager.cars_anchorPoints[carIndex] = nil
   CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-  -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
+  CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
+  CarManager.cars_timeInCurrentState[carIndex] = 0
   CarStateMachine.initializeCarInStateMachine(carIndex)
 
   -- remove speed limitations which could have occured during an accident
-  CarOperations.setAIThrottleLimit(carIndex, 1)
+  CarOperations.resetAIThrottleLimit(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
   CarOperations.setAIStopCounter(carIndex, 0)
   CarOperations.setGentleStop(carIndex, false)
