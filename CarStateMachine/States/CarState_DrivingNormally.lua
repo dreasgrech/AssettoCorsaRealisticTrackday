@@ -48,7 +48,7 @@ local handleCarFront = function(carIndex, car, carFront, storage)
   -- start driving to the side to initiate an overtake
   -- save a reference to the car we're overtaking because the next state needs it
   CarManager.cars_currentlyOvertakingCarIndex[carIndex] = carFrontIndex
-  return CarStateMachine.CarStateType.DRIVING_TO_SIDE_TO_OVERTAKE
+  return CarStateMachine.CarStateType.EASING_IN_OVERTAKE
 end
 
 local handleCarBehind = function(carIndex, car, carBehind, storage)
@@ -100,7 +100,7 @@ local handleCarBehind = function(carIndex, car, carBehind, storage)
     -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
     -- Since all the checks have passed, the yielding car can now start to yield
-    return CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE
+    return CarStateMachine.CarStateType.EASING_IN_YIELD
 end
 
 

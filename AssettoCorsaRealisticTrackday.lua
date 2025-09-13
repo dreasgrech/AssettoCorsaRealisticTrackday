@@ -12,13 +12,15 @@ CarManager = require("CarManager")
 
 CarStateMachine = require("CarStateMachine.CarStateMachine")
 CarState_DrivingNormally = require("CarStateMachine.States.CarState_DrivingNormally")
-CarState_YieldingToSide = require("CarStateMachine.States.CarState_YieldingToSide")
+CarState_EasingInYield = require("CarStateMachine.States.CarState_EasingInYield")
 CarState_StayingOnYieldingLane = require("CarStateMachine.States.CarState_StayingOnYieldingLane")
 CarState_EasingOutYield = require("CarStateMachine.States.CarState_EasingOutYield")
 CarState_CollidedWithCar = require("CarStateMachine.States.CarState_CollidedWithCar")
 CarState_CollidedWithTrack = require("CarStateMachine.States.CarState_CollidedWithTrack")
 CarState_AnotherCarCollidedIntoMe = require("CarStateMachine.States.CarState_AnotherCarCollidedIntoMe")
-CarState_DrivingToSideToOvertake = require("CarStateMachine.States.CarState_DrivingToSideToOvertake")
+CarState_EasingInOvertake = require("CarStateMachine.States.CarState_EasingInOvertake")
+CarState_StayingOnOvertakingLane = require("CarStateMachine.States.CarState_StayingOnOvertakingLane")
+CarState_EasingOutOvertake = require("CarStateMachine.States.CarState_EasingOutOvertake")
 
 AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
@@ -161,7 +163,7 @@ function script.MANIFEST__UPDATE(dt)
       CarStateMachine.update(carIndex, dt, sortedCars, i, storage)
 
       local carState = CarStateMachine.getCurrentState(carIndex)
-      local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
+      local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
 
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
 

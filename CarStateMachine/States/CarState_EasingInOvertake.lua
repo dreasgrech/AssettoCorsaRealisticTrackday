@@ -1,6 +1,6 @@
-local STATE = CarStateMachine.CarStateType.DRIVING_TO_SIDE_TO_OVERTAKE
+local STATE = CarStateMachine.CarStateType.EASING_IN_OVERTAKE
 
-CarStateMachine.CarStateTypeStrings[STATE] = "DrivingToSideToOvertake"
+CarStateMachine.CarStateTypeStrings[STATE] = "EasingInOvertake"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 -- ENTRY FUNCTION
@@ -37,12 +37,12 @@ end
 
 -- TRANSITION FUNCTION
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-    -- if we're suddendly at the front of the pack, return to normal driving
+    -- if we're suddendly at the front of the pack, return to easing out overtake
     local carFront = sortedCarsList[sortedCarsListIndex - 1]
     if (not carFront) then
-        -- no car in front of us, return to normal driving
+        -- no car in front of us, return to easing out overtake
         CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-        return CarStateMachine.CarStateType.DRIVING_NORMALLY
+        return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
     -- fetch the car index of the car we're overtaking
@@ -51,16 +51,16 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- something went wrong, we should have a reference to the car we're overtaking
         Logger.error(string.format('Car %d in state DrivingToSideToOvertake but has no reference to the car it is overtaking, returning to normal driving', carIndex))
         CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-        return CarStateMachine.CarStateType.DRIVING_NORMALLY
+        return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
     -- make sure the car we're overtaking is still valid
     local currentlyOvertakingCar = ac.getCar(currentlyOvertakingCarIndex)
     if (not currentlyOvertakingCar) then
-        -- the car we're overtaking is no longer valid, return to normal driving
+        -- the car we're overtaking is no longer valid, return to easing out overtake
         Logger.warn(string.format('Car %d in state DrivingToSideToOvertake but the car it was overtaking (car %d) is no longer valid, returning to normal driving', carIndex, currentlyOvertakingCarIndex))
         CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-        return CarStateMachine.CarStateType.DRIVING_NORMALLY
+        return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
     -- if we've arrived at the target side offset, we can now stay on the overtaking lane

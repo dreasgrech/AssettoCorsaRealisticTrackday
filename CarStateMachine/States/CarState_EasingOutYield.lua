@@ -29,29 +29,39 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local yieldSide = storage.yieldSide
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
       local easeOutYieldSide = (yieldSide == RaceTrackManager.TrackSide.LEFT) and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
-      local sideSafeToYield = CarStateMachine.isSafeToDriveToTheSide(carIndex, easeOutYieldSide)
-      if not sideSafeToYield then
-        -- isSafeToDriveToTheSide already logs the reason why we can't yield
-        -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
+      local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, 0, storage.rampRelease_mps, storage.overrideAiAwareness)
+
+      -- can't ease out yield because the side is blocked, just wait
+      if not droveSafelyToSide then
+        -- -- isSafeToDriveToTheSide already logs the reason why we can't yield
+        -- -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
+        -- return
         return
       end
 
-      -- todo move the targetsplineoffset assignment to trying to start easing out yield state?
-      local targetSplineOffset = 0
-      local splineOffsetTransitionSpeed = storage.rampRelease_mps
-      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
+      -- local sideSafeToYield = CarStateMachine.isSafeToDriveToTheSide(carIndex, easeOutYieldSide)
+      -- if not sideSafeToYield then
+        -- -- isSafeToDriveToTheSide already logs the reason why we can't yield
+        -- -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
+        -- return
+      -- end
 
-      -- set the spline offset on the yielding car
-      local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
-      physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
+      -- -- todo move the targetsplineoffset assignment to trying to start easing out yield state?
+      -- local targetSplineOffset = 0
+      -- local splineOffsetTransitionSpeed = storage.rampRelease_mps
+      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      -- currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
 
-      -- keep inverted turning lights on while easing out yield (inverted yield direction since the car is now going back to center)
-      local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
-      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+      -- -- set the spline offset on the yielding car
+      -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
+      -- physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
-      CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
-      CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
+      -- -- keep inverted turning lights on while easing out yield (inverted yield direction since the car is now going back to center)
+      -- local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
+      -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
+
+      -- CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
+      -- CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 end
 
 -- TRANSITION FUNCTION

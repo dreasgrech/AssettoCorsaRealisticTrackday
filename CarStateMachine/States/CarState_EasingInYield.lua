@@ -1,6 +1,6 @@
-local STATE = CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE
+local STATE = CarStateMachine.CarStateType.EASING_IN_YIELD
 
-CarStateMachine.CarStateTypeStrings[STATE] = "YieldingToTheSide"
+CarStateMachine.CarStateTypeStrings[STATE] = "EasingInYield"
 CarStateMachine.states_minimumTimeInState[STATE] = 1
 
 -- ENTRY FUNCTION
