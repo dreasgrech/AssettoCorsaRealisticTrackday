@@ -9,6 +9,9 @@ local CARSTATES_TO_UICOLOR = {
   [CarStateMachine.CarStateType.COLLIDED_WITH_TRACK] = ColorManager.RGBM_Colors.DarkRed,
   [CarStateMachine.CarStateType.COLLIDED_WITH_CAR] = ColorManager.RGBM_Colors.Rose,
   [CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME] = ColorManager.RGBM_Colors.OrangeRed,
+  [CarStateMachine.CarStateType.EASING_IN_OVERTAKE] = ColorManager.RGBM_Colors.DodgerBlue,
+  [CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE] = ColorManager.RGBM_Colors.DeepSkyBlue,
+  [CarStateMachine.CarStateType.EASING_OUT_OVERTAKE] = ColorManager.RGBM_Colors.Cyan,
 }
 
 local carTableColumns_name = { }
@@ -75,24 +78,9 @@ UIManager.drawMainWindowContent = function()
   table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
 
   -- Draw as a table: columns with headings
-  -- local COLS = 13
+  -- draw the column headers including setting the width
   local COLS = #carTableColumns_name
   ui.columns(COLS, true)
-  -- ui.columnSortingHeader('#', 0)
-  -- ui.columnSortingHeader('Distance (m)', -1)
-  -- ui.columnSortingHeader('Velocity (km/h)', 0)
-  -- ui.columnSortingHeader('Offset', 0)
-  -- ui.columnSortingHeader('TargetOffset', 0)
-  -- ui.columnSortingHeader('ThrottleLimit', 0)
-  -- ui.columnSortingHeader('AICaution', 0)
-  -- ui.columnSortingHeader('AITopSpeed', 0)
-  -- ui.columnSortingHeader('AIStopCounter', 0)
-  -- ui.columnSortingHeader('GentleStop', 0)
-  -- ui.columnSortingHeader('State', 0)
-  -- ui.columnSortingHeader('Yielding', 0)
-  -- ui.columnSortingHeader('Reason', 0)
-
-  -- draw the column headers including setting the width
   for col = 1, COLS do
   -- for col = 0, COLS+1 do
     ui.columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
