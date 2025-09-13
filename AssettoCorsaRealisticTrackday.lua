@@ -154,19 +154,13 @@ function script.MANIFEST__UPDATE(dt)
   for i = 1, #sortedCars do
     local car = sortedCars[i]
     local carIndex = car.index
-    if
-      -- car and
-      carIndex ~= 0  -- skip the player car since it doesn't need to run the yielding logic
-      -- carIndex and
-      -- car.isAIControlled -- only run the yielding logic on ai cars
-      -- and not CarManager.cars_evacuating[carIndex] -- don't run yielding logic if car is evacuating
+    if carIndex ~= 0  -- skip the player car since it doesn't need to run the yielding logic
     then
       CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
       -- execute the state machine for this car
-      -- local carBehind = playerCar
       local carBehind = sortedCars[i + 1]
-      CarStateMachine.update(carIndex, dt, car, carBehind, storage)
+      CarStateMachine.update(carIndex, dt, sortedCars, i, storage)
 
       local carState = CarStateMachine.getCurrentState(carIndex)
       local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.YIELDING_TO_THE_SIDE) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)

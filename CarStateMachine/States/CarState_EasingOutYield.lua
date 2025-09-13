@@ -4,7 +4,9 @@ CarStateMachine.CarStateTypeStrings[STATE] = "EasingOutYield"
 CarStateMachine.states_minimumTimeInState[STATE] = 1
 
 -- ENTRY FUNCTION
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+      local car = sortedCarList[sortedCarListIndex]
+
       -- reset the yield time counter
       CarManager.cars_yieldTime[carIndex] = 0
 
@@ -21,7 +23,8 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carB
 end
 
 -- UPDATE FUNCTION
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+      local car = sortedCarList[sortedCarListIndex]
 
       local yieldSide = storage.yieldSide
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
@@ -52,7 +55,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, car
 end
 
 -- TRANSITION FUNCTION
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
@@ -61,6 +64,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
 end
 
 -- EXIT FUNCTION
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
 
 end

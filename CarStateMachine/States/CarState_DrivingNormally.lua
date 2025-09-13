@@ -28,7 +28,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, car
 end
 
 -- TRANSITION FUNCTION
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+-- CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
 
       -- DEBUG DEBUG DEBUG
@@ -38,6 +39,9 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
           -- -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not yielding (raycast)'
       -- end
       -- DEBUG DEBUG DEBUG
+
+      local car = sortedCarList[sortedCarListIndex]
+      local carBehind = sortedCarList[sortedCarListIndex + 1]
 
       if not carBehind then
         CarManager.cars_reasonWhyCantYield[carIndex] = 'No overtaking car so not yielding'
@@ -96,6 +100,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
 end
 
 -- EXIT FUNCTION
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
 end

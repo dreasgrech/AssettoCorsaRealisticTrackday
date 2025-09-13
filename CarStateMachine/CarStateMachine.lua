@@ -111,7 +111,8 @@ CarStateMachine.initializeCarInStateMachine = function(carIndex)
     --CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 end
 
-CarStateMachine.update = function(carIndex, dt, car, carBehind, storage)
+-- CarStateMachine.update = function(carIndex, dt, car, carBehind, storage)
+CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     -- while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
         -- local carIndex = QueueManager.dequeue(queuedCollidedWithTrackAccidents)
         
@@ -152,7 +153,8 @@ CarStateMachine.update = function(carIndex, dt, car, carBehind, storage)
       CarStateMachine.changeState(carIndex, newStateToTransitionIntoThisFrame)
 
       -- execute the state's entry function
-      CarStateMachine.states_entryFunctions[newStateToTransitionIntoThisFrame](carIndex, dt, car, carBehind, storage)
+      -- CarStateMachine.states_entryFunctions[newStateToTransitionIntoThisFrame](carIndex, dt, car, carBehind, storage)
+      CarStateMachine.states_entryFunctions[newStateToTransitionIntoThisFrame](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     end
 
     local state = CarStateMachine.getCurrentState(carIndex)
@@ -164,7 +166,7 @@ CarStateMachine.update = function(carIndex, dt, car, carBehind, storage)
 
     -- run the state loop
     -- Logger.log(string.format("CarStateMachine: Car %d updateFunction of state %s: ", carIndex, CarStateMachine.CarStateTypeStrings[state]) .. tostring(CarStateMachine.states_updateFunctions[carIndex]))
-    CarStateMachine.states_updateFunctions[state](carIndex, dt, car, carBehind, storage)
+    CarStateMachine.states_updateFunctions[state](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
 
     local currentTimeInState = timeInStates[carIndex]
 
@@ -179,11 +181,11 @@ CarStateMachine.update = function(carIndex, dt, car, carBehind, storage)
     end
 
     -- check if we need to transition out of the state by executing the state's transition check function
-    local newState = CarStateMachine.states_transitionFunctions[state](carIndex, dt, car, carBehind, storage)
+    local newState = CarStateMachine.states_transitionFunctions[state](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     local shouldTransitionToNextState = newState
     if shouldTransitionToNextState then
       -- execute the state's exit function
-      CarStateMachine.states_exitFunctions[state](carIndex, dt, car, carBehind, storage)
+      CarStateMachine.states_exitFunctions[state](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
 
       queuedStatesToTransitionInto[carIndex] = newState
     end

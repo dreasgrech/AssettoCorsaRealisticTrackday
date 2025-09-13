@@ -4,14 +4,17 @@ CarStateMachine.CarStateTypeStrings[STATE] = "YieldingToTheSide"
 CarStateMachine.states_minimumTimeInState[STATE] = 1
 
 -- ENTRY FUNCTION
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+      local car = sortedCarList[sortedCarListIndex]
+
       -- turn on turning lights
       local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 end
 
 -- UPDATE FUNCTION
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+      local car = sortedCarList[sortedCarListIndex]
       local yieldSide = storage.yieldSide
 
       local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
@@ -56,7 +59,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, car
 end
 
 -- TRANSITION FUNCTION
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+      local car = sortedCarList[sortedCarListIndex]
+      local carBehind = sortedCarList[sortedCarListIndex + 1]
+
       -- If the yielding car is yielding and the overtaking car is now clearly ahead, we can ease out our yielding
       local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
       if isOvertakingCarClearlyAheadOfYieldingCar then
@@ -88,6 +94,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car,
 end
 
 -- EXIT FUNCTION
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
 
 end
