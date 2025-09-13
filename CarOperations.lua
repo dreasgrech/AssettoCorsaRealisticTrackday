@@ -83,6 +83,10 @@ CarOperations.setAIThrottleLimit = function(carIndex, limit)
     CarManager.cars_throttleLimit[carIndex] = limit
 end
 
+CarOperations.resetAIThrottleLimit = function(carIndex)
+  CarOperations.setAIThrottleLimit(carIndex, 1)
+end
+
 ---Changes AI caution, altering the distance it keeps from the car in front of it. Default value: `1`. Experimental.
 ---@param carIndex integer @0-based car index.
 ---@param caution number @AI caution from 0 to 16.

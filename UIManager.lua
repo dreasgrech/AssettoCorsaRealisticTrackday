@@ -33,6 +33,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'State', orderDirection = 0, width = 170, tooltip='Current state' },
+  { name = 'Time in State', orderDirection = 0, width = 100, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
   { name = 'Reason', orderDirection = 0, width = 800, tooltip='Reason for current state' },
@@ -62,6 +63,7 @@ UIManager.drawMainWindowContent = function()
   end
   ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
+  -- todo: remove this ai slop:
   ui.text('Cars:')
   local player = ac.getCar(0)
   -- sort cars by distance to player for clearer list
@@ -83,7 +85,6 @@ UIManager.drawMainWindowContent = function()
   local COLS = #carTableColumns_name
   ui.columns(COLS, true)
   for col = 1, COLS do
-  -- for col = 0, COLS+1 do
     ui.columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
     ui.setColumnWidth(col-1, carTableColumns_width[col])
   end
@@ -120,6 +121,7 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(tostring(CarManager.cars_aiStopCounter[i] or 0), uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_gentleStop[i]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[state] or tostring(state), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.1fs", CarStateMachine.timeInStates[i]), uiColor); ui.nextColumn()
       if CarManager.cars_currentlyYielding[i] then
         ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
       else

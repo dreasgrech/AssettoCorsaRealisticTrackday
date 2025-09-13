@@ -155,7 +155,9 @@ function script.MANIFEST__UPDATE(dt)
   for i = 1, #sortedCars do
     local car = sortedCars[i]
     local carIndex = car.index
-    if carIndex ~= 0  -- skip the player car since it doesn't need to run the yielding logic
+    -- if carIndex ~= 0  -- skip the player car since it doesn't need to run the yielding logic
+    -- if carIndex ~= -1  -- TODO: NOT SKIPPING PLAYER CAR FOR TESTING PURPOSES
+    if car.isAIControlled -- including the player car if it's AI controlled
     then
       CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 

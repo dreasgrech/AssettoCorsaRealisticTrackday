@@ -33,6 +33,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         return
       end
 
+      CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+      CarOperations.resetAIThrottleLimit(carIndex)
+
       -- -- make sure there isn't any car on the side we're trying to yield to so we don't crash into it
       -- local isSideSafeToYield = CarStateMachine.isSafeToDriveToTheSide(carIndex, yieldSide)
       -- if not isSideSafeToYield then
@@ -106,5 +109,6 @@ end
 
 -- EXIT FUNCTION
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-
+    CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+    CarOperations.resetAIThrottleLimit(carIndex)
 end

@@ -24,7 +24,7 @@ CarStateMachine.states_minimumTimeInState = { }
 local cars_previousState = {}
 local cars_state = {}
 
-local timeInStates = {}
+CarStateMachine.timeInStates = {}
 
 CarStateMachine.CarStateType = CarStateType
 
@@ -44,7 +44,7 @@ CarStateMachine.changeState = function(carIndex, newState)
     cars_previousState[carIndex] = currentState
 
     -- reset the time in state counter
-    timeInStates[carIndex] = 0
+    CarStateMachine.timeInStates[carIndex] = 0
 
     -- Logger.log(string.format("Car %d: Changing state (%d) from %s to %s", carIndex, currentState))
 
@@ -171,10 +171,10 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
     -- Logger.log(string.format("CarStateMachine: Car %d updateFunction of state %s: ", carIndex, CarStateMachine.CarStateTypeStrings[state]) .. tostring(CarStateMachine.states_updateFunctions[carIndex]))
     CarStateMachine.states_updateFunctions[state](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
 
-    local currentTimeInState = timeInStates[carIndex]
+    local currentTimeInState = CarStateMachine.timeInStates[carIndex]
 
     -- increase the time spent in this state
-    timeInStates[carIndex] = currentTimeInState + dt
+    CarStateMachine.timeInStates[carIndex] = currentTimeInState + dt
 
     -- make sure we have spent the minimum required time in this state before we can transition out of it
     local minimumTimeInState = CarStateMachine.states_minimumTimeInState[state]
