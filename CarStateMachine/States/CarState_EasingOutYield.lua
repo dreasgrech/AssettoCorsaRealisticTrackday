@@ -4,8 +4,8 @@ CarStateMachine.CarStateTypeStrings[STATE] = "EasingOutYield"
 CarStateMachine.states_minimumTimeInState[STATE] = 1
 
 -- ENTRY FUNCTION
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-      local car = sortedCarList[sortedCarListIndex]
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
+      local car = sortedCarsList[sortedCarListIndex]
 
       -- reset the yield time counter
       CarManager.cars_yieldTime[carIndex] = 0
@@ -23,8 +23,8 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 end
 
 -- UPDATE FUNCTION
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-      local car = sortedCarList[sortedCarListIndex]
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
+      local car = sortedCarsList[sortedCarListIndex]
 
       local yieldSide = storage.yieldSide
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
@@ -65,7 +65,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 end
 
 -- TRANSITION FUNCTION
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
+      local car = sortedCarsList[sortedCarListIndex]
+      local carBehind = sortedCarsList[sortedCarListIndex + 1]
+      local carFront = sortedCarsList[sortedCarListIndex - 1]
 
       -- if there's a car behind us, check if we should start yielding to it
       local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)

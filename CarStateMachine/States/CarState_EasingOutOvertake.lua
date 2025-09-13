@@ -26,21 +26,28 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local targetOffset = 0
     local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, storage.rampRelease_mps, storage.overrideAiAwareness)
     if not droveSafelyToSide then
-        -- TODO: Continue here
-        
+        -- TODO: Continue here: what should we do if we can't ease out the overtake because the side is blocked?
     end
-
-
 end
 
 -- TRANSITION FUNCTION
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      local car = sortedCarsList[sortedCarsListIndex]
+      local carBehind = sortedCarsList[sortedCarsListIndex + 1]
+      local carFront = sortedCarsList[sortedCarsListIndex - 1]
+
+      -- if there's a car behind us, check if we should start yielding to it
+      local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+      if newStateDueToCarBehind then
+        return newStateDueToCarBehind
+      end
+
+      -- if we're back to the center, return to normal driving
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
       end
-
 end
 
 -- EXIT FUNCTION
