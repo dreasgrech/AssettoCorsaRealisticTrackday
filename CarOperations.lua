@@ -298,9 +298,14 @@ local checkForOtherCars = function(worldPosition, direction, distance)
   return rayHit, raycastHitDistance
 end
 
+---comment
+---@param carIndex any
+---@return boolean
+---@return CarOperations.CarDirections|integer
+---@return number
 CarOperations.isTargetSideBlocked = function(carIndex)
   local car = ac.getCar(carIndex)
-  if not car then return false end
+  if not car then return false, CarOperations.CarDirections.None, 0 end
 
   -- local storage = StorageManager.getStorage()
 
@@ -308,7 +313,7 @@ CarOperations.isTargetSideBlocked = function(carIndex)
   local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
   if not carAnchorPoints then
     Logger.log(string.format("CarOperations.isTargetSideBlocked: Car %d has no anchor points calculated", carIndex))
-    return false
+    return false, CarOperations.CarDirections.None, 0
   end
   -- CarOperations.logCarAnchorPoints(carIndex, carAnchorPoints)
 
@@ -374,13 +379,13 @@ CarOperations.isTargetSideBlocked = function(carIndex)
     return true, CarOperations.CarDirections.RearRightAngled, hitDistance
   end
 
-  return false
+  return false, CarOperations.CarDirections.None, 0
 end
 
 ---comment
 ---@param carIndex number
 ---@return boolean
----@return CarOperations.CarDirections
+---@return CarOperations.CarDirections|integer
 ---@return number|nil
 CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints = function(carIndex)
     local car = ac.getCar(carIndex)
@@ -400,7 +405,7 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints = function(carI
 end
 
 ---comment
----@param carDirection CarOperations.CarDirections
+---@param carDirection CarOperations.CarDirections|integer
 CarOperations.getTrackSideFromCarDirection = function(carDirection)
   if carDirection == CarOperations.CarDirections.FrontLeft
   or carDirection == CarOperations.CarDirections.CenterLeft

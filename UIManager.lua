@@ -64,6 +64,10 @@ UIManager.drawMainWindowContent = function()
   end
   ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
+  if not storage.drawCarList then
+    return
+  end
+
   -- todo: remove this ai slop:
   -- ui.text('Cars:')
   local player = ac.getCar(0)
@@ -280,6 +284,12 @@ function UIManager.renderUIOptionsControls()
 
     if ui.checkbox('Draw Debug Gizmos', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
     if ui.itemHovered() then ui.setTooltip('Shows 3D debug information about the cars') end
+
+    if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
+    if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
+
+    if ui.checkbox('Handle side checking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
+    if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding.') end
 
     storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end

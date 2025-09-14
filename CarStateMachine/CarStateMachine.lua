@@ -61,18 +61,21 @@ end
 ---@return boolean
 -- local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
 CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
+    local storage = StorageManager.getStorage()
     -- check if there's a car on our side
-    local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
-    if isCarOnSide then
-        -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
-        local trackSideOfBlockingCar = CarOperations.getTrackSideFromCarDirection(carOnSideDirection)
-        local isSideCarOnTheSameSideAsYielding = drivingToSide == trackSideOfBlockingCar
-        
-        if isSideCarOnTheSameSideAsYielding then
-          -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
-          CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not driving to the side: ' .. CarOperations.CarDirectionsStrings[carOnSideDirection] .. '  gap=' .. string.format('%.2f', carOnSideDistance) .. 'm'
-          return false
-        end
+    if storage.handleSideChecking then
+      local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
+      if isCarOnSide then
+          -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
+          local trackSideOfBlockingCar = CarOperations.getTrackSideFromCarDirection(carOnSideDirection)
+          local isSideCarOnTheSameSideAsYielding = drivingToSide == trackSideOfBlockingCar
+          
+          if isSideCarOnTheSameSideAsYielding then
+            -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
+            CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not driving to the side: ' .. CarOperations.CarDirectionsStrings[carOnSideDirection] .. '  gap=' .. string.format('%.2f', carOnSideDistance) .. 'm'
+            return false
+          end
+      end
     end
 
     -- Check car blind spot
