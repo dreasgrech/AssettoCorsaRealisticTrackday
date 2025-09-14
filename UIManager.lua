@@ -125,14 +125,14 @@ UIManager.drawMainWindowContent = function()
       -- start a new ui id section so that we don't have name collisions
       ui.pushID(carIndex)
 
-      -- remember where the row starts
+      -- cache the top-left screen position of this row so we can draw the full-row background first, then reset the cursor to the same Y before drawing cells.
       local rowTop = ui.cursorScreenPos()  -- current screen-space cursor
 
       -- send the full-row clickable to the background so the per-cell text/controls render cleanly on top across all columns
       ui.pushColumnsBackground()
 
       -- create the full-row selectable which will be clickable
-      ui.selectable('##row'..carIndex, false, ui.SelectableFlags.SpanAllColumns)
+      ui.selectable('##row'..carIndex, false, ui.SelectableFlags.SpanAllColumns) -- ui.SelectableFlags.SpanAllColumns used to expand the hitbox across the entire row
       -- grab the itemClicked event of the selectable we just created
       local rowClicked = ui.itemClicked()         -- capture immediately (refers to the selectable)
       -- ui.setItemAllowOverlap()                     -- allow drawing cells over the clickable area
