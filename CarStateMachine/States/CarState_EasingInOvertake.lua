@@ -10,6 +10,12 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   if not currentlyOvertakingCarIndex then
     Logger.error(string.format('Car %d in state EasingInOvertake but has no reference to the car it is overtaking!  Previous state needs to set it.', carIndex))
   end
+
+  local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
+  if currentlyYieldingToCarIndex then
+    local previousState = CarStateMachine.cars_previousState[carIndex]
+    Logger.error(string.format('[CarState_EasingInOvertake] Car %d is both yielding to car %d and overtaking car %d at the same time!  Previous state: %s', carIndex, currentlyYieldingToCarIndex, currentlyOvertakingCarIndex, CarStateMachine.CarStateTypeStrings[previousState]))
+  end
 end
 
 -- UPDATE FUNCTION
