@@ -23,7 +23,7 @@ local carTableColumns_tooltip = { }
 local carTableColumns_dataBeforeDoD = {
   { name = '#', orderDirection = 0, width = 40, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
-  { name = 'Velocity (km/h)', orderDirection = 0, width = 105, tooltip='Current velocity' },
+  { name = 'Velocity', orderDirection = 0, width = 75, tooltip='Current velocity' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
   { name = 'Pedals (C,B,G)', orderDirection = 0, width = 100, tooltip='Pedal positions' },
@@ -126,7 +126,7 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
       -- ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%d", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%d km/h", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.cars_currentSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.1f|%.1f|%.1f", carInput.clutch, carInput.brake, carInput.gas), uiColor); ui.nextColumn()
