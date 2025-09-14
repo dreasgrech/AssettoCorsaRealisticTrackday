@@ -25,7 +25,7 @@ CarManager.cars_indPhase = {}
 CarManager.cars_hasTL = {}
 CarManager.cars_evacuating = {}
 
-CarManager.cars_anchorPoints = {}
+-- CarManager.cars_anchorPoints = {}
 CarManager.cars_totalSideBlockRaysData = {} -- {[carIndex] = 1, [carIndex] = 0, ...}
 CarManager.cars_sideBlockRaysData = {} -- Example: one ray=> {pos,dir,len}. two rays: {pos,dir,len,pos,dir,len}
 
@@ -68,7 +68,9 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_indPhase[carIndex] = false
   CarManager.cars_hasTL[carIndex] = false
   CarManager.cars_evacuating[carIndex] = false
-  CarManager.cars_anchorPoints[carIndex] = nil
+  -- CarManager.cars_anchorPoints[carIndex] = nil
+  CarManager.cars_totalSideBlockRaysData[carIndex] = 0
+  CarManager.cars_sideBlockRaysData[carIndex] = {} -- since this is used as a list, initialize to empty list
   CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
   CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
   CarManager.cars_timeInCurrentState[carIndex] = 0

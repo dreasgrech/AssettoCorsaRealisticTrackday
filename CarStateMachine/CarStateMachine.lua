@@ -64,7 +64,8 @@ CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
     local storage = StorageManager.getStorage()
     -- check if there's a car on our side
     if storage.handleSideChecking then
-      local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
+      -- local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
+      local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays_NEWDoDAPPROACH(carIndex)
       if isCarOnSide then
           -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
           local trackSideOfBlockingCar = CarOperations.getTrackSideFromCarDirection(carOnSideDirection)
@@ -147,7 +148,9 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
     -- end
 
-    CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
+    -- CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
+    CarManager.cars_totalSideBlockRaysData[carIndex] = 0
+    table.clear(CarManager.cars_sideBlockRaysData[carIndex])
 
     -- check if there's a new state we need to transition into
     local newStateToTransitionIntoThisFrame = queuedStatesToTransitionInto[carIndex]
