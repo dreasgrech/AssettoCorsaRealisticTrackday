@@ -21,7 +21,7 @@ local carTableColumns_tooltip = { }
 
 -- this table is only used to set the data to the actual data holders i.e. the tables named carTableColumns_xxx
 local carTableColumns_dataBeforeDoD = {
-  { name = '#', orderDirection = 0, width = 40, tooltip='Car ID' },
+  { name = '#', orderDirection = 0, width = 60, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
   { name = 'Velocity', orderDirection = 0, width = 75, tooltip='Current velocity' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
@@ -122,6 +122,13 @@ UIManager.drawMainWindowContent = function()
         Logger.error(string.format('Car %d is both yielding to car %d and overtaking car %d at the same time!', carIndex, currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
       end
 
+      ui.pushID(carIndex)
+
+      -- 1) Full-row clickable background
+      ui.selectable('##row', false, ui.SelectableFlags.SpanAllColumns)
+      local rowClicked = ui.itemClicked()         -- capture immediately (refers to the selectable)
+      -- ui.setItemAllowOverlap()                     -- allow drawing cells over the clickable area
+
       -- Row cells
       ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
@@ -154,6 +161,12 @@ UIManager.drawMainWindowContent = function()
       end
       ui.nextColumn()
       ui.textColored(reason, uiColor); ui.nextColumn()
+
+      if rowClicked then
+          Logger.log(string.format('UIManager: Car row %d clicked', carIndex))
+      end
+
+      ui.popID()
     end
   end
 
