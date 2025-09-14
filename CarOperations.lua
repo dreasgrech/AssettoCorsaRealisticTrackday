@@ -28,7 +28,7 @@ CarOperations.CarDirectionsStrings = {
   [CarOperations.CarDirections.RearRightAngled] = "RearRightAngled",
 }
 
-local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 4.0
+local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 3.0
 local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
 
 local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
@@ -268,13 +268,16 @@ local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, ha
 
   -- todo: ideally I don't calculate everything here since we probably dont need all of them in the calculations
 
-  local frontLeftWorldPosition   = carCenterWorldPosition + carForward *  carHalfLength + carLeft * carHalfWidth
-  local centerLeftWorldPosition  = carCenterWorldPosition + carLeft * carHalfWidth
-  local rearLeftWorldPosition    = carCenterWorldPosition - carForward *  carHalfLength + carLeft * carHalfWidth
+  local carForwardHalfCarLengthDirection = carForward * carHalfLength
+  local carLeftHalfCarWidthDirection = carLeft * carHalfWidth
+  local frontLeftWorldPosition   = carCenterWorldPosition + carForwardHalfCarLengthDirection + carLeftHalfCarWidthDirection
+  local centerLeftWorldPosition  = carCenterWorldPosition + carLeftHalfCarWidthDirection
+  local rearLeftWorldPosition    = carCenterWorldPosition - carForwardHalfCarLengthDirection + carLeftHalfCarWidthDirection
 
-  local frontRightWorldPosition  = carCenterWorldPosition + carForward *  carHalfLength + carRight * carHalfWidth
-  local centerRightWorldPosition = carCenterWorldPosition + carRight * carHalfWidth
-  local rearRightWorldPosition   = carCenterWorldPosition - carForward *  carHalfLength + carRight * carHalfWidth
+  local carRightHalfCarWidthDirection = carRight * carHalfWidth
+  local frontRightWorldPosition  = carCenterWorldPosition + carForwardHalfCarLengthDirection + carRightHalfCarWidthDirection
+  local centerRightWorldPosition = carCenterWorldPosition + carRightHalfCarWidthDirection
+  local rearRightWorldPosition   = carCenterWorldPosition - carForwardHalfCarLengthDirection + carRightHalfCarWidthDirection
 
   return {
     frontLeft = frontLeftWorldPosition,
@@ -292,6 +295,9 @@ local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, ha
 end
 
 local checkForOtherCars = function(worldPosition, direction, distance)
+  -- TODO: Maybe using physics.raycastTrack(...) could be faster
+  -- TODO: Andreas: it seems like physics.raycastTrack does not hit cars, only the track
+  -- local raycastHitDistance = physics.raycastTrack(worldPosition, direction, distance) 
   local carRay = render.createRay(worldPosition,  direction, distance)
   local raycastHitDistance = carRay:cars(BACKFACE_CULLING_FOR_BLOCKING)
   local rayHit = not (raycastHitDistance == -1)
@@ -422,6 +428,21 @@ CarOperations.getTrackSideFromCarDirection = function(carDirection)
   end
 
   return nil
+end
+
+CarOperations.renderCarBlockCheckRays_PARALLELLINES = function(carIndex)
+  local car = ac.getCar(carIndex)
+  if not car then return false, CarOperations.CarDirections.None, -1 end
+
+  local carPosition = car.position
+  local carForward = car.look
+  local carLeft = car.side
+  local carUp = car.up
+  local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
+  local carAnchorPoints = getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)
+  -- experimenting with two lines parallel to the car side instead of the 10 rays in various directions
+  -- draw parallel line on the left
+  -- render.debugLine(
 end
 
 CarOperations.renderCarBlockCheckRays = function(carIndex)
