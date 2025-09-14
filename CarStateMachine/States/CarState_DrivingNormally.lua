@@ -56,19 +56,15 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
       -- If there's a car behind us, check if we should start yielding to it
-      if carBehind then
-        local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-        if newStateDueToCarBehind then
-          return newStateDueToCarBehind
-        end
+      local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+      if newStateDueToCarBehind then
+        return newStateDueToCarBehind
       end
 
       -- if there's a car in front of us, check if we can overtake it
-      if carFront then
-        local newStateDueToCarFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
-        if newStateDueToCarFront then
-          return newStateDueToCarFront
-        end
+      local newStateDueToCarFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
+      if newStateDueToCarFront then
+        return newStateDueToCarFront
       end
 end
 

@@ -79,6 +79,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- if there's a car behind us, check if we should start yielding to it
       local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
       if newStateDueToCarBehind then
+        -- Andreas: don't clear the cars_currentlyYieldingCarToIndex value since handleShouldWeYieldToBehindCar writes to it
         return newStateDueToCarBehind
       end
 

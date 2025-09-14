@@ -5,6 +5,11 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+  -- make sure the state before us has saved the carIndex of the car we're overtaking
+  local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
+  if not currentlyOvertakingCarIndex then
+    Logger.error(string.format('Car %d in state EasingOutOvertake but has no reference to the car it is overtaking!  Previous state needs to set it.', carIndex))
+  end
 
 end
 
@@ -39,6 +44,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- if there's a car behind us, check if we should start yielding to it
       local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
       if newStateDueToCarBehind then
+        CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
         return newStateDueToCarBehind
       end
 

@@ -117,6 +117,11 @@ UIManager.drawMainWindowContent = function()
       local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
       local currentlyOvertaking = currentlyOvertakingCarIndex
 
+      -- TODO: this assert check should move to somewhere else
+      if currentlyOvertaking and currentlyYielding then
+        Logger.error(string.format('Car %d is both yielding to car %d and overtaking car %d at the same time!', carIndex, currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
+      end
+
       -- Row cells
       ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
