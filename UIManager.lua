@@ -112,6 +112,8 @@ UIManager.drawMainWindowContent = function()
       end
 
       local carInput = ac.overrideCarControls(carIndex)
+      local currentlyYieldingCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
+      local currentlyYielding = currentlyYieldingCarIndex
       local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
       local currentlyOvertaking = currentlyOvertakingCarIndex
 
@@ -130,16 +132,18 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[state] or tostring(state), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.1fs", CarManager.cars_timeInCurrentState[carIndex]), uiColor); ui.nextColumn()
-      if CarManager.cars_currentlyYielding[carIndex] then
+      -- if CarManager.cars_currentlyYielding[carIndex] then
+      if currentlyYielding then
         -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[carIndex] or 0), uiColor)
-        ui.textColored(string.format("yes #%d", CarManager.cars_currentlyYieldingCarToIndex[carIndex]), uiColor)
+        ui.textColored(string.format("yes #%d", currentlyYieldingCarIndex), uiColor)
       else
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
       if currentlyOvertaking then
         -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
-        ui.textColored(string.format("yes"), uiColor)
+        -- ui.textColored(string.format("yes"), uiColor)
+        ui.textColored(string.format("yes #%d", currentlyOvertakingCarIndex), uiColor)
       else
         ui.textColored("no", uiColor)
       end

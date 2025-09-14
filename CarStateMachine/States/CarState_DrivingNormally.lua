@@ -8,6 +8,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carB
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
+      CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       -- turn off turning lights
       CarOperations.toggleTurningLights(carIndex, car, ac.TurningLights.None)
