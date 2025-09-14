@@ -187,7 +187,45 @@ function script.MANIFEST__TRANSPARENT(dt)
     -- -- ui.textColored(string.format("Player car side is BLOCKED on %s (distance %.2f m)", tostring(carOnSideDirection), carOnSideDistance or -1), rgbm(1.0, 0.2, 0.2, 1.0))
     -- Logger.log(string.format("Player Car left side is BLOCKED (hit at %s, distance %.2f m)", CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
   -- end
-  -- CarOperations.renderCarBlockCheckRays(0)
+  local car = ac.getCar(0)
+  local carIndex = car.index
+  local carPosition = car.position
+  local carForward  = car.look
+  local carLeft     = car.side
+  local carUp       = car.up
+  local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
+  local p = CarOperations.getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)  -- returns left/right dirs too
+  local sideGap = 1.0
+  local leftOffset  = p.leftDirection  * sideGap
+  local rightOffset = p.rightDirection * sideGap
+  local ray1_pos  = p.rearLeft + leftOffset
+  local ray1_dir  = carForward
+  local ray1_len  = 6
+  local ray2_pos  = p.rearRight + rightOffset
+  --local ray2_dir  = p.frontRight + rightOffset
+  local ray2_dir  = carForward
+  local ray2_len  = 3
+  local ray3_pos  = p.frontRight + rightOffset
+  local ray3_dir  = p.rearLeft + leftOffset
+  local ray3_len  = 5
+  CarManager.cars_totalSideBlockRaysData[0] = 3
+  -- CarManager.cars_sideBlockRaysData[0] = {
+    -- ray1_pos, ray1_dir, ray1_len,
+    -- ray2_pos, ray2_dir, ray2_len
+  -- }
+  CarManager.cars_sideBlockRaysData[0] = {}
+  CarManager.cars_sideBlockRaysData[0][0] = ray1_pos
+  CarManager.cars_sideBlockRaysData[0][1] = ray1_dir
+  CarManager.cars_sideBlockRaysData[0][2] = ray1_len
+  CarManager.cars_sideBlockRaysData[0][3] = ray2_pos
+  CarManager.cars_sideBlockRaysData[0][4] = ray2_dir
+  CarManager.cars_sideBlockRaysData[0][5] = ray2_len
+  CarManager.cars_sideBlockRaysData[0][6] = ray3_pos
+  CarManager.cars_sideBlockRaysData[0][7] = ray3_dir
+  CarManager.cars_sideBlockRaysData[0][8] = ray3_len
+
+  -- CarOperations.renderCarBlockCheckRays_PARALLELLINES(0)
+  CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(0)
   -- ----------------------------------------------------------------
   
 
@@ -196,11 +234,11 @@ function script.MANIFEST__TRANSPARENT(dt)
     local sim = ac.getSim()
     -- for carIndex = 1, sim.carsCount - 1 do
     for carIndex, car in ac.iterateCars() do
-      local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
-      if carAnchorPoints then
+      -- local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
+      -- if carAnchorPoints then
         -- CarOperations.drawSideAnchorPoints(carIndex)
         CarOperations.renderCarBlockCheckRays(carIndex)
-      end
+      -- end
     end
   end
 

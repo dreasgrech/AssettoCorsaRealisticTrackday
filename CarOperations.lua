@@ -243,9 +243,8 @@ end
 
 -- Returns the six lateral anchor points plus some helpers
 ---@return table
--- CarOperations.getSideAnchorPoints = function(carIndex, car)
--- CarOperations.getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)
-local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)
+-- local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)
+CarOperations.getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)
   -- local carForward, carLeft, carUp = car.look, car.side, car.up  -- all normalized
 
   -- Half-extents from AABB (x=width, y=height, z=length)
@@ -403,7 +402,7 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints = function(carI
     local carUp = car.up
     local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
 
-    local carAnchorPoints = getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)
+    local carAnchorPoints = CarOperations.getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)
     CarManager.cars_anchorPoints[carIndex] = carAnchorPoints
 
     local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.isTargetSideBlocked(carIndex)
@@ -430,29 +429,64 @@ CarOperations.getTrackSideFromCarDirection = function(carDirection)
   return nil
 end
 
-CarOperations.renderCarBlockCheckRays_PARALLELLINES = function(carIndex)
-  local car = ac.getCar(carIndex)
-  if not car then return false, CarOperations.CarDirections.None, -1 end
+CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH = function(carIndex)
+  local totalSideBlockRaysData = CarManager.cars_totalSideBlockRaysData[carIndex]
+  if not totalSideBlockRaysData then
+    return
+  end
 
-  local carPosition = car.position
-  local carForward = car.look
-  local carLeft = car.side
-  local carUp = car.up
-  local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
-  local carAnchorPoints = getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)
-  -- experimenting with two lines parallel to the car side instead of the 10 rays in various directions
-  -- draw parallel line on the left
-  -- render.debugLine(
+  local cars_sideBlockRaysData = CarManager.cars_sideBlockRaysData[carIndex]
+  for i = 0, totalSideBlockRaysData - 1 do
+    local pos = cars_sideBlockRaysData[carIndex + (i*3)]
+    local dir = cars_sideBlockRaysData[carIndex + (i*3)+1]
+    local len = cars_sideBlockRaysData[carIndex + (i*3)+2]
+
+    -- Logger.log(string.format("CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH: car #%d pos: %s, dir: %s, len: %s", carIndex, tostring(pos), tostring(dir), tostring(len)))
+    render.debugLine(pos, pos + dir * len, RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)
+  end
 end
 
-CarOperations.renderCarBlockCheckRays = function(carIndex)
+CarOperations.renderCarBlockCheckRays_PARALLELLINES = function(carIndex)
   local car = ac.getCar(carIndex)
   if not car then return end
+
+  -- Build fresh anchors (front/rear on each side + directions)
+  local carPosition = car.position
+  local carForward  = car.look
+  local carLeft     = car.side
+  local carUp       = car.up
+  local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
+  local p = CarOperations.getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)  -- returns left/right dirs too
+  -- p has: frontLeft, rearLeft, frontRight, rearRight, leftDirection, rightDirection, etc.  :contentReference[oaicite:2]{index=2}
+
+  -- How far to place the parallel lines from the car’s sides (meters).
+  -- You can expose this in UI and store it in storage.parallelLinesSideGap or CarManager.sideParallelLinesGap.
+  -- local storage = (StorageManager and StorageManager.getStorage) and StorageManager.getStorage() or nil
+  local sideGap = 
+              -- (storage and storage.parallelLinesSideGap)
+               -- or CarManager.sideParallelLinesGap
+               -- or 
+               1.0
+
+  -- Offset vectors away from body
+  local leftOffset  = p.leftDirection  * sideGap
+  local rightOffset = p.rightDirection * sideGap
+
+  -- Draw two long parallel lines, rear→front, one on each side
+  render.debugLine(p.rearLeft  + leftOffset,  p.frontLeft  + leftOffset,  RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)   -- blue by your constants :contentReference[oaicite:3]{index=3}
+  render.debugLine(p.rearRight + rightOffset, p.frontRight + rightOffset, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)  -- red
+end
+
+
+CarOperations.renderCarBlockCheckRays = function(carIndex)
+-- CarOperations.renderCarBlockCheckRays = function(car)
+  -- local car = ac.getCar(carIndex)
+  -- if not car then return end
 
   -- local carAnchorPoints = CarOperations.getSideAnchorPoints(carIndex,car)
   local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
   if not carAnchorPoints then
-    Logger.log(string.format("CarOperations.renderCarBlockCheckRays: Car %d has no anchor points calculated", carIndex))
+    -- Logger.log(string.format("CarOperations.renderCarBlockCheckRays: Car %d has no anchor points calculated", carIndex))
     return
   end
 

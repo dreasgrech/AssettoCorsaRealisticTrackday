@@ -24,7 +24,11 @@ CarManager.cars_indRight = {}
 CarManager.cars_indPhase = {}
 CarManager.cars_hasTL = {}
 CarManager.cars_evacuating = {}
+
 CarManager.cars_anchorPoints = {}
+CarManager.cars_totalSideBlockRaysData = {} -- {[carIndex] = 1, [carIndex] = 0, ...}
+CarManager.cars_sideBlockRaysData = {} -- Example: one ray=> {pos,dir,len}. two rays: {pos,dir,len,pos,dir,len}
+
 CarManager.cars_throttleLimit = {}
 CarManager.cars_aiCaution = {}
 CarManager.cars_aiTopSpeed = {}
@@ -113,7 +117,12 @@ ac.onCarJumped(-1, function(carIndex)
 end)
 
 function CarManager.getCalculatedTrackLateralOffset(carIndex)
+  -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
+  -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
+  -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
+  -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
   return CarManager.cars_currentSplineOffset[carIndex]
+  --return CarManager.getActualTrackLateralOffset(ac.getCar(carIndex).position)
 end
 
 -- function CarManager.getActualTrackLateralOffset(carIndex)
