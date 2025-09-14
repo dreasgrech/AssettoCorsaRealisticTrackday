@@ -29,6 +29,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         return
     end
 
+    -- make the driver more aggressive while overtaking
+    CarOperations.setAICaution(carIndex, 0)
+
     -- local carFrontIndex = carFront.index
     -- local carFrontCurrentSideOffset = CarManager.cars_currentSplineOffset[carFrontIndex]
     -- local carFrontTargetSideOffset = CarManager.cars_targetSplineOffset[carFrontIndex]
@@ -87,7 +90,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     end
 
     -- if we've arrived at the target side offset, we can now stay on the overtaking lane
-    local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+    -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+    local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
     local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
     local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
     if arrivedAtTargetOffset then
@@ -97,5 +101,6 @@ end
 
 -- EXIT FUNCTION
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-
+    -- reset the overtaking car caution back to normal
+    CarOperations.resetAICaution(carIndex)
 end

@@ -19,8 +19,6 @@ CarManager.cars_reasonWhyCantYield = {}
 CarManager.cars_reasonWhyCantOvertake = {}
 CarManager.cars_yieldTime = {}
 CarManager.cars_currentTurningLights = {}
-CarManager.cars_isSideBlocked = {}
-CarManager.cars_sideBlockedCarIndex = {}
 CarManager.cars_indLeft = {}
 CarManager.cars_indRight = {}
 CarManager.cars_indPhase = {}
@@ -61,8 +59,6 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_reasonWhyCantOvertake[carIndex] = ''
   CarManager.cars_yieldTime[carIndex] = 0
   CarManager.cars_currentTurningLights[carIndex] = nil
-  CarManager.cars_isSideBlocked[carIndex] = false
-  CarManager.cars_sideBlockedCarIndex[carIndex] = nil
   CarManager.cars_indLeft[carIndex] = false
   CarManager.cars_indRight[carIndex] = false
   CarManager.cars_indPhase[carIndex] = false
@@ -79,7 +75,7 @@ local function setInitializedDefaults(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
   CarOperations.setAIStopCounter(carIndex, 0)
   CarOperations.setGentleStop(carIndex, false)
-  CarOperations.setAICaution(carIndex, 1)
+  CarOperations.resetAICaution(carIndex)
 
   -- reset any pedal positions we may have set
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
@@ -115,6 +111,20 @@ ac.onCarJumped(-1, function(carIndex)
   -- ac.log(("Car #%d (%s) jumped/reset at spline=%.3f"):format(carIndex, car.name, car.splinePosition))
   setInitializedDefaults(carIndex) -- reset state on jump/reset
 end)
+
+function CarManager.getCalculatedTrackLateralOffset(carIndex)
+  return CarManager.cars_currentSplineOffset[carIndex]
+end
+
+-- function CarManager.getActualTrackLateralOffset(carIndex)
+  -- local car = ac.getCar(carIndex)
+  -- if not car then
+    -- return 0
+  -- end
+function CarManager.getActualTrackLateralOffset(carPosition)
+  local carTrackCoordinates = ac.worldCoordinateToTrack(carPosition)
+  return carTrackCoordinates.x
+end
 
 
 function CarManager.getCarListSortedByTrackPosition()

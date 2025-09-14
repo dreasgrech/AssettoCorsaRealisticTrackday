@@ -21,7 +21,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carB
     -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 
       -- reset the yielding car caution back to normal
-      CarOperations.setAICaution(carIndex, 1)
+      CarOperations.resetAICaution(carIndex)
 
       -- remove the yielding car throttle limit since we will now be driving normally
       CarOperations.setAIThrottleLimit(carIndex, 1)

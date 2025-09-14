@@ -49,7 +49,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
 
       -- if we're back to the center, return to normal driving
-      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
         CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil -- clear the reference to the car we were overtaking since we'll now go back to normal driving

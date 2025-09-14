@@ -21,7 +21,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   CarOperations.removeAITopSpeed(carIndex)
 
   -- reset the yielding car caution back to normal
-  CarOperations.setAICaution(carIndex, 1)
+  CarOperations.resetAICaution(carIndex)
 
   -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
   local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
@@ -84,7 +84,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
 
       -- if we're back to the center, return to normal driving
-      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
         CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil -- clear the reference to the car we were yielding to since we'll now go back to normal driving

@@ -10,7 +10,8 @@ end
 
 -- UPDATE FUNCTION
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-
+    -- make the driver more aggressive while overtaking
+    CarOperations.setAICaution(carIndex, 0)
 end
 
 -- TRANSITION FUNCTION
@@ -54,4 +55,6 @@ end
 
 -- EXIT FUNCTION
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+    -- reset the overtaking car caution back to normal
+    CarOperations.resetAICaution(carIndex)
 end

@@ -116,7 +116,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
       -- local sideSign = yieldingToLeft and -1 or 1
       -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
-      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
       local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
       local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
       if arrivedAtTargetOffset then

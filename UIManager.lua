@@ -24,6 +24,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = '#', orderDirection = 0, width = 60, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
   { name = 'Velocity', orderDirection = 0, width = 75, tooltip='Current velocity' },
+  { name = 'Actual Offset', orderDirection = 0, width = 60, tooltip='Actual Lateral offset from centerline' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
   { name = 'Pedals (C,B,G)', orderDirection = 0, width = 100, tooltip='Pedal positions' },
@@ -116,6 +117,8 @@ UIManager.drawMainWindowContent = function()
       local currentlyYielding = currentlyYieldingCarIndex
       local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
       local currentlyOvertaking = currentlyOvertakingCarIndex
+      local actualTrackLateralOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+
 
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
@@ -149,7 +152,8 @@ UIManager.drawMainWindowContent = function()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
       -- ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d km/h", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", CarManager.cars_currentSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", actualTrackLateralOffset), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", CarManager.getCalculatedTrackLateralOffset(carIndex) or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.1f|%.1f|%.1f", carInput.clutch, carInput.brake, carInput.gas), uiColor); ui.nextColumn()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
@@ -207,10 +211,6 @@ UIManager.indicatorStatusText = function(i)
         end
     end
     if CarManager.cars_hasTL[i] == false then indTxt = indTxt .. '(!)' end
-    if CarManager.cars_isSideBlocked[i] then
-        -- explicitly show that we’re not able to move over yet and are slowing to create space
-        indTxt = (indTxt ~= '-' and (indTxt .. ' ') or '') .. '(slowing due to yield lane blocked)'
-    end
     return indTxt
 end
 
