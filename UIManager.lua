@@ -124,10 +124,17 @@ UIManager.drawMainWindowContent = function()
 
       ui.pushID(carIndex)
 
+      -- remember where the row starts
+      local rowTop = ui.cursorScreenPos()  -- current screen-space cursor
+      ui.pushColumnsBackground()
+
       -- 1) Full-row clickable background
-      ui.selectable('##row', false, ui.SelectableFlags.SpanAllColumns)
+      ui.selectable('##row'..carIndex, false, ui.SelectableFlags.SpanAllColumns)
       local rowClicked = ui.itemClicked()         -- capture immediately (refers to the selectable)
       -- ui.setItemAllowOverlap()                     -- allow drawing cells over the clickable area
+
+      ui.popColumnsBackground()
+      ui.setCursorScreenPos(rowTop) -- put cursor back so first cell draws at the right Y
 
       -- Row cells
       ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
@@ -162,11 +169,12 @@ UIManager.drawMainWindowContent = function()
       ui.nextColumn()
       ui.textColored(reason, uiColor); ui.nextColumn()
 
+      ui.popID()
+
       if rowClicked then
           Logger.log(string.format('UIManager: Car row %d clicked', carIndex))
       end
 
-      ui.popID()
     end
   end
 
