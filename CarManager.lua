@@ -81,7 +81,7 @@ local function setInitializedDefaults(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
   CarOperations.setAIStopCounter(carIndex, 0)
   CarOperations.setGentleStop(carIndex, false)
-  CarOperations.resetAICaution(carIndex)
+  CarOperations.removeAICaution(carIndex)
 
   -- reset any pedal positions we may have set
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)

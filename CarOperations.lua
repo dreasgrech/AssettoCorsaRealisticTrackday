@@ -87,7 +87,7 @@ CarOperations.resetAIThrottleLimit = function(carIndex)
   CarOperations.setAIThrottleLimit(carIndex, 1)
 end
 
-CarOperations.resetAICaution = function(carIndex)
+CarOperations.removeAICaution = function(carIndex)
   CarOperations.setAICaution(carIndex, 1)
 end
 
@@ -428,16 +428,16 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays_NEWDoDAPPROACH
     CarManager.cars_sideBlockRaysData[carIndex][4] = ray2_dir
     CarManager.cars_sideBlockRaysData[carIndex][5] = ray2_len
 
-    local leftHitCar, leftHitCarDistance = checkForOtherCars(ray1_pos, ray1_dir, ray1_len)
-    if leftHitCar then
-      -- TODO: can we be more specific with the direction here?
-      return true, CarOperations.CarDirections.CenterLeft, leftHitCarDistance
-    end
-
     local rightHitCar, rightHitCarDistance = checkForOtherCars(ray2_pos, ray2_dir, ray2_len)
     if rightHitCar then
       -- TODO: can we be more specific with the direction here?
       return true, CarOperations.CarDirections.CenterRight, rightHitCarDistance
+    end
+
+    local leftHitCar, leftHitCarDistance = checkForOtherCars(ray1_pos, ray1_dir, ray1_len)
+    if leftHitCar then
+      -- TODO: can we be more specific with the direction here?
+      return true, CarOperations.CarDirections.CenterLeft, leftHitCarDistance
     end
 
     return false, CarOperations.CarDirections.None, 0

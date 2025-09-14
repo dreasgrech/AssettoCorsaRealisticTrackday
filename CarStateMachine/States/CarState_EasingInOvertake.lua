@@ -102,5 +102,5 @@ end
 -- EXIT FUNCTION
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     -- reset the overtaking car caution back to normal
-    CarOperations.resetAICaution(carIndex)
+    CarOperations.removeAICaution(carIndex)
 end

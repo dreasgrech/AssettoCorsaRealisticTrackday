@@ -32,7 +32,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
       -- limit the yielding car throttle while driving on the yielding lane
       -- CarOperations.setAIThrottleLimit(carIndex, 0.5)
-      -- CarOperations.setAITopSpeed(carIndex, carBehind.speedKmh*0.7) -- limit the yielding car top speed to half the overtaking car speed while driving on the yielding lane
+      CarOperations.setAITopSpeed(carIndex, carWeAreCurrentlyYieldingTo.speedKmh*0.5) -- limit the yielding car top speed to half the overtaking car speed while driving on the yielding lane
 
       -- make sure we spend enough time in this state before opening the possibility to ease out
       -- if timeInStates[carIndex] < minimumTimesInState[CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] then
@@ -78,5 +78,6 @@ end
 
 -- EXIT FUNCTION
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-
+  CarOperations.removeAICaution(carIndex)
+  CarOperations.removeAITopSpeed(carIndex)
 end
