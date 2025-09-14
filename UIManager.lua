@@ -122,19 +122,27 @@ UIManager.drawMainWindowContent = function()
         Logger.error(string.format('Car %d is both yielding to car %d and overtaking car %d at the same time!', carIndex, currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
       end
 
+      -- start a new ui id section so that we don't have name collisions
       ui.pushID(carIndex)
 
       -- remember where the row starts
       local rowTop = ui.cursorScreenPos()  -- current screen-space cursor
+
+      -- send the full-row clickable to the background so the per-cell text/controls render cleanly on top across all columns
       ui.pushColumnsBackground()
 
-      -- 1) Full-row clickable background
+      -- create the full-row selectable which will be clickable
       ui.selectable('##row'..carIndex, false, ui.SelectableFlags.SpanAllColumns)
+      -- grab the itemClicked event of the selectable we just created
       local rowClicked = ui.itemClicked()         -- capture immediately (refers to the selectable)
       -- ui.setItemAllowOverlap()                     -- allow drawing cells over the clickable area
 
+      -- we can now pop the columns background so that cells draw normally
       ui.popColumnsBackground()
-      ui.setCursorScreenPos(rowTop) -- put cursor back so first cell draws at the right Y
+
+      -- put cursor back so first cell draws at the right Y
+      -- this is because we're drawing the clickable row first and then drawing the cells on top of it
+      ui.setCursorScreenPos(rowTop)
 
       -- Row cells
       ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
@@ -169,6 +177,7 @@ UIManager.drawMainWindowContent = function()
       ui.nextColumn()
       ui.textColored(reason, uiColor); ui.nextColumn()
 
+      -- end the ui id section
       ui.popID()
 
       if rowClicked then
