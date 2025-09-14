@@ -21,12 +21,13 @@ local CarStateType = {
 CarStateMachine.CarStateTypeStrings = {}
 CarStateMachine.states_minimumTimeInState = { }
 
-local cars_previousState = {}
 local cars_state = {}
 
+CarStateMachine.cars_previousState = {}
 CarStateMachine.CarStateType = CarStateType
 
-CarStateMachine.changeState = function(carIndex, newState)
+-- CarStateMachine.changeState = function(carIndex, newState)
+local changeState = function(carIndex, newState)
     -- save a reference to the current state before changing it
     local currentState = CarStateMachine.getCurrentState(carIndex)
     local isFirstState = currentState == nil -- is this the first state we're setting for this car?
@@ -39,7 +40,7 @@ CarStateMachine.changeState = function(carIndex, newState)
       currentState = newState
     end
 
-    cars_previousState[carIndex] = currentState
+    CarStateMachine.cars_previousState[carIndex] = currentState
 
     -- reset the time in state counter
     CarManager.cars_timeInCurrentState[carIndex] = 0
@@ -158,7 +159,7 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
       queuedStatesToTransitionInto[carIndex] = nil
 
       -- change to the new state
-      CarStateMachine.changeState(carIndex, newStateToTransitionIntoThisFrame)
+      changeState(carIndex, newStateToTransitionIntoThisFrame)
 
       -- execute the state's entry function
       -- CarStateMachine.states_entryFunctions[newStateToTransitionIntoThisFrame](carIndex, dt, car, carBehind, storage)
