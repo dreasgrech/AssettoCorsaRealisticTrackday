@@ -181,7 +181,8 @@ UIManager.drawMainWindowContent = function()
       ui.popID()
 
       if rowClicked then
-          Logger.log(string.format('UIManager: Car row %d clicked', carIndex))
+          -- Logger.log(string.format('UIManager: Car row %d clicked', carIndex))
+          CameraManager.followCarWithChaseCamera(carIndex)
       end
 
     end

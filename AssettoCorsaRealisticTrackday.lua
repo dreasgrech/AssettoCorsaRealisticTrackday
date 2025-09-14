@@ -9,6 +9,7 @@ StorageManager = require("StorageManager")
 MathHelpers = require("MathHelpers")
 CarOperations = require("CarOperations")
 CarManager = require("CarManager")
+CameraManager = require("CameraManager")
 
 CarStateMachine = require("CarStateMachine.CarStateMachine")
 CarState_DrivingNormally = require("CarStateMachine.States.CarState_DrivingNormally")
