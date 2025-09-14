@@ -10,6 +10,10 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carB
       CarManager.cars_targetSplineOffset[carIndex] = 0
       CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
+      -- remove any reference to a car we may have been overtaking or yielding
+      CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
+      CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
+
       -- turn off turning lights
       CarOperations.toggleTurningLights(carIndex, car, ac.TurningLights.None)
       
@@ -22,8 +26,6 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carB
       -- remove the yielding car throttle limit since we will now be driving normally
       CarOperations.setAIThrottleLimit(carIndex, 1)
 
-      -- remove any reference to a car we may have been overtaking
-      CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
 end
 
 -- UPDATE FUNCTION

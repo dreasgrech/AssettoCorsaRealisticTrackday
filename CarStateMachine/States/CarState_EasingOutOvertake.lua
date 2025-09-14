@@ -46,6 +46,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       local arrivedBackToNormal = currentSplineOffset == 0
       if arrivedBackToNormal then
+        CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil -- clear the reference to the car we were overtaking since we'll now go back to normal driving
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
       end
 end

@@ -104,11 +104,12 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- end
 
       -- if we have reached the target offset, we can go to the next state
-      local yieldSide = storage.yieldSide
-      local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
-      local sideSign = yieldingToLeft and -1 or 1
+      -- local yieldSide = storage.yieldSide
+      -- local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
+      -- local sideSign = yieldingToLeft and -1 or 1
+      -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
       local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-      local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
+      local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
       local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
       if arrivedAtTargetOffset then
         return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
