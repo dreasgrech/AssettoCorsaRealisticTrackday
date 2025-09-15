@@ -24,7 +24,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = '#', orderDirection = 0, width = 60, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
   { name = 'Velocity', orderDirection = 0, width = 75, tooltip='Current velocity' },
-  { name = 'Actual Offset', orderDirection = 0, width = 60, tooltip='Actual Lateral offset from centerline' },
+  { name = 'RealOffset', orderDirection = 0, width = 75, tooltip='Actual Lateral offset from centerline' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
   { name = 'Pedals (C,B,G)', orderDirection = 0, width = 100, tooltip='Pedal positions' },
@@ -121,7 +121,8 @@ UIManager.drawMainWindowContent = function()
       local currentlyYielding = currentlyYieldingCarIndex
       local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
       local currentlyOvertaking = currentlyOvertakingCarIndex
-      local actualTrackLateralOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+      -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
+      local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
 
 
       -- TODO: this assert check should move to somewhere else
@@ -218,6 +219,8 @@ UIManager.indicatorStatusText = function(i)
     return indTxt
 end
 
+local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
+
 function UIManager.draw3DOverheadText()
   local storage = StorageManager.getStorage()
   if not storage.debugDraw then return end
@@ -231,7 +234,8 @@ function UIManager.draw3DOverheadText()
     -- render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
   -- end
 
-  for i = 1, (sim.carsCount or 0) - 1 do
+  -- for i = 1, sim.carsCount - 1 do
+  for i = 0, sim.carsCount do
   -- for i, car in ac.iterateCars() do
     CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
     -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
@@ -255,7 +259,7 @@ function UIManager.draw3DOverheadText()
         -- render.debugText(car.position + vec3(0, 2.0, 0), txt)
 
         local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
-        render.debugText(car.position + vec3(0, 2.0, 0), text, CARSTATES_TO_UICOLOR[carState])
+        render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_UICOLOR[carState])
       end
     end
   end

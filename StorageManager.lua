@@ -25,6 +25,8 @@ local storageTable = {
 
 local storage = ac.storage(storageTable)
 
+---comment
+---@return storageTable
 function StorageManager.getStorage()
     return storage
 end

@@ -124,7 +124,7 @@ function CarManager.getCalculatedTrackLateralOffset(carIndex)
   -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
   -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
   return CarManager.cars_currentSplineOffset[carIndex]
-  --return CarManager.getActualTrackLateralOffset(ac.getCar(carIndex).position)
+  -- return CarManager.getActualTrackLateralOffset(ac.getCar(carIndex).position)
 end
 
 -- function CarManager.getActualTrackLateralOffset(carIndex)

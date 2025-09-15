@@ -93,7 +93,17 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
     local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
     local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
-    local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
+    -- local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
+      -- calculate by checking if we'rve gone past the target too but the target could be less or greater than our value
+      local arrivedAtTargetOffset
+      -- local driveToSide = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
+      local driveToSide = RaceTrackManager.getOppositeSide(storage.yieldSide)
+      if driveToSide == RaceTrackManager.TrackSide.LEFT then
+        arrivedAtTargetOffset = currentSplineOffset <= targetSplineOffset
+      else
+        arrivedAtTargetOffset = currentSplineOffset >= targetSplineOffset
+      end
+
     if arrivedAtTargetOffset then
         return CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
     end

@@ -47,8 +47,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         return
       end
 
-      CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
       CarOperations.resetAIThrottleLimit(carIndex)
+      CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
 
       -- -- make sure there isn't any car on the side we're trying to yield to so we don't crash into it
       -- local isSideSafeToYield = CarStateMachine.isSafeToDriveToTheSide(carIndex, yieldSide)
@@ -119,7 +119,16 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
       local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
-      local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
+      -- local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
+      -- calculate by checking if we'rve gone past the target too but the target could be less or greater than our value
+      local arrivedAtTargetOffset
+      local yieldSide = storage.yieldSide
+      if yieldSide == RaceTrackManager.TrackSide.LEFT then
+        arrivedAtTargetOffset = currentSplineOffset <= targetSplineOffset
+      else
+        arrivedAtTargetOffset = currentSplineOffset >= targetSplineOffset
+      end
+
       if arrivedAtTargetOffset then
         return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
       end

@@ -40,12 +40,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
-    -- -- if there's a car behind us that's faster than us, we need to yield to it instead of staying on the overtaking lane
-    -- local isCarBehindFasterThanUs = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(carBehind, car, 10)
-    -- if isCarBehindFasterThanUs then
-        -- return CarStateMachine.CarStateType.EASING_IN_YIELD
-    -- end
-
     --  check if we need to yield to a car behind us
     local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
     if newStateDueToCarBehind then
