@@ -393,10 +393,10 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays_NEWDoDAPPROACH
     local car = ac.getCar(carIndex)
     if not car then return false, CarOperations.CarDirections.None, -1 end
 
-    local carIndex = car.index
+    -- local carIndex = car.index
     local carPosition = car.position
     local carForward  = car.look
-    local carLeft     = car.side
+    local carLeftSide     = car.side
     local carUp       = car.up
     local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
     if not halfAABBSize.z then
@@ -404,29 +404,34 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays_NEWDoDAPPROACH
     end
 
     -- TODO: remove use of CarOperations.getSideAnchorPoints here and only calculate what we need
-    local p = CarOperations.getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)  -- returns left/right dirs too
-    local pLeftDirection = p.leftDirection
-    local pRightDirection = p.rightDirection
-    local pRearLeft  = p.rearLeft
-    local pRearRight = p.rearRight
+    local p = CarOperations.getSideAnchorPoints(carPosition, carForward, carLeftSide, carUp, halfAABBSize)  -- returns left/right dirs too
+    -- local pLeftDirection = p.leftDirection
+    -- local pRightDirection = p.rightDirection
     local sideGap = 2.0
+
+    CarManager.cars_totalSideBlockRaysData[carIndex] = 2
+
+    local pLeftDirection = carLeftSide
+    local pRearLeft  = p.rearLeft
     local leftOffset  = pLeftDirection  * sideGap
-    local rightOffset = pRightDirection * sideGap
     local ray1_pos  = pRearLeft + leftOffset
     local ray1_dir  = carForward
     local ray1_len  = (halfAABBSize.z * 2)-- + 6
-    local ray2_pos  = pRearRight + rightOffset
-    local ray2_dir  = carForward
-    local ray2_len  = (halfAABBSize.z * 2)-- + 3
-    CarManager.cars_totalSideBlockRaysData[carIndex] = 2
-
     -- todo: cache array here instead of calling carmanager.cars_sideBlockRaysData[carIndex] multiple times
     CarManager.cars_sideBlockRaysData[carIndex][0] = ray1_pos
     CarManager.cars_sideBlockRaysData[carIndex][1] = ray1_dir
     CarManager.cars_sideBlockRaysData[carIndex][2] = ray1_len
+
+    local pRightDirection = -carLeftSide
+    local pRearRight = p.rearRight
+    local rightOffset = pRightDirection * sideGap
+    local ray2_pos  = pRearRight + rightOffset
+    local ray2_dir  = carForward
+    local ray2_len  = (halfAABBSize.z * 2)-- + 3
     CarManager.cars_sideBlockRaysData[carIndex][3] = ray2_pos
     CarManager.cars_sideBlockRaysData[carIndex][4] = ray2_dir
     CarManager.cars_sideBlockRaysData[carIndex][5] = ray2_len
+
 
     local rightHitCar, rightHitCarDistance = checkForOtherCars(ray2_pos, ray2_dir, ray2_len)
     if rightHitCar then
