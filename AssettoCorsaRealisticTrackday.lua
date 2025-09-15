@@ -227,6 +227,7 @@ function script.MANIFEST__TRANSPARENT(dt)
   -- CarOperations.renderCarBlockCheckRays_PARALLELLINES(0)
   CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(0)
 --]=====]
+-- CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays(0, RaceTrackManager.TrackSide.LEFT)
   -- ----------------------------------------------------------------
   
 
@@ -234,12 +235,15 @@ function script.MANIFEST__TRANSPARENT(dt)
   if storage.debugDraw then
     local sim = ac.getSim()
     -- for carIndex = 1, sim.carsCount - 1 do
-    for carIndex, car in ac.iterateCars() do
+    -- for carIndex, car in ac.iterateCars() do
+    for i, car in ac.iterateCars() do
+      local carIndex = car.index
       -- local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
       -- if carAnchorPoints then
         -- CarOperations.drawSideAnchorPoints(carIndex)
         
         -- CarOperations.renderCarBlockCheckRays(carIndex)
+        -- CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
         CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
       -- end
     end

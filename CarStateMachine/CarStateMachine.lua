@@ -57,7 +57,7 @@ end
 
 ---comment
 ---@param carIndex number
----@param drivingToSide TraceTrackManager.TrackSide|integer
+---@param drivingToSide RaceTrackManager.TrackSide|integer
 ---@return boolean
 -- local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
 CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)

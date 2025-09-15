@@ -389,6 +389,12 @@ CarOperations.isTargetSideBlocked = function(carIndex)
 end
 --]=====]
 
+---comment
+---@param carIndex any
+---@param sideToCheck RaceTrackManager.TrackSide|integer
+---@return boolean
+---@return integer
+---@return integer
 CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(carIndex, sideToCheck)
     local car = ac.getCar(carIndex)
     if not car then return false, CarOperations.CarDirections.None, -1 end
@@ -449,31 +455,35 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(car
 
     ---------------------------------
     CarManager.cars_totalSideBlockRaysData[carIndex] = 1
-    local pDirection, pRearPosition
+    local pDirection, pRearPosition, hitDirection
     if sideToCheck == RaceTrackManager.TrackSide.LEFT then
       pDirection = carLeftDirection
       pRearPosition = p.rearLeft
+      hitDirection = CarOperations.CarDirections.CenterLeft
     else
       pDirection = -carLeftDirection
       pRearPosition = p.rearRight
+      hitDirection = CarOperations.CarDirections.CenterRight
     end
       
     local offset = pDirection * sideGap
 
-    local ray_pos = pRearPosition + offset
+    local ray_pos = (pRearPosition + offset)
     local ray_dir = carForward
-    local ray_len = (halfAABBSize.x * 2)
+    -- local ray_len = (halfAABBSize.z * 2)
+    local ray_len = (halfAABBSize.z * 4)
     CarManager.cars_sideBlockRaysData[carIndex][0] = ray_pos
     CarManager.cars_sideBlockRaysData[carIndex][1] = ray_dir
     CarManager.cars_sideBlockRaysData[carIndex][2] = ray_len
 
     local hitCar, hitCarDistance = checkForOtherCars(ray_pos, ray_dir, ray_len)
-    if hitCar then
-      return true, sideToCheck, hitCarDistance
-    end
+    return hitCar, hitDirection, hitCarDistance
+    -- if hitCar then
+      -- return true, hitDirection, hitCarDistance
+    -- end
     ---------------------------------
 
-    return false, CarOperations.CarDirections.None, 0
+    -- return false, CarOperations.CarDirections.None, 0
   end
 
 --[=====[
