@@ -221,6 +221,11 @@ CarStateMachine.informAboutAccident = function(accidentIndex)
 end
 
 CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)
+  local handleOvertaking = storage.handleOvertaking
+  if not handleOvertaking then
+    return
+  end
+
     -- if there's no car in front of us, do nothing
     if not carFront then
       return

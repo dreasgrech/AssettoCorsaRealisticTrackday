@@ -9,6 +9,7 @@ local storageTable = {
     yieldSide = RaceTrackManager.TrackSide.RIGHT,
     overrideAiAwareness = false,
     handleAccidents = false,
+    handleOvertaking = true,
     detectCarBehind_meters = 70,
     minPlayerSpeed_kmh = 0,
     -- minSpeedDelta_kmh = 0.0,
