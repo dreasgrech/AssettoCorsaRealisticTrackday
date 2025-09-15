@@ -127,7 +127,8 @@ UIManager.drawMainWindowContent = function()
 
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
-        Logger.error(string.format('Car %d is both yielding to car %d and overtaking car %d at the same time!', carIndex, currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
+        local previousCarState = CarStateMachine.cars_previousState[carIndex]
+        Logger.error(string.format('Car #%d (current: %s, previous:%s) is both yielding to car #%d and overtaking car #%d at the same time!', carIndex, CarStateMachine.CarStateTypeStrings[state],CarStateMachine.CarStateTypeStrings[previousCarState], currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
       end
 
       -- start a new ui id section so that we don't have name collisions
