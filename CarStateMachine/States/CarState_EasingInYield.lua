@@ -31,11 +31,6 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarList[sortedCarListIndex]
       local yieldSide = storage.yieldSide
 
-      -- local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
-      -- local sideSign = yieldingToLeft and -1 or 1
-      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-      -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
-
       local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, storage.yieldMaxOffset_normalized, storage.rampSpeed_mps, storage.overrideAiAwareness)
       if not droveSafelyToSide then
         -- reduce the car speed so that we can find a gap
@@ -50,39 +45,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       CarOperations.resetAIThrottleLimit(carIndex)
       CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
 
-      -- -- make sure there isn't any car on the side we're trying to yield to so we don't crash into it
-      -- local isSideSafeToYield = CarStateMachine.isSafeToDriveToTheSide(carIndex, yieldSide)
-      -- if not isSideSafeToYield then
-        -- -- reduce the car speed so that we can find a gap
-        -- CarOperations.setAIThrottleLimit(carIndex, 0.4)
-
-        -- -- set the brake pedal to something low to help slow down the car while waiting for a gap
-        -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.2)
-
-        -- return
-      -- end
-
-      CarManager.cars_reasonWhyCantYield[carIndex] = nil -- NOT INCLUDED IN NEW FUNCTION
-
-      -- CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
-
-      -- CarOperations.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap
-
-      -- -- if we are driving at high speed, we need to increase the ramp speed slower so that our car doesn't jolt out of control
-      -- local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
-
-      -- currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
-
-      -- -- set the spline offset on the ai car
-      -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
-      -- physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
-
-      -- -- keep the turning lights on while yielding
-      -- local turningLights = yieldingToLeft and ac.TurningLights.Left or ac.TurningLights.Right
-      -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
-
-      -- CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
-      -- CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
+      CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
 end
