@@ -65,7 +65,7 @@ CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
     -- check if there's a car on our side
     if storage.handleSideChecking then
       -- local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
-      local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays_NEWDoDAPPROACH(carIndex)
+      local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays(carIndex, drivingToSide)
       if isCarOnSide then
           -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
           local trackSideOfBlockingCar = CarOperations.getTrackSideFromCarDirection(carOnSideDirection)
