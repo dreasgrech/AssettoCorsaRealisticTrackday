@@ -409,7 +409,7 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays_NEWDoDAPPROACH
     local pRightDirection = p.rightDirection
     local pRearLeft  = p.rearLeft
     local pRearRight = p.rearRight
-    local sideGap = 1.0
+    local sideGap = 2.0
     local leftOffset  = pLeftDirection  * sideGap
     local rightOffset = pRightDirection * sideGap
     local ray1_pos  = pRearLeft + leftOffset
