@@ -41,11 +41,25 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
-      -- if there's a car behind us, check if we should start yielding to it
-      local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-      if newStateDueToCarBehind then
-        CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-        return newStateDueToCarBehind
+      local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
+      local currentlyOvertakingCar = ac.getCar(currentlyOvertakingCarIndex)
+      if not (currentlyOvertakingCar) then
+          -- the car we're overtaking is no longer valid, return to driving normally
+          return CarStateMachine.CarStateType.DRIVING_NORMALLY
+      end
+
+      -- check if there's currently a car behind us
+      if carBehind then
+        -- check if the car behind us is the same car we're overtaking
+        local isCarSameAsCarWeAreOvertaking = carBehind.index == currentlyOvertakingCarIndex
+        -- if the car behind us is not the same car we're overtaking, check if we should start yielding to it instead
+        if not isCarSameAsCarWeAreOvertaking then
+          local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+          if newStateDueToCarBehind then
+            CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
+            return newStateDueToCarBehind
+          end
+        end
       end
 
       -- if we're back to the center, return to normal driving
