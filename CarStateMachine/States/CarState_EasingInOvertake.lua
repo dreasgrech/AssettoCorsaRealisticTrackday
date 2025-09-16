@@ -30,7 +30,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     end
 
     -- make the driver more aggressive while overtaking
-    CarOperations.setAICaution(carIndex, 0)
+    -- CarOperations.setAICaution(carIndex, 0) -- andreas: commenting this because they get way too aggressive
 
     -- local carFrontIndex = carFront.index
     -- local carFrontCurrentSideOffset = CarManager.cars_currentSplineOffset[carFrontIndex]
@@ -39,7 +39,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
     -- the drive to side is to be opposite side to the the yielding side
     local driveToSide = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
-    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, storage.yieldMaxOffset_normalized, storage.rampSpeed_mps, storage.overrideAiAwareness)
+    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, storage.yieldMaxOffset_normalized, storage.overtakeRampSpeed_mps, storage.overrideAiAwareness)
     if not droveSafelyToSide then
         -- TODO: Continue here
         -- TODO: Continue here

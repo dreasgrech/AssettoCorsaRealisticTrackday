@@ -1,7 +1,7 @@
 local STATE = CarStateMachine.CarStateType.EASING_IN_YIELD
 
 CarStateMachine.CarStateTypeStrings[STATE] = "EasingInYield"
-CarStateMachine.states_minimumTimeInState[STATE] = 1
+CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)

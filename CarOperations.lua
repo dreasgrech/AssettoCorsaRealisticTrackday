@@ -468,7 +468,7 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(car
       
     local offset = pDirection * sideGap
 
-    local ray_pos = (pRearPosition + offset)
+    local ray_pos = (pRearPosition + offset) + (-carForward * (halfAABBSize.z))
     local ray_dir = carForward
     -- local ray_len = (halfAABBSize.z * 2)
     local ray_len = (halfAABBSize.z * 4)

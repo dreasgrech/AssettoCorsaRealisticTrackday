@@ -33,7 +33,8 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
   { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
-  { name = 'State', orderDirection = 0, width = 170, tooltip='Current state' },
+  { name = 'Previous State', orderDirection = 0, width = 170, tooltip='Previous state' },
+  { name = 'Current State', orderDirection = 0, width = 170, tooltip='Current state' },
   { name = 'Time in State', orderDirection = 0, width = 100, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
@@ -124,10 +125,10 @@ UIManager.drawMainWindowContent = function()
       -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
       local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
 
+      local previousCarState = CarStateMachine.cars_previousState[carIndex]
 
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
-        local previousCarState = CarStateMachine.cars_previousState[carIndex]
         Logger.error(string.format('Car #%d (current: %s, previous:%s) is both yielding to car #%d and overtaking car #%d at the same time!', carIndex, CarStateMachine.CarStateTypeStrings[state],CarStateMachine.CarStateTypeStrings[previousCarState], currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
       end
 
@@ -167,7 +168,8 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
-      ui.textColored(CarStateMachine.CarStateTypeStrings[state] or tostring(state), uiColor); ui.nextColumn()
+      ui.textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui.nextColumn()
+      ui.textColored(CarStateMachine.CarStateTypeStrings[state], uiColor); ui.nextColumn()
       ui.textColored(string.format("%.1fs", CarManager.cars_timeInCurrentState[carIndex]), uiColor); ui.nextColumn()
       -- if CarManager.cars_currentlyYielding[carIndex] then
       if currentlyYielding then
@@ -287,6 +289,9 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Handle overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
 
+    if ui.checkbox('Handle side checking while yielding/overtaking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
+    if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding.') end
+
     if ui.checkbox('Handle accidents', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
 
@@ -295,9 +300,6 @@ function UIManager.renderUIOptionsControls()
 
     if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
     if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
-
-    if ui.checkbox('Handle side checking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
-    if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding.') end
 
     storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
@@ -311,11 +313,17 @@ function UIManager.renderUIOptionsControls()
     -- storage.minSpeedDelta_kmh =  ui.slider('Min speed delta (km/h)', storage.minSpeedDelta_kmh, 0, 30)
     -- if ui.itemHovered() then ui.setTooltip('Require some closing speed before asking AI to yield.') end
 
-    storage.rampSpeed_mps =  ui.slider('Offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
+    storage.rampSpeed_mps =  ui.slider('Yield Offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when yielding.') end
 
     storage.rampRelease_mps =  ui.slider('Offset release (m/s)', storage.rampRelease_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset returns to normal once an overtaking car has fully driven past the yielding car.') end
+
+    storage.overtakeRampSpeed_mps =  ui.slider('Overtake offset ramp (m/s)', storage.overtakeRampSpeed_mps, 0.1, 3.0)
+    if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when overtaking another car.') end
+
+    storage.overtakeRampRelease_mps =  ui.slider('Overtake offset release (m/s)', storage.overtakeRampRelease_mps, 0.1, 3.0)
+    if ui.itemHovered() then ui.setTooltip('How quickly the side offset returns to normal once an overtaking car has fully driven past the overtaken car.') end
 
     storage.minAISpeed_kmh =  ui.slider('Min AI speed (km/h)', storage.minAISpeed_kmh, 0, 120)
     if ui.itemHovered() then ui.setTooltip('Don’t ask AI to yield if its own speed is below this (corners/traffic).') end

@@ -1,7 +1,7 @@
 local STATE = CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
 
 CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnOvertakingLane"
-CarStateMachine.states_minimumTimeInState[STATE] = 0.5
+CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
@@ -11,7 +11,7 @@ end
 -- UPDATE FUNCTION
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     -- make the driver more aggressive while overtaking
-    CarOperations.setAICaution(carIndex, 0)
+    -- CarOperations.setAICaution(carIndex, 0) -- andreas: commenting this because they get way too aggressive
 end
 
 -- TRANSITION FUNCTION

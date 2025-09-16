@@ -29,7 +29,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- the drive to side is now the same side as the yielding side since we're easing out of the overtake
     local driveToSide = storage.yieldSide
     local targetOffset = 0
-    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, storage.rampRelease_mps, storage.overrideAiAwareness)
+    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, storage.overtakeRampRelease_mps, storage.overrideAiAwareness)
     if not droveSafelyToSide then
         -- TODO: Continue here: what should we do if we can't ease out the overtake because the side is blocked?
     end
