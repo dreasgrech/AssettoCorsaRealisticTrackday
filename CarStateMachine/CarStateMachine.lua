@@ -235,7 +235,8 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
     local carPosition = car.position
     local carFrontPosition = carFront.position
     local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
-    if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
+    -- if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
+    if distanceToFrontCar > storage.detectCarBehind_meters then -- Andreas: using the same distance as detecting a car to yield to
       CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
       return
     end

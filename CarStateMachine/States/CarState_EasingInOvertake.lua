@@ -81,12 +81,25 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
     -- If there's a car behind us, check if we should start yielding to it
     local car = sortedCarsList[sortedCarsListIndex]
-    local carBehind = sortedCarsList[sortedCarsListIndex + 1]
     local carFront = sortedCarsList[sortedCarsListIndex - 1]
-    local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-    if newStateDueToCarBehind then
-        CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-        return newStateDueToCarBehind
+    local carBehind = sortedCarsList[sortedCarsListIndex + 1]
+    -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+    -- if newStateDueToCarBehind then
+        -- CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
+        -- return newStateDueToCarBehind
+    -- end
+    -- check if there's currently a car behind us
+    if carBehind then
+        -- check if the car behind us is the same car we're overtaking
+        local isCarSameAsCarWeAreOvertaking = carBehind.index == currentlyOvertakingCarIndex
+        -- if the car behind us is not the same car we're overtaking, check if we should start yielding to it instead
+        if not isCarSameAsCarWeAreOvertaking then
+            local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+            if newStateDueToCarBehind then
+                CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
+                return newStateDueToCarBehind
+            end
+        end
     end
 
     -- if we've arrived at the target side offset, we can now stay on the overtaking lane
