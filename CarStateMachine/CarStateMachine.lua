@@ -231,6 +231,15 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
       return
     end
 
+    -- If we're not close to the front car, do nothing
+    local carPosition = car.position
+    local carFrontPosition = carFront.position
+    local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
+    if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
+      CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
+      return
+    end
+
   -- If we're not faster than the car in front, do nothing
   local areWeFasterThenTheCarInFront = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, carFront, 5)
   if not areWeFasterThenTheCarInFront then
@@ -249,7 +258,7 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   -- consider the car behind us
   if carBehind then
   -- if there's a car behind us, make sure it's not too close before we start overtaking
-    local distanceFromCarBehindToUs = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
+    local distanceFromCarBehindToUs = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, carPosition))
     if distanceFromCarBehindToUs < 5.0 then
       CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car behind too close so not overtaking'
       return

@@ -20,10 +20,11 @@ local storageTable = {
     overtakeRampRelease_mps = 0.4,
     clearAhead_meters = 6.0,
     minAISpeed_kmh = 35.0,
-    blockSideLateral_meters = 2.2,
-    blockSideLongitudinal_meters = 5.5,
-    blockSlowdownKmh = 12.0,
-    blockThrottleLimit = 0.92,
+    distanceToFrontCarToOvertake = 5.0,
+    -- blockSideLateral_meters = 2.2,
+    -- blockSideLongitudinal_meters = 5.5,
+    -- blockSlowdownKmh = 12.0,
+    -- blockThrottleLimit = 0.92,
 }
 
 local storage = ac.storage(storageTable)
