@@ -164,6 +164,15 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
       -- clear the queued transition since we're now taking care of it
       queuedStatesToTransitionInto[carIndex] = nil
 
+      -- If this is not our first state, check if we've been in the previous state for at least some time, otherwise warn because there might be an issue
+      local currentStateBeforeChange = CarStateMachine.getCurrentState(carIndex)
+      if currentStateBeforeChange then
+        local timeInStateBeforeChange = CarManager.cars_timeInCurrentState[carIndex]
+        if timeInStateBeforeChange < 0.1 then
+          Logger.warn(string.format("CarStateMachine: Car %d changing state too quickly, only %.2f seconds in state %s before changing to %s", carIndex, timeInStateBeforeChange, CarStateMachine.CarStateTypeStrings[CarStateMachine.getCurrentState(carIndex)], CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame]))
+        end
+      end
+
       -- change to the new state
       changeState(carIndex, newStateToTransitionIntoThisFrame)
 

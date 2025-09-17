@@ -29,8 +29,8 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
   { name = 'Pedals (C,B,G)', orderDirection = 0, width = 100, tooltip='Pedal positions' },
   { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
-  { name = 'AICaution', orderDirection = 0, width = 80, tooltip='AI caution level' },
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
+  { name = 'AICaution', orderDirection = 0, width = 80, tooltip='AI caution level' },
   { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'Previous State', orderDirection = 0, width = 170, tooltip='Previous state' },
@@ -164,8 +164,8 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.1f|%.1f|%.1f", carInput.clutch, carInput.brake, carInput.gas), uiColor); ui.nextColumn()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
-      ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
+      ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui.nextColumn()

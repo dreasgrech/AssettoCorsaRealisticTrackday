@@ -33,7 +33,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
       -- limit the yielding car throttle while driving on the yielding lane
       -- CarOperations.setAIThrottleLimit(carIndex, 0.5)
-      CarOperations.setAITopSpeed(carIndex, carWeAreCurrentlyYieldingTo.speedKmh*0.7) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
+      local car = sortedCarsList[sortedCarsListIndex]
+      local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
+      CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
 
       -- make sure we spend enough time in this state before opening the possibility to ease out
       -- if timeInStates[carIndex] < minimumTimesInState[CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] then
@@ -80,6 +82,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       ----------------------------------------------------------------
       -- todo: working on this to prevent traffic jams where everyone is yielding to everyone else
       -- todo: but it's causing a state flickering issue probably because of the syncing of the overtaking and yielding cars states
+      --todo: maybe also check the lateral offset of the yielding car to make sure it's still on the yielding lane?
+      --todo: i thinkk it's also important to check the behind lateral offset when deciding if we should start yielding at all
       if currentlyYieldingToCarIndex ~= 0 then
         local overtakingCarIndexOfYieldingCar = CarManager.cars_currentlyOvertakingCarIndex[currentlyYieldingToCarIndex]
         local isOvertakingCarAlsoOvertakingUs = overtakingCarIndexOfYieldingCar == carIndex
