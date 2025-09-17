@@ -74,24 +74,28 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- return CarStateMachine.CarStateType.EASING_OUT_YIELD
       -- end
 
+      -- -- if we have reached the target offset, we can go to the next state
+      -- -- local yieldSide = storage.yieldSide
+      -- -- local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
+      -- -- local sideSign = yieldingToLeft and -1 or 1
+      -- -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
+      -- -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+      -- local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
+      -- -- local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
+      -- -- calculate by checking if we'rve gone past the target too but the target could be less or greater than our value
+      -- local arrivedAtTargetOffset
+      -- local yieldSide = storage.yieldSide
+      -- if yieldSide == RaceTrackManager.TrackSide.LEFT then
+        -- arrivedAtTargetOffset = currentSplineOffset <= targetSplineOffset
+      -- else
+        -- arrivedAtTargetOffset = currentSplineOffset >= targetSplineOffset
+      -- end
+
       -- if we have reached the target offset, we can go to the next state
       -- local yieldSide = storage.yieldSide
-      -- local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
-      -- local sideSign = yieldingToLeft and -1 or 1
-      -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
-      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
-      local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
-      -- local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
-      -- calculate by checking if we'rve gone past the target too but the target could be less or greater than our value
-      local arrivedAtTargetOffset
-      local yieldSide = storage.yieldSide
-      if yieldSide == RaceTrackManager.TrackSide.LEFT then
-        arrivedAtTargetOffset = currentSplineOffset <= targetSplineOffset
-      else
-        arrivedAtTargetOffset = currentSplineOffset >= targetSplineOffset
-      end
-
+      local yieldSide = RaceTrackManager.getYieldingSide()
+      local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, yieldSide)
       if arrivedAtTargetOffset then
         return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
       end

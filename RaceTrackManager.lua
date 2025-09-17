@@ -21,4 +21,15 @@ RaceTrackManager.getOppositeSide = function(side)
     return RaceTrackManager.TrackSide.LEFT
 end
 
+RaceTrackManager.getYieldingSide = function()
+    local storage = StorageManager.getStorage()
+    local yieldSide = storage.yieldSide
+    return yieldSide
+end
+
+RaceTrackManager.getOvertakingSide = function()
+    local yieldSide = RaceTrackManager.getYieldingSide()
+    return RaceTrackManager.getOppositeSide(yieldSide)
+end
+
 return RaceTrackManager

@@ -73,6 +73,16 @@ CarOperations.resetPedalPosition = function(carIndex, carPedal)
   end
 end
 
+CarOperations.hasArrivedAtTargetSplineOffset = function(carIndex, drivingToSide)
+    local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+    local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
+      if drivingToSide == RaceTrackManager.TrackSide.LEFT then
+        return currentSplineOffset <= targetSplineOffset
+      end
+
+      return currentSplineOffset >= targetSplineOffset
+end
+
 ---Limits AI throttle pedal.
 ---Andreas: I don't think physics.setAIThrottleLimit works as intended because it doesn't seem to have any effect on the car speed.
 ---Andreas: Or maybe it touches the pedal values?

@@ -27,7 +27,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     --storage.yieldSide 
 
     -- the drive to side is now the same side as the yielding side since we're easing out of the overtake
-    local driveToSide = storage.yieldSide
+    -- local driveToSide = storage.yieldSide
+    local driveToSide = RaceTrackManager.getYieldingSide()
     local targetOffset = 0
     local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, storage.overtakeRampRelease_mps, storage.overrideAiAwareness)
     if not droveSafelyToSide then
@@ -63,18 +64,22 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
 
       -- if we're back to the center, return to normal driving
-      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
-      -- local arrivedBackToNormal = currentSplineOffset == 0
-      local arrivedBackToNormal
-      local driveToSide = storage.yieldSide
-      if driveToSide == RaceTrackManager.TrackSide.LEFT then
-        arrivedBackToNormal = currentSplineOffset <= 0
-      else
-        arrivedBackToNormal = currentSplineOffset >= 0
-      end
+      -- -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+      -- -- local arrivedBackToNormal = currentSplineOffset == 0
+      -- local arrivedBackToNormal
+      -- local driveToSide = storage.yieldSide
+      -- if driveToSide == RaceTrackManager.TrackSide.LEFT then
+        -- arrivedBackToNormal = currentSplineOffset <= 0
+      -- else
+        -- arrivedBackToNormal = currentSplineOffset >= 0
+      -- end
 
-      if arrivedBackToNormal then
+      -- if we're back to the center, return to normal driving
+      -- local driveToSide = storage.yieldSide
+      local driveToSide = RaceTrackManager.getYieldingSide()
+      local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, driveToSide)
+      if arrivedAtTargetOffset then
         CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil -- clear the reference to the car we were overtaking since we'll now go back to normal driving
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
       end

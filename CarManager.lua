@@ -137,6 +137,28 @@ function CarManager.getActualTrackLateralOffset(carPosition)
   return carTrackCoordinates.x
 end
 
+function CarManager.isCarOnOvertakingLane(carIndex, overtakeSide)
+  local car = ac.getCar(carIndex)
+  if not car then
+    return false
+  end
+
+  local carPosition = car.position
+  -- local yieldSide = storage.yieldSide
+  -- local overtakeSide = RaceTrackManager.getOppositeSide(yieldSide)
+
+  local carTrackCoordinates = ac.worldCoordinateToTrack(carPosition)
+  -- local sides = ac.getTrackAISplineSides(car.splinePosition) -- vec2(leftDistM, rightDistM)
+
+  local carTrackCoordinatesX = carTrackCoordinates.x
+  if overtakeSide == RaceTrackManager.TrackSide.LEFT then
+    -- return carTrackCoordinatesX < 0 and math.abs(carTrackCoordinatesX) > (sides.x * 0.5)
+    return carTrackCoordinatesX <= -0.3
+  end
+
+  -- return carTrackCoordinatesX > 0 and math.abs(carTrackCoordinatesX) > (sides.y * 0.5)
+  return carTrackCoordinatesX > 0.3
+end
 
 function CarManager.getCarListSortedByTrackPosition()
   local sortedCarsList = {}

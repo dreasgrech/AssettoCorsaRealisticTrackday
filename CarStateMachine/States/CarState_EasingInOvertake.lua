@@ -38,7 +38,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     --storage.yieldSide 
 
     -- the drive to side is to be opposite side to the the yielding side
-    local driveToSide = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
+    -- local driveToSide = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
+    local driveToSide = RaceTrackManager.getOvertakingSide()
     local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, storage.yieldMaxOffset_normalized, storage.overtakeRampSpeed_mps, storage.overrideAiAwareness)
     if not droveSafelyToSide then
         -- TODO: Continue here
@@ -102,21 +103,25 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         end
     end
 
-    -- if we've arrived at the target side offset, we can now stay on the overtaking lane
-    -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-    local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
-    local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
-    -- local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
-      -- calculate by checking if we'rve gone past the target too but the target could be less or greater than our value
-      local arrivedAtTargetOffset
-      -- local driveToSide = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
-      local driveToSide = RaceTrackManager.getOppositeSide(storage.yieldSide)
-      if driveToSide == RaceTrackManager.TrackSide.LEFT then
-        arrivedAtTargetOffset = currentSplineOffset <= targetSplineOffset
-      else
-        arrivedAtTargetOffset = currentSplineOffset >= targetSplineOffset
-      end
+    -- -- if we've arrived at the target side offset, we can now stay on the overtaking lane
+    -- -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+    -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+    -- local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
+    -- -- local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
+      -- -- calculate by checking if we'rve gone past the target too but the target could be less or greater than our value
+      -- local arrivedAtTargetOffset
+      -- -- local driveToSide = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
+      -- local driveToSide = RaceTrackManager.getOppositeSide(storage.yieldSide)
+      -- if driveToSide == RaceTrackManager.TrackSide.LEFT then
+        -- arrivedAtTargetOffset = currentSplineOffset <= targetSplineOffset
+      -- else
+        -- arrivedAtTargetOffset = currentSplineOffset >= targetSplineOffset
+      -- end
 
+    -- if we've arrived at the target side offset, we can now stay on the overtaking lane
+    -- local driveToSide = RaceTrackManager.getOppositeSide(storage.yieldSide)
+    local driveToSide = RaceTrackManager.getOvertakingSide()
+    local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, driveToSide)
     if arrivedAtTargetOffset then
         return CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
     end
