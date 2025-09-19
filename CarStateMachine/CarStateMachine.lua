@@ -109,8 +109,22 @@ local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()
 -- a dictionary which holds, if available, the state to transition to next in the upcoming frame
 local queuedStatesToTransitionInto = {}
 
+CarStateMachine.setStateExitReason = function(carIndex, reason)
+    local state = CarStateMachine.getCurrentState(carIndex)
+    -- if not CarStateMachine.cars_statesExitReason[carIndex] then
+      -- CarStateMachine.cars_statesExitReason[carIndex] = {}
+    -- end
+
+    CarManager.cars_statesExitReason[carIndex][state] = reason
+end
+
 CarStateMachine.initializeCarInStateMachine = function(carIndex)
     -- Logger.log(string.format("CarStateMachine: initializeCarInStateMachine() car %d in state machine, setting initial state to DRIVING_NORMALLY", carIndex))
+
+    -- clear the car's states history since this is could be a recycled car
+    CarStateMachine.cars_previousState[carIndex] = nil
+    cars_state[carIndex] = nil
+
     -- queue up the DRIVING_NORMALLY state for the car so that it will take effect in the next frame
     queuedStatesToTransitionInto[carIndex] = CarStateMachine.CarStateType.DRIVING_NORMALLY
     -- Logger.log(string.format("CarStateMachine: Car %d Just added normally state: %d", carIndex, queuedStatesToTransitionInto[carIndex]))
@@ -168,8 +182,17 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
       local currentStateBeforeChange = CarStateMachine.getCurrentState(carIndex)
       if currentStateBeforeChange then
         local timeInStateBeforeChange = CarManager.cars_timeInCurrentState[carIndex]
+        local previousState = CarStateMachine.cars_previousState[carIndex]
         if timeInStateBeforeChange < 0.1 then
-          Logger.warn(string.format("CarStateMachine: Car %d changing state too quickly, only %.2f seconds in state %s before changing to %s", carIndex, timeInStateBeforeChange, CarStateMachine.CarStateTypeStrings[CarStateMachine.getCurrentState(carIndex)], CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame]))
+          local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
+          Logger.warn(string.format(
+          "CarStateMachine: Car %d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
+          carIndex,
+          timeInStateBeforeChange,
+          CarStateMachine.CarStateTypeStrings[CarStateMachine.getCurrentState(carIndex)],
+          CarStateMachine.CarStateTypeStrings[previousState],
+          CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame],
+          cars_statesExitReason))
         end
       end
 

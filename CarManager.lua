@@ -37,6 +37,7 @@ CarManager.cars_gentleStop = {}
 CarManager.cars_currentlyOvertakingCarIndex = {} -- car index of the car we're currently overtaking
 CarManager.cars_currentlyYieldingCarToIndex = {} -- car index of the car we're currently yielding to
 CarManager.cars_timeInCurrentState = {} -- time spent in the current state (seconds)
+CarManager.cars_statesExitReason = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -74,6 +75,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
   CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
   CarManager.cars_timeInCurrentState[carIndex] = 0
+  CarManager.cars_statesExitReason[carIndex] = {}
   CarStateMachine.initializeCarInStateMachine(carIndex)
 
   -- remove speed limitations which could have occured during an accident

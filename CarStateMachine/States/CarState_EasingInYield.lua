@@ -63,6 +63,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car clearly ahead, so easing out yield'
 
         -- go to trying to start easing out yield state
+        CarStateMachine.setStateExitReason(carIndex, 'Overtaking car is clearly ahead of us so easing out yield')
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -97,6 +98,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local yieldSide = RaceTrackManager.getYieldingSide()
       local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, yieldSide)
       if arrivedAtTargetOffset then
+        CarStateMachine.setStateExitReason(carIndex, 'Arrived at yielding position, now staying on yielding lane')
         return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
       end
 end
