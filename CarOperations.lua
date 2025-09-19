@@ -249,15 +249,6 @@ function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMa
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 end
 
---- returns the actual spline offset of the car, which may be different from the one set via physics.setAISplineOffset due to physics corrections
----@param car any
----@return number
-function CarOperations.getActualSplineOffset(car)
-  local carTrackCoordinates = ac.worldCoordinateToTrack(car.position)
-  local carTrackLateralCoordinate = carTrackCoordinates.x
-  return carTrackLateralCoordinate
-end
-
 -- Returns the six lateral anchor points plus some helpers
 ---@return table
 -- local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)

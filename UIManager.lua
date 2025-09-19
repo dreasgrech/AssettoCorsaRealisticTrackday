@@ -21,9 +21,9 @@ local carTableColumns_tooltip = { }
 
 -- this table is only used to set the data to the actual data holders i.e. the tables named carTableColumns_xxx
 local carTableColumns_dataBeforeDoD = {
-  { name = '#', orderDirection = 0, width = 60, tooltip='Car ID' },
+  { name = '#', orderDirection = 0, width = 35, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
-  { name = 'Velocity', orderDirection = 0, width = 75, tooltip='Current velocity' },
+  { name = 'Velocity', orderDirection = 0, width = 70, tooltip='Current velocity' },
   { name = 'RealOffset', orderDirection = 0, width = 75, tooltip='Actual Lateral offset from centerline' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
@@ -31,14 +31,15 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
   { name = 'AICaution', orderDirection = 0, width = 80, tooltip='AI caution level' },
-  { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
-  { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
+  -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
+  -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'Previous State', orderDirection = 0, width = 170, tooltip='Previous state' },
   { name = 'Current State', orderDirection = 0, width = 170, tooltip='Current state' },
   { name = 'Time in State', orderDirection = 0, width = 100, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
-  { name = 'Reason', orderDirection = 0, width = 800, tooltip='Reason for current state' },
+  { name = "Can't Yield Reason", orderDirection = 0, width = 300, tooltip="Reason why the car can't yield" },
+  { name = "Can't Overtake Reason", orderDirection = 0, width = 800, tooltip="Reason why the car can't overtake" },
 }
 
 -- add the car table columns data to the actual data holders
@@ -111,7 +112,8 @@ UIManager.drawMainWindowContent = function()
       local state = CarStateMachine.getCurrentState(carIndex)
       local throttleLimitString = (not (CarManager.cars_throttleLimit[carIndex] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[carIndex]) or 'no limit'
       local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[carIndex] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[carIndex]) or 'no limit'
-      local reason = CarManager.cars_reasonWhyCantYield[carIndex] or ''
+      local cantYieldReason = CarManager.cars_reasonWhyCantYield[carIndex] or ''
+      local cantOvertakeReason = CarManager.cars_reasonWhyCantOvertake[carIndex] or ''
       local uiColor = CARSTATES_TO_UICOLOR[state] or ColorManager.RGBM_Colors.White
       if car.index == 0 then
         uiColor = ColorManager.RGBM_Colors.Violet
@@ -166,8 +168,8 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
-      ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
-      ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
+      -- ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
+      -- ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[state], uiColor); ui.nextColumn()
       ui.textColored(string.format("%.1fs", CarManager.cars_timeInCurrentState[carIndex]), uiColor); ui.nextColumn()
@@ -187,7 +189,8 @@ UIManager.drawMainWindowContent = function()
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
-      ui.textColored(reason, uiColor); ui.nextColumn()
+      ui.textColored(cantYieldReason, uiColor); ui.nextColumn()
+      ui.textColored(cantOvertakeReason, uiColor); ui.nextColumn()
 
       -- end the ui id section
       ui.popID()

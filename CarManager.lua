@@ -120,13 +120,11 @@ ac.onCarJumped(-1, function(carIndex)
   setInitializedDefaults(carIndex) -- reset state on jump/reset
 end)
 
+--- returns the calculated spline offset of the car, which is the one we use when easing driving to the side
+---@param carIndex any
+---@return unknown
 function CarManager.getCalculatedTrackLateralOffset(carIndex)
-  -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
-  -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
-  -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
-  -- TODO: Experimenting with using actual track lateral offset instead of our smoothed one
   return CarManager.cars_currentSplineOffset[carIndex]
-  -- return CarManager.getActualTrackLateralOffset(ac.getCar(carIndex).position)
 end
 
 -- function CarManager.getActualTrackLateralOffset(carIndex)
@@ -134,6 +132,9 @@ end
   -- if not car then
     -- return 0
   -- end
+--- returns the actual spline offset of the car, which may be different from the one set via physics.setAISplineOffset due to physics corrections
+---@param carPosition vec3
+---@return number
 function CarManager.getActualTrackLateralOffset(carPosition)
   local carTrackCoordinates = ac.worldCoordinateToTrack(carPosition)
   return carTrackCoordinates.x
@@ -149,10 +150,11 @@ function CarManager.isCarOnOvertakingLane(carIndex, overtakeSide)
   -- local yieldSide = storage.yieldSide
   -- local overtakeSide = RaceTrackManager.getOppositeSide(yieldSide)
 
-  local carTrackCoordinates = ac.worldCoordinateToTrack(carPosition)
   -- local sides = ac.getTrackAISplineSides(car.splinePosition) -- vec2(leftDistM, rightDistM)
+  -- local carTrackCoordinates = ac.worldCoordinateToTrack(carPosition)
+  local carTrackCoordinatesX = CarManager.getActualTrackLateralOffset(carPosition)
 
-  local carTrackCoordinatesX = carTrackCoordinates.x
+  -- local carTrackCoordinatesX = carTrackCoordinates.x
   if overtakeSide == RaceTrackManager.TrackSide.LEFT then
     -- return carTrackCoordinatesX < 0 and math.abs(carTrackCoordinatesX) > (sides.x * 0.5)
     return carTrackCoordinatesX <= -0.1
