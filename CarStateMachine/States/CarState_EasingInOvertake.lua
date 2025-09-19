@@ -17,6 +17,10 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     local previousState = CarStateMachine.cars_previousState[carIndex]
     Logger.error(string.format('[CarState_EasingInOvertake] Car %d is both yielding to car %d and overtaking car %d at the same time!  Previous state: %s', carIndex, currentlyYieldingToCarIndex, currentlyOvertakingCarIndex, CarStateMachine.CarStateTypeStrings[previousState]))
   end
+
+  local car = sortedCarsList[sortedCarsListIndex]
+  -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
+  CarManager.cars_currentSplineOffset[carIndex] = CarManager.getActualTrackLateralOffset(car.position)
 end
 
 -- UPDATE FUNCTION

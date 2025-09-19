@@ -21,6 +21,9 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 
   local car = sortedCarList[sortedCarListIndex]
 
+  -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
+  CarManager.cars_currentSplineOffset[carIndex] = CarManager.getActualTrackLateralOffset(car.position)
+
   -- turn on turning lights
   local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
   CarOperations.toggleTurningLights(carIndex, car, turningLights)

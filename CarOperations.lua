@@ -229,7 +229,10 @@ function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMa
 
       local yieldingToLeft = side == RaceTrackManager.TrackSide.LEFT
       local sideSign = yieldingToLeft and -1 or 1
-      local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
+      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+      -- local currentSplineOffset = CarManager.getActualTrackLateralOffset(car.position)
+
       -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
       local targetSplineOffset = driveToSideMaxOffset * sideSign
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)

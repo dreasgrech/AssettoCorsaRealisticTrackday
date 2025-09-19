@@ -11,6 +11,9 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     Logger.error(string.format('Car %d in state EasingOutOvertake but has no reference to the car it is overtaking!  Previous state needs to set it.', carIndex))
   end
 
+  local car = sortedCarsList[sortedCarsListIndex]
+  -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
+  CarManager.cars_currentSplineOffset[carIndex] = CarManager.getActualTrackLateralOffset(car.position)
 end
 
 -- UPDATE FUNCTION
