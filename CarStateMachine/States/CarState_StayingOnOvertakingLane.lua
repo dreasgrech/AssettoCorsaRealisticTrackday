@@ -63,14 +63,14 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
     -- TODO: There's a bug with this isCarWeAreOvertakingIsClearlyAheadOfUs check here because when it's enabled, the cars exit out of this state immediately
     -- TODO: But without it, a car can get stuck in this state if the yielding car suddendly drives far ahead
-    -- -- if on the other hand the car we're overtaking is now clearly ahead of us, than we also need to ease out our overtaking
-    -- -- local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
-    -- local overtakingCarLeeway = 5
-    -- local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, currentlyOvertakingCar, storage.clearAhead_meters + overtakingCarLeeway)
-    -- if isCarWeAreOvertakingIsClearlyAheadOfUs then
-        -- -- go to trying to start easing out yield state
-        -- return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
-    -- end
+    -- if on the other hand the car we're overtaking is now clearly ahead of us, than we also need to ease out our overtaking
+    -- local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
+    local overtakingCarLeeway = 40
+    local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, currentlyOvertakingCar, storage.clearAhead_meters + overtakingCarLeeway)
+    if isCarWeAreOvertakingIsClearlyAheadOfUs then
+        -- go to trying to start easing out yield state
+        return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
+    end
 
     -- --  check if we need to yield to a car behind us
     -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
