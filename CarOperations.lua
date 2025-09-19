@@ -234,6 +234,8 @@ function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMa
       -- local currentSplineOffset = CarManager.getActualTrackLateralOffset(car.position)
 
       -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
+      -- TODO: limit the target offset when we are approaching a corner or in mid corner!
+      -- TODO: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/issues/41
       local targetSplineOffset = driveToSideMaxOffset * sideSign
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
 
