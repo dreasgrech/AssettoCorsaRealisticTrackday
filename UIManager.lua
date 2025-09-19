@@ -1,6 +1,12 @@
 ﻿local UIManager = {}
 
-local CARSTATES_TO_UICOLOR = {
+-- UI Car list table colors
+local CARLIST_ROW_BACKGROUND_COLOR_SELECTED = rgbm(1, 0, 0, 0.3)
+local CARLIST_ROW_BACKGROUND_COLOR_CLICKED = rgbm(1, 0, 0, 0.3)
+local CARLIST_ROW_BACKGROUND_COLOR_HOVERED = rgbm(1, 0, 0, 0.1)
+local CARLIST_ROW_TEXT_COLOR_LOCALPLAYER = ColorManager.RGBM_Colors.Violet
+
+local CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE = {
   [CarStateMachine.CarStateType.DRIVING_NORMALLY] = ColorManager.RGBM_Colors.White,
   [CarStateMachine.CarStateType.EASING_IN_YIELD] = ColorManager.RGBM_Colors.LimeGreen,
   [CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] = ColorManager.RGBM_Colors.YellowGreen,
@@ -42,6 +48,8 @@ local carTableColumns_dataBeforeDoD = {
   { name = "Can't Overtake Reason", orderDirection = 0, width = 800, tooltip="Reason why the car can't overtake" },
 }
 
+local uiCarListSelectedIndex = 0
+
 -- add the car table columns data to the actual data holders
 for i, col in ipairs(carTableColumns_dataBeforeDoD) do
   carTableColumns_name[i] = col.name
@@ -70,26 +78,6 @@ UIManager.drawMainWindowContent = function()
     return
   end
 
-  -- todo: remove this ai slop:
-  -- ui.text('Cars:')
-  local player = ac.getCar(0)
-
-  -- sort cars by distance to player for clearer list
-  --[=====[
-  local order = {}
-  -- for i = 1, totalAI do
-  for i = 0, totalAI do
-    local car = ac.getCar(i)
-  -- for i, car in ac.iterateCars() do
-    if car and CarManager.cars_initialized[i] then
-      local d = CarManager.cars_distanceFromPlayerToCar[i]
-      if not d or d <= 0 then d = MathHelpers.vlen(MathHelpers.vsub(player.position, car.position)) end
-      table.insert(order, { i = i, d = d })
-    end
-  end
-  table.sort(order, function(a, b) return (a.d or 1e9) < (b.d or 1e9) end)
-  --]=====]
-
   -- Draw as a table: columns with headings
   -- draw the column headers including setting the width
   local totalColumns = #carTableColumns_name
@@ -101,10 +89,7 @@ UIManager.drawMainWindowContent = function()
 
   local sortedCarsList = CarManager.currentSortedCarsList
 
-  -- for n = 1, #order do
   for n = 1, #sortedCarsList do
-    -- local carIndex = order[n].i
-    -- local car = ac.getCar(carIndex)
     local car = sortedCarsList[n]
     local carIndex = car.index
     if car and CarManager.cars_initialized[carIndex] then
@@ -114,9 +99,9 @@ UIManager.drawMainWindowContent = function()
       local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[carIndex] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[carIndex]) or 'no limit'
       local cantYieldReason = CarManager.cars_reasonWhyCantYield[carIndex] or ''
       local cantOvertakeReason = CarManager.cars_reasonWhyCantOvertake[carIndex] or ''
-      local uiColor = CARSTATES_TO_UICOLOR[state] or ColorManager.RGBM_Colors.White
+      local uiColor = CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[state] or ColorManager.RGBM_Colors.White
       if car.index == 0 then
-        uiColor = ColorManager.RGBM_Colors.Violet
+        uiColor = CARLIST_ROW_TEXT_COLOR_LOCALPLAYER
       end
 
       local carInput = ac.overrideCarControls(carIndex)
@@ -143,13 +128,25 @@ UIManager.drawMainWindowContent = function()
       -- send the full-row clickable to the background so the per-cell text/controls render cleanly on top across all columns
       ui.pushColumnsBackground()
 
+      -- push the row colors we'll use for the full-row clickable
+      ui.pushStyleColor(ui.StyleColor.Header, CARLIST_ROW_BACKGROUND_COLOR_SELECTED)
+      ui.pushStyleColor(ui.StyleColor.HeaderActive, CARLIST_ROW_BACKGROUND_COLOR_CLICKED)
+      ui.pushStyleColor(ui.StyleColor.HeaderHovered, CARLIST_ROW_BACKGROUND_COLOR_HOVERED)
+
       -- create the full-row selectable which will be clickable
-      ui.selectable('##row'..carIndex, false, ui.SelectableFlags.SpanAllColumns) -- ui.SelectableFlags.SpanAllColumns used to expand the hitbox across the entire row
+      local isRowSelected = carIndex == uiCarListSelectedIndex
+      local rowH = ui.textLineHeightWithSpacing()
+      -- todo: check about this string concat here: '##row'..carIndex
+      ui.selectable('##row'..carIndex, isRowSelected, ui.SelectableFlags.SpanAllColumns, vec2(0, rowH)) -- ui.SelectableFlags.SpanAllColumns used to expand the hitbox across the entire row
+
       -- grab the itemClicked event of the selectable we just created
       local rowClicked = ui.itemClicked()         -- capture immediately (refers to the selectable)
       -- ui.setItemAllowOverlap()                     -- allow drawing cells over the clickable area
 
-      -- we can now pop the columns background so that cells draw normally
+      -- pop the row colors now that the selectable is done
+      ui.popStyleColor(3)
+
+      -- pop the columns background so that cells draw normally
       ui.popColumnsBackground()
 
       -- put cursor back so first cell draws at the right Y
@@ -197,6 +194,7 @@ UIManager.drawMainWindowContent = function()
 
       if rowClicked then
           -- Logger.log(string.format('UIManager: Car row %d clicked', carIndex))
+          uiCarListSelectedIndex = carIndex
           CameraManager.followCarWithChaseCamera(carIndex)
       end
 
@@ -265,7 +263,7 @@ function UIManager.draw3DOverheadText()
         -- render.debugText(car.position + vec3(0, 2.0, 0), txt)
 
         local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
-        render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_UICOLOR[carState])
+        render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState])
       end
     end
   end
