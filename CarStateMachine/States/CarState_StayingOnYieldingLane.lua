@@ -36,6 +36,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarsList[sortedCarsListIndex]
       local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
       CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
+      CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1)
 
       -- make sure we spend enough time in this state before opening the possibility to ease out
       -- if timeInStates[carIndex] < minimumTimesInState[CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] then
@@ -88,16 +89,17 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- todo: but it's causing a state flickering issue probably because of the syncing of the overtaking and yielding cars states
       --todo: maybe also check the lateral offset of the yielding car to make sure it's still on the yielding lane?
       --todo: i thinkk it's also important to check the behind lateral offset when deciding if we should start yielding at all
-      if currentlyYieldingToCarIndex ~= 0 then
-        local overtakingCarIndexOfYieldingCar = CarManager.cars_currentlyOvertakingCarIndex[currentlyYieldingToCarIndex]
-        local isOvertakingCarAlsoOvertakingUs = overtakingCarIndexOfYieldingCar == carIndex
-        if not isOvertakingCarAlsoOvertakingUs then
-          -- the car we're yielding to is not overtaking us, so we can ease out our yielding
-          CarManager.cars_reasonWhyCantYield[carIndex] = 'The car we are yielding to is not overtaking us, so easing out yield'
-          CarStateMachine.setStateExitReason(carIndex, 'The car we are yielding to is not overtaking us, so easing out yield')
-          return CarStateMachine.CarStateType.EASING_OUT_YIELD
-        end
-      end
+      -- todo: update: this code is not good because it only works with other ai cars but NOT with the player car, so it needs to be rethinked
+      -- if currentlyYieldingToCarIndex ~= 0 then
+        -- local overtakingCarIndexOfYieldingCar = CarManager.cars_currentlyOvertakingCarIndex[currentlyYieldingToCarIndex]
+        -- local isOvertakingCarAlsoOvertakingUs = overtakingCarIndexOfYieldingCar == carIndex
+        -- if not isOvertakingCarAlsoOvertakingUs then
+          -- -- the car we're yielding to is not overtaking us, so we can ease out our yielding
+          -- CarManager.cars_reasonWhyCantYield[carIndex] = 'The car we are yielding to is not overtaking us, so easing out yield'
+          -- CarStateMachine.setStateExitReason(carIndex, 'The car we are yielding to is not overtaking us, so easing out yield')
+          -- return CarStateMachine.CarStateType.EASING_OUT_YIELD
+        -- end
+      -- end
       ----------------------------------------------------------------
 
       if carBehind then

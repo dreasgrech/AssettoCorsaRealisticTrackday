@@ -182,6 +182,10 @@ function CarOperations.limitSplitOffsetRampUpSpeed(carSpeedKmh, rampSpeed)
   return rampSpeed
 end
 
+function CarOperations.isCarInPits(car)
+  return car.isInPit or car.isInPitlane
+end
+
 function CarOperations.stopCarAfterAccident(carIndex)
     -- stop the car
     CarOperations.setAIThrottleLimit(carIndex, 0)

@@ -263,6 +263,11 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
       return
     end
 
+    if CarOperations.isCarInPits(carFront) then
+      CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front is in pits so not overtaking'
+      return
+    end
+
     -- If we're not close to the front car, do nothing
     local carPosition = car.position
     local carFrontPosition = carFront.position
@@ -308,6 +313,11 @@ end
 CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehind, carFront, storage)
     -- if there's no car behind us, do nothing
     if not carBehind then
+      return
+    end
+
+    if CarOperations.isCarInPits(carBehind) then
+      CarManager.cars_reasonWhyCantYield[carIndex] = 'Car behind is in pits so not yielding'
       return
     end
 

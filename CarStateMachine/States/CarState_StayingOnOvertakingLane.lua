@@ -26,13 +26,30 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- the car we're overtaking is no longer valid, return to easing out overtake
         Logger.warn(string.format('Car %d in state StayingOnOvertakingLane but the car it was overtaking (car %d) is no longer valid, returning to ease out overtake', carIndex, currentlyOvertakingCarIndex))
         -- CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
+        CarStateMachine.setStateExitReason(carIndex, string.format('Car %d in state StayingOnOvertakingLane but the car it was overtaking (car %d) is no longer valid, returning to ease out overtake', carIndex, currentlyOvertakingCarIndex))
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
     -- if we don't have an overtaking car anymore, we can ease out our yielding
     if not carBehind then
         -- CarManager.cars_reasonWhyCantYield[carIndex] = 'No yielding car so not staying on overtaking lane'
+        CarStateMachine.setStateExitReason(carIndex, 'No yielding car so not staying on overtaking lane')
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
+    end
+
+    -- If there's a car in front of us, check if we can overtake it as well
+    if carFront then
+        local carFrontIndex = carFront.index
+        local isCarInFrontSameAsWeAreOvertaking = carFrontIndex == currentlyOvertakingCarIndex
+        if not isCarInFrontSameAsWeAreOvertaking then
+            local newStateDueToCarInFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
+            if newStateDueToCarInFront then
+                CarStateMachine.setStateExitReason(carIndex, string.format("Continuing to overtake next front car #%d", carFrontIndex))
+                -- return newStateDueToCarInFront
+                CarManager.cars_currentlyOvertakingCarIndex[carIndex] = carFrontIndex -- start overtaking the new car in front of us
+                return CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
+            end
+        end
     end
 
     -- if we're now clearly ahead of the car we're overtaking, we can ease out our overtaking
@@ -40,18 +57,20 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     local areWeClearlyAheadOfCarWeAreOvertaking = CarOperations.isSecondCarClearlyAhead(currentlyOvertakingCar, car, storage.clearAhead_meters)
     if areWeClearlyAheadOfCarWeAreOvertaking then
         -- go to trying to start easing out yield state
+        CarStateMachine.setStateExitReason(carIndex, 'Clearly ahead of car we were overtaking so easing out overtake')
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
-    --[===[
-    -- if on the other hand the car we're overtaking is now clearly ahead of us, than we also need to ease out our overtaking
-    -- local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
-    local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, currentlyOvertakingCar, storage.clearAhead_meters)
-    if isCarWeAreOvertakingIsClearlyAheadOfUs then
-        -- go to trying to start easing out yield state
-        return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
-    end
-    --]===]
+    -- TODO: There's a bug with this isCarWeAreOvertakingIsClearlyAheadOfUs check here because when it's enabled, the cars exit out of this state immediately
+    -- TODO: But without it, a car can get stuck in this state if the yielding car suddendly drives far ahead
+    -- -- if on the other hand the car we're overtaking is now clearly ahead of us, than we also need to ease out our overtaking
+    -- -- local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
+    -- local overtakingCarLeeway = 5
+    -- local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, currentlyOvertakingCar, storage.clearAhead_meters + overtakingCarLeeway)
+    -- if isCarWeAreOvertakingIsClearlyAheadOfUs then
+        -- -- go to trying to start easing out yield state
+        -- return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
+    -- end
 
     -- --  check if we need to yield to a car behind us
     -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
@@ -61,18 +80,19 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     -- end
 
     -- check if there's currently a car behind us
-    if carBehind then
+    -- if carBehind then
         -- check if the car behind us is the same car we're overtaking
-        local isCarSameAsCarWeAreOvertaking = carBehind.index == currentlyOvertakingCarIndex
+        local isCarBehindSameAsCarWeAreOvertaking = carBehind.index == currentlyOvertakingCarIndex
         -- if the car behind us is not the same car we're overtaking, check if we should start yielding to it instead
-        if not isCarSameAsCarWeAreOvertaking then
+        if not isCarBehindSameAsCarWeAreOvertaking then
             local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
             if newStateDueToCarBehind then
                 CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
+                CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to car #%d", carBehind.index))
                 return newStateDueToCarBehind
             end
         end
-    end
+    -- end
 
 end
 

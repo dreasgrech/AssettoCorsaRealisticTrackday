@@ -155,11 +155,11 @@ function CarManager.isCarOnOvertakingLane(carIndex, overtakeSide)
   local carTrackCoordinatesX = carTrackCoordinates.x
   if overtakeSide == RaceTrackManager.TrackSide.LEFT then
     -- return carTrackCoordinatesX < 0 and math.abs(carTrackCoordinatesX) > (sides.x * 0.5)
-    return carTrackCoordinatesX <= -0.3
+    return carTrackCoordinatesX <= -0.1
   end
 
   -- return carTrackCoordinatesX > 0 and math.abs(carTrackCoordinatesX) > (sides.y * 0.5)
-  return carTrackCoordinatesX > 0.3
+  return carTrackCoordinatesX >= 0.1
 end
 
 function CarManager.getCarListSortedByTrackPosition()
