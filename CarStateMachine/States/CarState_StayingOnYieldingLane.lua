@@ -123,4 +123,5 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
   CarOperations.removeAICaution(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
+  CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0)
 end
