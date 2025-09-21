@@ -69,26 +69,6 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   UIManager.drawMainWindowContent()
 end
 
--- Returns car indices sorted by car.splinePosition (ascending)
-local function getCarIndicesSortedBySpline()
-  local ids = {}
-  for carIndex, car in ac.iterateCars() do
-    ids[#ids + 1] = carIndex
-  end
-  table.sort(ids, function(a, b)
-    local carA = ac.getCar(a)
-    local carB = ac.getCar(b)
-    if not carA then
-      return true
-    elseif not carB then
-      return false
-    end
-
-    return carA.splinePosition < carB.splinePosition
-  end)
-  return ids
-end
-
 ---
 -- wiki: called after a whole simulation update
 ---
