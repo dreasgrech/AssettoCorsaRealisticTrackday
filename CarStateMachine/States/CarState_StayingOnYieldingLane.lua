@@ -36,7 +36,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarsList[sortedCarsListIndex]
       local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
       CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
-      CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1)
+      -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1)
+      CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.1)
 
       -- make sure we spend enough time in this state before opening the possibility to ease out
       -- if timeInStates[carIndex] < minimumTimesInState[CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE] then
@@ -123,5 +124,6 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
   CarOperations.removeAICaution(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
-  CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0)
+  -- CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+  CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
 end

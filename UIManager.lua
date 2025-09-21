@@ -34,7 +34,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
   { name = 'UT Distance', orderDirection = 0, width = 90, tooltip='Upcoming Turn distance' },
-  { name = 'UT TurnAngle', orderDirection = 0, width = 90, tooltip='Upcoming Turn turn-angle' },
+  -- { name = 'UT TurnAngle', orderDirection = 0, width = 90, tooltip='Upcoming Turn turn-angle' },
   { name = 'Pedals (C,B,G)', orderDirection = 0, width = 100, tooltip='Pedal positions' },
   { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
@@ -116,7 +116,8 @@ UIManager.drawMainWindowContent = function()
 
       local previousCarState = CarStateMachine.cars_previousState[carIndex]
 
-      local trackUpcomingTurn = ac.getTrackUpcomingTurn(carIndex)
+      -- local trackUpcomingTurn = ac.getTrackUpcomingTurn(carIndex)
+      local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)
 
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
@@ -165,8 +166,9 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("%.3f", actualTrackLateralOffset), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.getCalculatedTrackLateralOffset(carIndex) or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", trackUpcomingTurn.x, uiColor)); ui.nextColumn()
-      ui.textColored(string.format("%.3f", trackUpcomingTurn.y, uiColor)); ui.nextColumn()
+      -- ui.textColored(string.format("%.3f", trackUpcomingTurn.x, uiColor)); ui.nextColumn()
+      ui.textColored(string.format("%.3f", distanceToUpcomingTurn, uiColor)); ui.nextColumn()
+      -- ui.textColored(string.format("%.3f", trackUpcomingTurn.y, uiColor)); ui.nextColumn()
       ui.textColored(string.format("%.1f|%.1f|%.1f", carInput.clutch, carInput.brake, carInput.gas), uiColor); ui.nextColumn()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()

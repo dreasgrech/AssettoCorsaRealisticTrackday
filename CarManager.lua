@@ -140,6 +140,10 @@ function CarManager.getActualTrackLateralOffset(carPosition)
   return carTrackCoordinates.x
 end
 
+--- returns a boolean value indicating whether the car is on the overtaking lane
+---@param carIndex number
+---@param overtakeSide any
+---@return boolean
 function CarManager.isCarOnOvertakingLane(carIndex, overtakeSide)
   local car = ac.getCar(carIndex)
   if not car then
@@ -147,20 +151,12 @@ function CarManager.isCarOnOvertakingLane(carIndex, overtakeSide)
   end
 
   local carPosition = car.position
-  -- local yieldSide = storage.yieldSide
-  -- local overtakeSide = RaceTrackManager.getOppositeSide(yieldSide)
-
-  -- local sides = ac.getTrackAISplineSides(car.splinePosition) -- vec2(leftDistM, rightDistM)
-  -- local carTrackCoordinates = ac.worldCoordinateToTrack(carPosition)
   local carTrackCoordinatesX = CarManager.getActualTrackLateralOffset(carPosition)
 
-  -- local carTrackCoordinatesX = carTrackCoordinates.x
   if overtakeSide == RaceTrackManager.TrackSide.LEFT then
-    -- return carTrackCoordinatesX < 0 and math.abs(carTrackCoordinatesX) > (sides.x * 0.5)
     return carTrackCoordinatesX <= -0.1
   end
 
-  -- return carTrackCoordinatesX > 0 and math.abs(carTrackCoordinatesX) > (sides.y * 0.5)
   return carTrackCoordinatesX >= 0.1
 end
 
@@ -175,6 +171,15 @@ function CarManager.getCarListSortedByTrackPosition()
   end)
 
   return sortedCarsList
+end
+
+function CarManager.isCarMidCorner(carIndex)
+  local trackUpcomingTurn = ac.getTrackUpcomingTurn(carIndex)
+  local distanceToUpcomingTurn = trackUpcomingTurn.x
+  -- local turnAngle = trackUpcomingTurn.y
+
+  local isMidCorner = distanceToUpcomingTurn == 0
+  return isMidCorner, distanceToUpcomingTurn
 end
 
 -- -- Utility: compute world right-vector at a given progress on the AI spline
