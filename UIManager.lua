@@ -68,14 +68,14 @@ UIManager.drawMainWindowContent = function()
   ui.separator()
 
   local sim = ac.getSim()
-  local yieldingCount = 0
-  local totalAI = math.max(0, (sim.carsCount or 1) - 1)
-  for i = 1, totalAI do
-    if CarManager.cars_currentlyYielding[i] then
-      yieldingCount = yieldingCount + 1
-    end
-  end
-  ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
+  -- local yieldingCount = 0
+  -- local totalAI = math.max(0, (sim.carsCount or 1) - 1)
+  -- for i = 1, totalAI do
+    -- if CarManager.cars_currentlyYielding[i] then
+      -- yieldingCount = yieldingCount + 1
+    -- end
+  -- end
+  -- ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
   if not storage.drawCarList then
     return

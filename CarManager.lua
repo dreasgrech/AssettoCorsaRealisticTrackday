@@ -6,7 +6,7 @@ local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 local CAR_SPEEDS_BUFFER_SIZE = 600
 
 CarManager.cars_initialized = {}
-CarManager.cars_currentlyYielding = {}
+-- CarManager.cars_currentlyYielding = {}
 
 CarManager.cars_currentSplineOffset_meters = {} -- used in old system which used meters instead of normalized
 CarManager.cars_targetSplineOffset_meters = {} -- used in old system which used meters instead of normalized
@@ -54,7 +54,7 @@ CarManager.currentSortedCarsList = {}
 
 local function setInitializedDefaults(carIndex)
   CarManager.cars_initialized[carIndex] = true
-  CarManager.cars_currentlyYielding[carIndex] = false
+  -- CarManager.cars_currentlyYielding[carIndex] = false
 
   CarManager.cars_currentSplineOffset_meters[carIndex] = 0
   CarManager.cars_targetSplineOffset_meters[carIndex] = 0

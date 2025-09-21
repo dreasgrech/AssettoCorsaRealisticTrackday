@@ -108,17 +108,15 @@ function script.MANIFEST__UPDATE(dt)
   for i = 1, totalCars do
     local car = sortedCars[i]
     local carIndex = car.index
-    if car.isAIControlled -- including the player car if it's AI controlled
-    then
+    if car.isAIControlled then -- including the player car if it's AI controlled
       -- CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
       -- execute the state machine for this car
       CarStateMachine.update(carIndex, dt, sortedCars, i, storage)
 
-      local carState = CarStateMachine.getCurrentState(carIndex)
-
-      local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
-      CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
+      -- local carState = CarStateMachine.getCurrentState(carIndex)
+      -- local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
+      -- CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
     end
   end
 end
