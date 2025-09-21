@@ -3,7 +3,7 @@ local CarManager = {}
 -- Andreas: used while still writing the accident system
 local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 
-local CAR_SPEEDS_BUFFER_SIZE = 300
+local CAR_SPEEDS_BUFFER_SIZE = 600
 
 CarManager.cars_initialized = {}
 CarManager.cars_currentlyYielding = {}

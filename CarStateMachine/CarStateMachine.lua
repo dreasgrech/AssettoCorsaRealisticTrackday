@@ -258,34 +258,38 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
     return
   end
 
-    -- if there's no car in front of us, do nothing
-    if not carFront then
-      return
-    end
+  -- if there's no car in front of us, do nothing
+  if not carFront then
+    return
+  end
 
-    if CarOperations.isCarInPits(carFront) then
-      CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front is in pits so not overtaking'
-      return
-    end
+  local carFrontIndex = carFront.index
 
-    -- If we're not close to the front car, do nothing
-    local carPosition = car.position
-    local carFrontPosition = carFront.position
-    local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
-    -- if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
-    if distanceToFrontCar > storage.detectCarBehind_meters then -- Andreas: using the same distance as detecting a car to yield to
-      CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
-      return
-    end
+  if CarOperations.isCarInPits(carFront) then
+    CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front is in pits so not overtaking'
+    return
+  end
+
+  -- If we're not close to the front car, do nothing
+  local carPosition = car.position
+  local carFrontPosition = carFront.position
+  local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
+  -- if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
+  if distanceToFrontCar > storage.detectCarBehind_meters then -- Andreas: using the same distance as detecting a car to yield to
+    CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
+    return
+  end
 
   -- If we're not faster than the car in front, do nothing
-  local areWeFasterThenTheCarInFront = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, carFront, 5)
+  local ourSpeedKmh = CarManager.cars_averageSpeedKmh[carIndex]
+  local frontCarSpeedKmh = CarManager.cars_averageSpeedKmh[carFrontIndex]
+  -- local areWeFasterThenTheCarInFront = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, carFront, 5)
+  local areWeFasterThenTheCarInFront = ourSpeedKmh > frontCarSpeedKmh
   if not areWeFasterThenTheCarInFront then
     CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front is faster so not overtaking'
     return
   end
 
-  local carFrontIndex = carFront.index
   -- check if the car in front of us is yielding
   -- local isCarInFrontYielding = CarManager.cars_currentlyYielding[carFrontIndex]
   -- if not isCarInFrontYielding then
@@ -339,8 +343,10 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
       return
     end
 
-    local yieldingCarSpeedKmh = car.speedKmh
-    local overtakingCarSpeedKmh = carBehind.speedKmh
+    -- local yieldingCarSpeedKmh = car.speedKmh
+    -- local overtakingCarSpeedKmh = carBehind.speedKmh
+    local yieldingCarSpeedKmh = CarManager.cars_averageSpeedKmh[carIndex]
+    local overtakingCarSpeedKmh = CarManager.cars_averageSpeedKmh[carBehindIndex]
 
     -- Check if the overtaking car is above the minimum speed
     local isOvertakingCarAboveMinSpeed = overtakingCarSpeedKmh >= storage.minPlayerSpeed_kmh

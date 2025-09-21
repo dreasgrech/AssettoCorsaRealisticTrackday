@@ -151,6 +151,12 @@ function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCa
   return firstCar.speedKmh > secondCar.speedKmh + firstCarSpeedLeeway
 end
 
+function CarOperations.isFirstCarFasterThanSecondCar(firstCarIndex, secondCarIndex, secondCarSpeedExtra)
+  local firstCarSpeedKmh = CarManager.cars_averageSpeedKmh[firstCarIndex]
+  local secondCarSpeedKmh = CarManager.cars_averageSpeedKmh[secondCarIndex]
+  return firstCarSpeedKmh > secondCarSpeedKmh + secondCarSpeedExtra
+end
+
 function CarOperations.isSecondCarClearlyAhead(firstCar, secondCar, meters)
     if not secondCar then
       return false

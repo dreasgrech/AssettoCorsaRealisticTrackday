@@ -13,6 +13,8 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   if not currentlyYieldingToCarIndex then
     Logger.error(string.format('Car %d in state StayingOnYieldingLane but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
   end
+
+  CarManager.cars_reasonWhyCantYield[carIndex] = nil
 end
 
 -- UPDATE FUNCTION
@@ -20,11 +22,13 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       -- local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
       local carWeAreCurrentlyYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
+
+      -- if the car we're yielding to doesn't exist anymore, don't do anything and then we'll transition out of this state in the transition function
       if not carWeAreCurrentlyYieldingTo then
         return
       end
 
-      CarManager.cars_reasonWhyCantYield[carIndex] = nil
+      -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
 
@@ -38,6 +42,11 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
       -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1)
       CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.1)
+
+      -- TODO: Here continue driving to the side but using the real offset
+      -- TODO: Here continue driving to the side but using the real offset
+      -- TODO: Here continue driving to the side but using the real offset
+      -- TODO: Here continue driving to the side but using the real offset
 end
 
 -- TRANSITION FUNCTION
@@ -72,7 +81,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
 
       --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
-      local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, carWeAreYieldingTo, OVERTAKING_CAR_FASTER_LEEWAY)
+      -- local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, carWeAreYieldingTo, OVERTAKING_CAR_FASTER_LEEWAY)
+      local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarFasterThanSecondCar(carIndex, currentlyYieldingToCarIndex, OVERTAKING_CAR_FASTER_LEEWAY)
       if isYieldingCarFasterThanOvertakingCar then
         -- go to trying to start easing out yield state
         CarManager.cars_reasonWhyCantYield[carIndex] = 'We are now faster than the car behind, so easing out yield'

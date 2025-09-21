@@ -94,6 +94,9 @@ function script.MANIFEST__UPDATE(dt)
   for i, car in ac.iterateCars() do
     carList[i] = car
 
+    local carIndex = car.index
+    CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
+
     CarManager.saveCarSpeed(car)
   end
   local sortedCars = CarManager.sortCarListByTrackPosition(carList)
@@ -107,7 +110,7 @@ function script.MANIFEST__UPDATE(dt)
     local carIndex = car.index
     if car.isAIControlled -- including the player car if it's AI controlled
     then
-      CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
+      -- CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
       -- execute the state machine for this car
       CarStateMachine.update(carIndex, dt, sortedCars, i, storage)
