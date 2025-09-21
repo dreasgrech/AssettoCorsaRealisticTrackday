@@ -12,7 +12,6 @@ CarManager.cars_targetSplineOffset_meters = {} -- used in old system which used 
 CarManager.cars_currentSplineOffset = {}
 CarManager.cars_targetSplineOffset = {}
 
-CarManager.cars_distanceFromPlayerToCar = {}
 CarManager.cars_maxSideMargin = {}
 CarManager.cars_currentNormalizedTrackProgress = {}
 CarManager.cars_reasonWhyCantYield = {}
@@ -38,6 +37,7 @@ CarManager.cars_currentlyOvertakingCarIndex = {} -- car index of the car we're c
 CarManager.cars_currentlyYieldingCarToIndex = {} -- car index of the car we're currently yielding to
 CarManager.cars_timeInCurrentState = {} -- time spent in the current state (seconds)
 CarManager.cars_statesExitReason = {}
+CarManager.cars_averageSpeedKmh = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -57,7 +57,6 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_currentSplineOffset[carIndex] = 0
   CarManager.cars_targetSplineOffset[carIndex] = 0
 
-  CarManager.cars_distanceFromPlayerToCar[carIndex] = 0
   CarManager.cars_maxSideMargin[carIndex] = 0
   CarManager.cars_currentNormalizedTrackProgress[carIndex] = -1
   CarManager.cars_reasonWhyCantYield[carIndex] = ''
@@ -76,6 +75,7 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
   CarManager.cars_timeInCurrentState[carIndex] = 0
   CarManager.cars_statesExitReason[carIndex] = {}
+  CarManager.cars_averageSpeedKmh[carIndex] = 0
   CarStateMachine.initializeCarInStateMachine(carIndex)
 
   -- remove speed limitations which could have occured during an accident
@@ -160,17 +160,31 @@ function CarManager.isCarOnOvertakingLane(carIndex, overtakeSide)
   return carTrackCoordinatesX >= 0.1
 end
 
-function CarManager.getCarListSortedByTrackPosition()
-  local sortedCarsList = {}
-  for i, car in ac.iterateCars() do
-    sortedCarsList[#sortedCarsList + 1] = car
-  end
+---used in sorting
+---@param carA ac.StateCar
+---@param carB ac.StateCar
+---@return boolean
+local function isFirstCarSplinePositionGreater(carA, carB)
+  return carA.splinePosition > carB.splinePosition
+end
 
-  table.sort(sortedCarsList, function (carA, carB)
-    return carA.splinePosition > carB.splinePosition
-  end)
+-- function CarManager.getCarListSortedByTrackPosition()
+  -- local sortedCarsList = {}
+  -- for i, car in ac.iterateCars() do
+    -- sortedCarsList[#sortedCarsList + 1] = car
+  -- end
 
-  return sortedCarsList
+  -- -- table.sort(sortedCarsList, function (carA, carB)
+    -- -- return carA.splinePosition > carB.splinePosition
+  -- -- end)
+  -- table.sort(sortedCarsList, isFirstCarSplinePositionGreater)
+
+  -- return sortedCarsList
+-- end
+
+function CarManager.sortCarListByTrackPosition(carList)
+  table.sort(carList, isFirstCarSplinePositionGreater)
+  return carList
 end
 
 function CarManager.isCarMidCorner(carIndex)

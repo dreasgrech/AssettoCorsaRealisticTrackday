@@ -75,16 +75,6 @@ end
 function script.MANIFEST__UPDATE(dt)
   if (not shouldAppRun()) then return end
 
-  ----------------------------------------------------------------
-  -- local isBlocked, direction, distance = CarOperations.isTargetSideBlocked(0)
-  -- if isBlocked then
-    -- -- ui.textColored(string.format("Player car side is BLOCKED on %s (distance %.2f m)", tostring(direction), distance or -1), rgbm(1.0, 0.2, 0.2, 1.0))
-    -- Logger.log(string.format("Car %d left side is BLOCKED (hit at %s, distance %.2f m)", 0, CarOperations.CarDirectionsStrings[direction], distance or -1))
-  -- else
-    -- -- ui.textColored("Player car side is clear", rgbm(0.2, 1.0, 0.2, 1.0))
-  -- end
-  ----------------------------------------------------------------
-
   local sim = ac.getSim()
   if sim.isPaused then return end
 
@@ -99,26 +89,20 @@ function script.MANIFEST__UPDATE(dt)
     RaceFlagManager.removeRaceFlag()
   end
 
-  local sortedCars = CarManager.getCarListSortedByTrackPosition()
+  -- build the sorted car list and do any per-car operations that doesn't require the sorted list
+  local carList = {}
+  for i, car in ac.iterateCars() do
+    carList[i] = car
+  end
+  local sortedCars = CarManager.sortCarListByTrackPosition(carList)
+
   -- save a reference to the current sorted cars list for other parts of the app to use
   CarManager.currentSortedCarsList = sortedCars
 
-  -- local orderedCarsString = ""
-  -- for i = 1, #sortedCars do
-    -- local car = sortedCars[i]
-    -- if not car then break end
-    -- orderedCarsString = orderedCarsString .. string.format("%d. #%d, ", i, car.index)
-  -- end
-  -- Logger.log(string.format("Ordered: %s", orderedCarsString))
-
-  -- for carIndex, car in ac.iterateCars() do
-  -- for carIndex = 1, sim.carsCount - 1 do
-  -- for i = 1, sim.carsCount - 1 do
-  for i = 1, #sortedCars do
+  local totalCars = #sortedCars
+  for i = 1, totalCars do
     local car = sortedCars[i]
     local carIndex = car.index
-    -- if carIndex ~= 0  -- skip the player car since it doesn't need to run the yielding logic
-    -- if carIndex ~= -1  -- TODO: NOT SKIPPING PLAYER CAR FOR TESTING PURPOSES
     if car.isAIControlled -- including the player car if it's AI controlled
     then
       CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
@@ -130,15 +114,6 @@ function script.MANIFEST__UPDATE(dt)
 
       local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
       CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
-
-      -- local carBehind = sortedCars[i + 1]
-      -- if carBehind then
-        -- local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
-        local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(playerCar.position, car.position))
-        CarManager.cars_distanceFromPlayerToCar[carIndex] = distanceFromOvertakingCarToYieldingCar
-      -- else
-        -- CarManager.cars_distanceFromPlayerToCar[carIndex] = 0
-      -- end
     end
   end
 end
