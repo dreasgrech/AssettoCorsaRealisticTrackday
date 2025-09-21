@@ -3,6 +3,8 @@ local CarManager = {}
 -- Andreas: used while still writing the accident system
 local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 
+local CAR_SPEEDS_BUFFER_SIZE = 300
+
 CarManager.cars_initialized = {}
 CarManager.cars_currentlyYielding = {}
 
@@ -37,6 +39,9 @@ CarManager.cars_currentlyOvertakingCarIndex = {} -- car index of the car we're c
 CarManager.cars_currentlyYieldingCarToIndex = {} -- car index of the car we're currently yielding to
 CarManager.cars_timeInCurrentState = {} -- time spent in the current state (seconds)
 CarManager.cars_statesExitReason = {}
+CarManager.cars_speedBuffer = {}
+CarManager.cars_speedBufferIndex = {}
+CarManager.cars_speedBufferTotal = {}
 CarManager.cars_averageSpeedKmh = {}
 
 CarManager.cars_AABBSIZE = {}
@@ -75,6 +80,9 @@ local function setInitializedDefaults(carIndex)
   CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
   CarManager.cars_timeInCurrentState[carIndex] = 0
   CarManager.cars_statesExitReason[carIndex] = {}
+  CarManager.cars_speedBuffer[carIndex] = {}
+  CarManager.cars_speedBufferIndex[carIndex] = 0
+  CarManager.cars_speedBufferTotal[carIndex] = 0
   CarManager.cars_averageSpeedKmh[carIndex] = 0
   CarStateMachine.initializeCarInStateMachine(carIndex)
 
@@ -110,6 +118,10 @@ function CarManager.ensureDefaults(carIndex)
 end
 
 -- Monitor flood ai cars cycle event so that we also reset our state
+-- TODO: Move the ac.onCarJumped event to the main file
+-- TODO: Move the ac.onCarJumped event to the main file
+-- TODO: Move the ac.onCarJumped event to the main file
+-- TODO: Move the ac.onCarJumped event to the main file
 ac.onCarJumped(-1, function(carIndex)
   local car = ac.getCar(carIndex)
   if not car then
@@ -194,6 +206,26 @@ function CarManager.isCarMidCorner(carIndex)
 
   local isMidCorner = distanceToUpcomingTurn == 0
   return isMidCorner, distanceToUpcomingTurn
+end
+
+---comment
+---@param car ac.StateCar
+function CarManager.saveCarSpeed(car)
+  local carIndex = car.index
+  local currentSpeedKmh = car.speedKmh
+
+  local currentSpeedBufferIndex = CarManager.cars_speedBufferIndex[carIndex]
+  local speedThatWillBeReplaced = CarManager.cars_speedBuffer[carIndex][currentSpeedBufferIndex] or 0
+  local speedBufferTotal = CarManager.cars_speedBufferTotal[carIndex]
+  speedBufferTotal = speedBufferTotal - speedThatWillBeReplaced + currentSpeedKmh
+
+  CarManager.cars_speedBufferTotal[carIndex] = speedBufferTotal
+  CarManager.cars_speedBuffer[carIndex][currentSpeedBufferIndex] = currentSpeedKmh
+  CarManager.cars_speedBufferIndex[carIndex] = (currentSpeedBufferIndex + 1) % CAR_SPEEDS_BUFFER_SIZE
+  CarManager.cars_averageSpeedKmh[carIndex] = speedBufferTotal / CAR_SPEEDS_BUFFER_SIZE
+
+  -- log the entire speed buffer
+  -- Logger.log(string.format("Car %d speed buffer: %s, average: %.2f", carIndex, table.concat(CarManager.cars_speedBuffer[carIndex], ", "), CarManager.cars_averageSpeedKmh[carIndex] or 0))
 end
 
 -- -- Utility: compute world right-vector at a given progress on the AI spline

@@ -93,6 +93,8 @@ function script.MANIFEST__UPDATE(dt)
   local carList = {}
   for i, car in ac.iterateCars() do
     carList[i] = car
+
+    CarManager.saveCarSpeed(car)
   end
   local sortedCars = CarManager.sortCarListByTrackPosition(carList)
 
