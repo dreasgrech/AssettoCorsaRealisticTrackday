@@ -13,6 +13,7 @@ CameraManager = require("CameraManager")
 Strings = require("Strings.Strings")
 Strings_ReasonWhyCantYield = require("Strings.Strings_ReasonWhyCantYield")
 Strings_ReasonWhyCantOvertake = require("Strings.Strings_ReasonWhyCantOvertake")
+Strings_StateExitReason = require("Strings.Strings_StateExitReason")
 StringsManager = require("StringsManager")
 
 CarStateMachine = require("CarStateMachine.CarStateMachine")

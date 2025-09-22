@@ -49,7 +49,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local currentlyOvertakingCar = ac.getCar(currentlyOvertakingCarIndex)
       if not (currentlyOvertakingCar) then
           -- the car we're overtaking is no longer valid, return to driving normally
-        CarStateMachine.setStateExitReason(carIndex, string.format('Car %d in state EasingOutOvertake but the car it was overtaking (car %d) is no longer valid, returning to driving normally', carIndex, currentlyOvertakingCarIndex))
+        -- CarStateMachine.setStateExitReason(carIndex, string.format('Car %d in state EasingOutOvertake but the car it was overtaking (car %d) is no longer valid, returning to driving normally', carIndex, currentlyOvertakingCarIndex))
+        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarNoLongerExists)
           return CarStateMachine.CarStateType.DRIVING_NORMALLY
       end
 
@@ -62,7 +63,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
           local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
           if newStateDueToCarBehind then
             CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-            CarStateMachine.setStateExitReason(carIndex, string.format('Yielding to new car behind #%d instead', carBehind.index))
+            -- CarStateMachine.setStateExitReason(carIndex, string.format('Yielding to new car behind #%d instead', carBehind.index))
+            CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].YieldingToCar)
             return newStateDueToCarBehind
           end
         end
@@ -86,7 +88,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, driveToSide)
       if arrivedAtTargetOffset then
         CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil -- clear the reference to the car we were overtaking since we'll now go back to normal driving
-        CarStateMachine.setStateExitReason(carIndex, string.format('Arrived back to normal driving position, no longer yielding'))
+        -- CarStateMachine.setStateExitReason(carIndex, string.format('Arrived back to normal driving position, no longer yielding'))
+        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].ArrivedToNormal)
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
       end
 end

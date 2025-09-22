@@ -81,7 +81,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- the car we're overtaking is no longer valid, return to easing out overtake
         Logger.warn(string.format('Car %d in state DrivingToSideToOvertake but the car it was overtaking (car %d) is no longer valid, returning to normal driving', carIndex, currentlyOvertakingCarIndex))
         CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-        CarStateMachine.setStateExitReason(carIndex, string.format('Car %d in state DrivingToSideToOvertake but the car it was overtaking (car %d) is no longer valid, returning to normal driving', carIndex, currentlyOvertakingCarIndex))
+        -- CarStateMachine.setStateExitReason(carIndex, string.format('Car %d in state DrivingToSideToOvertake but the car it was overtaking (car %d) is no longer valid, returning to normal driving', carIndex, currentlyOvertakingCarIndex))
+        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarNoLongerExists)
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
@@ -103,7 +104,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
             if newStateDueToCarBehind then
                 CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-                CarStateMachine.setStateExitReason(carIndex, string.format('Yielding to new car behind #%d instead', carBehind.index))
+                -- CarStateMachine.setStateExitReason(carIndex, string.format('Yielding to new car behind #%d instead', carBehind.index))
+                CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].YieldingToCar)
                 return newStateDueToCarBehind
             end
         end
@@ -129,7 +131,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     local driveToSide = RaceTrackManager.getOvertakingSide()
     local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, driveToSide)
     if arrivedAtTargetOffset then
-        CarStateMachine.setStateExitReason(carIndex, 'Arrived at overtaking position, now staying on overtaking lane')
+        -- CarStateMachine.setStateExitReason(carIndex, 'Arrived at overtaking position, now staying on overtaking lane')
+        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].ArrivedAtOvertakingLane)
         return CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
     end
 end

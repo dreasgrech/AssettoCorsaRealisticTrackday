@@ -121,7 +121,8 @@ UIManager.drawMainWindowContent = function()
 
       -- local previousCarState = CarStateMachine.cars_previousState[carIndex]
       local previousCarState = CarStateMachine.getPreviousState(carIndex)
-      local lastStateExitReason = CarManager.cars_statesExitReason[carIndex][previousCarState] or ''
+      -- local lastStateExitReason = CarManager.cars_statesExitReason[carIndex][previousCarState] or ''
+      local lastStateExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousCarState]) or ''
 
       -- local trackUpcomingTurn = ac.getTrackUpcomingTurn(carIndex)
       local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)

@@ -119,14 +119,14 @@ local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()
 -- a dictionary which holds, if available, the state to transition to next in the upcoming frame
 local queuedStatesToTransitionInto = {}
 
-CarStateMachine.setStateExitReason = function(carIndex, reason)
-    local state = CarStateMachine.getCurrentState(carIndex)
-    -- if not CarStateMachine.cars_statesExitReason[carIndex] then
-      -- CarStateMachine.cars_statesExitReason[carIndex] = {}
-    -- end
+-- CarStateMachine.setStateExitReason = function(carIndex, reason)
+    -- local state = CarStateMachine.getCurrentState(carIndex)
+    -- -- if not CarStateMachine.cars_statesExitReason[carIndex] then
+      -- -- CarStateMachine.cars_statesExitReason[carIndex] = {}
+    -- -- end
 
-    CarManager.cars_statesExitReason[carIndex][state] = reason
-end
+    -- CarManager.cars_statesExitReason[carIndex][state] = reason
+-- end
 
 CarStateMachine.setReasonWhyCantYield = function(carIndex, reason)
   StringsManager.setString(carIndex, Strings.StringCategories.ReasonWhyCantYield, reason)
@@ -134,6 +134,10 @@ end
 
 CarStateMachine.setReasonWhyCantOvertake = function(carIndex, reason)
   StringsManager.setString(carIndex, Strings.StringCategories.ReasonWhyCantOvertake, reason)
+end
+
+CarStateMachine.setStateExitReason = function(carIndex, reason)
+  StringsManager.setString(carIndex, Strings.StringCategories.StateExitReason, reason)
 end
 
 CarStateMachine.initializeCarInStateMachine = function(carIndex)
@@ -202,7 +206,8 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
         local timeInStateBeforeChange = CarManager.cars_timeInCurrentState[carIndex]
         local previousState = CarStateMachine.getPreviousState(carIndex)
         if timeInStateBeforeChange < 0.1 then
-          local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
+          -- local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
+          local cars_statesExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousState]) or ''
           Logger.warn(string.format(
           "CarStateMachine: Car %d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
           carIndex,
