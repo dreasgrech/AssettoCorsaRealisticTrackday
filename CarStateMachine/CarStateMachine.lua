@@ -291,12 +291,11 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   end
 
   -- check if the car in front of us is yielding
-  -- local isCarInFrontYielding = CarManager.cars_currentlyYielding[carFrontIndex]
-  -- if not isCarInFrontYielding then
-    -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front not yielding so not overtaking'
-    -- return
-  -- end
-  -- TODO: maybe here I can check the car's actual laterl offset and check if the carFront is on the yielding lane
+  local carFrontDrivingOnYieldingLane = CarManager.isCarDrivingOnSide(carFrontIndex, RaceTrackManager.getYieldingSide())
+  if not carFrontDrivingOnYieldingLane then
+    CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front not on yielding lane so not overtaking'
+    return
+  end
 
   -- consider the car behind us
   if carBehind then
@@ -375,9 +374,10 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     -- end
 
     -- check if the car overtaking car is actually driving on the overtaking lane
-    local yieldSide = storage.yieldSide
-    local overtakeSide = RaceTrackManager.getOppositeSide(yieldSide)
-    local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakeSide)
+    -- local yieldSide = storage.yieldSide
+    -- local overtakeSide = RaceTrackManager.getOppositeSide(yieldSide)
+    -- local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakeSide)
+    local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, RaceTrackManager.getOvertakingSide())
     if not isOvertakingCarOnOvertakingLane then
       CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car not on overtaking lane so not yielding'
       return
