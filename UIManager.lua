@@ -101,7 +101,8 @@ UIManager.drawMainWindowContent = function()
       local state = CarStateMachine.getCurrentState(carIndex)
       local throttleLimitString = (not (CarManager.cars_throttleLimit[carIndex] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[carIndex]) or 'no limit'
       local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[carIndex] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[carIndex]) or 'no limit'
-      local cantYieldReason = CarManager.cars_reasonWhyCantYield[carIndex] or ''
+      -- local cantYieldReason = CarManager.cars_reasonWhyCantYield[carIndex] or ''
+      local cantYieldReason = Strings.StringValues[Strings.StringCategories.ReasonWhyCantYield][CarManager.cars_reasonWhyCantYield_NAME[carIndex]] or ''
       local cantOvertakeReason = CarManager.cars_reasonWhyCantOvertake[carIndex] or ''
       local uiColor = CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[state] or ColorManager.RGBM_Colors.White
       if car.index == 0 then

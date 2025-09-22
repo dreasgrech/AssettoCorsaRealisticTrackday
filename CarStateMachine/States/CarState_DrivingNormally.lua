@@ -8,7 +8,8 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carB
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
-      CarManager.cars_reasonWhyCantYield[carIndex] = nil
+      -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
+      CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
 
       -- remove any reference to a car we may have been overtaking or yielding
       CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
@@ -71,5 +72,6 @@ end
 
 -- EXIT FUNCTION
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-      CarManager.cars_reasonWhyCantYield[carIndex] = nil
+      -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
+      CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
 end

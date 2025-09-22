@@ -11,7 +11,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     -- todo: look at ac.overrideTyreSmoke(tyreIndex, intensity, thickness, surfaceHeat)
     CarOperations.stopCarAfterAccident(carIndex)
 
-    CarManager.cars_reasonWhyCantYield[carIndex] = 'Collided with another car so we are stopped'
+    --CarManager.cars_reasonWhyCantYield[carIndex] = 'Collided with another car so we are stopped'
 end
 
 -- UPDATE FUNCTION

@@ -16,7 +16,8 @@ CarManager.cars_targetSplineOffset = {}
 
 CarManager.cars_maxSideMargin = {}
 CarManager.cars_currentNormalizedTrackProgress = {}
-CarManager.cars_reasonWhyCantYield = {}
+-- CarManager.cars_reasonWhyCantYield = {}
+CarManager.cars_reasonWhyCantYield_NAME = {}
 CarManager.cars_reasonWhyCantOvertake = {}
 CarManager.cars_yieldTime = {}
 CarManager.cars_currentTurningLights = {}
@@ -64,7 +65,8 @@ CarManager.setInitializedDefaults = function(carIndex)
 
   CarManager.cars_maxSideMargin[carIndex] = 0
   CarManager.cars_currentNormalizedTrackProgress[carIndex] = -1
-  CarManager.cars_reasonWhyCantYield[carIndex] = ''
+  -- CarManager.cars_reasonWhyCantYield[carIndex] = ''
+  CarManager.cars_reasonWhyCantYield_NAME[carIndex] = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None
   CarManager.cars_reasonWhyCantOvertake[carIndex] = ''
   CarManager.cars_yieldTime[carIndex] = 0
   CarManager.cars_currentTurningLights[carIndex] = nil
