@@ -59,6 +59,7 @@ CarStateMachine.getPreviousState = function(carIndex)
 end
 
 local ReasonWhyCantYieldStringNames = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield]
+local ReasonWhyCantOvertakeStringNames = Strings.StringNames[Strings.StringCategories.ReasonWhyCantOvertake]
 
 --- TODO: This function should probably be moved to CarOperations
 ---@param carIndex number
@@ -128,12 +129,11 @@ CarStateMachine.setStateExitReason = function(carIndex, reason)
 end
 
 CarStateMachine.setReasonWhyCantYield = function(carIndex, reason)
-  StringsManager.setString(
-    carIndex,
-    Strings.StringCategories.ReasonWhyCantYield,
-    -- Strings.StringsNames[Strings.StringCategories.ReasonWhyCantYield].TargetSideBlocked
-    reason
-  )
+  StringsManager.setString(carIndex, Strings.StringCategories.ReasonWhyCantYield, reason)
+end
+
+CarStateMachine.setReasonWhyCantOvertake = function(carIndex, reason)
+  StringsManager.setString(carIndex, Strings.StringCategories.ReasonWhyCantOvertake, reason)
 end
 
 CarStateMachine.initializeCarInStateMachine = function(carIndex)
@@ -284,7 +284,8 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   local carFrontIndex = carFront.index
 
   if CarOperations.isCarInPits(carFront) then
-    CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front is in pits so not overtaking'
+    -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front is in pits so not overtaking'
+    CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.YieldingCarInPits)
     return
   end
 
@@ -294,7 +295,8 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
   -- if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
   if distanceToFrontCar > storage.detectCarBehind_meters then -- Andreas: using the same distance as detecting a car to yield to
-    CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
+    -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
+    CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.YieldingCarTooFarAhead)
     return
   end
 
@@ -304,14 +306,16 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   -- local areWeFasterThenTheCarInFront = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, carFront, 5)
   local areWeFasterThenTheCarInFront = ourSpeedKmh > frontCarSpeedKmh
   if not areWeFasterThenTheCarInFront then
-    CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front is faster so not overtaking'
+    -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front is faster so not overtaking'
+    CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.YieldingCarIsFaster)
     return
   end
 
   -- check if the car in front of us is yielding
   local carFrontDrivingOnYieldingLane = CarManager.isCarDrivingOnSide(carFrontIndex, RaceTrackManager.getYieldingSide())
   if not carFrontDrivingOnYieldingLane then
-    CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front not on yielding lane so not overtaking'
+    -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front not on yielding lane so not overtaking'
+    CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.YieldingCarNotOnYieldingLane)
     return
   end
 
@@ -320,7 +324,8 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   -- if there's a car behind us, make sure it's not too close before we start overtaking
     local distanceFromCarBehindToUs = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, carPosition))
     if distanceFromCarBehindToUs < 5.0 then
-      CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car behind too close so not overtaking'
+      -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car behind too close so not overtaking'
+      CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.AnotherCarBehindTooClose)
       return
     end
   end
