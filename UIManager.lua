@@ -29,12 +29,12 @@ local carTableColumns_tooltip = { }
 local carTableColumns_dataBeforeDoD = {
   { name = '#', orderDirection = 0, width = 35, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
-  { name = 'Velocity', orderDirection = 0, width = 70, tooltip='Current velocity' },
-  { name = 'Average Speed', orderDirection = 0, width = 70, tooltip='Average speed' },
+  { name = 'Speed', orderDirection = 0, width = 70, tooltip='Current velocity' },
+  { name = 'AverageSpeed', orderDirection = 0, width = 70, tooltip='Average speed' },
   { name = 'RealOffset', orderDirection = 0, width = 75, tooltip='Actual Lateral offset from centerline' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
-  { name = 'UT Distance', orderDirection = 0, width = 90, tooltip='Upcoming Turn distance' },
+  -- { name = 'UT Distance', orderDirection = 0, width = 90, tooltip='Upcoming Turn distance' },
   -- { name = 'UT TurnAngle', orderDirection = 0, width = 90, tooltip='Upcoming Turn turn-angle' },
   { name = 'Pedals (C,B,G)', orderDirection = 0, width = 100, tooltip='Pedal positions' },
   { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
@@ -42,13 +42,14 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'AICaution', orderDirection = 0, width = 80, tooltip='AI caution level' },
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
-  { name = 'Previous State', orderDirection = 0, width = 170, tooltip='Previous state' },
-  { name = 'Current State', orderDirection = 0, width = 170, tooltip='Current state' },
-  { name = 'Time in State', orderDirection = 0, width = 100, tooltip='Time spent in current state' },
+  { name = 'PreviousState', orderDirection = 0, width = 170, tooltip='Previous state' },
+  { name = 'CurrentState', orderDirection = 0, width = 170, tooltip='Current state' },
+  { name = 'StateTime', orderDirection = 0, width = 75, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
-  { name = "Can't Yield Reason", orderDirection = 0, width = 300, tooltip="Reason why the car can't yield" },
-  { name = "Can't Overtake Reason", orderDirection = 0, width = 800, tooltip="Reason why the car can't overtake" },
+  { name = 'PreviousStateExitReason', orderDirection = 0, width = 300, tooltip='Reason for last state exit' },
+  { name = "CantYieldReason", orderDirection = 0, width = 300, tooltip="Reason why the car can't yield" },
+  { name = "CantOvertakeReason", orderDirection = 0, width = 800, tooltip="Reason why the car can't overtake" },
 }
 
 local uiCarListSelectedIndex = 0
@@ -115,7 +116,9 @@ UIManager.drawMainWindowContent = function()
       -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
       local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
 
-      local previousCarState = CarStateMachine.cars_previousState[carIndex]
+      -- local previousCarState = CarStateMachine.cars_previousState[carIndex]
+      local previousCarState = CarStateMachine.getPreviousState(carIndex)
+      local lastStateExitReason = CarManager.cars_statesExitReason[carIndex][previousCarState] or ''
 
       -- local trackUpcomingTurn = ac.getTrackUpcomingTurn(carIndex)
       local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)
@@ -169,7 +172,7 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("%.3f", CarManager.getCalculatedTrackLateralOffset(carIndex) or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
       -- ui.textColored(string.format("%.3f", trackUpcomingTurn.x, uiColor)); ui.nextColumn()
-      ui.textColored(string.format("%.3f", distanceToUpcomingTurn, uiColor)); ui.nextColumn()
+      -- ui.textColored(string.format("%.3f", distanceToUpcomingTurn, uiColor)); ui.nextColumn()
       -- ui.textColored(string.format("%.3f", trackUpcomingTurn.y, uiColor)); ui.nextColumn()
       ui.textColored(string.format("%.1f|%.1f|%.1f", carInput.clutch, carInput.brake, carInput.gas), uiColor); ui.nextColumn()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
@@ -196,6 +199,7 @@ UIManager.drawMainWindowContent = function()
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
+      ui.textColored(lastStateExitReason, uiColor); ui.nextColumn()
       ui.textColored(cantYieldReason, uiColor); ui.nextColumn()
       ui.textColored(cantOvertakeReason, uiColor); ui.nextColumn()
 

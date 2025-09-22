@@ -14,7 +14,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   -- make sure that we're also not yielding to another car at the same time
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
   if currentlyYieldingToCarIndex then
-    local previousState = CarStateMachine.cars_previousState[carIndex]
+    local previousState = CarStateMachine.getPreviousState(carIndex)
     Logger.error(string.format('[CarState_EasingInOvertake] Car %d is both yielding to car %d and overtaking car %d at the same time!  Previous state: %s', carIndex, currentlyYieldingToCarIndex, currentlyOvertakingCarIndex, CarStateMachine.CarStateTypeStrings[previousState]))
   end
 

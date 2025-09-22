@@ -57,6 +57,29 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
+      if carBehind then
+        -- check if the current car behind us is the same car we're yielding to
+        local carBehindIndex = carBehind.index
+        local isBehindCarSameCarWeAreYieldingTo = carBehindIndex == currentlyYieldingToCarIndex
+        
+        -- if the car behind us is not the same car we're yielding to, check if we should start yielding to the new car behind us instead
+        if not isBehindCarSameCarWeAreYieldingTo then
+          local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+          if newStateDueToCarBehind then
+            -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
+            CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to new car behind #%d instead", carBehindIndex))
+            CarManager.cars_currentlyYieldingCarToIndex[carIndex] = carBehindIndex -- continue yielding to the new car behind us
+            -- return newStateDueToCarBehind
+            return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
+          end
+        end
+      end
+
+      --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
+      --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
+      --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
+      --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
+
       -- if we don't have an overtaking car anymore, we can ease out our yielding
       if not carWeAreYieldingTo then
         CarStateMachine.setStateExitReason(carIndex, 'No overtaking car so not staying on yielding lane')
@@ -92,21 +115,24 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
-      if carBehind then
-        -- check if the current car behind us is the same car we're yielding to
-        local carBehindIndex = carBehind.index
-        local isBehindCarSameCarWeAreYieldingTo = carBehindIndex == currentlyYieldingToCarIndex
+      -- if carBehind then
+        -- -- check if the current car behind us is the same car we're yielding to
+        -- local carBehindIndex = carBehind.index
+        -- local isBehindCarSameCarWeAreYieldingTo = carBehindIndex == currentlyYieldingToCarIndex
         
-        -- if the car behind us is not the same car we're yielding to, check if we should start yielding to the new car behind us instead
-        if not isBehindCarSameCarWeAreYieldingTo then
-          local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-          if newStateDueToCarBehind then
-            -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
-            CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to new car behind #%d instead", carBehindIndex))
-            return newStateDueToCarBehind
-          end
-        end
-      end
+        -- -- if the car behind us is not the same car we're yielding to, check if we should start yielding to the new car behind us instead
+        -- if not isBehindCarSameCarWeAreYieldingTo then
+          -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+          -- if newStateDueToCarBehind then
+            -- -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
+            -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to new car behind #%d instead", carBehindIndex))
+            -- -- TODO: maybe in here since we are already yielding, we should stay on the yielding lane instead of going to easing in yield
+            -- -- TODO: and change the car index that we are yielding to.
+            -- -- TODO: I think the overtake state is already doing this when overtaking multiple cars in a row
+            -- return newStateDueToCarBehind
+          -- end
+        -- end
+      -- end
 end
 
 -- EXIT FUNCTION

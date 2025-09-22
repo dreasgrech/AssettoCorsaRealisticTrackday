@@ -26,7 +26,6 @@ local cars_state = {}
 CarStateMachine.cars_previousState = {}
 CarStateMachine.CarStateType = CarStateType
 
--- CarStateMachine.changeState = function(carIndex, newState)
 local changeState = function(carIndex, newState)
     -- save a reference to the current state before changing it
     local currentState = CarStateMachine.getCurrentState(carIndex)
@@ -55,7 +54,11 @@ CarStateMachine.getCurrentState = function(carIndex)
     return cars_state[carIndex]
 end
 
----comment
+CarStateMachine.getPreviousState = function(carIndex)
+    return CarStateMachine.cars_previousState[carIndex]
+end
+
+--- TODO: This function should probably be moved to CarOperations
 ---@param carIndex number
 ---@param drivingToSide RaceTrackManager.TrackSide|integer
 ---@return boolean
@@ -182,7 +185,7 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
       local currentStateBeforeChange = CarStateMachine.getCurrentState(carIndex)
       if currentStateBeforeChange then
         local timeInStateBeforeChange = CarManager.cars_timeInCurrentState[carIndex]
-        local previousState = CarStateMachine.cars_previousState[carIndex]
+        local previousState = CarStateMachine.getPreviousState(carIndex)
         if timeInStateBeforeChange < 0.1 then
           local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
           Logger.warn(string.format(

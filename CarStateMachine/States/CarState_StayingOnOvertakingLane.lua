@@ -90,7 +90,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
             if newStateDueToCarBehind then
                 CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
-                CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to car #%d", carBehind.index))
+                CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to car #%d instead", carBehind.index))
                 return newStateDueToCarBehind
             end
         end
