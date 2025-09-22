@@ -233,8 +233,8 @@ function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMa
       -- local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
       local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, rampSpeed_mps)
 
-      local yieldingToLeft = side == RaceTrackManager.TrackSide.LEFT
-      local sideSign = yieldingToLeft and -1 or 1
+      local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
+      local sideSign = drivingToTheLeft and -1 or 1
       -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
       -- local currentSplineOffset = CarManager.getActualTrackLateralOffset(car.position)
@@ -249,8 +249,8 @@ function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMa
       -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
-      -- keep the turning lights on while yielding
-      local turningLights = yieldingToLeft and ac.TurningLights.Left or ac.TurningLights.Right
+      -- keep the turning lights on while driving to the side
+      local turningLights = drivingToTheLeft and ac.TurningLights.Left or ac.TurningLights.Right
       CarOperations.toggleTurningLights(carIndex, car, turningLights)
 
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
