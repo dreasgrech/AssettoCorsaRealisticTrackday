@@ -377,7 +377,7 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     -- check if the car overtaking car is actually driving on the overtaking lane
     local yieldSide = storage.yieldSide
     local overtakeSide = RaceTrackManager.getOppositeSide(yieldSide)
-    local isOvertakingCarOnOvertakingLane = CarManager.isCarOnOvertakingLane(carBehindIndex, overtakeSide)
+    local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakeSide)
     if not isOvertakingCarOnOvertakingLane then
       CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car not on overtaking lane so not yielding'
       return

@@ -154,9 +154,9 @@ end
 
 --- returns a boolean value indicating whether the car is on the overtaking lane
 ---@param carIndex number
----@param overtakeSide any
+---@param trackSide any
 ---@return boolean
-function CarManager.isCarOnOvertakingLane(carIndex, overtakeSide)
+function CarManager.isCarDrivingOnSide(carIndex, trackSide)
   local car = ac.getCar(carIndex)
   if not car then
     return false
@@ -165,7 +165,7 @@ function CarManager.isCarOnOvertakingLane(carIndex, overtakeSide)
   local carPosition = car.position
   local carTrackCoordinatesX = CarManager.getActualTrackLateralOffset(carPosition)
 
-  if overtakeSide == RaceTrackManager.TrackSide.LEFT then
+  if trackSide == RaceTrackManager.TrackSide.LEFT then
     return carTrackCoordinatesX <= -0.1
   end
 
@@ -206,6 +206,16 @@ function CarManager.isCarMidCorner(carIndex)
 
   local isMidCorner = distanceToUpcomingTurn == 0
   return isMidCorner, distanceToUpcomingTurn
+end
+
+function CarManager.isCarOffTrack(carIndex)
+  local car = ac.getCar(carIndex)
+  if not car then
+    return false
+  end
+
+  local carActualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
+  return math.abs(carActualTrackLateralOffset) > 1.5
 end
 
 ---comment
