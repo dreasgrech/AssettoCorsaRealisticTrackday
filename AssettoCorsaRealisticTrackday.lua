@@ -55,6 +55,16 @@ ac.onCarCollision(-1, function (carIndex)
     CarStateMachine.informAboutAccident(accidentIndex)
 end)
 
+-- Monitor flood ai cars cycle event so that we also reset our state
+ac.onCarJumped(-1, function(carIndex)
+  local car = ac.getCar(carIndex)
+  if not car then
+    return
+  end
+
+  CarManager.setInitializedDefaults(carIndex)
+end)
+
 ---
 -- Function defined in manifest.ini
 -- wiki: function to be called each frame to draw window content

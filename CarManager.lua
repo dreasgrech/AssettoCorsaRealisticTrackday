@@ -52,7 +52,7 @@ CarManager.currentSortedCarsList = {}
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
 
-local function setInitializedDefaults(carIndex)
+CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_initialized[carIndex] = true
   -- CarManager.cars_currentlyYielding[carIndex] = false
 
@@ -114,23 +114,8 @@ function CarManager.ensureDefaults(carIndex)
     return
   end
 
-  setInitializedDefaults(carIndex)
+  CarManager.setInitializedDefaults(carIndex)
 end
-
--- Monitor flood ai cars cycle event so that we also reset our state
--- TODO: Move the ac.onCarJumped event to the main file
--- TODO: Move the ac.onCarJumped event to the main file
--- TODO: Move the ac.onCarJumped event to the main file
--- TODO: Move the ac.onCarJumped event to the main file
-ac.onCarJumped(-1, function(carIndex)
-  local car = ac.getCar(carIndex)
-  if not car then
-    return
-  end
-
-  -- ac.log(("Car #%d (%s) jumped/reset at spline=%.3f"):format(carIndex, car.name, car.splinePosition))
-  setInitializedDefaults(carIndex) -- reset state on jump/reset
-end)
 
 --- returns the calculated spline offset of the car, which is the one we use when easing driving to the side
 ---@param carIndex any
