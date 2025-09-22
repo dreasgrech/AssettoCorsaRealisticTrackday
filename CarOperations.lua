@@ -225,8 +225,8 @@ function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMa
         return false
     end
 
+      -- todo: should these two operations be here?
       CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
-
       CarOperations.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap
 
       -- if we are driving at high speed, we need to increase the ramp speed slower so that our car doesn't jolt out of control
