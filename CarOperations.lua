@@ -74,7 +74,8 @@ CarOperations.resetPedalPosition = function(carIndex, carPedal)
 end
 
 CarOperations.hasArrivedAtTargetSplineOffset = function(carIndex, drivingToSide)
-    local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+    -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+    local currentSplineOffset = CarManager.getActualTrackLateralOffset(ac.getCar(carIndex).position)
     local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
       if drivingToSide == RaceTrackManager.TrackSide.LEFT then
         return currentSplineOffset <= targetSplineOffset
@@ -205,8 +206,16 @@ end
 
 ---@param turningLights ac.TurningLights
 function CarOperations.toggleTurningLights(carIndex, car, turningLights)
+    local c = ac.getCar(carIndex)
+    if not c.hasTurningLights then
+        Logger.warn(string.format("CarOperations.toggleTurningLights: Car %d has no turning lights", carIndex))
+        return
+    end
+
     if ac.setTargetCar(carIndex) then
         ac.setTurningLights(turningLights)
+    else
+      Logger.warn(string.format("CarOperations.toggleTurningLights: Could not set target car to %d", carIndex))
     end
 
     -- TODO: we don't need all of these
