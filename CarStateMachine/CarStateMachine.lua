@@ -166,13 +166,15 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_CAR)
     -- end
 
-    -- while QueueManager.queueLength(queuedCarCollidedWithMeAccidents) > 0 do
-        -- local carIndex = QueueManager.dequeue(queuedCarCollidedWithMeAccidents)
+    while QueueManager.queueLength(queuedCarCollidedWithMeAccidents) > 0 do
+        local carIndex = QueueManager.dequeue(queuedCarCollidedWithMeAccidents)
 
-        -- -- Logger.log(string.format("CarStateMachine: Car %d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", carIndex))
-        -- Logger.log(string.format("%d ", QueueManager.queueLength(queuedCarCollidedWithMeAccidents)))
+        -- Logger.log(string.format("CarStateMachine: Car %d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", carIndex))
+        -- Logger.log(string.format("%d %d ", carIndex, QueueManager.queueLength(queuedCarCollidedWithMeAccidents)))
+        -- Logger.log(string.format("%d", carIndex))
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
-    -- end
+        queuedStatesToTransitionInto[carIndex] = CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME
+    end
 
     -- CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
     CarManager.cars_totalSideBlockRaysData[carIndex] = 0
@@ -252,6 +254,7 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
 end
 
 CarStateMachine.informAboutAccident = function(accidentIndex)
+  -- Logger.log(string.format("CarStateMachine: informAboutAccident accidentIndex=%d", accidentIndex))
     local collidedWithTrack = AccidentManager.accidents_collidedWithTrack[accidentIndex]
     local carIndex = AccidentManager.accidents_carIndex[accidentIndex]
     local collidedWithCarIndex = AccidentManager.accidents_collidedWithCarIndex[accidentIndex]
@@ -260,6 +263,7 @@ CarStateMachine.informAboutAccident = function(accidentIndex)
         QueueManager.enqueue(queuedCollidedWithTrackAccidents, carIndex)
     else
         -- if the car collided with another car, we need to inform both cars
+        -- Logger.log(string.format("Enqueueing accident: car %d collided with car %d", carIndex, collidedWithCarIndex))
         QueueManager.enqueue(queuedCollidedWithCarAccidents, carIndex)
         QueueManager.enqueue(queuedCarCollidedWithMeAccidents, collidedWithCarIndex)
     end

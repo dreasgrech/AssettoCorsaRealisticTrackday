@@ -55,7 +55,15 @@ end
 
 -- Monitor car collisions so we can register an accident
 ac.onCarCollision(-1, function (carIndex)
+    local storage = StorageManager.getStorage()
+    if not storage.handleAccidents then
+        return
+    end
+
     local accidentIndex = AccidentManager.registerCollision(carIndex)
+    if not accidentIndex then
+        return
+    end
 
     CarStateMachine.informAboutAccident(accidentIndex)
 end)
