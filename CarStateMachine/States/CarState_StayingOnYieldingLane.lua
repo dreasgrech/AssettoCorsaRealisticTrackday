@@ -41,8 +41,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarsList[sortedCarsListIndex]
       local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
       CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
-      -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1)
-      CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.1)
+      CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1)
+      CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.8)
 
       -- TODO: Here continue driving to the side but using the real offset
       -- TODO: Here continue driving to the side but using the real offset
@@ -146,6 +146,6 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
   CarOperations.removeAICaution(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
-  -- CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+  CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
 end
