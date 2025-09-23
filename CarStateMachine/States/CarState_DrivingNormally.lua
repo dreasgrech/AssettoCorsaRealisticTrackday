@@ -16,7 +16,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carB
       CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
 
       -- turn off turning lights
-      CarOperations.toggleTurningLights(carIndex, car, ac.TurningLights.None)
+      CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
       
     -- start driving normally
     -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)

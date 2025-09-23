@@ -66,9 +66,21 @@ UIManager.drawMainWindowContent = function()
   local storage = StorageManager.getStorage()
   ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
 
+  --[====[
+  -- Andreas: testing the indicator lights issue here
+  -- Andreas:  It seems to be a car-specific issue for ai driven cars, because for example on an ai car, ac.setTurningLights works fine on the Ferrari GTO 84 but doesn't work on the Alfa Mito, but then the function works with both cars when driven by the local player.
+  if ui.button('Left indicator', ui.ButtonFlags.None) then
+    CarOperations.toggleTurningLights(3, ac.getCar(1), ac.TurningLights.Left)
+  end
+  ui.sameLine()
+  if ui.button('Right indicator', ui.ButtonFlags.None) then
+    CarOperations.toggleTurningLights(0, ac.getCar(1), ac.TurningLights.Right)
+  end
+  --]====]
+
   ui.separator()
 
-  local sim = ac.getSim()
+  -- local sim = ac.getSim()
   -- local yieldingCount = 0
   -- local totalAI = math.max(0, (sim.carsCount or 1) - 1)
   -- for i = 1, totalAI do
@@ -223,23 +235,23 @@ UIManager.drawMainWindowContent = function()
   ui.columns(1, false)
 end
 
-UIManager.indicatorStatusText = function(i)
-    local l = CarManager.cars_indLeft[i]
-    local r = CarManager.cars_indRight[i]
-    local ph = CarManager.cars_indPhase[i]
-    local indTxt = '-'
-    if l or r then
-        if l and r then
-            indTxt = ph and 'H*' or 'H'
-        elseif l then
-            indTxt = ph and 'L*' or 'L'
-        else
-            indTxt = ph and 'R*' or 'R'
-        end
-    end
-    if CarManager.cars_hasTL[i] == false then indTxt = indTxt .. '(!)' end
-    return indTxt
-end
+-- UIManager.indicatorStatusText = function(i)
+    -- local l = CarManager.cars_indLeft[i]
+    -- local r = CarManager.cars_indRight[i]
+    -- local ph = CarManager.cars_indPhase[i]
+    -- local indTxt = '-'
+    -- if l or r then
+        -- if l and r then
+            -- indTxt = ph and 'H*' or 'H'
+        -- elseif l then
+            -- indTxt = ph and 'L*' or 'L'
+        -- else
+            -- indTxt = ph and 'R*' or 'R'
+        -- end
+    -- end
+    -- if CarManager.cars_hasTL[i] == false then indTxt = indTxt .. '(!)' end
+    -- return indTxt
+-- end
 
 local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 

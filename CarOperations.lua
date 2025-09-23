@@ -205,12 +205,13 @@ function CarOperations.stopCarAfterAccident(carIndex)
 end
 
 ---@param turningLights ac.TurningLights
-function CarOperations.toggleTurningLights(carIndex, car, turningLights)
-    local c = ac.getCar(carIndex)
-    if not c.hasTurningLights then
-        Logger.warn(string.format("CarOperations.toggleTurningLights: Car %d has no turning lights", carIndex))
-        return
-    end
+-- function CarOperations.toggleTurningLights(carIndex, car, turningLights)
+function CarOperations.toggleTurningLights(carIndex, turningLights)
+    -- local c = ac.getCar(carIndex)
+    -- if not c.hasTurningLights then
+        -- Logger.warn(string.format("CarOperations.toggleTurningLights: Car %d has no turning lights", carIndex))
+        -- return
+    -- end
 
     if ac.setTargetCar(carIndex) then
         ac.setTurningLights(turningLights)
@@ -219,14 +220,14 @@ function CarOperations.toggleTurningLights(carIndex, car, turningLights)
     end
 
     -- TODO: we don't need all of these
-    CarManager.cars_currentTurningLights[carIndex] = turningLights
-    CarManager.cars_indLeft[carIndex] = car.turningLeftLights
-    CarManager.cars_indRight[carIndex] = car.turningRightLights
-    CarManager.cars_indPhase[carIndex] = car.turningLightsActivePhase
-    CarManager.cars_hasTL[carIndex] = car.hasTurningLights
+    -- CarManager.cars_currentTurningLights[carIndex] = turningLights
+    -- CarManager.cars_indLeft[carIndex] = car.turningLeftLights
+    -- CarManager.cars_indRight[carIndex] = car.turningRightLights
+    -- CarManager.cars_indPhase[carIndex] = car.turningLightsActivePhase
+    -- CarManager.cars_hasTL[carIndex] = car.hasTurningLights
 end
 
-function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMaxOffset,rampSpeed_mps, overrideAiAwareness)
+function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMaxOffset,rampSpeed_mps, overrideAiAwareness)
     -- make sure there isn't any car on the side we're trying to drive to so we don't crash into it
     local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
     if not isSideSafeToDrive then
@@ -260,7 +261,8 @@ function CarOperations.driveSafelyToSide (carIndex, dt, car, side, driveToSideMa
 
       -- keep the turning lights on while driving to the side
       local turningLights = drivingToTheLeft and ac.TurningLights.Left or ac.TurningLights.Right
-      CarOperations.toggleTurningLights(carIndex, car, turningLights)
+      -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
+      CarOperations.toggleTurningLights(carIndex, turningLights)
 
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
@@ -319,8 +321,8 @@ CarOperations.getSideAnchorPoints = function(carPosition, carForward, carLeft, c
 end
 
 local checkForOtherCars = function(worldPosition, direction, distance)
-  -- TODO: Maybe using physics.raycastTrack(...) could be faster
-  -- TODO: Andreas: it seems like physics.raycastTrack does not hit cars, only the track
+  --  Maybe using physics.raycastTrack(...) could be faster
+  --  Andreas: it seems like physics.raycastTrack does not hit cars, only the track
   -- local raycastHitDistance = physics.raycastTrack(worldPosition, direction, distance) 
   local carRay = render.createRay(worldPosition,  direction, distance)
   local raycastHitDistance = carRay:cars(BACKFACE_CULLING_FOR_BLOCKING)

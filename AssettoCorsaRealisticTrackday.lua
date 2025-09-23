@@ -242,7 +242,6 @@ end
 function script.update(dt)
   if (not shouldAppRun()) then return end
 
-  -- TODO: We probably don't need these settings checks in here
 end
 --]=====]
 

@@ -70,7 +70,6 @@ CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
     local storage = StorageManager.getStorage()
     -- check if there's a car on our side
     if storage.handleSideChecking then
-      -- local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveAnchorPoints(carIndex)
       local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays(carIndex, drivingToSide)
       if isCarOnSide then
           -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
@@ -79,14 +78,14 @@ CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
           
           if isSideCarOnTheSameSideAsYielding then
             -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
-            -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Target side blocked by another car so not driving to the side: ' .. CarOperations.CarDirectionsStrings[carOnSideDirection] .. '  gap=' .. string.format('%.2f', carOnSideDistance) .. 'm'
-            -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side blocked by another car (%s) so not driving to the side: gap=%.2f m', CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1)
+            -- TODO: get this setReasonWhyCantYield out of here!
             CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.TargetSideBlocked)
             return false
           end
       end
     end
 
+    --[====[
     -- Check car blind spot
     -- Andreas: I've never seen this code working yet...
     local distanceToNearestCarInBlindSpot_L, distanceToNearestCarInBlindSpot_R = ac.getCarBlindSpot(carIndex)
@@ -95,11 +94,11 @@ CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
 
     if (isSideBlocked_L or isSideBlocked_R) then
         Logger.log(string.format("Car %d: Blindspot L=%.2f  R=%.2f", carIndex, distanceToNearestCarInBlindSpot_L or -1, distanceToNearestCarInBlindSpot_R or -1))
-        -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Car in blind spot so not driving to the side: ' ..tostring(distanceToNearestCarInBlindSpot_L) .. 'm'
-        -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Car in blind spot so not driving to the side: L=%.2f m  R=%.2f m', distanceToNearestCarInBlindSpot_L or -1, distanceToNearestCarInBlindSpot_R or -1)
+        -- TODO: get this setReasonWhyCantYield out of here!
         CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.CarInBlindSpot)
         return false
     end
+    --]====]
 
     return true
 end
@@ -118,15 +117,6 @@ local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()
 
 -- a dictionary which holds, if available, the state to transition to next in the upcoming frame
 local queuedStatesToTransitionInto = {}
-
--- CarStateMachine.setStateExitReason = function(carIndex, reason)
-    -- local state = CarStateMachine.getCurrentState(carIndex)
-    -- -- if not CarStateMachine.cars_statesExitReason[carIndex] then
-      -- -- CarStateMachine.cars_statesExitReason[carIndex] = {}
-    -- -- end
-
-    -- CarManager.cars_statesExitReason[carIndex][state] = reason
--- end
 
 CarStateMachine.setReasonWhyCantYield = function(carIndex, reason)
   StringsManager.setString(carIndex, Strings.StringCategories.ReasonWhyCantYield, reason)

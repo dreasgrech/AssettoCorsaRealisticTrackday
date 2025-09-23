@@ -26,7 +26,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 
   -- turn on turning lights
   local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
-  CarOperations.toggleTurningLights(carIndex, car, turningLights)
+  CarOperations.toggleTurningLights(carIndex, turningLights)
 end
 
 -- UPDATE FUNCTION
