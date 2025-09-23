@@ -3,6 +3,8 @@ local STATE = CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
 CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnOvertakingLane"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
+local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
 
@@ -27,7 +29,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         Logger.warn(string.format('Car %d in state StayingOnOvertakingLane but the car it was overtaking (car %d) is no longer valid, returning to ease out overtake', carIndex, currentlyOvertakingCarIndex))
         -- CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
         -- CarStateMachine.setStateExitReason(carIndex, string.format('Car %d in state StayingOnOvertakingLane but the car it was overtaking (car %d) is no longer valid, returning to ease out overtake', carIndex, currentlyOvertakingCarIndex))
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarNoLongerExists)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarNoLongerExists)
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
@@ -48,7 +50,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             local newStateDueToCarInFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
             if newStateDueToCarInFront then
                 -- CarStateMachine.setStateExitReason(carIndex, string.format("Continuing to overtake next front car #%d", carFrontIndex))
-                CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].ContinuingOvertakingNextCar)
+                CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
                 -- return newStateDueToCarInFront
                 CarManager.cars_currentlyOvertakingCarIndex[carIndex] = carFrontIndex -- start overtaking the new car in front of us
                 return CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
@@ -62,7 +64,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     if areWeClearlyAheadOfCarWeAreOvertaking then
         -- go to trying to start easing out yield state
         -- CarStateMachine.setStateExitReason(carIndex, 'Clearly ahead of car we were overtaking so easing out overtake')
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].ClearlyAheadOfYieldingCar)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.ClearlyAheadOfYieldingCar)
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
@@ -94,7 +96,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             if newStateDueToCarBehind then
                 CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
                 -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to car #%d instead", carBehind.index))
-                CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].YieldingToCar)
+                CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
                 return newStateDueToCarBehind
             end
         end

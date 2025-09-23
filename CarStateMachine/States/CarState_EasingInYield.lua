@@ -3,6 +3,8 @@ local STATE = CarStateMachine.CarStateType.EASING_IN_YIELD
 CarStateMachine.CarStateTypeStrings[STATE] = "EasingInYield"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
+local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
   -- make sure the state before us has saved the carIndex of the car we're yielding to
@@ -68,7 +70,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
         -- go to trying to start easing out yield state
         -- CarStateMachine.setStateExitReason(carIndex, 'Overtaking car is clearly ahead of us so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarIsClearlyAhead)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyAhead)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -80,31 +82,12 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- return CarStateMachine.CarStateType.EASING_OUT_YIELD
       -- end
 
-      -- -- if we have reached the target offset, we can go to the next state
-      -- -- local yieldSide = storage.yieldSide
-      -- -- local yieldingToLeft = yieldSide == RaceTrackManager.TrackSide.LEFT
-      -- -- local sideSign = yieldingToLeft and -1 or 1
-      -- -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
-      -- -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-      -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
-      -- local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
-      -- -- local arrivedAtTargetOffset = currentSplineOffset == targetSplineOffset
-      -- -- calculate by checking if we'rve gone past the target too but the target could be less or greater than our value
-      -- local arrivedAtTargetOffset
-      -- local yieldSide = storage.yieldSide
-      -- if yieldSide == RaceTrackManager.TrackSide.LEFT then
-        -- arrivedAtTargetOffset = currentSplineOffset <= targetSplineOffset
-      -- else
-        -- arrivedAtTargetOffset = currentSplineOffset >= targetSplineOffset
-      -- end
-
       -- if we have reached the target offset, we can go to the next state
-      -- local yieldSide = storage.yieldSide
       local yieldSide = RaceTrackManager.getYieldingSide()
       local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, yieldSide)
       if arrivedAtTargetOffset then
         -- CarStateMachine.setStateExitReason(carIndex, 'Arrived at yielding position, now staying on yielding lane')
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].ArrivedAtYieldingLane)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.ArrivedAtYieldingLane)
         return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
       end
 end

@@ -3,13 +3,16 @@ local STATE = CarStateMachine.CarStateType.DRIVING_NORMALLY
 CarStateMachine.CarStateTypeStrings[STATE] = "DrivingNormally"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
+local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+local ReasonWhyCantYield = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield]
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
-      CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
+      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
 
       -- remove any reference to a car we may have been overtaking or yielding
       CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
@@ -59,7 +62,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
       if newStateDueToCarBehind then
         -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to car #%d", carBehind.index))
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].YieldingToCar)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
         return newStateDueToCarBehind
       end
 
@@ -67,7 +70,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local newStateDueToCarFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
       if newStateDueToCarFront then
         -- CarStateMachine.setStateExitReason(carIndex, string.format("Overtaking car #%d", carFront.index))
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCar)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCar)
         return newStateDueToCarFront
       end
 end
@@ -75,5 +78,5 @@ end
 -- EXIT FUNCTION
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
-      CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
+      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
 end

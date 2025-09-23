@@ -3,6 +3,8 @@ local STATE = CarStateMachine.CarStateType.EASING_OUT_YIELD
 CarStateMachine.CarStateTypeStrings[STATE] = "EasingOutYield"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
+local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
   -- make sure the state before us has saved the carIndex of the car we're yielding to
@@ -86,7 +88,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       if newStateDueToCarBehind then
         -- Andreas: don't clear the cars_currentlyYieldingCarToIndex value since handleShouldWeYieldToBehindCar writes to it
         -- CarStateMachine.setStateExitReason(carIndex, string.format('Yielding to new car behind #%d instead', carBehind.index))
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].YieldingToCar)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
         return newStateDueToCarBehind
       end
 
@@ -115,7 +117,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       if arrivedAtTargetOffset then
         CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil -- clear the reference to the car we were yielding to since we'll now go back to normal driving
         -- CarStateMachine.setStateExitReason(carIndex, string.format('Arrived back to normal driving position, no longer yielding'))
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].ArrivedToNormal)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.ArrivedToNormal)
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
       end
 end
