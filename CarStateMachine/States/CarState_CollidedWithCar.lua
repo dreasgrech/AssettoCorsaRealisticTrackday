@@ -1,7 +1,7 @@
 local STATE = CarStateMachine.CarStateType.COLLIDED_WITH_CAR
 
 CarStateMachine.CarStateTypeStrings[STATE] = "CollidedWithCar"
-CarStateMachine.states_minimumTimeInState[STATE] = 10
+CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
@@ -9,14 +9,14 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     -- todo: look at ac.setDriverDoorOpen(carIndex, isOpen, instant)
     -- todo: look at ac.setBodyDirt(carIndex, dirt)
     -- todo: look at ac.overrideTyreSmoke(tyreIndex, intensity, thickness, surfaceHeat)
-    CarOperations.stopCarAfterAccident(carIndex)
+    --CarOperations.stopCarAfterAccident(carIndex)
 
     --CarManager.cars_reasonWhyCantYield[carIndex] = 'Collided with another car so we are stopped'
 end
 
 -- UPDATE FUNCTION
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-
+    CarOperations.stopCarAfterAccident(carIndex)
 end
 
 -- TRANSITION FUNCTION

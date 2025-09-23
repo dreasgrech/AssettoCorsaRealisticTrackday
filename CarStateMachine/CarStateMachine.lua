@@ -159,21 +159,22 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_TRACK)
     -- end
 
-    -- while QueueManager.queueLength(queuedCollidedWithCarAccidents) > 0 do
-        -- local carIndex = QueueManager.dequeue(queuedCollidedWithCarAccidents)
+    while QueueManager.queueLength(queuedCollidedWithCarAccidents) > 0 do
+        local accidentCarIndex = QueueManager.dequeue(queuedCollidedWithCarAccidents)
         
         -- Logger.log(string.format("CarStateMachine: Car %d collided with another car, switching to COLLIDED_WITH_CAR state", carIndex))
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_CAR)
-    -- end
+        queuedStatesToTransitionInto[accidentCarIndex] = CarStateMachine.CarStateType.COLLIDED_WITH_CAR
+    end
 
     while QueueManager.queueLength(queuedCarCollidedWithMeAccidents) > 0 do
-        local carIndex = QueueManager.dequeue(queuedCarCollidedWithMeAccidents)
+        local accidentCarIndex = QueueManager.dequeue(queuedCarCollidedWithMeAccidents)
 
         -- Logger.log(string.format("CarStateMachine: Car %d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", carIndex))
         -- Logger.log(string.format("%d %d ", carIndex, QueueManager.queueLength(queuedCarCollidedWithMeAccidents)))
         -- Logger.log(string.format("%d", carIndex))
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
-        queuedStatesToTransitionInto[carIndex] = CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME
+        queuedStatesToTransitionInto[accidentCarIndex] = CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME
     end
 
     -- CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed

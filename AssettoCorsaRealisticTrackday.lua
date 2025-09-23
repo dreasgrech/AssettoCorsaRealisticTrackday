@@ -76,6 +76,7 @@ ac.onCarJumped(-1, function(carIndex)
   end
 
   CarManager.setInitializedDefaults(carIndex)
+  AccidentManager.informAboutCarReset(carIndex)
 end)
 
 ---

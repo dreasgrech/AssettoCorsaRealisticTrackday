@@ -14,6 +14,23 @@ AccidentManager.accidents_resolved = {}
 -- TODO: when a car jumped (resets in ai flood or pits), we should also clear any accidents it was involved in
 -- TODO: when a car jumped (resets in ai flood or pits), we should also clear any accidents it was involved in
 
+AccidentManager.informAboutCarReset = function(carIndex)
+    local accidentIndexAsCulprit = CarManager.cars_culpritInAccidentIndex[carIndex]
+    if accidentIndexAsCulprit > 0 then
+        -- Logger.log(string.format("AccidentManager: Car #%d has reset, clearing it from accident #%d", carIndex, accidentIndexAsCulprit))
+        Logger.log(string.format("[AccidentManager] Car #%d has reset, clearing accident #%d", carIndex, accidentIndexAsCulprit))
+
+        AccidentManager.accidents_carIndex[accidentIndexAsCulprit] = nil
+        AccidentManager.accidents_worldPosition[accidentIndexAsCulprit] = nil
+        AccidentManager.accidents_splinePosition[accidentIndexAsCulprit] = nil
+        AccidentManager.accidents_collidedWithTrack[accidentIndexAsCulprit] = nil
+        AccidentManager.accidents_collidedWithCarIndex[accidentIndexAsCulprit] = nil
+        AccidentManager.accidents_resolved[accidentIndexAsCulprit] = true
+
+        --CarManager.cars_culpritInAccidentIndex[carIndex] = nil
+    end
+end
+
 AccidentManager.registerCollision = function(culpritCarIndex)
     -- local storage = StorageManager.getStorage()
     -- if not storage.handleAccidents then
@@ -69,10 +86,9 @@ AccidentManager.registerCollision = function(culpritCarIndex)
 
     local collidedWithAnotherCar = not collidedWithTrack
     if collidedWithAnotherCar then
-        -- fetch the accident index of the car we collided with, if any
+        -- if the victim car the culprit car collided with is already in an accident with the culprit car, ignore this collision
         local victimCarCulpritInAnotherAccidentIndex = CarManager.cars_culpritInAccidentIndex[collidedWith]
         if victimCarCulpritInAnotherAccidentIndex > 0 then
-            -- if the victim car the culprit car collided with is already in an accident with the culprit car, ignore this collision
             if AccidentManager.accidents_collidedWithCarIndex[victimCarCulpritInAnotherAccidentIndex] == culpritCarIndex then
                 Logger.log(string.format(
                 "#%d collided with car #%d but that victim car is already involved in accident #%d with culprit car, ignoring new collision",
@@ -117,7 +133,7 @@ AccidentManager.isCarComingUpToAccident = function(car)
     for i = 1, lastAccidentIndexCreated do
         if not AccidentManager.accidents_resolved[i] then
             local accidentSplinePosition = AccidentManager.accidents_splinePosition[i]
-            local carIsCloseButHasntYetPassedTheAccidentPosition = 
+            local carIsCloseButHasntYetPassedTheAccidentPosition =
                 carSplinePosition < accidentSplinePosition and
                 accidentSplinePosition - carSplinePosition < 0.05 -- 50 meters
 

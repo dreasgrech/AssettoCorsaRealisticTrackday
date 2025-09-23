@@ -47,7 +47,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'StateTime', orderDirection = 0, width = 75, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
-  { name = 'PreviousStateExitReason', orderDirection = 0, width = 300, tooltip='Reason for last state exit' },
+  { name = 'PreviousStateExitReason', orderDirection = 0, width = 250, tooltip='Reason for last state exit' },
   { name = "CantYieldReason", orderDirection = 0, width = 300, tooltip="Reason why the car can't yield" },
   { name = "CantOvertakeReason", orderDirection = 0, width = 800, tooltip="Reason why the car can't overtake" },
 }
