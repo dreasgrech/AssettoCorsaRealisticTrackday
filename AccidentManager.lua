@@ -20,13 +20,24 @@ AccidentManager.registerCollision = function(culpritCarIndex)
         -- return
     -- end
 
+    -- TODO: need to handle what happens when a player car is the culprit car
+    -- TODO: need to handle what happens when a player car is the culprit car
+    -- TODO: need to handle what happens when a player car is the culprit car
+    -- TODO: need to handle what happens when a player car is the culprit car
+
+
+    if culpritCarIndex == 0 then
+        Logger.log("AccidentManager.registerCollision called with culpritCarIndex 0 local player, ignoring")
+        return
+    end
+
     local culpritCar = ac.getCar(culpritCarIndex)
-    -- if not car or not car.isAIControlled then return end
     if not culpritCar then return end
 
     -- if the culprit car is already a culprit in another accident, ignore this collision
-    if CarManager.cars_culpritInAccident[culpritCarIndex] > 0 then
-        Logger.log(string.format("#%d is already a culprit in accident #%d, ignoring new collision", culpritCarIndex, CarManager.cars_culpritInAccident[culpritCarIndex]))
+    local culpritCarAsCulpritInAnotherAccidentIndex = CarManager.cars_culpritInAccidentIndex[culpritCarIndex]
+    if culpritCarAsCulpritInAnotherAccidentIndex > 0 then
+        -- Logger.log(string.format("#%d is already a culprit in accident #%d, ignoring new collision", culpritCarIndex, CarManager.cars_culpritInAccident[culpritCarIndex]))
         return
     end
 
@@ -35,8 +46,12 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     local collidedWith = culpritCar.collidedWith
     local collidedWithTrack = collidedWith == 0
 
+    -- CURRENTLY IGNORING TRACK COLLISIONS WHILE WORKING ON CAR-TO-CAR COLLISIONS
+    -- CURRENTLY IGNORING TRACK COLLISIONS WHILE WORKING ON CAR-TO-CAR COLLISIONS
+    -- CURRENTLY IGNORING TRACK COLLISIONS WHILE WORKING ON CAR-TO-CAR COLLISIONS
+    -- CURRENTLY IGNORING TRACK COLLISIONS WHILE WORKING ON CAR-TO-CAR COLLISIONS
     if collidedWithTrack then
-        Logger.warn(string.format("#%d collided with the track but ignoring track collisions for now", culpritCarIndex))
+        --Logger.warn(string.format("#%d collided with the track but ignoring track collisions for now", culpritCarIndex))
         return
     end
     
@@ -52,6 +67,22 @@ AccidentManager.registerCollision = function(culpritCarIndex)
 
     -- local collisionCarAccidentsInvolvedIn = CarManager.cars_culpritInAccident[culpritCarIndex]
 
+    local collidedWithAnotherCar = not collidedWithTrack
+    if collidedWithAnotherCar then
+        -- fetch the accident index of the car we collided with, if any
+        local victimCarCulpritInAnotherAccidentIndex = CarManager.cars_culpritInAccidentIndex[collidedWith]
+        if victimCarCulpritInAnotherAccidentIndex > 0 then
+            -- if the victim car the culprit car collided with is already in an accident with the culprit car, ignore this collision
+            if AccidentManager.accidents_collidedWithCarIndex[victimCarCulpritInAnotherAccidentIndex] == culpritCarIndex then
+                Logger.log(string.format(
+                "#%d collided with car #%d but that victim car is already involved in accident #%d with culprit car, ignoring new collision",
+                culpritCarIndex,
+                collidedWith,
+                victimCarCulpritInAnotherAccidentIndex))
+                return
+            end
+        end
+    end
 
     -- register a new accident
     lastAccidentIndexCreated = lastAccidentIndexCreated + 1
@@ -67,7 +98,7 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     AccidentManager.accidents_collidedWithCarIndex[accidentIndex] = collidedWith
     AccidentManager.accidents_resolved[accidentIndex] = false
 
-    CarManager.cars_culpritInAccident[culpritCarIndex] = accidentIndex
+    CarManager.cars_culpritInAccidentIndex[culpritCarIndex] = accidentIndex
 
     Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", culpritCarIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), lastAccidentIndexCreated, #AccidentManager.accidents_carIndex))
 
