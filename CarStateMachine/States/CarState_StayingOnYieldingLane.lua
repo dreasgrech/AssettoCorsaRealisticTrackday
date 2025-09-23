@@ -121,25 +121,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarNotOnOvertakingSide)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
-
-      -- if carBehind then
-        -- -- check if the current car behind us is the same car we're yielding to
-        -- local carBehindIndex = carBehind.index
-        -- local isBehindCarSameCarWeAreYieldingTo = carBehindIndex == currentlyYieldingToCarIndex
-        
-        -- -- if the car behind us is not the same car we're yielding to, check if we should start yielding to the new car behind us instead
-        -- if not isBehindCarSameCarWeAreYieldingTo then
-          -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-          -- if newStateDueToCarBehind then
-            -- -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
-            -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to new car behind #%d instead", carBehindIndex))
-            -- -- TODO: maybe in here since we are already yielding, we should stay on the yielding lane instead of going to easing in yield
-            -- -- TODO: and change the car index that we are yielding to.
-            -- -- TODO: I think the overtake state is already doing this when overtaking multiple cars in a row
-            -- return newStateDueToCarBehind
-          -- end
-        -- end
-      -- end
 end
 
 -- EXIT FUNCTION
