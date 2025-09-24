@@ -265,15 +265,17 @@ CarStateMachine.informAboutAccident = function(accidentIndex)
 end
 
 CarStateMachine.handleShouldWeStartNavigatingAroundAccident = function(carIndex, car)
+  -- return false
     local storage = StorageManager.getStorage()
     local handleAccidents = storage.handleAccidents
     if not handleAccidents then
-      return
+      return nil
     end
 
-    local isCarComingUpToAccident = AccidentManager.isCarComingUpToAccident(car)
-    if isCarComingUpToAccident then
+    local isCarComingUpToAccidentIndex = AccidentManager.isCarComingUpToAccident(car)
+    if isCarComingUpToAccidentIndex then
       -- Logger.log(string.format("CarStateMachine: Car %d coming up to accident, switching to NAVIGATING_AROUND_ACCIDENT state", carIndex))
+      CarManager.cars_navigatingAroundAccidentIndex[carIndex] = isCarComingUpToAccidentIndex
       return CarStateMachine.CarStateType.NAVIGATING_AROUND_ACCIDENT
     end
 end
@@ -300,7 +302,8 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   -- If we're not close to the front car, do nothing
   local carPosition = car.position
   local carFrontPosition = carFront.position
-  local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
+  -- local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
+  local distanceToFrontCar = MathHelpers.distanceBetweenVec3s(carFrontPosition, carPosition)
   -- if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
   if distanceToFrontCar > storage.detectCarBehind_meters then -- Andreas: using the same distance as detecting a car to yield to
     -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
@@ -330,7 +333,8 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   -- consider the car behind us
   if carBehind then
   -- if there's a car behind us, make sure it's not too close before we start overtaking
-    local distanceFromCarBehindToUs = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, carPosition))
+    -- local distanceFromCarBehindToUs = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, carPosition))
+    local distanceFromCarBehindToUs = MathHelpers.distanceBetweenVec3s(carBehind.position, carPosition)
     if distanceFromCarBehindToUs < 5.0 then
       -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car behind too close so not overtaking'
       CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.AnotherCarBehindTooClose)
@@ -359,7 +363,8 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     local carBehindIndex = carBehind.index
 
     -- If this car is not close to the overtaking car, do nothing
-    local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
+    -- local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
+    local distanceFromOvertakingCarToYieldingCar = MathHelpers.distanceBetweenVec3s(carBehind.position, car.position)
     local radius = storage.detectCarBehind_meters
     local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCar <= radius
     if not isYieldingCarCloseToOvertakingCar then

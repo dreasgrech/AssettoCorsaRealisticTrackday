@@ -7,5 +7,8 @@ function MathHelpers.approach(curr, target, step)
     if math.abs(target - curr) <= step then return target end
     return curr + (target > curr and step or -step)
 end
+function MathHelpers.distanceBetweenVec3s(vec3a, vec3b)
+    return MathHelpers.vlen(MathHelpers.vsub(vec3a, vec3b))
+end
 
 return MathHelpers

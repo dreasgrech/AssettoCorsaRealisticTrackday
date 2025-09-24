@@ -121,8 +121,9 @@ AccidentManager.registerCollision = function(culpritCarIndex)
 
     -- check the existing accidents and update the first non-resolved accident index so that loops iterating over accidents can start from there
     for i = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
-        if not AccidentManager.accidents_resolved[i] then
-            Logger.log(string.format("AccidentManager: Updating firstNonResolvedAccidentIndex from %d to %d", firstNonResolvedAccidentIndex, i))
+        -- if not AccidentManager.accidents_resolved[i] then
+        if AccidentManager.accidents_resolved[i] == false then
+            Logger.log(string.format("AccidentManager: Updating firstNonResolvedAccidentIndex from %d to %d (last accident index: %d)", firstNonResolvedAccidentIndex, i, lastAccidentIndexCreated))
             firstNonResolvedAccidentIndex = i
             break
         end
@@ -133,31 +134,31 @@ end
 
 ---Andreas: this function is O(n)
 ---@param car ac.StateCar?
----@return boolean
+---@return integer|nil accidentIndex or nil if no upcoming accident
 AccidentManager.isCarComingUpToAccident = function(car)
     if lastAccidentIndexCreated == 0 then
-        return false
+        return nil
     end
 
-    if not car then return false end
+    if not car then return nil end
 
     local carSplinePosition = car.splinePosition
 
-    -- for i = 1, lastAccidentIndexCreated do
+     -- for i = 1, lastAccidentIndexCreated do
     for i = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
         if not AccidentManager.accidents_resolved[i] then
             local accidentSplinePosition = AccidentManager.accidents_splinePosition[i]
             local carIsCloseButHasntYetPassedTheAccidentPosition =
                 carSplinePosition < accidentSplinePosition and
-                accidentSplinePosition - carSplinePosition < 0.05 -- 50 meters
+                accidentSplinePosition - carSplinePosition < 0.02
 
             if carIsCloseButHasntYetPassedTheAccidentPosition then
-                return true
+                return i
             end
         end
     end
 
-    return false
+    return nil
 end
 
 return AccidentManager
