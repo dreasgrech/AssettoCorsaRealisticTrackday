@@ -128,6 +128,9 @@ function script.MANIFEST__UPDATE(dt)
   -- save a reference to the current sorted cars list for other parts of the app to use
   CarManager.currentSortedCarsList = sortedCars
 
+  -- handle any queued accidents before updating the car state machines
+  CarStateMachine.handleQueuedAccidents()
+
   local totalCars = #sortedCars
   for i = 1, totalCars do
     local car = sortedCars[i]
@@ -136,7 +139,7 @@ function script.MANIFEST__UPDATE(dt)
       -- CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
       -- execute the state machine for this car
-      CarStateMachine.update(carIndex, dt, sortedCars, i, storage)
+      CarStateMachine.updateCar(carIndex, dt, sortedCars, i, storage)
 
       -- local carState = CarStateMachine.getCurrentState(carIndex)
       -- local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)

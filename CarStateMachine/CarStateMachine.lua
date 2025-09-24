@@ -16,6 +16,7 @@ local CarStateType = {
   EASING_IN_OVERTAKE = 1024,
   STAYING_ON_OVERTAKING_LANE = 2048,
   EASING_OUT_OVERTAKE = 4096,
+  NAVIGATING_AROUND_ACCIDENT = 8192,
 }
 
 CarStateMachine.CarStateTypeStrings = {}
@@ -143,15 +144,7 @@ CarStateMachine.initializeCarInStateMachine = function(carIndex)
     --CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 end
 
--- CarStateMachine.update = function(carIndex, dt, car, carBehind, storage)
-CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-
-    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
-    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
-    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
-    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
-    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
-    -- TODO: THIS CODE OF DEQUEING SHOULDNT HAPPEN HERE!  IT SHOULD HAPPEN OUTSIDE OF HERE!
+CarStateMachine.handleQueuedAccidents = function()
     -- while QueueManager.queueLength(queuedCollidedWithTrackAccidents) > 0 do
         -- local carIndex = QueueManager.dequeue(queuedCollidedWithTrackAccidents)
         
@@ -176,7 +169,9 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
         -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
         queuedStatesToTransitionInto[accidentCarIndex] = CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME
     end
+end
 
+CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     -- CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
     CarManager.cars_totalSideBlockRaysData[carIndex] = 0
     table.clear(CarManager.cars_sideBlockRaysData[carIndex])
@@ -216,7 +211,6 @@ CarStateMachine.update = function(carIndex, dt, sortedCarList, sortedCarListInde
       changeState(carIndex, newStateToTransitionIntoThisFrame)
 
       -- execute the state's entry function
-      -- CarStateMachine.states_entryFunctions[newStateToTransitionIntoThisFrame](carIndex, dt, car, carBehind, storage)
       CarStateMachine.states_entryFunctions[newStateToTransitionIntoThisFrame](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     end
 

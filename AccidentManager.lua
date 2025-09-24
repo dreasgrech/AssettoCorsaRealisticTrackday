@@ -1,6 +1,7 @@
 local AccidentManager = {}
 
 local lastAccidentIndexCreated = 0
+local firstNonResolvedAccidentIndex = 1
 
 AccidentManager.accidents_carIndex = {}
 AccidentManager.accidents_worldPosition = {}
@@ -118,19 +119,32 @@ AccidentManager.registerCollision = function(culpritCarIndex)
 
     Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", culpritCarIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), lastAccidentIndexCreated, #AccidentManager.accidents_carIndex))
 
+    -- check the existing accidents and update the first non-resolved accident index so that loops iterating over accidents can start from there
+    for i = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
+        if not AccidentManager.accidents_resolved[i] then
+            Logger.log(string.format("AccidentManager: Updating firstNonResolvedAccidentIndex from %d to %d", firstNonResolvedAccidentIndex, i))
+            firstNonResolvedAccidentIndex = i
+            break
+        end
+    end
+
     return accidentIndex
 end
 
+---Andreas: this function is O(n)
+---@param car ac.StateCar
+---@return boolean
 AccidentManager.isCarComingUpToAccident = function(car)
     if lastAccidentIndexCreated == 0 then
         return false
     end
 
-    if not car then return end
+    if not car then return false end
 
     local carSplinePosition = car.splinePosition
 
-    for i = 1, lastAccidentIndexCreated do
+    -- for i = 1, lastAccidentIndexCreated do
+    for i = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
         if not AccidentManager.accidents_resolved[i] then
             local accidentSplinePosition = AccidentManager.accidents_splinePosition[i]
             local carIsCloseButHasntYetPassedTheAccidentPosition =
