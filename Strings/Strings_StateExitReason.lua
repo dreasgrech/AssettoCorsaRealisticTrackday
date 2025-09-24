@@ -15,6 +15,9 @@ local stringNames = {
     YieldingCarIsFasterThenOvertakingCar = 11,
     OvertakingCarNotOnOvertakingSide = 12,
     NavigatingAroundAccident = 13,
+    NoAccidentIndexToNavigateAround = 14,
+    FoundCloserAccidentToNavigateAround = 15,
+    AccidentIsFarBehindUs = 16,
 }
 
 local stringValues = {

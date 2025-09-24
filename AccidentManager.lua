@@ -29,6 +29,16 @@ AccidentManager.informAboutCarReset = function(carIndex)
         AccidentManager.accidents_resolved[accidentIndexAsCulprit] = true
 
         --CarManager.cars_culpritInAccidentIndex[carIndex] = nil
+
+        -- check the existing accidents and update the first non-resolved accident index so that loops iterating over accidents can start from there
+        for i = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
+            -- if not AccidentManager.accidents_resolved[i] then
+            if AccidentManager.accidents_resolved[i] == false then
+                Logger.log(string.format("AccidentManager: Updating firstNonResolvedAccidentIndex from %d to %d (last accident index: %d)", firstNonResolvedAccidentIndex, i, lastAccidentIndexCreated))
+                firstNonResolvedAccidentIndex = i
+                break
+            end
+        end
     end
 end
 
@@ -45,7 +55,7 @@ AccidentManager.registerCollision = function(culpritCarIndex)
 
 
     if culpritCarIndex == 0 then
-        Logger.log("AccidentManager.registerCollision called with culpritCarIndex 0 local player, ignoring")
+        -- Logger.log("AccidentManager.registerCollision called with culpritCarIndex 0 local player, ignoring")
         return
     end
 
@@ -91,11 +101,11 @@ AccidentManager.registerCollision = function(culpritCarIndex)
         local victimCarCulpritInAnotherAccidentIndex = CarManager.cars_culpritInAccidentIndex[collidedWith]
         if victimCarCulpritInAnotherAccidentIndex > 0 then
             if AccidentManager.accidents_collidedWithCarIndex[victimCarCulpritInAnotherAccidentIndex] == culpritCarIndex then
-                Logger.log(string.format(
-                "#%d collided with car #%d but that victim car is already involved in accident #%d with culprit car, ignoring new collision",
-                culpritCarIndex,
-                collidedWith,
-                victimCarCulpritInAnotherAccidentIndex))
+                -- Logger.log(string.format(
+                -- "#%d collided with car #%d but that victim car is already involved in accident #%d with culprit car, ignoring new collision",
+                -- culpritCarIndex,
+                -- collidedWith,
+                -- victimCarCulpritInAnotherAccidentIndex))
                 return
             end
         end
@@ -123,7 +133,7 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     for i = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
         -- if not AccidentManager.accidents_resolved[i] then
         if AccidentManager.accidents_resolved[i] == false then
-            Logger.log(string.format("AccidentManager: Updating firstNonResolvedAccidentIndex from %d to %d (last accident index: %d)", firstNonResolvedAccidentIndex, i, lastAccidentIndexCreated))
+            -- Logger.log(string.format("AccidentManager: Updating firstNonResolvedAccidentIndex from %d to %d (last accident index: %d)", firstNonResolvedAccidentIndex, i, lastAccidentIndexCreated))
             firstNonResolvedAccidentIndex = i
             break
         end

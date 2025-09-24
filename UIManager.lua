@@ -18,6 +18,7 @@ local CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE = {
   [CarStateMachine.CarStateType.EASING_IN_OVERTAKE] = ColorManager.RGBM_Colors.DodgerBlue,
   [CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE] = ColorManager.RGBM_Colors.DeepSkyBlue,
   [CarStateMachine.CarStateType.EASING_OUT_OVERTAKE] = ColorManager.RGBM_Colors.Cyan,
+  [CarStateMachine.CarStateType.NAVIGATING_AROUND_ACCIDENT] = ColorManager.RGBM_Colors.MediumPurple,
 }
 
 local carTableColumns_name = { }
@@ -47,6 +48,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'StateTime', orderDirection = 0, width = 75, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
+  { name = 'Navigating', orderDirection = 0, width = 80, tooltip='Navigating accident status' },
   { name = 'PreviousStateExitReason', orderDirection = 0, width = 250, tooltip='Reason for last state exit' },
   { name = "CantYieldReason", orderDirection = 0, width = 300, tooltip="Reason why the car can't yield" },
   { name = "CantOvertakeReason", orderDirection = 0, width = 800, tooltip="Reason why the car can't overtake" },
@@ -131,6 +133,8 @@ UIManager.drawMainWindowContent = function()
       -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
       local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
 
+      local currentlyNavigatingAroundAccidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
+
       -- local previousCarState = CarStateMachine.cars_previousState[carIndex]
       local previousCarState = CarStateMachine.getPreviousState(carIndex)
       -- local lastStateExitReason = CarManager.cars_statesExitReason[carIndex][previousCarState] or ''
@@ -211,6 +215,14 @@ UIManager.drawMainWindowContent = function()
         -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
         -- ui.textColored(string.format("yes"), uiColor)
         ui.textColored(string.format("yes #%d", currentlyOvertakingCarIndex), uiColor)
+      else
+        ui.textColored("no", uiColor)
+      end
+      ui.nextColumn()
+      if currentlyNavigatingAroundAccidentIndex > 0 then
+        -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
+        -- ui.textColored(string.format("yes"), uiColor)
+        ui.textColored(string.format("yes #%d", currentlyNavigatingAroundAccidentIndex), uiColor)
       else
         ui.textColored("no", uiColor)
       end

@@ -155,18 +155,16 @@ CarStateMachine.handleQueuedAccidents = function()
     while QueueManager.queueLength(queuedCollidedWithCarAccidents) > 0 do
         local accidentCarIndex = QueueManager.dequeue(queuedCollidedWithCarAccidents)
         
-        -- Logger.log(string.format("CarStateMachine: Car %d collided with another car, switching to COLLIDED_WITH_CAR state", carIndex))
-        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.COLLIDED_WITH_CAR)
+        Logger.log(string.format("CarStateMachine: #%d collided with another car, switching to COLLIDED_WITH_CAR state", accidentCarIndex))
         queuedStatesToTransitionInto[accidentCarIndex] = CarStateMachine.CarStateType.COLLIDED_WITH_CAR
     end
 
     while QueueManager.queueLength(queuedCarCollidedWithMeAccidents) > 0 do
         local accidentCarIndex = QueueManager.dequeue(queuedCarCollidedWithMeAccidents)
 
-        -- Logger.log(string.format("CarStateMachine: Car %d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", carIndex))
+        Logger.log(string.format("CarStateMachine: #%d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", accidentCarIndex))
         -- Logger.log(string.format("%d %d ", carIndex, QueueManager.queueLength(queuedCarCollidedWithMeAccidents)))
         -- Logger.log(string.format("%d", carIndex))
-        -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
         queuedStatesToTransitionInto[accidentCarIndex] = CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME
     end
 end
