@@ -14,6 +14,7 @@ local stringNames = {
     OvertakingCarIsClearlyBehind = 10,
     YieldingCarIsFasterThenOvertakingCar = 11,
     OvertakingCarNotOnOvertakingSide = 12,
+    NavigatingAroundAccident = 13,
 }
 
 local stringValues = {
@@ -30,6 +31,7 @@ local stringValues = {
     [stringNames.OvertakingCarIsClearlyBehind] = "Overtaking car is clearly behind",
     [stringNames.YieldingCarIsFasterThenOvertakingCar] = "Yielding car is faster than overtaking car",
     [stringNames.OvertakingCarNotOnOvertakingSide] = "Overtaking car not on overtaking side",
+    [stringNames.NavigatingAroundAccident] = "Navigating around accident",
 }
 
 local stringSaveFunction = function (carIndex, stringName)

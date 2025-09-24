@@ -132,7 +132,7 @@ AccidentManager.registerCollision = function(culpritCarIndex)
 end
 
 ---Andreas: this function is O(n)
----@param car ac.StateCar
+---@param car ac.StateCar?
 ---@return boolean
 AccidentManager.isCarComingUpToAccident = function(car)
     if lastAccidentIndexCreated == 0 then

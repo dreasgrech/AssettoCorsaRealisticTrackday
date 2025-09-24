@@ -264,6 +264,20 @@ CarStateMachine.informAboutAccident = function(accidentIndex)
     end
 end
 
+CarStateMachine.handleShouldWeStartNavigatingAroundAccident = function(carIndex, car)
+    local storage = StorageManager.getStorage()
+    local handleAccidents = storage.handleAccidents
+    if not handleAccidents then
+      return
+    end
+
+    local isCarComingUpToAccident = AccidentManager.isCarComingUpToAccident(car)
+    if isCarComingUpToAccident then
+      -- Logger.log(string.format("CarStateMachine: Car %d coming up to accident, switching to NAVIGATING_AROUND_ACCIDENT state", carIndex))
+      return CarStateMachine.CarStateType.NAVIGATING_AROUND_ACCIDENT
+    end
+end
+
 CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)
   local handleOvertaking = storage.handleOvertaking
   if not handleOvertaking then

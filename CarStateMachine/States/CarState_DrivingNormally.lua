@@ -58,6 +58,13 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
+      -- if there's an accident ahead, we need to start navigating around it
+      local newStateDueToAccident = CarStateMachine.handleShouldWeStartNavigatingAroundAccident(carIndex, car)
+      if newStateDueToAccident then
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.NavigatingAroundAccident)
+        return newStateDueToAccident
+      end
+
       -- If there's a car behind us, check if we should start yielding to it
       local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
       if newStateDueToCarBehind then

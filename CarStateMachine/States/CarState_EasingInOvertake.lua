@@ -68,6 +68,15 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     -- end
 
+    local car = sortedCarsList[sortedCarsListIndex]
+
+    -- if there's an accident ahead, we need to start navigating around it
+    local newStateDueToAccident = CarStateMachine.handleShouldWeStartNavigatingAroundAccident(carIndex, car)
+    if newStateDueToAccident then
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.NavigatingAroundAccident)
+        return newStateDueToAccident
+    end
+
     -- fetch the car index of the car we're overtaking
     local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
     -- if (not currentlyOvertakingCarIndex) then
@@ -89,7 +98,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     end
 
     -- If there's a car behind us, check if we should start yielding to it
-    local car = sortedCarsList[sortedCarsListIndex]
     local carFront = sortedCarsList[sortedCarsListIndex - 1]
     local carBehind = sortedCarsList[sortedCarsListIndex + 1]
     -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)

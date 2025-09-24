@@ -27,6 +27,7 @@ CarState_AnotherCarCollidedIntoMe = require("CarStateMachine.States.CarState_Ano
 CarState_EasingInOvertake = require("CarStateMachine.States.CarState_EasingInOvertake")
 CarState_StayingOnOvertakingLane = require("CarStateMachine.States.CarState_StayingOnOvertakingLane")
 CarState_EasingOutOvertake = require("CarStateMachine.States.CarState_EasingOutOvertake")
+CarState_NavigatingAroundAccident = require("CarStateMachine.States.CarState_NavigatingAroundAccident")
 
 AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
@@ -122,6 +123,10 @@ function script.MANIFEST__UPDATE(dt)
     CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
     CarManager.saveCarSpeed(car)
+
+    -- local isCarComingUpToAccident = AccidentManager.isCarComingUpToAccident(car)
+    -- if isCarComingUpToAccident then
+    -- end
   end
   local sortedCars = CarManager.sortCarListByTrackPosition(carList)
 

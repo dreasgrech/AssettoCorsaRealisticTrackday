@@ -6,6 +6,8 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 local OVERTAKING_CAR_FASTER_LEEWAY = 20 -- the leeway given to the yielding car to be considered "faster" than the car trying to overtake it.  This means that the yielding car needs to be at least this much faster than the car behind it to consider it faster
 
+local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
   -- make sure the state before us has saved the carIndex of the car we're yielding to
@@ -53,6 +55,14 @@ end
 -- TRANSITION FUNCTION
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       local car = sortedCarsList[sortedCarsListIndex]
+
+      -- if there's an accident ahead, we need to start navigating around it
+      local newStateDueToAccident = CarStateMachine.handleShouldWeStartNavigatingAroundAccident(carIndex, car)
+      if newStateDueToAccident then
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.NavigatingAroundAccident)
+        return newStateDueToAccident
+      end
+
       local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
       local carWeAreYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
       local carBehind = sortedCarsList[sortedCarsListIndex + 1]
@@ -69,7 +79,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
           if newStateDueToCarBehind then
             -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
             -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to new car behind #%d instead", carBehindIndex))
-            CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].YieldingToCar)
+            CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
             CarManager.cars_currentlyYieldingCarToIndex[carIndex] = carBehindIndex -- continue yielding to the new car behind us
             -- return newStateDueToCarBehind
             return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
@@ -85,7 +95,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- if we don't have an overtaking car anymore, we can ease out our yielding
       if not carWeAreYieldingTo then
         -- CarStateMachine.setStateExitReason(carIndex, 'No overtaking car so not staying on yielding lane')
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarNoLongerExists)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarNoLongerExists)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -93,7 +103,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, carWeAreYieldingTo, storage.clearAhead_meters)
       if isOvertakingCarClearlyAheadOfYieldingCar then
         -- CarStateMachine.setStateExitReason(carIndex, 'Overtaking car is clearly ahead of us so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarIsClearlyAhead)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyAhead)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -101,7 +111,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local isOvertakingCarClearlyBehindYieldingCar = CarOperations.isSecondCarClearlyBehindFirstCar(car, carWeAreYieldingTo, storage.detectCarBehind_meters)
       if isOvertakingCarClearlyBehindYieldingCar then
         -- CarStateMachine.setStateExitReason(carIndex, 'Overtaking car is clearly behind us so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarIsClearlyBehind)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyBehind)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -110,7 +120,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarFasterThanSecondCar(carIndex, currentlyYieldingToCarIndex, OVERTAKING_CAR_FASTER_LEEWAY)
       if isYieldingCarFasterThanOvertakingCar then
         -- CarStateMachine.setStateExitReason(carIndex, 'We are now faster than the car behind, so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].YieldingCarIsFasterThenOvertakingCar)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingCarIsFasterThenOvertakingCar)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
@@ -118,7 +128,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local carWeAreYieldingToDrivingOnOvertakingLane = CarManager.isCarDrivingOnSide(currentlyYieldingToCarIndex, RaceTrackManager.getOvertakingSide())
       if not carWeAreYieldingToDrivingOnOvertakingLane then
         -- CarStateMachine.setStateExitReason(carIndex, 'Overtaking car no longer on overtaking lane, so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, Strings.StringNames[Strings.StringCategories.StateExitReason].OvertakingCarNotOnOvertakingSide)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarNotOnOvertakingSide)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 end
