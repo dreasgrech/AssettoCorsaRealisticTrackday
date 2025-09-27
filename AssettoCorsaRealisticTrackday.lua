@@ -56,6 +56,7 @@ end
 
 -- Monitor car collisions so we can register an accident
 ac.onCarCollision(-1, function (carIndex)
+    if (not shouldAppRun()) then return end
     local storage = StorageManager.getStorage()
     if not storage.handleAccidents then
         return
@@ -71,6 +72,7 @@ end)
 
 -- Monitor flood ai cars cycle event so that we also reset our state
 ac.onCarJumped(-1, function(carIndex)
+  if (not shouldAppRun()) then return end
   local car = ac.getCar(carIndex)
   if not car then
     return
@@ -85,8 +87,8 @@ end)
 -- wiki: function to be called each frame to draw window content
 ---
 function script.MANIFEST__FUNCTION_MAIN(dt)
-  local storage = StorageManager.getStorage()
   if (not shouldAppRun()) then
+    local storage = StorageManager.getStorage()
     ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(storage.enabled), tostring(Constants.IS_ONLINE)))
     return
   end
