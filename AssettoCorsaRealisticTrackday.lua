@@ -139,8 +139,6 @@ function script.MANIFEST__UPDATE(dt)
     local car = sortedCars[i]
     local carIndex = car.index
     if car.isAIControlled then -- including the player car if it's AI controlled
-      -- CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
-
       -- execute the state machine for this car
       CarStateMachine.updateCar(carIndex, dt, sortedCars, i, storage)
 
