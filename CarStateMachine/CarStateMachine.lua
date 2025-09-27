@@ -270,7 +270,8 @@ CarStateMachine.handleShouldWeStartNavigatingAroundAccident = function(carIndex,
       return nil
     end
 
-    local isCarComingUpToAccidentIndex, accidentClosestCarIndex = AccidentManager.isCarComingUpToAccident(car)
+    -- todo: currently have a hardcoded value here!!!
+    local isCarComingUpToAccidentIndex, accidentClosestCarIndex = AccidentManager.isCarComingUpToAccident(car, 100)
     if isCarComingUpToAccidentIndex then
       -- Logger.log(string.format("CarStateMachine: Car %d coming up to accident, switching to NAVIGATING_AROUND_ACCIDENT state", carIndex))
       AccidentManager.setCarNavigatingAroundAccident(carIndex, isCarComingUpToAccidentIndex, accidentClosestCarIndex)

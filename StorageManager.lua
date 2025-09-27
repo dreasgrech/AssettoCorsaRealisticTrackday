@@ -18,6 +18,7 @@ local StorageManager = {}
 ---@field overtakeRampRelease_mps number
 ---@field clearAhead_meters number
 ---@field minAISpeed_kmh number
+---@field distanceFromAccidentToSeeYellowFlag_meters number
 
 ---@type StorageTable
 local storageTable = {
@@ -39,6 +40,7 @@ local storageTable = {
     overtakeRampRelease_mps = 0.4,
     clearAhead_meters = 6.0,
     minAISpeed_kmh = 35.0,
+    distanceFromAccidentToSeeYellowFlag_meters = 200.0,
 }
 
 local storage = ac.storage(storageTable)

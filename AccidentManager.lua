@@ -149,10 +149,10 @@ AccidentManager.setCarNavigatingAroundAccident = function(carIndex, accidentInde
     CarManager.cars_navigatingAroundCarIndex[carIndex] = carToNavigateAroundIndex
 end
 
----Andreas: this function is O(n)
+---Andreas: this function is O(n) where n is the total number of accidents
 ---@param car ac.StateCar?
 ---@return integer|nil accidentIndex, integer closestCarIndex
-AccidentManager.isCarComingUpToAccident = function(car)
+AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident)
     if lastAccidentIndexCreated == 0 then
         return nil, -1
     end
@@ -160,6 +160,28 @@ AccidentManager.isCarComingUpToAccident = function(car)
     if not car then return nil, -1 end
 
     local carSplinePosition = car.splinePosition
+    local carWorldPosition = car.position
+
+    -- TODO: the return of this loop is not considering all the accidents!  it's just using the first one
+
+    --[====[
+    * For all accidents that are not yet resolved
+        * Check which car (culprit or victim) is closest to our car
+        * Compare the distance of the closest car of this accident with our saved closest car of previous accidents we iterated
+        * If this closest car is closer than our previously saved closest car, then
+            * Save this accident index as the closest accident and the closest car index
+        * else ignore this accident
+
+    --]====]
+
+    -- TODO: Are you sure there's isn't a better way of doing this?  Such as using the sortedCarList and find the next car that is in an accident??
+    -- TODO: Are you sure there's isn't a better way of doing this?  Such as using the sortedCarList and find the next car that is in an accident??
+    -- TODO: Are you sure there's isn't a better way of doing this?  Such as using the sortedCarList and find the next car that is in an accident??
+    -- TODO: Are you sure there's isn't a better way of doing this?  Such as using the sortedCarList and find the next car that is in an accident??
+
+    local currentClosestAccidentIndex = nil
+    local currentClosestAccidentClosestCarIndex = -1
+    local currentClosestAccidentClosestCarSplinePosition = nil
 
      -- for i = 1, lastAccidentIndexCreated do
     for accidentIndex = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
@@ -168,6 +190,64 @@ AccidentManager.isCarComingUpToAccident = function(car)
             local culpritCar = ac.getCar(culpritCarIndex)
             local victimCarIndex = AccidentManager.accidents_collidedWithCarIndex[accidentIndex]
             local victimCar = ac.getCar(victimCarIndex)
+
+            local closestCarSplineDistance = math.huge
+            local closestCar = nil
+
+            if culpritCar then
+                -- make sure the culprit car is ahead of us
+                local culpritCarSplinePosition = culpritCar.splinePosition
+                local culpritCarAheadOfUs = culpritCarSplinePosition > carSplinePosition
+                if culpritCarAheadOfUs then
+                    -- make sure the culprit car is within the distance to detect an accident
+                    local culpritCarWorldPosition = culpritCar.position
+                    -- local distanceFromOurCarToCulpritCar = (culpritCarWorldPosition - carWorldPosition):length()
+                    local distanceFromOurCarToCulpritCar = MathHelpers.distanceBetweenVec3s(carWorldPosition, culpritCarWorldPosition)
+                    if distanceFromOurCarToCulpritCar < distanceToDetectAccident then
+                        closestCarSplineDistance = math.abs(carSplinePosition - culpritCarSplinePosition)
+                        closestCar = culpritCar
+                    end
+                end
+            end
+
+            if victimCar then
+                -- make sure the victim car is ahead of us
+                local victimCarSplinePosition = victimCar.splinePosition
+                local victimCarAheadOfUs = victimCarSplinePosition > carSplinePosition
+                if victimCarAheadOfUs then
+                    -- make sure the victim car is within the distance to detect an accident
+                    local victimCarWorldPosition = victimCar.position
+                    local distanceFromOurCarToVictimCar = MathHelpers.distanceBetweenVec3s(carWorldPosition, victimCarWorldPosition)
+                    if distanceFromOurCarToVictimCar < distanceToDetectAccident then
+                        -- if the victim car is closer than the culprit car, use the victim car as the closest car
+                        local victimCarSplineDistance = math.abs(carSplinePosition - victimCarSplinePosition)
+                        if victimCarSplineDistance < closestCarSplineDistance then
+                            closestCarSplineDistance = victimCarSplineDistance
+                            closestCar = victimCar
+                        end
+                    end
+
+                end
+            end
+
+            -- if from this accident we found the closest car to us, check if closest car of this accident is closer than the closest car of previous accidents we iterated
+            if closestCar then
+                -- if we haven't yet saved a closest accident, use this accident as the closest accident
+                if not currentClosestAccidentIndex then
+                    currentClosestAccidentIndex = accidentIndex
+                    currentClosestAccidentClosestCarIndex = closestCar.index
+                    currentClosestAccidentClosestCarSplinePosition = closestCar.splinePosition
+                else
+                    if closestCarSplineDistance < currentClosestAccidentClosestCarSplinePosition then
+                        currentClosestAccidentIndex = accidentIndex
+                        currentClosestAccidentClosestCarIndex = closestCar.index
+                        currentClosestAccidentClosestCarSplinePosition = closestCar.splinePosition
+                    end
+                end
+            end
+
+--[=====[
+            -- local culpritCarSplinePosition = 
 
             -- check which car is closest to our car by comparing spline positions
             local culpritCarSplineDistance = math.huge
@@ -181,8 +261,6 @@ AccidentManager.isCarComingUpToAccident = function(car)
 
             -- local culpritCarSplineDistance = math.abs(carSplinePosition - culpritCar.splinePosition)
             -- local victimCarSplineDistance = math.abs(carSplinePosition - victimCar.splinePosition)
-            local closestCarSplineDistance
-            local closestCar = nil
             if culpritCarSplineDistance < victimCarSplineDistance then
                 closestCar = culpritCar
                 closestCarSplineDistance = culpritCarSplineDistance
@@ -191,12 +269,18 @@ AccidentManager.isCarComingUpToAccident = function(car)
                 closestCarSplineDistance = victimCarSplineDistance
             end
 
+            -- TODO: need to make sure that the car hasn't already passed the closest car spline position!!!
+            -- TODO: need to make sure that the car hasn't already passed the closest car spline position!!!
+            -- TODO: need to make sure that the car hasn't already passed the closest car spline position!!!
+            -- TODO: need to make sure that the car hasn't already passed the closest car spline position!!!
+
+            -- todo: get this 0.02 value out of here!!
             if closestCar and closestCarSplineDistance < 0.02 then
                 local closestCarIndex = closestCar.index
                 return accidentIndex, closestCarIndex
             end
 
-            --[=====[
+            --[===[
             -- TODO: THIS IS NOT GOOD BECAUSE THE ACCIDENT POSITION IS POINTLESS
             -- TODO: WE NEED TO CHECK BOTH POSITIONS OF THE CARS THAT ARE INVOLVED IN THE ACCIDENT
             local accidentSplinePosition = AccidentManager.accidents_splinePosition[i]
@@ -207,11 +291,13 @@ AccidentManager.isCarComingUpToAccident = function(car)
             if carIsCloseButHasntYetPassedTheAccidentPosition then
                 return i
             end
-            --]=====]
+            --]===]
+--]=====]
         end
     end
 
-    return nil, -1
+    -- return nil, -1
+    return currentClosestAccidentIndex, currentClosestAccidentClosestCarIndex
 end
 
 return AccidentManager

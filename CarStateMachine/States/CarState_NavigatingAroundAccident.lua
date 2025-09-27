@@ -31,7 +31,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
     local car = sortedCarsList[sortedCarsListIndex]
     -- check if we are close enough to a different accident
-    local closestAccidentIndex, closestAccidentClosestCarIndex = AccidentManager.isCarComingUpToAccident(car)
+    local closestAccidentIndex, closestAccidentClosestCarIndex = AccidentManager.isCarComingUpToAccident(car, storage.distanceFromAccidentToSeeYellowFlag_meters)
     if not closestAccidentIndex then
         AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
         return
@@ -84,7 +84,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local targetOffset = 0
 
     local carToNavigateAround = closestAccidentClosestCar
-    CarManager.cars_navigatingAroundCarIndex[carIndex] = carToNavigateAround.index
+    -- CarManager.cars_navigatingAroundCarIndex[carIndex] = carToNavigateAround.index
 
     -- local accidentWorldPosition = AccidentManager.accidents_worldPosition[accidentIndex]
     -- local distanceToAccident = car.position:distance(accidentWorldPosition)
@@ -97,7 +97,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         targetOffset = -2 -- todo: need to decide the corect side
     else
         -- the car to navigate around is already to one side, so we need to go to the other side
-        targetOffset = (carToNavigateAroundLateralOffset * signOfLateralOffset) + (2.0 * signOfLateralOffset)
+        -- targetOffset = (carToNavigateAroundLateralOffset * signOfLateralOffset) + (2.0 * signOfLateralOffset)
+        targetOffset = carToNavigateAroundLateralOffset * -1
     end
 
     local sideToDriveTo = targetOffset < 0 and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT

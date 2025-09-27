@@ -1,5 +1,7 @@
 local RaceTrackManager = {}
 
+---@type RaceTrackManager.TrackSide
+---@enum integer
 RaceTrackManager.TrackSide = {
     LEFT = 1,
     RIGHT = 2,
@@ -11,8 +13,8 @@ RaceTrackManager.TrackSideStrings = {
 }
 
 --- Returns RIGHT if given LEFT and vice versa
----@param side RaceteTrackManager.TrackSide|integer
----@return RaceteTrackManager.TrackSide|integer
+---@param side RaceTrackManager.TrackSide|integer
+---@return RaceTrackManager.TrackSide|integer
 RaceTrackManager.getOppositeSide = function(side)
     if side == RaceTrackManager.TrackSide.LEFT then
         return RaceTrackManager.TrackSide.RIGHT

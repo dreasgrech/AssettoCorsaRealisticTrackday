@@ -227,6 +227,15 @@ function CarOperations.toggleTurningLights(carIndex, turningLights)
     -- CarManager.cars_hasTL[carIndex] = car.hasTurningLights
 end
 
+---comment
+---@param carIndex number
+---@param dt number
+---@param car ac.StateCar
+---@param side integer|RaceTrackManager.TrackSide
+---@param driveToSideMaxOffset number
+---@param rampSpeed_mps number
+---@param overrideAiAwareness boolean
+---@return boolean
 function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMaxOffset,rampSpeed_mps, overrideAiAwareness)
     -- make sure there isn't any car on the side we're trying to drive to so we don't crash into it
     local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)

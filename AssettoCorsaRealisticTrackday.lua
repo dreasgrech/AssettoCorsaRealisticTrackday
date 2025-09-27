@@ -104,7 +104,7 @@ function script.MANIFEST__UPDATE(dt)
   local playerCar = ac.getCar(0)
 
   -- check if the player is coming up to an accident so we can set a caution flag
-  local isPlayerComingUpToAccidentIndex = AccidentManager.isCarComingUpToAccident(playerCar)
+  local isPlayerComingUpToAccidentIndex = AccidentManager.isCarComingUpToAccident(playerCar, storage.distanceFromAccidentToSeeYellowFlag_meters)
   if isPlayerComingUpToAccidentIndex then
     RaceFlagManager.setRaceFlag(ac.FlagType.Caution)
   else
