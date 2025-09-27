@@ -50,6 +50,7 @@ CarManager.cars_averageSpeedKmh = {}
 -- CarManager.cars_totalAccidentsInvolvedIn = {}
 CarManager.cars_culpritInAccidentIndex = {}
 CarManager.cars_navigatingAroundAccidentIndex = {}
+CarManager.cars_navigatingAroundCarIndex = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -97,6 +98,7 @@ CarManager.setInitializedDefaults = function(carIndex)
   -- CarManager.cars_involvedInAccidents[carIndex] = {}
   CarManager.cars_culpritInAccidentIndex[carIndex] = 0
   CarManager.cars_navigatingAroundAccidentIndex[carIndex] = 0
+  CarManager.cars_navigatingAroundCarIndex[carIndex] = 0
   CarStateMachine.initializeCarInStateMachine(carIndex)
 
   -- remove speed limitations which could have occured during an accident

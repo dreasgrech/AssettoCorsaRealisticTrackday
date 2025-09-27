@@ -15,6 +15,7 @@ Strings_ReasonWhyCantYield = require("Strings.Strings_ReasonWhyCantYield")
 Strings_ReasonWhyCantOvertake = require("Strings.Strings_ReasonWhyCantOvertake")
 Strings_StateExitReason = require("Strings.Strings_StateExitReason")
 StringsManager = require("StringsManager")
+local OnCarEventManager = require("OnCarEventManager")
 
 CarStateMachine = require("CarStateMachine.CarStateMachine")
 CarState_DrivingNormally = require("CarStateMachine.States.CarState_DrivingNormally")
@@ -62,12 +63,7 @@ ac.onCarCollision(-1, function (carIndex)
         return
     end
 
-    local accidentIndex = AccidentManager.registerCollision(carIndex)
-    if not accidentIndex then
-        return
-    end
-
-    CarStateMachine.informAboutAccident(accidentIndex)
+    OnCarEventManager.enqueueOnCarEvent(OnCarEventManager.OnCarEventType.Collision, carIndex)
 end)
 
 -- Monitor flood ai cars cycle event so that we also reset our state
@@ -78,8 +74,7 @@ ac.onCarJumped(-1, function(carIndex)
     return
   end
 
-  CarManager.setInitializedDefaults(carIndex)
-  AccidentManager.informAboutCarReset(carIndex)
+    OnCarEventManager.enqueueOnCarEvent(OnCarEventManager.OnCarEventType.Jumped, carIndex)
 end)
 
 ---
@@ -136,7 +131,8 @@ function script.MANIFEST__UPDATE(dt)
   CarManager.currentSortedCarsList = sortedCars
 
   -- handle any queued accidents before updating the car state machines
-  CarStateMachine.handleQueuedAccidents()
+  OnCarEventManager.processQueuedEvents()
+  CarStateMachine.handleQueuedAccidents() -- todo: check if this can be integrated with the processQueuedEvents() above
 
   local totalCars = #sortedCars
   for i = 1, totalCars do

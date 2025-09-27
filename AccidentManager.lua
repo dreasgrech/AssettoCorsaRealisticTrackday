@@ -17,6 +17,7 @@ AccidentManager.accidents_resolved = {}
 
 AccidentManager.informAboutCarReset = function(carIndex)
     local accidentIndexAsCulprit = CarManager.cars_culpritInAccidentIndex[carIndex]
+    -- Logger.log(string.format("[AccidentManager] informAboutCarReset called for car #%d. culpritInAccident #%d.  Total accidents: %d", carIndex, accidentIndexAsCulprit, #AccidentManager.accidents_carIndex))
     if accidentIndexAsCulprit > 0 then
         -- Logger.log(string.format("AccidentManager: Car #%d has reset, clearing it from accident #%d", carIndex, accidentIndexAsCulprit))
         Logger.log(string.format("[AccidentManager] Car #%d has reset, clearing accident #%d", carIndex, accidentIndexAsCulprit))
@@ -99,8 +100,9 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     if collidedWithAnotherCar then
         -- if the victim car the culprit car collided with is already in an accident with the culprit car, ignore this collision
         local victimCarCulpritInAnotherAccidentIndex = CarManager.cars_culpritInAccidentIndex[collidedWith]
-        if victimCarCulpritInAnotherAccidentIndex > 0 then
-            if AccidentManager.accidents_collidedWithCarIndex[victimCarCulpritInAnotherAccidentIndex] == culpritCarIndex then
+        if victimCarCulpritInAnotherAccidentIndex and victimCarCulpritInAnotherAccidentIndex > 0 then
+            local collidedWithCarIndex = AccidentManager.accidents_collidedWithCarIndex[victimCarCulpritInAnotherAccidentIndex]
+            if collidedWithCarIndex and collidedWithCarIndex == culpritCarIndex then
                 -- Logger.log(string.format(
                 -- "#%d collided with car #%d but that victim car is already involved in accident #%d with culprit car, ignoring new collision",
                 -- culpritCarIndex,

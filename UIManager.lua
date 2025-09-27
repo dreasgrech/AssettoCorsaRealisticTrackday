@@ -48,7 +48,8 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'StateTime', orderDirection = 0, width = 75, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
-  { name = 'Navigating', orderDirection = 0, width = 80, tooltip='Navigating accident status' },
+  { name = 'InvolvedInAccident', orderDirection = 0, width = 120, tooltip='Involved in accident status' },
+  { name = 'NavigatingAccident', orderDirection = 0, width = 120, tooltip='Navigating accident status' },
   { name = 'PreviousStateExitReason', orderDirection = 0, width = 250, tooltip='Reason for last state exit' },
   { name = "CantYieldReason", orderDirection = 0, width = 300, tooltip="Reason why the car can't yield" },
   { name = "CantOvertakeReason", orderDirection = 0, width = 800, tooltip="Reason why the car can't overtake" },
@@ -133,6 +134,7 @@ UIManager.drawMainWindowContent = function()
       -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
       local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
 
+      local involvedInAccidentIndex = false
       local currentlyNavigatingAroundAccidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
 
       -- local previousCarState = CarStateMachine.cars_previousState[carIndex]
@@ -219,10 +221,19 @@ UIManager.drawMainWindowContent = function()
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
+      -- if involvedInAccidentIndex and involvedInAccidentIndex > 0 then
+      if involvedInAccidentIndex then
+        -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
+        -- ui.textColored(string.format("yes"), uiColor)
+        ui.textColored(string.format("yes #%d", involvedInAccidentIndex), uiColor)
+      else
+        ui.textColored("no", uiColor)
+      end
+      ui.nextColumn()
       if currentlyNavigatingAroundAccidentIndex > 0 then
         -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
         -- ui.textColored(string.format("yes"), uiColor)
-        ui.textColored(string.format("yes #%d", currentlyNavigatingAroundAccidentIndex), uiColor)
+        ui.textColored(string.format("yes #%d (car: #%d)", currentlyNavigatingAroundAccidentIndex, CarManager.cars_navigatingAroundCarIndex[carIndex]), uiColor)
       else
         ui.textColored("no", uiColor)
       end
@@ -279,6 +290,9 @@ function UIManager.draw3DOverheadText()
     -- -- respect existing depth, don’t write to depth (debug text won’t “punch holes”)
     -- render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
   -- end
+    render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
+    render.setCullMode(render.CullMode.Front)
+    -- render.CullMode
 
   -- for i = 1, sim.carsCount - 1 do
   for i = 0, sim.carsCount do

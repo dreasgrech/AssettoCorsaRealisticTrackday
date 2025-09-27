@@ -56,6 +56,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
     local targetOffset = 0
 
+    CarManager.cars_navigatingAroundCarIndex[carIndex] = carToNavigateAround.index
+
     -- local accidentWorldPosition = AccidentManager.accidents_worldPosition[accidentIndex]
     -- local distanceToAccident = car.position:distance(accidentWorldPosition)
 
