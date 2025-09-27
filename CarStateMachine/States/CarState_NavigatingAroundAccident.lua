@@ -29,26 +29,53 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Accelerate, 0.2)
     --CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.2)
 
-    local culpritCarIndex = AccidentManager.accidents_carIndex[accidentIndex]
-    local culpritCar = ac.getCar(culpritCarIndex)
-    local victimCarIndex = AccidentManager.accidents_collidedWithCarIndex[accidentIndex]
-    local victimCar = ac.getCar(victimCarIndex)
+    local car = sortedCarsList[sortedCarsListIndex]
+    -- check if we are close enough to a different accident
+    local closestAccidentIndex, closestAccidentClosestCarIndex = AccidentManager.isCarComingUpToAccident(car)
+    if not closestAccidentIndex then
+        AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
+        return
+    end
+
+    -- if closestAccidentIndex then-- and closestAccidentIndex ~= accidentIndex then
+        -- Logger.log(string.format("[CarState_NavigatingAroundAccident] #%d is switching to navigate around closer accident #%d instead of previous accident #%d", carIndex, closestAccidentIndex, accidentIndex))
+
+        -- -- we are closer to a different accident, so switch to navigating around that one instead
+        -- CarManager.cars_navigatingAroundAccidentIndex[carIndex] = closestAccidentIndex
+    AccidentManager.setCarNavigatingAroundAccident(carIndex, closestAccidentIndex, closestAccidentClosestCarIndex)
+
+    accidentIndex = closestAccidentIndex
+
+    -- end
+
+    -- local culpritCarIndex = AccidentManager.accidents_carIndex[accidentIndex]
+    -- local culpritCar = ac.getCar(culpritCarIndex)
+    -- local victimCarIndex = AccidentManager.accidents_collidedWithCarIndex[accidentIndex]
+    -- local victimCar = ac.getCar(victimCarIndex)
 
     -- determine which car is closest to us by comparing spline positions 
     local car = sortedCarsList[sortedCarsListIndex]
-    local culpritCarSplineDistance = math.abs(car.splinePosition - culpritCar.splinePosition)
-    local victimCarSplineDistance = math.abs(car.splinePosition - victimCar.splinePosition)
+    -- local culpritCarSplineDistance = math.abs(car.splinePosition - culpritCar.splinePosition)
+    -- local victimCarSplineDistance = math.abs(car.splinePosition - victimCar.splinePosition)
 
-    local carToNavigateAroundSplineDistance
-    local carToNavigateAround = nil
-    if culpritCarSplineDistance < victimCarSplineDistance then
-        carToNavigateAround = culpritCar
-        carToNavigateAroundSplineDistance = culpritCarSplineDistance
-    else
-        carToNavigateAround = victimCar
-        carToNavigateAroundSplineDistance = victimCarSplineDistance
+    -- local carToNavigateAroundSplineDistance
+    -- local carToNavigateAround = nil
+    -- if culpritCarSplineDistance < victimCarSplineDistance then
+        -- carToNavigateAround = culpritCar
+        -- carToNavigateAroundSplineDistance = culpritCarSplineDistance
+    -- else
+        -- carToNavigateAround = victimCar
+        -- carToNavigateAroundSplineDistance = victimCarSplineDistance
+    -- end
+
+    -- if carToNavigateAroundSplineDistance > 0.01 then
+    local closestAccidentClosestCar = ac.getCar(closestAccidentClosestCarIndex)
+    if not closestAccidentClosestCar then
+        Logger.error(string.format("Could not get closest car to navigate around for car #%d navigating around accident #%d", carIndex, accidentIndex))
+        return
     end
 
+    local carToNavigateAroundSplineDistance = math.abs(car.splinePosition - closestAccidentClosestCar.splinePosition)
     if carToNavigateAroundSplineDistance > 0.01 then
         -- we're more than 1 centimeter away from the car to navigate around, so just drive normally for now
         return
@@ -56,6 +83,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
     local targetOffset = 0
 
+    local carToNavigateAround = closestAccidentClosestCar
     CarManager.cars_navigatingAroundCarIndex[carIndex] = carToNavigateAround.index
 
     -- local accidentWorldPosition = AccidentManager.accidents_worldPosition[accidentIndex]
@@ -82,6 +110,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     if accidentIndex == 0 then
         -- Logger.error(string.format("accidentIndex is 0! in car #%d", carIndex))
         -- CarStateMachine.changeCarState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
+        AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
         CarStateMachine.setStateExitReason(carIndex, StateExitReason.NoAccidentIndexToNavigateAround)
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
     end
@@ -98,6 +127,34 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         end
     end
 
+    -- if we are now past the car we are currently navigating around, and are some distance away from it, return to normal driving
+    local carToNavigateAroundIndex = CarManager.cars_navigatingAroundCarIndex[carIndex]
+    local carToNavigateAround = ac.getCar(carToNavigateAroundIndex)
+    if not carToNavigateAround then
+        Logger.error(string.format("Could not get car to navigate around for car #%d navigating around accident #%d", carIndex, accidentIndex))
+        AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.CarToNavigateAroundNotFound)
+        return CarStateMachine.CarStateType.DRIVING_NORMALLY
+    end
+
+    -- make sure that the car we're navigating around is behind us
+    local carToNavigateAroundSplineDistance = carToNavigateAround.splinePosition
+    local ourCarSplinePosition = car.splinePosition
+    if ourCarSplinePosition > carToNavigateAroundSplineDistance then
+        -- make sure we're some distance away from the car we're navigating around
+        local carToNavigateAroundWorldPosition = carToNavigateAround.position
+        local ourCarWorldPosition = car.position
+        local distanceToCarToNavigateAround = MathHelpers.distanceBetweenVec3s(ourCarWorldPosition, carToNavigateAroundWorldPosition)
+        if distanceToCarToNavigateAround > 10 then
+            -- we're more than some meters away from the car we were navigating around, so return to normal driving
+            AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
+            CarStateMachine.setStateExitReason(carIndex, StateExitReason.AccidentIsFarBehindUs)
+            return CarStateMachine.CarStateType.DRIVING_NORMALLY
+        end
+    end
+
+
+    --[=====[
     local accidentWorldPosition = AccidentManager.accidents_worldPosition[accidentIndex]
     local carPosition = car.position
     local carSplinePosition = car.splinePosition
@@ -113,6 +170,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             return CarStateMachine.CarStateType.DRIVING_NORMALLY
         end
     end
+    -]=====]
 end
 
 -- EXIT FUNCTION

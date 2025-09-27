@@ -230,7 +230,7 @@ UIManager.drawMainWindowContent = function()
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
-      if currentlyNavigatingAroundAccidentIndex > 0 then
+      if currentlyNavigatingAroundAccidentIndex and currentlyNavigatingAroundAccidentIndex > 0 then
         -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
         -- ui.textColored(string.format("yes"), uiColor)
         ui.textColored(string.format("yes #%d (car: #%d)", currentlyNavigatingAroundAccidentIndex, CarManager.cars_navigatingAroundCarIndex[carIndex]), uiColor)

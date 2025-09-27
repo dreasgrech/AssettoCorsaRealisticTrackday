@@ -97,8 +97,9 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_averageSpeedKmh[carIndex] = 0
   -- CarManager.cars_involvedInAccidents[carIndex] = {}
   CarManager.cars_culpritInAccidentIndex[carIndex] = 0
-  CarManager.cars_navigatingAroundAccidentIndex[carIndex] = 0
-  CarManager.cars_navigatingAroundCarIndex[carIndex] = 0
+  -- CarManager.cars_navigatingAroundAccidentIndex[carIndex] = nil
+  -- CarManager.cars_navigatingAroundCarIndex[carIndex] = nil
+  AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
   CarStateMachine.initializeCarInStateMachine(carIndex)
 
   -- remove speed limitations which could have occured during an accident
