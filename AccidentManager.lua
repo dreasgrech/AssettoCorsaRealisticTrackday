@@ -10,6 +10,7 @@ AccidentManager.accidents_worldPosition = {}
 AccidentManager.accidents_splinePosition = {}
 AccidentManager.accidents_collidedWithTrack = {}
 AccidentManager.accidents_collidedWithCarIndex = {}
+AccidentManager.accidents_yellowFlagZoneIndex = {}
 AccidentManager.accidents_resolved = {}
 
 local setAccidentAsResolved = function(accidentIndex)
@@ -18,6 +19,11 @@ local setAccidentAsResolved = function(accidentIndex)
         AccidentManager.accidents_splinePosition[accidentIndex] = nil
         AccidentManager.accidents_collidedWithTrack[accidentIndex] = nil
         AccidentManager.accidents_collidedWithCarIndex[accidentIndex] = nil
+
+        -- remove the yellow flag zone associated with this accident
+        local yellowFlagZoneIndex = AccidentManager.accidents_yellowFlagZoneIndex[accidentIndex]
+        RaceTrackManager.removeYellowFlagZone(yellowFlagZoneIndex)
+        AccidentManager.accidents_yellowFlagZoneIndex[accidentIndex] = nil
 
         --CarManager.cars_culpritInAccidentIndex[carIndex] = nil
 
@@ -134,7 +140,12 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     AccidentManager.accidents_collidedWithCarIndex[accidentIndex] = collidedWith
     AccidentManager.accidents_resolved[accidentIndex] = false
 
+    -- mark the culprit car as being in an accident
     CarManager.cars_culpritInAccidentIndex[culpritCarIndex] = accidentIndex
+
+    -- create a yellow flag zone for this accident
+    local yellowFlagZoneIndex = RaceTrackManager.declareYellowFlagZone(carSplinePosition)
+    AccidentManager.accidents_yellowFlagZoneIndex[accidentIndex] = yellowFlagZoneIndex
 
     Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", culpritCarIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), accidentIndex, #AccidentManager.accidents_carIndex))
 

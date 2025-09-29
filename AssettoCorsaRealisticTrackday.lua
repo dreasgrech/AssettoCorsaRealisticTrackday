@@ -106,8 +106,11 @@ function script.MANIFEST__UPDATE(dt)
   local playerCar = ac.getCar(0)
 
   -- check if the player is coming up to an accident so we can set a caution flag
-  local isPlayerComingUpToAccidentIndex = AccidentManager.isCarComingUpToAccident(playerCar, storage.distanceFromAccidentToSeeYellowFlag_meters)
-  if isPlayerComingUpToAccidentIndex then
+  -- local isPlayerComingUpToAccidentIndex = AccidentManager.isCarComingUpToAccident(playerCar, storage.distanceFromAccidentToSeeYellowFlag_meters)
+  -- if isPlayerComingUpToAccidentIndex then
+  local playerCarSplinePosition = playerCar.splinePosition
+  local isPlayerInYellowFlagZone = RaceTrackManager.isSplinePositionInYellowZone(playerCarSplinePosition)
+  if isPlayerInYellowFlagZone then
     RaceFlagManager.setRaceFlag(ac.FlagType.Caution)
   else
     RaceFlagManager.removeRaceFlag()

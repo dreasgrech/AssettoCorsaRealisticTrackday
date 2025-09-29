@@ -48,6 +48,9 @@ RaceTrackManager.getOvertakingSide = function()
     return RaceTrackManager.getOppositeSide(yieldSide)
 end
 
+---Creates a new yellow flag zone ending at the given spline position and extending backwards by the configured distance
+---@param yellowZoneEndSplinePosition number
+---@return number yellowFlagZoneIndex
 RaceTrackManager.declareYellowFlagZone = function(yellowZoneEndSplinePosition)
     local yellowFlagZoneIndex = CompletableIndexCollectionManager.incrementLastIndexCreated(yellowZonesCompletableIndex)
 
@@ -69,12 +72,43 @@ RaceTrackManager.declareYellowFlagZone = function(yellowZoneEndSplinePosition)
     return yellowFlagZoneIndex
 end
 
+--- Removes a yellow flag zone
+---@param yellowFlagZoneIndex number
 RaceTrackManager.removeYellowFlagZone = function(yellowFlagZoneIndex)
     yellowZones_startSplinePosition[yellowFlagZoneIndex] = nil
     yellowZones_endSplinePosition[yellowFlagZoneIndex] = nil
 
     yellowZones_resolved[yellowFlagZoneIndex] = true
     CompletableIndexCollectionManager.updateFirstNonResolvedIndex(yellowZonesCompletableIndex, yellowZones_resolved)
+end
+
+RaceTrackManager.isSplinePositionInYellowZone = function(splinePosition)
+    local lastYellowZoneIndexCreated = CompletableIndexCollectionManager.getLastIndexCreated(yellowZonesCompletableIndex)
+    if lastYellowZoneIndexCreated == 0 then
+        return false
+    end
+
+    local firstNonResolvedYellowZoneIndex = CompletableIndexCollectionManager.getFirstNonResolvedIndex(yellowZonesCompletableIndex)
+    for yellowZoneIndex = firstNonResolvedYellowZoneIndex, lastYellowZoneIndexCreated do
+        if yellowZones_resolved[yellowZoneIndex] == false then
+            local yellowZoneStartSplinePosition = yellowZones_startSplinePosition[yellowZoneIndex]
+            local yellowZoneEndSplinePosition = yellowZones_endSplinePosition[yellowZoneIndex]
+
+            if yellowZoneStartSplinePosition < yellowZoneEndSplinePosition then
+                -- normal case, zone does not wrap around the 0.0/1.0 point
+                if splinePosition >= yellowZoneStartSplinePosition and splinePosition <= yellowZoneEndSplinePosition then
+                    return true
+                end
+            else
+                -- zone wraps around the 0.0/1.0 point
+                if (splinePosition >= yellowZoneStartSplinePosition and splinePosition <= 1.0) or (splinePosition >= 0.0 and splinePosition <= yellowZoneEndSplinePosition) then
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
 end
 
 return RaceTrackManager
