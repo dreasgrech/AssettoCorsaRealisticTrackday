@@ -109,13 +109,25 @@ function script.MANIFEST__UPDATE(dt)
   -- check if the player is coming up to an accident so we can set a caution flag
   -- local isPlayerComingUpToAccidentIndex = AccidentManager.isCarComingUpToAccident(playerCar, storage.distanceFromAccidentToSeeYellowFlag_meters)
   -- if isPlayerComingUpToAccidentIndex then
-  local playerCarSplinePosition = playerCar.splinePosition
-  local isPlayerInYellowFlagZone = RaceTrackManager.isSplinePositionInYellowZone(playerCarSplinePosition)
-  if isPlayerInYellowFlagZone then
-    RaceFlagManager.setRaceFlag(ac.FlagType.Caution)
-  else
-    RaceFlagManager.removeRaceFlag()
+  local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()
+  -- Logger.log(string.format("Camera focused car index is %d", cameraFocusedCarIndex or -1))
+  local cameraFocusedCar = ac.getCar(cameraFocusedCarIndex)
+  if cameraFocusedCar then
+    local cameraFocusedCarSplinePosition = cameraFocusedCar.splinePosition
+    local isFocusedCarInYellowFlagZone = RaceTrackManager.isSplinePositionInYellowZone(cameraFocusedCarSplinePosition)
+    if isFocusedCarInYellowFlagZone then
+      RaceFlagManager.setRaceFlag(ac.FlagType.Caution)
+    else
+      RaceFlagManager.removeRaceFlag()
+    end
   end
+  -- local playerCarSplinePosition = playerCar.splinePosition
+  -- local isPlayerInYellowFlagZone = RaceTrackManager.isSplinePositionInYellowZone(playerCarSplinePosition)
+  -- if isPlayerInYellowFlagZone then
+    -- RaceFlagManager.setRaceFlag(ac.FlagType.Caution)
+  -- else
+    -- RaceFlagManager.removeRaceFlag()
+  -- end
 
   -- build the sorted car list and do any per-car operations that doesn't require the sorted list
   local carList = {}
