@@ -1,7 +1,7 @@
 local AccidentManager = {}
 
-local lastAccidentIndexCreated = 0
-local firstNonResolvedAccidentIndex = 1
+-- local lastAccidentIndexCreated = 0
+-- local firstNonResolvedAccidentIndex = 1
 
 AccidentManager.accidents_carIndex = {}
 AccidentManager.accidents_worldPosition = {}
@@ -10,16 +10,19 @@ AccidentManager.accidents_collidedWithTrack = {}
 AccidentManager.accidents_collidedWithCarIndex = {}
 AccidentManager.accidents_resolved = {}
 
+local accidentCompletableIndex = CompletableIndexCollectionManager.createNewIndex()
+
 local setAccidentAsResolved = function(accidentIndex)
         AccidentManager.accidents_carIndex[accidentIndex] = nil
         AccidentManager.accidents_worldPosition[accidentIndex] = nil
         AccidentManager.accidents_splinePosition[accidentIndex] = nil
         AccidentManager.accidents_collidedWithTrack[accidentIndex] = nil
         AccidentManager.accidents_collidedWithCarIndex[accidentIndex] = nil
-        AccidentManager.accidents_resolved[accidentIndex] = true
 
         --CarManager.cars_culpritInAccidentIndex[carIndex] = nil
 
+        --[==[
+        AccidentManager.accidents_resolved[accidentIndex] = true
         -- check the existing accidents and update the first non-resolved accident index so that loops iterating over accidents can start from there
         for i = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
             -- if not AccidentManager.accidents_resolved[i] then
@@ -29,6 +32,10 @@ local setAccidentAsResolved = function(accidentIndex)
                 break
             end
         end
+        --]==]
+
+        AccidentManager.accidents_resolved[accidentIndex] = true
+        CompletableIndexCollectionManager.updateFirstNonResolvedIndex(accidentCompletableIndex, AccidentManager.accidents_resolved)
 end
 
 AccidentManager.informAboutCarReset = function(carIndex)
@@ -113,8 +120,9 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     end
 
     -- register a new accident
-    lastAccidentIndexCreated = lastAccidentIndexCreated + 1
-    local accidentIndex = lastAccidentIndexCreated
+    -- lastAccidentIndexCreated = lastAccidentIndexCreated + 1
+    -- local accidentIndex = lastAccidentIndexCreated
+    local accidentIndex = CompletableIndexCollectionManager.incrementLastIndexCreated(accidentCompletableIndex)
 
     local carSplinePosition = culpritCar.splinePosition
 
@@ -128,7 +136,7 @@ AccidentManager.registerCollision = function(culpritCarIndex)
 
     CarManager.cars_culpritInAccidentIndex[culpritCarIndex] = accidentIndex
 
-    Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", culpritCarIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), lastAccidentIndexCreated, #AccidentManager.accidents_carIndex))
+    Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", culpritCarIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), accidentIndex, #AccidentManager.accidents_carIndex))
 
     return accidentIndex
 end
@@ -142,6 +150,7 @@ end
 ---@param car ac.StateCar?
 ---@return integer|nil accidentIndex, integer closestCarIndex
 AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident)
+    local lastAccidentIndexCreated = CompletableIndexCollectionManager.getLastIndexCreated(accidentCompletableIndex)
     if lastAccidentIndexCreated == 0 then
         return nil, -1
     end
@@ -173,6 +182,7 @@ AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident
     local currentClosestAccidentClosestCarSplinePosition = nil
 
      -- for i = 1, lastAccidentIndexCreated do
+    local firstNonResolvedAccidentIndex = CompletableIndexCollectionManager.getFirstNonResolvedIndex(accidentCompletableIndex)
     for accidentIndex = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
         if not AccidentManager.accidents_resolved[accidentIndex] then
             local culpritCarIndex = AccidentManager.accidents_carIndex[accidentIndex]
