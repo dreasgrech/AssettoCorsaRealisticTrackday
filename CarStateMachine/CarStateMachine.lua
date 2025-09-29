@@ -210,6 +210,12 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
       changeState(carIndex, newStateToTransitionIntoThisFrame)
 
       -- execute the state's entry function
+      --[====[
+      if not CarStateMachine.states_entryFunctions[newStateToTransitionIntoThisFrame] then
+        Logger.error(string.format("CarStateMachine: #%d state %d has no entry function!", carIndex, newStateToTransitionIntoThisFrame))
+        return
+      end
+      --]====]
       CarStateMachine.states_entryFunctions[newStateToTransitionIntoThisFrame](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     end
 
@@ -222,6 +228,14 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
 
     -- run the state loop
     -- Logger.log(string.format("CarStateMachine: Car %d updateFunction of state %s: ", carIndex, CarStateMachine.CarStateTypeStrings[state]) .. tostring(CarStateMachine.states_updateFunctions[carIndex]))
+
+
+    --[====[
+    if not CarStateMachine.states_updateFunctions[state] then
+      Logger.error(string.format("CarStateMachine: #%d state %d has no update function!", carIndex, state))
+      return
+    end
+    --]====]
     CarStateMachine.states_updateFunctions[state](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
 
     local currentTimeInState = CarManager.cars_timeInCurrentState[carIndex]
