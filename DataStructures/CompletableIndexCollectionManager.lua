@@ -5,6 +5,8 @@ local collections_firstNonResolvedIndex = {}
 
 local lastCreatedCollectionIndex = 0
 
+--- Creates a new Index and returns its index
+---@return integer indexIndex
 CompletableIndexCollectionManager.createNewIndex = function()
     lastCreatedCollectionIndex = lastCreatedCollectionIndex + 1
 
@@ -14,30 +16,30 @@ CompletableIndexCollectionManager.createNewIndex = function()
     return lastCreatedCollectionIndex
 end
 
-CompletableIndexCollectionManager.getLastIndexCreated = function(collectionIndex)
-    return collections_lastIndexCreated[collectionIndex]
+CompletableIndexCollectionManager.getLastIndexCreated = function(indexIndex)
+    return collections_lastIndexCreated[indexIndex]
 end
 
-CompletableIndexCollectionManager.getFirstNonResolvedIndex = function(collectionIndex)
-    return collections_firstNonResolvedIndex[collectionIndex]
+CompletableIndexCollectionManager.getFirstNonResolvedIndex = function(indexIndex)
+    return collections_firstNonResolvedIndex[indexIndex]
 end
 
-CompletableIndexCollectionManager.updateFirstNonResolvedIndex = function(collectionIndex, resolvedCollection)
+CompletableIndexCollectionManager.updateFirstNonResolvedIndex = function(indexIndex, resolvedCollection)
     -- check the resolvedCollection and update the first non-resolved collection index so that loops iterating over the indexes can skip resolved ones
-    local firstNonResolvedIndex = collections_firstNonResolvedIndex[collectionIndex]
-    local lastIndexCreated = collections_lastIndexCreated[collectionIndex]
+    local firstNonResolvedIndex = collections_firstNonResolvedIndex[indexIndex]
+    local lastIndexCreated = collections_lastIndexCreated[indexIndex]
     for i = firstNonResolvedIndex, lastIndexCreated do
         if resolvedCollection[i] == false then
-            Logger.log(string.format("[CompletableIndexCollectionManager] #%d Setting first non-resolved index to %d", collectionIndex, i))
-            collections_firstNonResolvedIndex[collectionIndex] = i
+            Logger.log(string.format("[CompletableIndexCollectionManager] #%d Setting first non-resolved index to %d", indexIndex, i))
+            collections_firstNonResolvedIndex[indexIndex] = i
             break
         end
     end
 end
 
-CompletableIndexCollectionManager.incrementLastIndexCreated = function(collectionIndex)
-    local lastIndexCreated = collections_lastIndexCreated[collectionIndex] + 1
-    collections_lastIndexCreated[collectionIndex] = lastIndexCreated
+CompletableIndexCollectionManager.incrementLastIndexCreated = function(indexIndex)
+    local lastIndexCreated = collections_lastIndexCreated[indexIndex] + 1
+    collections_lastIndexCreated[indexIndex] = lastIndexCreated
 
     return lastIndexCreated
 end
