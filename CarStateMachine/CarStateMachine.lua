@@ -17,6 +17,7 @@ local CarStateType = {
   STAYING_ON_OVERTAKING_LANE = 2048,
   EASING_OUT_OVERTAKE = 4096,
   NAVIGATING_AROUND_ACCIDENT = 8192,
+  DRIVING_IN_YELLOW_FLAG_ZONE = 16384,
 }
 
 CarStateMachine.CarStateTypeStrings = {}
@@ -262,7 +263,8 @@ CarStateMachine.informAboutAccident = function(accidentIndex)
     end
 end
 
-CarStateMachine.handleShouldWeStartNavigatingAroundAccident = function(carIndex, car)
+-- CarStateMachine.handleShouldWeStartNavigatingAroundAccident = function(carIndex, car)
+CarStateMachine.handleYellowFlagZone = function(carIndex, car)
   -- return false
     local storage = StorageManager.getStorage()
     local handleAccidents = storage.handleAccidents
@@ -270,6 +272,13 @@ CarStateMachine.handleShouldWeStartNavigatingAroundAccident = function(carIndex,
       return nil
     end
 
+    local carSplinePosition = car.splinePosition
+    local isInYellowFlagZone = AccidentManager.isCarInYellowFlagZone(carSplinePosition)
+    if isInYellowFlagZone then
+      return CarStateMachine.CarStateType.DRIVING_IN_YELLOW_FLAG_ZONE
+    end
+
+    --[====[
     -- todo: currently have a hardcoded value here!!!
     local isCarComingUpToAccidentIndex, accidentClosestCarIndex = AccidentManager.isCarComingUpToAccident(car, 100)
     if isCarComingUpToAccidentIndex then
@@ -277,6 +286,7 @@ CarStateMachine.handleShouldWeStartNavigatingAroundAccident = function(carIndex,
       AccidentManager.setCarNavigatingAroundAccident(carIndex, isCarComingUpToAccidentIndex, accidentClosestCarIndex)
       return CarStateMachine.CarStateType.NAVIGATING_AROUND_ACCIDENT
     end
+    --]====]
 end
 
 CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)

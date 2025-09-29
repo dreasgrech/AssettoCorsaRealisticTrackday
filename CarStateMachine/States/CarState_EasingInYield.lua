@@ -61,11 +61,11 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local car = sortedCarList[sortedCarListIndex]
       -- local carBehind = sortedCarList[sortedCarListIndex + 1]
 
-      -- if there's an accident ahead, we need to start navigating around it
-      local newStateDueToAccident = CarStateMachine.handleShouldWeStartNavigatingAroundAccident(carIndex, car)
-      if newStateDueToAccident then
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.NavigatingAroundAccident)
-        return newStateDueToAccident
+      -- check if we're now in a yellow flag zone
+      local newStateDueToYellowFlagZone = CarStateMachine.handleYellowFlagZone(carIndex, car)
+      if newStateDueToYellowFlagZone then
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
+        return newStateDueToYellowFlagZone
       end
 
       local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]

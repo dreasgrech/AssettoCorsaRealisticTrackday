@@ -82,6 +82,9 @@ RaceTrackManager.removeYellowFlagZone = function(yellowFlagZoneIndex)
     CompletableIndexCollectionManager.updateFirstNonResolvedIndex(yellowZonesCompletableIndex, yellowZones_resolved)
 end
 
+---Returns a boolean value indicating whether the given spline position is inside any active yellow flag zone
+---@param splinePosition any
+---@return boolean
 RaceTrackManager.isSplinePositionInYellowZone = function(splinePosition)
     local lastYellowZoneIndexCreated = CompletableIndexCollectionManager.getLastIndexCreated(yellowZonesCompletableIndex)
     if lastYellowZoneIndexCreated == 0 then

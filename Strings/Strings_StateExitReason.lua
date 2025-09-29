@@ -18,6 +18,8 @@ local stringNames = {
     NoAccidentIndexToNavigateAround = 14,
     FoundCloserAccidentToNavigateAround = 15,
     AccidentIsFarBehindUs = 16,
+    EnteringYellowFlagZone = 17,
+    ExitedYellowFlagZone = 18,
 }
 
 local stringValues = {
@@ -35,6 +37,10 @@ local stringValues = {
     [stringNames.YieldingCarIsFasterThenOvertakingCar] = const("Yielding car is faster than overtaking car"),
     [stringNames.OvertakingCarNotOnOvertakingSide] = const("Overtaking car not on overtaking side"),
     [stringNames.NavigatingAroundAccident] = const("Navigating around accident"),
+    [stringNames.NoAccidentIndexToNavigateAround] = const("No accident index to navigate around"),
+    [stringNames.FoundCloserAccidentToNavigateAround] = const("Found closer accident to navigate around"),
+    [stringNames.AccidentIsFarBehindUs] = const("Accident is far behind us"),
+    [stringNames.ExitedYellowFlagZone] = const("Exited yellow flag zone"),
 }
 
 local stringSaveFunction = function (carIndex, stringName)

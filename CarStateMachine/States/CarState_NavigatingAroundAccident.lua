@@ -118,8 +118,13 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
     local car = sortedCarsList[sortedCarsListIndex]
 
+    --[====[
+    -- TODO: HAD TO COMMENT CLOSER ACCIDENT CHECK WHILE HANDLING YELLOW FLAG ZONES.  REIMPLEMENT!!!!
+    -- TODO: HAD TO COMMENT CLOSER ACCIDENT CHECK WHILE HANDLING YELLOW FLAG ZONES.  REIMPLEMENT!!!!
+    -- TODO: HAD TO COMMENT CLOSER ACCIDENT CHECK WHILE HANDLING YELLOW FLAG ZONES.  REIMPLEMENT!!!!
+    -- TODO: HAD TO COMMENT CLOSER ACCIDENT CHECK WHILE HANDLING YELLOW FLAG ZONES.  REIMPLEMENT!!!!
     -- check if there's an even closer accident that we should be navigating around instead
-    local newStateDueToAccident = CarStateMachine.handleShouldWeStartNavigatingAroundAccident(carIndex, car)
+    local newStateDueToAccident = CarStateMachine.handleYellowFlagZone(carIndex, car)
     if newStateDueToAccident then
         if CarManager.cars_navigatingAroundAccidentIndex[carIndex] ~= accidentIndex then
             Logger.log(string.format("[CarState_NavigatingAroundAccident] Car %d switching to navigate around new accident #%d instead of previous accident #%d", carIndex, CarManager.cars_navigatingAroundAccidentIndex[carIndex], accidentIndex))
@@ -127,6 +132,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             return newStateDueToAccident
         end
     end
+    --]====]
 
     -- if we are now past the car we are currently navigating around, and are some distance away from it, return to normal driving
     local carToNavigateAroundIndex = CarManager.cars_navigatingAroundCarIndex[carIndex]
