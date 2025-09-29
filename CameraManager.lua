@@ -6,4 +6,11 @@ CameraManager.followCarWithChaseCamera = function(carIndex)
   ac.setCurrentDrivableCamera(ac.DrivableCamera.Chase)  -- pick the chase view (or .Chase2)
 end
 
+---Returns the index of the currently focused car
+---@return integer
+CameraManager.getFocusedCarIndex = function()
+  local sim = ac.getSim()
+  return sim.focusedCar
+end
+
 return CameraManager
