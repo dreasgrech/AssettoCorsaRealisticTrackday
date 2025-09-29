@@ -1,3 +1,6 @@
+--[====[
+---@ext:verbose
+--]====]
 local CarStateMachine = {}
 
 -- local LOG_CAR_STATEMACHINE_IN_CSP_LOG = true
@@ -5,6 +8,7 @@ local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
 -- [Flags]
 local CarStateType = {
+-- local CarStateType = const({
   DRIVING_NORMALLY = 1,
   EASING_IN_YIELD = 4, 
   STAYING_ON_YIELDING_LANE = 8,
@@ -27,6 +31,26 @@ local cars_state = {}
 
 CarStateMachine.cars_previousState = {}
 CarStateMachine.CarStateType = CarStateType
+--[====[
+CarStateMachine.CarStateType = const({
+  DRIVING_NORMALLY = 1,
+  EASING_IN_YIELD = 4, 
+  STAYING_ON_YIELDING_LANE = 8,
+  EASING_OUT_YIELD = 32,
+  WAITING_AFTER_ACCIDENT = 64,
+  COLLIDED_WITH_TRACK = 128,
+  COLLIDED_WITH_CAR = 256,
+  ANOTHER_CAR_COLLIDED_INTO_ME = 512,
+  EASING_IN_OVERTAKE = 1024,
+  STAYING_ON_OVERTAKING_LANE = 2048,
+  EASING_OUT_OVERTAKE = 4096,
+  NAVIGATING_AROUND_ACCIDENT = 8192,
+  DRIVING_IN_YELLOW_FLAG_ZONE = 16384,
+})
+
+local debug_state = CarStateMachine.CarStateType.DRIVING_NORMALLY
+ac.log(string.format("CarStateMachine debug_state = %d", debug_state))
+--]====]
 
 local changeState = function(carIndex, newState)
     -- save a reference to the current state before changing it

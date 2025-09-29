@@ -1,3 +1,12 @@
+--[====[
+---@ext:verbose
+local constTable = const({
+  value=42
+})
+local v = constTable.value
+ac.log(string.format("Const value is %d", v))
+--]====]
+
 local STATE = CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
 
 CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnYieldingLane"
