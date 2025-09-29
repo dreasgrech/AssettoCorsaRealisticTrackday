@@ -38,15 +38,20 @@ RaceTrackManager.getOppositeSide = function(side)
     return RaceTrackManager.TrackSide.LEFT
 end
 
+---Returns the yielding side as configured in the settings
+---@return RaceTrackManager.TrackSide yieldSide
 RaceTrackManager.getYieldingSide = function()
     local storage = StorageManager.getStorage()
     local yieldSide = storage.yieldSide
     return yieldSide
 end
 
+---Returns the overtaking side as configured in the settings
+---@return RaceTrackManager.TrackSide overtakingSide
 RaceTrackManager.getOvertakingSide = function()
     local yieldSide = RaceTrackManager.getYieldingSide()
-    return RaceTrackManager.getOppositeSide(yieldSide)
+    local overtakingSide = RaceTrackManager.getOppositeSide(yieldSide)
+    return overtakingSide
 end
 
 ---Creates a new yellow flag zone ending at the given spline position and extending backwards by the configured distance
@@ -84,7 +89,7 @@ RaceTrackManager.removeYellowFlagZone = function(yellowFlagZoneIndex)
 end
 
 ---Returns a boolean value indicating whether the given spline position is inside any active yellow flag zone
----@param splinePosition any
+---@param splinePosition number
 ---@return boolean
 RaceTrackManager.isSplinePositionInYellowZone = function(splinePosition)
     local lastYellowZoneIndexCreated = CompletableIndexCollectionManager.getLastIndexCreated(yellowZonesCompletableIndex)

@@ -5,7 +5,7 @@ local StorageManager = {}
 ---@field debugDraw boolean
 ---@field drawCarList boolean
 ---@field handleSideChecking boolean
----@field yieldSide integer            -- RaceTrackManager.TrackSide
+---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
 ---@field handleAccidents boolean
 ---@field handleOvertaking boolean
