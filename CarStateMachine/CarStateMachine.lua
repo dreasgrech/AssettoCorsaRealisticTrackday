@@ -273,7 +273,7 @@ CarStateMachine.handleYellowFlagZone = function(carIndex, car)
     end
 
     local carSplinePosition = car.splinePosition
-    local isInYellowFlagZone = AccidentManager.isCarInYellowFlagZone(carSplinePosition)
+    local isInYellowFlagZone = RaceTrackManager.isSplinePositionInYellowZone(carSplinePosition)
     if isInYellowFlagZone then
       return CarStateMachine.CarStateType.DRIVING_IN_YELLOW_FLAG_ZONE
     end
