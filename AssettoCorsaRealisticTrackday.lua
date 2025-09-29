@@ -1,6 +1,8 @@
 DequeManager = require("DataStructures.DequeManager")
 StackManager = require("DataStructures.StackManager")
 QueueManager = require("DataStructures.QueueManager")
+CompletableIndexCollectionManager = require("DataStructures.CompletableIndexCollectionManager")
+
 Constants = require("Constants")
 ColorManager = require("ColorManager")
 RaceTrackManager = require("RaceTrackManager")
