@@ -1,5 +1,21 @@
 ﻿local CarOperations = {}
 
+--[====[
+---@alias CarOperations.CarDirections 
+---| `CarOperations.CarDirections.None` @Value: 0.
+---| `CarOperations.CarDirections.FrontLeft` @Value: 1.
+---| `CarOperations.CarDirections.CenterLeft` @Value: 2.
+---| `CarOperations.CarDirections.RearLeft` @Value: 3.
+---| `CarOperations.CarDirections.FrontRight` @Value: 4.
+---| `CarOperations.CarDirections.CenterRight` @Value: 5.
+---| `CarOperations.CarDirections.RearRight` @Value: 6.
+---| `CarOperations.CarDirections.FrontLeftAngled` @Value: 7.
+---| `CarOperations.CarDirections.RearLeftAngled` @Value: 8.
+---| `CarOperations.CarDirections.FrontRightAngled` @Value: 9.
+---| `CarOperations.CarDirections.RearRightAngled` @Value: 10.
+--]====]
+
+---@enum CarOperations.CarDirections
 CarOperations.CarDirections = {
   None = 0,
   FrontLeft = 1,
@@ -36,6 +52,7 @@ local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
 local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
 local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
 
+---@enum CarOperations.CarPedals
 CarOperations.CarPedals = {
   Gas = 1,
   Brake = 2,
@@ -45,7 +62,7 @@ CarOperations.CarPedals = {
 ---Value from 0 to 1. Final value will be the maximum of original and this.
 ---(For clutch: 1 is for clutch pedal fully depressed, 0 for pressed).
 ---@param carIndex integer
----@param carPedal CarOperations.CarPedals | integer
+---@param carPedal CarOperations.CarPedals
 ---@param pedalPosition number
 CarOperations.setPedalPosition = function(carIndex, carPedal, pedalPosition)
   local carInput = ac.overrideCarControls(carIndex)
@@ -227,11 +244,11 @@ function CarOperations.toggleTurningLights(carIndex, turningLights)
     -- CarManager.cars_hasTL[carIndex] = car.hasTurningLights
 end
 
----comment
+--- Drives the car to the specified side while making sure there are no cars blocking the side we're trying to drive to.
 ---@param carIndex number
 ---@param dt number
 ---@param car ac.StateCar
----@param side integer|RaceTrackManager.TrackSide
+---@param side RaceTrackManager.TrackSide
 ---@param driveToSideMaxOffset number
 ---@param rampSpeed_mps number
 ---@param overrideAiAwareness boolean
@@ -275,6 +292,8 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
 
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
+
+      return true
 end
 
 -- Returns the six lateral anchor points plus some helpers
@@ -343,7 +362,7 @@ end
 ---comment
 ---@param carIndex any
 ---@return boolean
----@return CarOperations.CarDirections|integer
+---@return CarOperations.CarDirections
 ---@return number
 CarOperations.isTargetSideBlocked = function(carIndex)
   local car = ac.getCar(carIndex)
@@ -427,7 +446,7 @@ end
 
 ---comment
 ---@param carIndex any
----@param sideToCheck RaceTrackManager.TrackSide|integer
+---@param sideToCheck RaceTrackManager.TrackSide
 ---@return boolean
 ---@return integer
 ---@return integer
@@ -547,7 +566,7 @@ end
 --]=====]
 
 ---comment
----@param carDirection CarOperations.CarDirections|integer
+---@param carDirection CarOperations.CarDirections
 CarOperations.getTrackSideFromCarDirection = function(carDirection)
   if carDirection == CarOperations.CarDirections.FrontLeft
   or carDirection == CarOperations.CarDirections.CenterLeft

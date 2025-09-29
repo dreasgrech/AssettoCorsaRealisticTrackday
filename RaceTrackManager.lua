@@ -7,8 +7,9 @@ local yellowZones_endSplinePosition = {}
 local yellowZones_resolved = {}
 
 
----@type RaceTrackManager.TrackSide
----@enum integer
+---@alias RaceTrackManager.TrackSide
+---| `RaceTrackManager.TrackSide.LEFT` @Value: 1.
+---| `RaceTrackManager.TrackSide.RIGHT` @Value: 2.
 RaceTrackManager.TrackSide = {
     LEFT = 1,
     RIGHT = 2,
@@ -27,8 +28,8 @@ RaceTrackManager.getTrackLengthMeters = function()
 end
 
 --- Returns RIGHT if given LEFT and vice versa
----@param side RaceTrackManager.TrackSide|integer
----@return RaceTrackManager.TrackSide|integer
+---@param side RaceTrackManager.TrackSide
+---@return RaceTrackManager.TrackSide
 RaceTrackManager.getOppositeSide = function(side)
     if side == RaceTrackManager.TrackSide.LEFT then
         return RaceTrackManager.TrackSide.RIGHT

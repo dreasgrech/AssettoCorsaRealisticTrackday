@@ -7,9 +7,16 @@ local CarStateMachine = {}
 local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
 -- [Flags]
-local CarStateType = {
--- local CarStateType = const({
-  DRIVING_NORMALLY = 1,
+CarStateMachine.CarStateTypeStrings = {}
+CarStateMachine.states_minimumTimeInState = { }
+
+local cars_state = {}
+
+CarStateMachine.cars_previousState = {}
+
+---@enum CarStateMachine.CarStateType
+CarStateMachine.CarStateType = {
+  DRIVING_NORMALLY = 1, -- normal driving state, driving on the racing line
   EASING_IN_YIELD = 4, 
   STAYING_ON_YIELDING_LANE = 8,
   EASING_OUT_YIELD = 32,
@@ -24,13 +31,6 @@ local CarStateType = {
   DRIVING_IN_YELLOW_FLAG_ZONE = 16384,
 }
 
-CarStateMachine.CarStateTypeStrings = {}
-CarStateMachine.states_minimumTimeInState = { }
-
-local cars_state = {}
-
-CarStateMachine.cars_previousState = {}
-CarStateMachine.CarStateType = CarStateType
 --[====[
 CarStateMachine.CarStateType = const({
   DRIVING_NORMALLY = 1,
