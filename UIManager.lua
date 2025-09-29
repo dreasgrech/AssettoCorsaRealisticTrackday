@@ -30,6 +30,7 @@ local carTableColumns_tooltip = { }
 local carTableColumns_dataBeforeDoD = {
   { name = '#', orderDirection = 0, width = 35, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
+  { name = 'Spline', orderDirection = 0, width = 70, tooltip='Spline Position' },
   { name = 'Speed', orderDirection = 0, width = 70, tooltip='Current velocity' },
   { name = 'AverageSpeed', orderDirection = 0, width = 70, tooltip='Average speed' },
   { name = 'RealOffset', orderDirection = 0, width = 75, tooltip='Actual Lateral offset from centerline' },
@@ -188,6 +189,7 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
       -- ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", car.splinePosition), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d km/h", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d km/h", math.floor(CarManager.cars_averageSpeedKmh[carIndex] or 0)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", actualTrackLateralOffset), uiColor); ui.nextColumn()
