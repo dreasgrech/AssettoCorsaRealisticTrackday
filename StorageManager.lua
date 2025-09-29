@@ -19,6 +19,7 @@ local StorageManager = {}
 ---@field clearAhead_meters number
 ---@field minAISpeed_kmh number
 ---@field distanceFromAccidentToSeeYellowFlag_meters number
+---@field distanceToStartNavigatingAroundCarInAccident_meters number
 
 ---@type StorageTable
 local storageTable = {
@@ -41,6 +42,7 @@ local storageTable = {
     clearAhead_meters = 6.0,
     minAISpeed_kmh = 35.0,
     distanceFromAccidentToSeeYellowFlag_meters = 200.0,
+    distanceToStartNavigatingAroundCarInAccident_meters = 30.0,
 }
 
 local storage = ac.storage(storageTable)

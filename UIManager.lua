@@ -388,6 +388,9 @@ function UIManager.renderUIOptionsControls()
     storage.distanceFromAccidentToSeeYellowFlag_meters =  ui.slider('Distance from accident to see yellow flag (m)', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500)
     if ui.itemHovered() then ui.setTooltip('Distance from accident at which AI will see the yellow flag and start slowing down.') end
 
+    storage.distanceToStartNavigatingAroundCarInAccident_meters =  ui.slider('Distance to start navigating around car in accident (m)', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100)
+    if ui.itemHovered() then ui.setTooltip('Distance from accident at which AI will start navigating around the car in accident.') end
+
     -- storage.distanceToFrontCarToOvertake =  ui.slider('Min distance to front car to overtake (m)', storage.distanceToFrontCarToOvertake, 1.0, 20.0)
     -- if ui.itemHovered() then ui.setTooltip('Minimum distance to the car in front before an AI car will consider overtaking it.') end
 end
