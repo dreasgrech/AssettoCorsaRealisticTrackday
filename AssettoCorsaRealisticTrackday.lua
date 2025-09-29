@@ -31,6 +31,7 @@ CarState_EasingInOvertake = require("CarStateMachine.States.CarState_EasingInOve
 CarState_StayingOnOvertakingLane = require("CarStateMachine.States.CarState_StayingOnOvertakingLane")
 CarState_EasingOutOvertake = require("CarStateMachine.States.CarState_EasingOutOvertake")
 CarState_NavigatingAroundAccident = require("CarStateMachine.States.CarState_NavigatingAroundAccident")
+CarState_DrivingInYellowFlagZone = require("CarStateMachine.States.CarState_DrivingInYellowFlagZone")
 
 AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
