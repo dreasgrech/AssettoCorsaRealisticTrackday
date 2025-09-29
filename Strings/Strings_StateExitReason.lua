@@ -21,20 +21,20 @@ local stringNames = {
 }
 
 local stringValues = {
-    [stringNames.None] = "No reason",
-    [stringNames.YieldingToCar] = "Yielding to car behind",
-    [stringNames.OvertakingCar] = "Overtaking car in front",
-    [stringNames.OvertakingCarNoLongerExists] = "Overtaking car no longer exists",
-    [stringNames.ArrivedAtOvertakingLane] = "Arrived at overtaking lane",
-    [stringNames.OvertakingCarIsClearlyAhead] = "Overtaking car is clearly ahead",
-    [stringNames.ArrivedAtYieldingLane] = "Arrived at yielding lane",
-    [stringNames.ArrivedToNormal] = "Arrived to normal driving lane",
-    [stringNames.ContinuingOvertakingNextCar] = "Continuing overtaking next car",
-    [stringNames.ClearlyAheadOfYieldingCar] = "Clearly ahead of yielding car",
-    [stringNames.OvertakingCarIsClearlyBehind] = "Overtaking car is clearly behind",
-    [stringNames.YieldingCarIsFasterThenOvertakingCar] = "Yielding car is faster than overtaking car",
-    [stringNames.OvertakingCarNotOnOvertakingSide] = "Overtaking car not on overtaking side",
-    [stringNames.NavigatingAroundAccident] = "Navigating around accident",
+    [stringNames.None] = const("No reason"),
+    [stringNames.YieldingToCar] = const("Yielding to car behind"),
+    [stringNames.OvertakingCar] = const("Overtaking car in front"),
+    [stringNames.OvertakingCarNoLongerExists] = const("Overtaking car no longer exists"),
+    [stringNames.ArrivedAtOvertakingLane] = const("Arrived at overtaking lane"),
+    [stringNames.OvertakingCarIsClearlyAhead] = const("Overtaking car is clearly ahead"),
+    [stringNames.ArrivedAtYieldingLane] = const("Arrived at yielding lane"),
+    [stringNames.ArrivedToNormal] = const("Arrived to normal driving lane"),
+    [stringNames.ContinuingOvertakingNextCar] = const("Continuing overtaking next car"),
+    [stringNames.ClearlyAheadOfYieldingCar] = const("Clearly ahead of yielding car"),
+    [stringNames.OvertakingCarIsClearlyBehind] = const("Overtaking car is clearly behind"),
+    [stringNames.YieldingCarIsFasterThenOvertakingCar] = const("Yielding car is faster than overtaking car"),
+    [stringNames.OvertakingCarNotOnOvertakingSide] = const("Overtaking car not on overtaking side"),
+    [stringNames.NavigatingAroundAccident] = const("Navigating around accident"),
 }
 
 local stringSaveFunction = function (carIndex, stringName)
