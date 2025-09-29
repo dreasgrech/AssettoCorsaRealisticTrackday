@@ -3,14 +3,14 @@ local AccidentManager = {}
 -- local lastAccidentIndexCreated = 0
 -- local firstNonResolvedAccidentIndex = 1
 
+local accidentCompletableIndex = CompletableIndexCollectionManager.createNewIndex()
+
 AccidentManager.accidents_carIndex = {}
 AccidentManager.accidents_worldPosition = {}
 AccidentManager.accidents_splinePosition = {}
 AccidentManager.accidents_collidedWithTrack = {}
 AccidentManager.accidents_collidedWithCarIndex = {}
 AccidentManager.accidents_resolved = {}
-
-local accidentCompletableIndex = CompletableIndexCollectionManager.createNewIndex()
 
 local setAccidentAsResolved = function(accidentIndex)
         AccidentManager.accidents_carIndex[accidentIndex] = nil
