@@ -37,6 +37,9 @@ CompletableIndexCollectionManager.updateFirstNonResolvedIndex = function(indexIn
     end
 end
 
+---
+---@param indexIndex number
+---@return number lastIndexCreated
 CompletableIndexCollectionManager.incrementLastIndexCreated = function(indexIndex)
     local lastIndexCreated = collections_lastIndexCreated[indexIndex] + 1
     collections_lastIndexCreated[indexIndex] = lastIndexCreated
