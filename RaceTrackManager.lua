@@ -23,8 +23,18 @@ RaceTrackManager.TrackSideStrings = {
 local sim = ac.getSim()
 local trackLength_meters = sim.trackLengthM
 
+--- Returns the total track length in meters
+---@return number
 RaceTrackManager.getTrackLengthMeters = function()
     return trackLength_meters
+end
+
+--- Converts a spline span value representing a fraction of the track length (0..1) to meters
+--- Example: 0.5 = half the track length, 0.25 = quarter of the track length
+---@param splineValue number
+---@return number
+RaceTrackManager.splineSpanToMeters = function(splineValue)
+    return splineValue * trackLength_meters
 end
 
 --- Returns RIGHT if given LEFT and vice versa
@@ -88,7 +98,8 @@ RaceTrackManager.removeYellowFlagZone = function(yellowFlagZoneIndex)
     CompletableIndexCollectionManager.updateFirstNonResolvedIndex(yellowZonesCompletableIndex, yellowZones_resolved)
 end
 
----Returns a boolean value indicating whether the given spline position is inside any active yellow flag zone
+---Returns a boolean value indicating whether the given spline position is inside any active yellow flag zone.
+---O(n) where n is approximately (gaps are removed when a zone is resolved) the number of active yellow flag zones
 ---@param splinePosition number
 ---@return boolean
 RaceTrackManager.isSplinePositionInYellowZone = function(splinePosition)
