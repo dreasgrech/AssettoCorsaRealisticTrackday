@@ -55,6 +55,7 @@ CarManager.cars_navigatingAroundCarIndex = {}
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
 
+---@type table<ac.StateCar>
 CarManager.currentSortedCarsList = {}
 
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
@@ -195,6 +196,9 @@ end
   -- return sortedCarsList
 -- end
 
+---Sorts the given car list by track position, with the car furthest ahead first
+---@param carList table<ac.StateCar>
+---@return table<ac.StateCar> carList 
 function CarManager.sortCarListByTrackPosition(carList)
   table.sort(carList, isFirstCarSplinePositionGreater)
   return carList

@@ -1,6 +1,8 @@
 local CompletableIndexCollectionManager = {}
 
+---@type table<integer, integer>
 local collections_lastIndexCreated = {}
+---@type table<integer, integer>
 local collections_firstNonResolvedIndex = {}
 
 local lastCreatedCollectionIndex = 0
@@ -16,14 +18,23 @@ CompletableIndexCollectionManager.createNewIndex = function()
     return lastCreatedCollectionIndex
 end
 
+---Returns the last index created for the given index
+---@param indexIndex number
+---@return integer lastIndexCreated
 CompletableIndexCollectionManager.getLastIndexCreated = function(indexIndex)
     return collections_lastIndexCreated[indexIndex]
 end
 
+---Returns the first non-resolved index for the given index
+---@param indexIndex number
+---@return integer firstNonResolvedIndex
 CompletableIndexCollectionManager.getFirstNonResolvedIndex = function(indexIndex)
     return collections_firstNonResolvedIndex[indexIndex]
 end
 
+---
+---@param indexIndex number
+---@param resolvedCollection table<integer, boolean>
 CompletableIndexCollectionManager.updateFirstNonResolvedIndex = function(indexIndex, resolvedCollection)
     -- check the resolvedCollection and update the first non-resolved collection index so that loops iterating over the indexes can skip resolved ones
     local firstNonResolvedIndex = collections_firstNonResolvedIndex[indexIndex]
