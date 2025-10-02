@@ -385,6 +385,9 @@ function UIManager.renderUIOptionsControls()
     storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, 0.1, 1.0)
     if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
 
+    storage.clearAhead_meters = ui.slider('The distance (m) which determines whether a car is far enough ahead of another car', storage.clearAhead_meters, 4, 20)
+    if ui.itemHovered() then ui.setTooltip('When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.'); end
+
     ui.separator()
 
     ui.text('Yielding')

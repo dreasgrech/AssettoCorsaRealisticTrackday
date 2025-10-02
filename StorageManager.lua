@@ -26,27 +26,32 @@ local StorageManager = {}
 ---@type StorageTable
 local storageTable = {
     enabled = true,
-    debugDraw = false,
-    drawCarList = true,
     handleSideChecking = true,
     yieldSide = RaceTrackManager.TrackSide.RIGHT,
     overrideAiAwareness = false,
-    handleAccidents = false,
-    handleOvertaking = true,
-    detectCarBehind_meters = 70,
     -- minSpeedDelta_kmh = 0.0,
+    defaultAICaution = 3,
     maxLateralOffset_normalized = 0.8,
+
+    detectCarBehind_meters = 70,
     rampSpeed_mps = 0.5,
     rampRelease_mps = 0.3,
+
+    handleOvertaking = true,
+    clearAhead_meters = 6.0,
     overtakeRampSpeed_mps = 0.7,
     overtakeRampRelease_mps = 0.4,
-    clearAhead_meters = 6.0,
-    defaultAICaution = 1,
-    distanceFromAccidentToSeeYellowFlag_meters = 200.0,
-    distanceToStartNavigatingAroundCarInAccident_meters = 30.0,
+
     customAIFlood_enabled = false,
     customAIFlood_distanceBehindPlayerToCycle_meters = 200,
     customAIFlood_distanceAheadOfPlayerToCycle_meters = 100,
+
+    handleAccidents = false,
+    distanceFromAccidentToSeeYellowFlag_meters = 200.0,
+    distanceToStartNavigatingAroundCarInAccident_meters = 30.0,
+
+    debugDraw = false,
+    drawCarList = true,
 }
 
 local storage = ac.storage(storageTable)
