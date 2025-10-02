@@ -12,6 +12,11 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     --CarOperations.stopCarAfterAccident(carIndex)
 
     --CarManager.cars_reasonWhyCantYield[carIndex] = 'Collided with another car so we are stopped'
+
+
+    -- TODO: maybe we can try moving the car to the closest side of the track so it doesn't block the entire track?
+    -- TODO: using ac.getTrackAISplineSides to move to the side
+
 end
 
 -- UPDATE FUNCTION
