@@ -29,6 +29,8 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carB
 
       -- remove the yielding car throttle limit since we will now be driving normally
       CarOperations.setAIThrottleLimit(carIndex, 1)
+      
+      CarOperations.setDefaultAIGrip(carIndex)
 end
 
 -- UPDATE FUNCTION
