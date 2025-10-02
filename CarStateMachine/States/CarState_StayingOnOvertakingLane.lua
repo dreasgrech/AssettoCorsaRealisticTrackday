@@ -44,7 +44,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     end
 
     -- If an upcoming corner is coming , increase the caution a bit so that we don't go flying off the track
-    local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(car)
+    local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)
     if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_CAUTION then
         aiCaution = AICAUTION_WHILE_INCORNER
     end
