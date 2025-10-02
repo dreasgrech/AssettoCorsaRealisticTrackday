@@ -61,6 +61,8 @@ CarManager.sortedCarList_carIndexToSortedIndex = {} -- [carIndex] = sortedListIn
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
 
+---Sets all the default values for a car
+---@param carIndex number
 CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_initialized[carIndex] = true
 
@@ -122,6 +124,8 @@ CarManager.setInitializedDefaults = function(carIndex)
   end
 end
 
+---If the car hasn't been initialized yet, initializes it to default values
+---@param carIndex number
 function CarManager.ensureDefaults(carIndex)
   if CarManager.cars_initialized[carIndex] then
     return

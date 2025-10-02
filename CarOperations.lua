@@ -89,6 +89,9 @@ CarOperations.setPedalPosition = function(carIndex, carPedal, pedalPosition)
   end
 end
 
+---Resets the specified pedal to the original value
+---@param carIndex integer
+---@param carPedal CarOperations.CarPedals
 CarOperations.resetPedalPosition = function(carIndex, carPedal)
   local carInput = ac.overrideCarControls(carIndex)
   if not carInput then return end
@@ -102,6 +105,10 @@ CarOperations.resetPedalPosition = function(carIndex, carPedal)
   end
 end
 
+---Returns a boolean value indicating whether the car has arrived at its target spline offset
+---@param carIndex integer
+---@param drivingToSide RaceTrackManager.TrackSide
+---@return boolean
 CarOperations.hasArrivedAtTargetSplineOffset = function(carIndex, drivingToSide)
     -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
     local currentSplineOffset = CarManager.getActualTrackLateralOffset(ac.getCar(carIndex).position)
@@ -142,6 +149,8 @@ CarOperations.setAITopSpeed = function(carIndex, limit)
     CarManager.cars_aiTopSpeed[carIndex] = limit
 end
 
+---Removes the AI top speed limit.
+---@param carIndex integer
 CarOperations.removeAITopSpeed = function(carIndex)
   CarOperations.setAITopSpeed(carIndex, math.huge)
 end
@@ -154,6 +163,8 @@ CarOperations.setAICaution = function(carIndex, caution)
     CarManager.cars_aiCaution[carIndex] = caution
 end
 
+---Removes any AI caution and sets it back to the default value.
+---@param carIndex integer
 CarOperations.removeAICaution = function(carIndex)
   local storage = StorageManager.getStorage()
   CarOperations.setAICaution(carIndex, storage.defaultAICaution)
@@ -177,6 +188,8 @@ CarOperations.setGrip = function(carIndex, grip)
     CarManager.cars_grip[carIndex] = grip
 end
 
+---Sets the AI grip back to the default value.
+---@param carIndex integer
 CarOperations.setDefaultAIGrip = function(carIndex)
   -- todo: physics.setExtraAIGrip says that the default value is 1 but also says that AI cars have 120% grip
   CarOperations.setGrip(carIndex, DEFAULT_AICARS_GRIP)
@@ -190,6 +203,10 @@ CarOperations.setGentleStop = function(carIndex, stop)
     CarManager.cars_gentleStop[carIndex] = stop
 end
 
+---Returns a boolean value indicating whether the first car is behind the second car.
+---@param firstCar ac.StateCar
+---@param secondCar ac.StateCar
+---@return boolean
 function CarOperations.isFirstCarBehindSecondCar(firstCar, secondCar)
   return firstCar.splinePosition < secondCar.splinePosition
 
@@ -198,28 +215,48 @@ function CarOperations.isFirstCarBehindSecondCar(firstCar, secondCar)
     -- return MathHelpers.dot(aiCarFwd, rel) < 0
 end
 
+---Returns a boolean value indicating whether the first car is currently faster than the second car.
+---@param firstCar ac.StateCar
+---@param secondCar ac.StateCar
+---@param firstCarSpeedLeeway number @The extra speed that's allowed to the second car to still be considered "faster".
+---@return boolean
 function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCar, firstCarSpeedLeeway)
   return firstCar.speedKmh > secondCar.speedKmh + firstCarSpeedLeeway
 end
 
+---Returns a boolean value indicating whether the first car is faster than the second car.
+---@param firstCarIndex integer
+---@param secondCarIndex integer
+---@param secondCarSpeedExtra number @The extra speed that's allowed to the second car to still be considered "faster".
+---@return boolean
 function CarOperations.isFirstCarFasterThanSecondCar(firstCarIndex, secondCarIndex, secondCarSpeedExtra)
   local firstCarSpeedKmh = CarManager.cars_averageSpeedKmh[firstCarIndex]
   local secondCarSpeedKmh = CarManager.cars_averageSpeedKmh[secondCarIndex]
   return firstCarSpeedKmh > secondCarSpeedKmh + secondCarSpeedExtra
 end
 
+---Returns a boolean value indicating whether the second car is clearly ahead of the first car.
+---@param firstCar ac.StateCar
+---@param secondCar ac.StateCar?
+---@param meters number
+---@return boolean
 function CarOperations.isSecondCarClearlyAhead(firstCar, secondCar, meters)
     if not secondCar then
       return false
     end
 
-    local fwd = firstCar.look or firstCar.forward or vec3(0,0,1)
+    local fwd = firstCar.look
     local rel = MathHelpers.vsub(secondCar.position, firstCar.position)
     return MathHelpers.dot(fwd, rel) > meters
 end
 
+---Returns a boolean value indicating whether the second car is clearly behind the first car.
+---@param firstCar ac.StateCar
+---@param secondCar ac.StateCar
+---@param meters number
+---@return boolean
 function CarOperations.isSecondCarClearlyBehindFirstCar(firstCar, secondCar, meters)
-    local fwd = firstCar.look or firstCar.forward or vec3(0,0,1)
+    local fwd = firstCar.look
     local rel = MathHelpers.vsub(secondCar.position, firstCar.position)
     return MathHelpers.dot(fwd, rel) < -meters
 end
@@ -246,6 +283,8 @@ function CarOperations.isCarInPits(car)
   return car.isInPit or car.isInPitlane
 end
 
+---Applies a bunch of values to stop the car
+---@param carIndex integer
 function CarOperations.stopCarAfterAccident(carIndex)
     -- stop the car
     CarOperations.setAIThrottleLimit(carIndex, 0)
@@ -258,7 +297,6 @@ function CarOperations.stopCarAfterAccident(carIndex)
 end
 
 ---@param turningLights ac.TurningLights
--- function CarOperations.toggleTurningLights(carIndex, car, turningLights)
 function CarOperations.toggleTurningLights(carIndex, turningLights)
     -- local c = ac.getCar(carIndex)
     -- if not c.hasTurningLights then
