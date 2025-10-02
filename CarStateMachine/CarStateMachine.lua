@@ -332,6 +332,13 @@ CarStateMachine.handleYellowFlagZone = function(carIndex, car)
     --]====]
 end
 
+---Returns the EASING_IN_OVERTAKE state if the car passes all the checks required to start overtaking a car behind it
+---@param carIndex integer
+---@param car ac.StateCar
+---@param carBehind ac.StateCar
+---@param carFront ac.StateCar
+---@param storage StorageTable
+---@return CarStateMachine.CarStateType|nil
 CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)
   local handleOvertaking = storage.handleOvertaking
   if not handleOvertaking then
@@ -400,6 +407,13 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   return CarStateMachine.CarStateType.EASING_IN_OVERTAKE
 end
 
+---Returns the EASING_IN_YIELD state if the car passes all the checks required to start yielding to a car behind it
+---@param carIndex integer
+---@param car ac.StateCar
+---@param carBehind ac.StateCar
+---@param carFront ac.StateCar
+---@param storage StorageTable
+---@return CarStateMachine.CarStateType|nil
 CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehind, carFront, storage)
     -- if there's no car behind us, do nothing
     if not carBehind then
@@ -437,22 +451,6 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     -- local overtakingCarSpeedKmh = carBehind.speedKmh
     local yieldingCarSpeedKmh = CarManager.cars_averageSpeedKmh[carIndex]
     local overtakingCarSpeedKmh = CarManager.cars_averageSpeedKmh[carBehindIndex]
-
-    -- Check if the overtaking car is above the minimum speed
-    local isOvertakingCarAboveMinSpeed = overtakingCarSpeedKmh >= storage.minPlayerSpeed_kmh
-    if not isOvertakingCarAboveMinSpeed then
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car below minimum speed so not yielding'
-      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarBelowMinimumSpeed)
-      return
-    end
-
-    -- Check if the yielding car is above the minimum speed
-    local isYieldingCarAboveMinSpeed = yieldingCarSpeedKmh >= storage.minAISpeed_kmh
-    if not isYieldingCarAboveMinSpeed then
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Yielding car speed too low (corner/traffic) so not yielding'
-      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.YieldingCarBelowMinimumSpeed)
-      return
-    end
 
     -- Check if we're faster than the overtaking car
     local isYieldingCarSlowerThanOvertakingCar = yieldingCarSpeedKmh < overtakingCarSpeedKmh

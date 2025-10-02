@@ -10,14 +10,12 @@ local StorageManager = {}
 ---@field handleAccidents boolean
 ---@field handleOvertaking boolean
 ---@field detectCarBehind_meters number
----@field minPlayerSpeed_kmh number
 ---@field yieldMaxOffset_normalized number
 ---@field rampSpeed_mps number
 ---@field rampRelease_mps number
 ---@field overtakeRampSpeed_mps number
 ---@field overtakeRampRelease_mps number
 ---@field clearAhead_meters number
----@field minAISpeed_kmh number
 ---@field defaultAICaution integer
 ---@field distanceFromAccidentToSeeYellowFlag_meters number
 ---@field distanceToStartNavigatingAroundCarInAccident_meters number
@@ -36,7 +34,6 @@ local storageTable = {
     handleAccidents = false,
     handleOvertaking = true,
     detectCarBehind_meters = 70,
-    minPlayerSpeed_kmh = 0,
     -- minSpeedDelta_kmh = 0.0,
     yieldMaxOffset_normalized = 0.8,
     rampSpeed_mps = 0.5,
@@ -44,7 +41,6 @@ local storageTable = {
     overtakeRampSpeed_mps = 0.7,
     overtakeRampRelease_mps = 0.4,
     clearAhead_meters = 6.0,
-    minAISpeed_kmh = 35.0,
     defaultAICaution = 1,
     distanceFromAccidentToSeeYellowFlag_meters = 200.0,
     distanceToStartNavigatingAroundCarInAccident_meters = 30.0,
