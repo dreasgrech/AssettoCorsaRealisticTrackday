@@ -225,9 +225,9 @@ function CarOperations.isSecondCarClearlyBehindFirstCar(firstCar, secondCar, met
 end
 
 ---limits the ramp up speed of the spline offset when the car is driving at high speed
----@param carSpeedKmh any
----@param rampSpeed any
----@return unknown
+---@param carSpeedKmh number
+---@param rampSpeed number
+---@return number rampSpeed
 function CarOperations.limitSplitOffsetRampUpSpeed(carSpeedKmh, rampSpeed)
   if carSpeedKmh > 300 then
     return rampSpeed * 0.1
@@ -239,6 +239,9 @@ function CarOperations.limitSplitOffsetRampUpSpeed(carSpeedKmh, rampSpeed)
   return rampSpeed
 end
 
+---
+---@param car ac.StateCar
+---@return boolean
 function CarOperations.isCarInPits(car)
   return car.isInPit or car.isInPitlane
 end
