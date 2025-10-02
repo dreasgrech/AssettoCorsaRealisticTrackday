@@ -5,6 +5,8 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
+local AICAUTION_WHILE_OVERTAKING = 1
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
 
@@ -25,13 +27,22 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
     -- TODO: If an upcoming corner if coming ac.getTrackUpcomingTurn(), don't drop the cautio to zero
 
+    -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
+    local aiCaution = AICAUTION_WHILE_OVERTAKING
+
+    -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
     local carFront = sortedCarsList[sortedCarsListIndex - 1]
     if carFront then
         -- if the car in front of us is not in front of us, we can drop the caution to 0 to speed up overtaking
         local carFrontTrackLateralOffset = CarManager.getActualTrackLateralOffset(carFront.position)
         local lateralOffsetsDelta = math.abs(carTrackLateralOffset - carFrontTrackLateralOffset)
-        CarOperations.setAICaution(carIndex, lateralOffsetsDelta > 0.5 and 0 or storage.defaultAICaution)
+        if lateralOffsetsDelta > 0.5 then
+            aiCaution = 0
+        end
     end
+
+    -- set the ai caution based on our calculations above
+    CarOperations.setAICaution(carIndex, aiCaution)
 end
 
 --- TRANSITION FUNCTION

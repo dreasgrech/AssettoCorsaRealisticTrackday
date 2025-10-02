@@ -35,7 +35,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'SplinePosition', orderDirection = 0, width = 70, tooltip='Spline Position' },
   { name = 'SplineSides', orderDirection = 0, width = 85, tooltip='Spline Sides' },
   { name = 'Speed', orderDirection = 0, width = 70, tooltip='Current velocity' },
-  { name = 'AverageSpeed', orderDirection = 0, width = 70, tooltip='Average speed' },
+  { name = 'AverageSpeed', orderDirection = 0, width = 100, tooltip='Average speed' },
   { name = 'RealOffset', orderDirection = 0, width = 75, tooltip='Actual Lateral offset from centerline' },
   { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
@@ -44,8 +44,8 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'Pedals (C,B,G)', orderDirection = 0, width = 100, tooltip='Pedal positions' },
   { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
-  { name = 'AICaution', orderDirection = 0, width = 80, tooltip='AI caution level' },
-  { name = 'Grip', orderDirection = 0, width = 80, tooltip='AI grip level' },
+  { name = 'AICaution', orderDirection = 0, width = 75, tooltip='AI caution level' },
+  { name = 'Grip', orderDirection = 0, width = 40, tooltip='AI grip level' },
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'PreviousState', orderDirection = 0, width = 170, tooltip='Previous state' },
@@ -374,14 +374,8 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Handle side checking while yielding/overtaking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
     if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding.') end
 
-    if ui.checkbox('Handle accidents (WORK IN PROGRESS)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
-    if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
-
-    if ui.checkbox('Draw Debug Gizmos', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
-    if ui.itemHovered() then ui.setTooltip('Shows 3D debug information about the cars') end
-
-    if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
-    if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
+    storage.defaultAICaution =  ui.slider('Default AI Caution', storage.defaultAICaution, 3, 16) -- do not drop the minimum below 2 because 1 is used while overtaking
+    if ui.itemHovered() then ui.setTooltip('Base AI caution level (higher = more cautious, slower but less accident prone).') end
 
     storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
@@ -404,14 +398,28 @@ function UIManager.renderUIOptionsControls()
     storage.overtakeRampRelease_mps =  ui.slider('Overtake offset release (m/s)', storage.overtakeRampRelease_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset returns to normal once an overtaking car has fully driven past the overtaken car.') end
 
+    ui.separator()
+
+    ui.text('Accidents')
+
+    if ui.checkbox('Handle accidents (WORK IN PROGRESS)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
+
     storage.distanceFromAccidentToSeeYellowFlag_meters =  ui.slider('Distance from accident to see yellow flag (m)', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500)
     if ui.itemHovered() then ui.setTooltip('Distance from accident at which AI will see the yellow flag and start slowing down.') end
 
     storage.distanceToStartNavigatingAroundCarInAccident_meters =  ui.slider('Distance to start navigating around car in accident (m)', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100)
     if ui.itemHovered() then ui.setTooltip('Distance from accident at which AI will start navigating around the car in accident.') end
 
-    storage.defaultAICaution =  ui.slider('Default AI Caution', storage.defaultAICaution, 1, 16)
-    if ui.itemHovered() then ui.setTooltip('Base AI caution level (higher = more cautious, slower).') end
+    ui.separator()
+
+    ui.text('Debugging')
+
+    if ui.checkbox('Draw Debug Gizmos', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
+    if ui.itemHovered() then ui.setTooltip('Shows 3D debug information about the cars') end
+
+    if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
+    if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
 
 --[===[
     ui.separator()

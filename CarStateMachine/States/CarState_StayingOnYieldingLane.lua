@@ -14,6 +14,7 @@ CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnYieldingLane"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 local OVERTAKING_CAR_FASTER_LEEWAY = 20 -- the leeway given to the yielding car to be considered "faster" than the car trying to overtake it.  This means that the yielding car needs to be at least this much faster than the car behind it to consider it faster
+local AICAUTION_WHILE_YIELDING = 4 -- the AI caution level while yielding
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
@@ -45,7 +46,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
 
       -- make the yielding car leave more space in between the car in front while driving on the yielding lane
-      CarOperations.setAICaution(carIndex, 2)
+      CarOperations.setAICaution(carIndex, AICAUTION_WHILE_YIELDING)
 
       -- limit the yielding car throttle while driving on the yielding lane
       CarOperations.setAIThrottleLimit(carIndex, 0.5)

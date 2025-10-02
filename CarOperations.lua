@@ -332,7 +332,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
       -- todo: should these operations be here?
       CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
       CarOperations.resetAIThrottleLimit(carIndex) -- remove any speed limit we may have applied while waiting for a gap
-      CarOperations.setGrip(carIndex, 2) -- increase grip while driving to the side
+      CarOperations.setGrip(carIndex, 1.4) -- increase grip while driving to the side
 
       -- if we are driving at high speed, we need to increase the ramp speed slower so that our car doesn't jolt out of control
       -- local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
