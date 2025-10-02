@@ -29,7 +29,6 @@ local stringValues = {
 }
 
 local stringSaveFunction = function (carIndex, stringName)
-    -- CarManager.cars_reasonWhyCantYield[carIndex] = stringName
     CarManager.cars_reasonWhyCantYield_NAME[carIndex] = stringName
 end
 

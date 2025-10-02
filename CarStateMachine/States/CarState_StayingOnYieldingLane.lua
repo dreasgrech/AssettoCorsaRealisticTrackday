@@ -31,7 +31,6 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     Logger.error(string.format('Car %d in state StayingOnYieldingLane but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
   end
 
-  -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
   CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
 end
 

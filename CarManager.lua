@@ -6,21 +6,14 @@ local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 local CAR_SPEEDS_BUFFER_SIZE = 600
 
 CarManager.cars_initialized = {}
--- CarManager.cars_currentlyYielding = {}
-
-CarManager.cars_currentSplineOffset_meters = {} -- used in old system which used meters instead of normalized
-CarManager.cars_targetSplineOffset_meters = {} -- used in old system which used meters instead of normalized
 
 CarManager.cars_currentSplineOffset = {}
 CarManager.cars_targetSplineOffset = {}
 
 CarManager.cars_maxSideMargin = {}
 CarManager.cars_currentNormalizedTrackProgress = {}
--- CarManager.cars_reasonWhyCantYield = {}
 CarManager.cars_reasonWhyCantYield_NAME = {}
--- CarManager.cars_reasonWhyCantOvertake = {}
 CarManager.cars_reasonWhyCantOvertake_NAME = {}
--- CarManager.cars_statesExitReason = {}
 CarManager.cars_statesExitReason_NAME = {}
 CarManager.cars_yieldTime = {}
 -- CarManager.cars_currentTurningLights = {}
@@ -70,18 +63,12 @@ CarManager.sortedCarList_carIndexToSortedIndex = {} -- [carIndex] = sortedListIn
 
 CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_initialized[carIndex] = true
-  -- CarManager.cars_currentlyYielding[carIndex] = false
-
-  CarManager.cars_currentSplineOffset_meters[carIndex] = 0
-  CarManager.cars_targetSplineOffset_meters[carIndex] = 0
 
   CarManager.cars_currentSplineOffset[carIndex] = 0
   CarManager.cars_targetSplineOffset[carIndex] = 0
 
   CarManager.cars_maxSideMargin[carIndex] = 0
   CarManager.cars_currentNormalizedTrackProgress[carIndex] = -1
-  -- CarManager.cars_reasonWhyCantYield[carIndex] = ''
-  -- CarManager.cars_reasonWhyCantOvertake[carIndex] = ''
   CarManager.cars_reasonWhyCantYield_NAME[carIndex] = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None
   CarManager.cars_reasonWhyCantOvertake_NAME[carIndex] = Strings.StringNames[Strings.StringCategories.ReasonWhyCantOvertake].None
   CarManager.cars_yieldTime[carIndex] = 0
@@ -97,7 +84,6 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
   CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
   CarManager.cars_timeInCurrentState[carIndex] = 0
-  -- CarManager.cars_statesExitReason[carIndex] = {}
   CarManager.cars_statesExitReason_NAME[carIndex] = {}
   CarManager.cars_speedBuffer[carIndex] = {}
   CarManager.cars_speedBufferIndex[carIndex] = 0
@@ -214,6 +200,10 @@ function CarManager.sortCarListByTrackPosition(carList)
   return carList
 end
 
+---Returns a boolean value indicating whether the car is mid-corner and the distance to the upcoming turn (0 if mid-corner)
+---@param carIndex number
+---@return boolean
+---@return number
 function CarManager.isCarMidCorner(carIndex)
   local trackUpcomingTurn = ac.getTrackUpcomingTurn(carIndex)
   local distanceToUpcomingTurn = trackUpcomingTurn.x
@@ -223,6 +213,9 @@ function CarManager.isCarMidCorner(carIndex)
   return isMidCorner, distanceToUpcomingTurn
 end
 
+---Returns a boolean value indicating whether the car is off track (more than 1.5 lanes away from center)
+---@param carIndex number
+---@return boolean
 function CarManager.isCarOffTrack(carIndex)
   local car = ac.getCar(carIndex)
   if not car then

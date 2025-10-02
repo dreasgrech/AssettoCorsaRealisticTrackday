@@ -87,7 +87,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     -- Andreas: commenting this because it's not good.
     -- Andreas: because if we are the last car in the list, there technically won't be a car behind us anymore while we are overtaking
     -- if not carBehind then
-        -- -- CarManager.cars_reasonWhyCantYield[carIndex] = 'No yielding car so not staying on overtaking lane'
         -- CarStateMachine.setStateExitReason(carIndex, 'No yielding car so not staying on overtaking lane')
         -- return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     -- end

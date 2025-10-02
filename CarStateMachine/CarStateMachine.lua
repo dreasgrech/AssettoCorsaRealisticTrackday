@@ -420,7 +420,6 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     end
 
     if CarOperations.isCarInPits(carBehind) then
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Car behind is in pits so not yielding'
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarInPits)
       return
     end
@@ -433,7 +432,6 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     local radius = storage.detectCarBehind_meters
     local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCar <= radius
     if not isYieldingCarCloseToOvertakingCar then
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Too far (outside detect radius) so not yielding'
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarTooFarBehind)
       return
     end
@@ -441,7 +439,6 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     -- Check if the overtaking car is behind the yielding car
     local isOvertakingCarBehindYieldingCar = CarOperations.isFirstCarBehindSecondCar(carBehind, car)
     if not isOvertakingCarBehindYieldingCar then
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car not behind (clear) so not yielding'
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarNotBehind)
       return
     end
@@ -454,7 +451,6 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     -- Check if we're faster than the overtaking car
     local isYieldingCarSlowerThanOvertakingCar = yieldingCarSpeedKmh < overtakingCarSpeedKmh
     if not isYieldingCarSlowerThanOvertakingCar then
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = 'We are faster than the car behind so not yielding'
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.WeAreFasterThanOvertakingCar)
       return
     end
@@ -470,7 +466,6 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
     -- local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakeSide)
     local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, RaceTrackManager.getOvertakingSide())
     if not isOvertakingCarOnOvertakingLane then
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car not on overtaking lane so not yielding'
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.WeAreFasterThanOvertakingCar)
       return
     end

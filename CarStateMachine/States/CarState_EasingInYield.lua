@@ -62,7 +62,6 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       CarOperations.resetAIThrottleLimit(carIndex)
       CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
 
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
       CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
 
       CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
@@ -91,7 +90,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- if the car we're yielding to is now clearly ahead of us, we can ease out our yielding
       local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, carWeAreYieldingTo, storage.clearAhead_meters)
       if isOvertakingCarClearlyAheadOfYieldingCar then
-        -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Overtaking car clearly ahead, so easing out yield'
 
         -- go to trying to start easing out yield state
         -- CarStateMachine.setStateExitReason(carIndex, 'Overtaking car is clearly ahead of us so easing out yield')
