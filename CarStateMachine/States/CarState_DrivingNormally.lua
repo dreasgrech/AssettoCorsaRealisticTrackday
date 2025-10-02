@@ -12,7 +12,7 @@ local ReasonWhyCantYield = Strings.StringNames[Strings.StringCategories.ReasonWh
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
       CarManager.cars_targetSplineOffset[carIndex] = 0
@@ -107,7 +107,7 @@ end
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
 end

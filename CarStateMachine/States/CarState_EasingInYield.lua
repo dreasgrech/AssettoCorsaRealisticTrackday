@@ -11,7 +11,7 @@ local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitRe
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
   -- make sure the state before us has saved the carIndex of the car we're yielding to
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
   if not currentlyYieldingToCarIndex then
@@ -26,7 +26,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     carIndex, currentlyYieldingToCarIndex, currentlyOvertakingCarIndex, CarStateMachine.CarStateTypeStrings[previousState]))
   end
 
-  local car = sortedCarList[sortedCarListIndex]
+  local car = sortedCarsList[sortedCarsListIndex]
 
   -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
   CarManager.cars_currentSplineOffset[carIndex] = CarManager.getActualTrackLateralOffset(car.position)
@@ -42,8 +42,8 @@ end
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-      local car = sortedCarList[sortedCarListIndex]
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      local car = sortedCarsList[sortedCarsListIndex]
       local yieldSide = RaceTrackManager.getYieldingSide()
 
       local targetOffset = storage.maxLateralOffset_normalized
@@ -74,8 +74,8 @@ end
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
-      local car = sortedCarList[sortedCarListIndex]
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      local car = sortedCarsList[sortedCarsListIndex]
       -- local carBehind = sortedCarList[sortedCarListIndex + 1]
 
       -- check if we're now in a yellow flag zone
@@ -123,7 +123,7 @@ end
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
     CarOperations.resetAIThrottleLimit(carIndex)
 end

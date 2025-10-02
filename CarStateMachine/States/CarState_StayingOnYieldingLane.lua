@@ -168,7 +168,7 @@ end
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
   CarOperations.removeAICaution(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)

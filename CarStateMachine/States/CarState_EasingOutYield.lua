@@ -11,14 +11,14 @@ local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitRe
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
+CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
   -- make sure the state before us has saved the carIndex of the car we're yielding to
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
   if not currentlyYieldingToCarIndex then
     Logger.error(string.format('Car %d in state EasingOutYield but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
   end
 
-  local car = sortedCarsList[sortedCarListIndex]
+  local car = sortedCarsList[sortedCarsListIndex]
 
   -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
   CarManager.cars_currentSplineOffset[carIndex] = CarManager.getActualTrackLateralOffset(car.position)
@@ -45,8 +45,8 @@ end
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
-      local car = sortedCarsList[sortedCarListIndex]
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      local car = sortedCarsList[sortedCarsListIndex]
 
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
       local easeOutYieldSide = RaceTrackManager.getOvertakingSide() -- always ease out yield to the overtaking side
@@ -68,8 +68,8 @@ end
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
-      local car = sortedCarsList[sortedCarListIndex]
+CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      local car = sortedCarsList[sortedCarsListIndex]
 
       -- check if we're now in a yellow flag zone
       local newStateDueToYellowFlagZone = CarStateMachine.handleYellowFlagZone(carIndex, car)
@@ -78,8 +78,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         return newStateDueToYellowFlagZone
       end
 
-      local carBehind = sortedCarsList[sortedCarListIndex + 1]
-      local carFront = sortedCarsList[sortedCarListIndex - 1]
+      local carBehind = sortedCarsList[sortedCarsListIndex + 1]
+      local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
       -- if there's a car behind us, check if we should start yielding to it
       local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
@@ -126,6 +126,6 @@ end
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
-CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
 
 end
