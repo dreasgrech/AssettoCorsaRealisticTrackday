@@ -44,6 +44,10 @@ CarOperations.CarDirectionsStrings = {
   [CarOperations.CarDirections.RearRightAngled] = "RearRightAngled",
 }
 
+---This 1.2 default value is fetched from the comment of physics.setExtraAIGrip
+---which says that the default AI cars grip is 120%
+local DEFAULT_AICARS_GRIP = 1.2
+
 local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 3.0
 local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
 
@@ -153,6 +157,20 @@ end
 CarOperations.setAIStopCounter = function(carIndex, time)
     physics.setAIStopCounter(carIndex, time)
     CarManager.cars_aiStopCounter[carIndex] = time
+end
+
+---
+---@param carIndex integer
+---@param grip number @grip value
+CarOperations.setGrip = function(carIndex, grip)
+    physics.setExtraAIGrip(carIndex, grip)
+
+    CarManager.cars_grip[carIndex] = grip
+end
+
+CarOperations.setDefaultAIGrip = function(carIndex)
+  -- todo: physics.setExtraAIGrip says that the default value is 1 but also says that AI cars have 120% grip
+  CarOperations.setGrip(carIndex, DEFAULT_AICARS_GRIP)
 end
 
 ---Activates or deactivates gentle stopping.

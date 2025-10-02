@@ -45,6 +45,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
   { name = 'AICaution', orderDirection = 0, width = 80, tooltip='AI caution level' },
+  { name = 'Grip', orderDirection = 0, width = 80, tooltip='AI grip level' },
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'PreviousState', orderDirection = 0, width = 170, tooltip='Previous state' },
@@ -223,6 +224,7 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
+      ui.textColored(tostring(CarManager.cars_grip[carIndex] or 0), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui.nextColumn()

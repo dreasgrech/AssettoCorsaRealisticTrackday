@@ -51,7 +51,11 @@ CarManager.cars_averageSpeedKmh = {}
 CarManager.cars_culpritInAccidentIndex = {}
 CarManager.cars_navigatingAroundAccidentIndex = {}
 CarManager.cars_navigatingAroundCarIndex = {}
+
 -- CarManager.cars_justTeleportedDueToCustomAIFlood = {}
+
+---@type table<integer,number>
+CarManager.cars_grip = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
@@ -114,6 +118,7 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarOperations.setAIStopCounter(carIndex, 0)
   CarOperations.setGentleStop(carIndex, false)
   CarOperations.removeAICaution(carIndex)
+  CarOperations.setDefaultAIGrip(carIndex)
 
   -- reset any pedal positions we may have set
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
