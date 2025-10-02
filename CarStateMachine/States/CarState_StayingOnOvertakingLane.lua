@@ -5,11 +5,12 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
+-- todo: these need to be extracted to one place
 local AICAUTION_WHILE_OVERTAKING_AND_NO_OBSTACLE_INFRONT = 0
 local AICAUTION_WHILE_OVERTAKING = 1
 local AICAUTION_WHILE_INCORNER = 2
 
-local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_CAUTION = 50 -- if an upcoming corner is closer than this, increase the caution level
+local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_CAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level
 
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
@@ -38,7 +39,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         -- if the car in front of us is not in front of us, we can drop the caution to 0 to speed up overtaking
         local carFrontTrackLateralOffset = CarManager.getActualTrackLateralOffset(carFront.position)
         local lateralOffsetsDelta = math.abs(carTrackLateralOffset - carFrontTrackLateralOffset)
-        if lateralOffsetsDelta > 0.5 then -- if the lateral offset is more than half a lane apart, we can consider it safe
+        if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
             aiCaution = AICAUTION_WHILE_OVERTAKING_AND_NO_OBSTACLE_INFRONT
         end
     end
@@ -119,12 +120,13 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
     -- TODO: There's a bug with this isCarWeAreOvertakingIsClearlyAheadOfUs check here because when it's enabled, the cars exit out of this state immediately
     -- TODO: But without it, a car can get stuck in this state if the yielding car suddendly drives far ahead
-    -- if on the other hand the car we're overtaking is now clearly ahead of us, than we also need to ease out our overtaking
+    -- if the car we're overtaking is now clearly ahead of us, than we also need to ease out our overtaking
     -- local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
     local overtakingCarLeeway = 40
     local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, currentlyOvertakingCar, storage.clearAhead_meters + overtakingCarLeeway)
     if isCarWeAreOvertakingIsClearlyAheadOfUs then
         -- go to trying to start easing out yield state
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyAhead)
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 

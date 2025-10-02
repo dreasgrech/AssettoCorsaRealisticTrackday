@@ -105,6 +105,9 @@ CarOperations.resetPedalPosition = function(carIndex, carPedal)
   end
 end
 
+-- local ARRIVED_AT_TARGET_SPLINE_OFFSET_EPSILON = 0.02 -- in lateral spline offset units
+local ARRIVED_AT_TARGET_SPLINE_OFFSET_EPSILON = 0.1 -- in lateral spline offset units
+
 ---Returns a boolean value indicating whether the car has arrived at its target spline offset
 ---@param carIndex integer
 ---@param drivingToSide RaceTrackManager.TrackSide
@@ -114,10 +117,10 @@ CarOperations.hasArrivedAtTargetSplineOffset = function(carIndex, drivingToSide)
     local currentSplineOffset = CarManager.getActualTrackLateralOffset(ac.getCar(carIndex).position)
     local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
       if drivingToSide == RaceTrackManager.TrackSide.LEFT then
-        return currentSplineOffset <= targetSplineOffset
+        return currentSplineOffset - ARRIVED_AT_TARGET_SPLINE_OFFSET_EPSILON <= targetSplineOffset
       end
 
-      return currentSplineOffset >= targetSplineOffset
+      return currentSplineOffset + ARRIVED_AT_TARGET_SPLINE_OFFSET_EPSILON >= targetSplineOffset
 end
 
 ---Limits AI throttle pedal.
@@ -271,7 +274,7 @@ function CarOperations.limitSplitOffsetRampUpSpeed(carSpeedKmh, rampSpeed)
   elseif carSpeedKmh > 200 then
     return rampSpeed * 0.25
   elseif carSpeedKmh > 100 then
-    return rampSpeed * 0.5
+    return rampSpeed * 0.8
   end
   return rampSpeed
 end
@@ -375,7 +378,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
       CarOperations.resetAIThrottleLimit(carIndex) -- remove any speed limit we may have applied while waiting for a gap
       CarOperations.setGrip(carIndex, 1.4) -- increase grip while driving to the side
 
-      -- if we are driving at high speed, we need to increase the ramp speed slower so that our car doesn't jolt out of control
+      -- if we are driving at high speed, we need to decrease the ramp speed so that our car doesn't jolt out of control
       -- local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
       local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, rampSpeed_mps)
 

@@ -394,7 +394,7 @@ function UIManager.renderUIOptionsControls()
 
     ui.text('Yielding')
 
-    storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters])
+    storage.detectCarBehind_meters =  ui.slider('Detect car behind (m)', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters])
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
 
     storage.rampSpeed_mps =  ui.slider('Yield offset ramp (m/s)', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps])
@@ -409,6 +409,9 @@ function UIManager.renderUIOptionsControls()
 
     if ui.checkbox('Handle overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
+
+    storage.detectCarAhead_meters =  ui.slider('Detect car ahead (m)', storage.detectCarAhead_meters, StorageManager.options_min[StorageManager.Options.DetectCarAhead_meters], StorageManager.options_max[StorageManager.Options.DetectCarAhead_meters])
+    if ui.itemHovered() then ui.setTooltip('Start overtaking if the car in front is within this distance') end
 
     storage.overtakeRampSpeed_mps =  ui.slider('Overtake offset ramp (m/s)', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps])
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when overtaking another car.') end

@@ -8,21 +8,27 @@ StorageManager.Options ={
     OverrideAiAwareness = 4,
     DefaultAICaution = 5,
     MaxLateralOffset_normalized = 6,
+
     DetectCarBehind_meters = 7,
     RampSpeed_mps = 8,
     RampRelease_mps = 9,
+
     HandleOvertaking = 10,
-    ClearAhead_meters = 11,
-    OvertakeRampSpeed_mps = 12,
-    OvertakeRampRelease_mps = 13,
-    CustomAIFlood_enabled = 14,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 15,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 16,
-    HandleAccidents = 17,
-    DistanceFromAccidentToSeeYellowFlag_meters = 18,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 19,
-    DebugDraw = 20,
-    DrawCarList = 21,
+    DetectCarAhead_meters = 11,
+    ClearAhead_meters = 12,
+    OvertakeRampSpeed_mps = 13,
+    OvertakeRampRelease_mps = 14,
+
+    CustomAIFlood_enabled = 15,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 16,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 17,
+
+    HandleAccidents = 18,
+    DistanceFromAccidentToSeeYellowFlag_meters = 19,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 20,
+
+    DebugDraw = 21,
+    DrawCarList = 22,
 }
 
 -- only used to build the actual tables that hold the runtime values
@@ -39,6 +45,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.RampRelease_mps, default=0.3, min=0.1, max=3.0 },
 
     { name = StorageManager.Options.HandleOvertaking, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.DetectCarAhead_meters, default=100, min=50, max=500 },
     { name = StorageManager.Options.ClearAhead_meters, default=6.0, min=4.0, max=20.0 },
     { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.7, min=0.1, max=3.0 },
     { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.4, min=0.1, max=3.0 },
@@ -79,6 +86,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field rampSpeed_mps number
 ---@field rampRelease_mps number
 ---@field handleOvertaking boolean
+---@field detectCarAhead_meters number
 ---@field clearAhead_meters number
 ---@field overtakeRampSpeed_mps number
 ---@field overtakeRampRelease_mps number
@@ -105,6 +113,7 @@ local storageTable = {
     rampRelease_mps = StorageManager.options_default[StorageManager.Options.RampRelease_mps],
 
     handleOvertaking = StorageManager.options_default[StorageManager.Options.HandleOvertaking],
+    detectCarAhead_meters = StorageManager.options_default[StorageManager.Options.DetectCarAhead_meters],
     clearAhead_meters = StorageManager.options_default[StorageManager.Options.ClearAhead_meters],
     overtakeRampSpeed_mps = StorageManager.options_default[StorageManager.Options.OvertakeRampSpeed_mps],
     overtakeRampRelease_mps = StorageManager.options_default[StorageManager.Options.OvertakeRampRelease_mps],

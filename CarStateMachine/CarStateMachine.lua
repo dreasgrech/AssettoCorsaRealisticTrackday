@@ -363,7 +363,7 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   -- local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
   local distanceToFrontCar = MathHelpers.distanceBetweenVec3s(carFrontPosition, carPosition)
   -- if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
-  if distanceToFrontCar > storage.detectCarBehind_meters then -- Andreas: using the same distance as detecting a car to yield to
+  if distanceToFrontCar > storage.detectCarAhead_meters then
     -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
     CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.YieldingCarTooFarAhead)
     return
@@ -380,7 +380,7 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
     return
   end
 
-  -- check if the car in front of us is yielding
+  -- check if the car in front of us is on the yielding lane
   local carFrontDrivingOnYieldingLane = CarManager.isCarDrivingOnSide(carFrontIndex, RaceTrackManager.getYieldingSide())
   if not carFrontDrivingOnYieldingLane then
     -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front not on yielding lane so not overtaking'
@@ -469,6 +469,10 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehi
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.WeAreFasterThanOvertakingCar)
       return
     end
+
+    -- TODO: also check if our car is a lot more powerful than the overtaking car, think twice before yielding
+    -- TODO: also check if our car is a lot more powerful than the overtaking car, think twice before yielding
+    -- TODO: also check if our car is a lot more powerful than the overtaking car, think twice before yielding
 
     -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
