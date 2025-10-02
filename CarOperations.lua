@@ -655,7 +655,7 @@ end
   -- local carUp       = car.up
   -- local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
   -- local p = CarOperations.getSideAnchorPoints(carPosition, carForward, carLeft, carUp, halfAABBSize)  -- returns left/right dirs too
-  -- -- p has: frontLeft, rearLeft, frontRight, rearRight, leftDirection, rightDirection, etc.  :contentReference[oaicite:2]{index=2}
+  -- -- p has: frontLeft, rearLeft, frontRight, rearRight, leftDirection, rightDirection, etc.  
 
   -- -- How far to place the parallel lines from the car’s sides (meters).
   -- -- You can expose this in UI and store it in storage.parallelLinesSideGap or CarManager.sideParallelLinesGap.
@@ -671,7 +671,7 @@ end
   -- local rightOffset = p.rightDirection * sideGap
 
   -- -- Draw two long parallel lines, rear→front, one on each side
-  -- render.debugLine(p.rearLeft  + leftOffset,  p.frontLeft  + leftOffset,  RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)   -- blue by your constants :contentReference[oaicite:3]{index=3}
+  -- render.debugLine(p.rearLeft  + leftOffset,  p.frontLeft  + leftOffset,  RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR)   -- blue by your constants 
   -- render.debugLine(p.rearRight + rightOffset, p.frontRight + rightOffset, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)  -- red
 -- end
 

@@ -265,10 +265,10 @@ end
   -- CarManager.cars_reason[carIndex] = "starting to shove car sideways to evacuate"
 
   -- -- optional safety bubble: disable car-car collisions during the shove
-  -- physics.disableCarCollisions(carIndex, true)            -- re-enable later  :contentReference[oaicite:0]{index=0}
+  -- physics.disableCarCollisions(carIndex, true)            -- re-enable later  
 
   -- -- cap pace while evacuating
-  -- physics.setAITopSpeed(carIndex, 15)                     -- 15 km/h crawl   :contentReference[oaicite:1]{index=1}
+  -- physics.setAITopSpeed(carIndex, 15)                     -- 15 km/h crawl   
   -- CarOperations.setAIThrottleLimit(carIndex, 0.25)
 
   -- -- Let tyres-out be OK globally in modes; prevents penalties while off track (optional)
@@ -294,7 +294,7 @@ end
       -- physics.addForce(idx, applyPos, false, sideways * forceN * dt, false, -1)
       -- ac.log("lateral log")
     -- end
-  -- ]], { idx = carIndex, sign = (towardsRight and 1 or -1), forceN = strengthN }, function(err) end)   -- :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5} :contentReference[oaicite:6]{index=6}
+  -- ]], { idx = carIndex, sign = (towardsRight and 1 or -1), forceN = strengthN }, function(err) end)
       -- -- CarManager.cars_reason[carIndex] = "applying lateral shove to evacuate in loop"
 
   -- -- stop the shove and restore things later
@@ -320,17 +320,17 @@ end
   --- end
 
   --- -- pick nearer side and immediately bias AI to that edge (cheap hint)
-  --- local tcoords = ac.worldCoordinateToTrack(car.position)                       -- X∈[-1..1], Z∈[0..1]  :contentReference[oaicite:8]{index=8}
+  --- local tcoords = ac.worldCoordinateToTrack(car.position)                       -- X∈[-1..1], Z∈[0..1]  
   --- local prog    = tcoords.z
-  --- local sides   = ac.getTrackAISplineSides(prog)                                -- vec2(leftDistM, rightDistM)  :contentReference[oaicite:9]{index=9}
+  --- local sides   = ac.getTrackAISplineSides(prog)                                -- vec2(leftDistM, rightDistM)  
   --- local goRight = (sides.y <= sides.x)
   --- local edgeOffsetNorm = goRight and 0.98 or -0.98                              -- hug the boundary
-  --- physics.setAISplineOffset(carIndex, edgeOffsetNorm, true)                     -- override AI awareness       :contentReference[oaicite:10]{index=10}
+  --- physics.setAISplineOffset(carIndex, edgeOffsetNorm, true)                     -- override AI awareness       
 
   --- -- brief settle, then push onto grass if still near racing line
   --- CarManager.cars_evacuating[carIndex] = true
-  --- physics.setAIStopCounter(carIndex, 0.4)                                       -- momentary pause              :contentReference[oaicite:11]{index=11}
-  --- physics.setGentleStop(carIndex, true)                                         -- smooth decel                 :contentReference[oaicite:12]{index=12}
+  --- physics.setAIStopCounter(carIndex, 0.4)                                       -- momentary pause              
+  --- physics.setGentleStop(carIndex, true)                                         -- smooth decel                 
 
   --- CarManager.cars_reason[carIndex] = ("Just collided.  Evacuating %s side at spline=%.3f") 
                                 --- :format(goRight and "RIGHT" or "LEFT", car.splinePosition)
@@ -344,10 +344,10 @@ end
     --- CarManager.cars_reason[carIndex] = "Starting to shove car off track to the " .. (goRight and "RIGHT" or "LEFT")
 
     --- -- crawl and steer bias remain; now physically nudge off the tarmac
-    --- shoveCarSideways(carIndex, goRight, 9000, 1.2)                              -- ~9 kN lateral shove ~1.2 s   :contentReference[oaicite:13]{index=13}
+    --- shoveCarSideways(carIndex, goRight, 9000, 1.2)                              -- ~9 kN lateral shove ~1.2 s   
 
     --- -- if you want them to then head to pits once clear:
-    --- -- physics.setAIPitStopRequest(carIndex, true)                                 -- optional                     :contentReference[oaicite:14]{index=14}
+    --- -- physics.setAIPitStopRequest(carIndex, true)                                 -- optional                     
 
     --- Logger.log(("Car #%d (%s) evacuating %s side at spline=%.3f") :format(carIndex, car.name, goRight and "RIGHT" or "LEFT", car.splinePosition))
 
