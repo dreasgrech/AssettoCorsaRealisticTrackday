@@ -1,12 +1,16 @@
 local OnCarEventManager = {}
 
+---@enum OnCarEventManager.OnCarEventType 
 local OnCarEventType = {
     None = 0,
     Collision = 1,
     Jumped = 2,
 }
 
+-- TODO: Get the actual implementation of these functions out of this file
 local onCarEventExecutions = {
+    ---The callback function for when a car collision event occurs
+    ---@param carIndex integer
     [OnCarEventType.Collision] = function (carIndex)
         local storage = StorageManager.getStorage()
         if storage.handleAccidents then
@@ -19,6 +23,8 @@ local onCarEventExecutions = {
             CarStateMachine.informAboutAccident(accidentIndex)
         end
     end,
+    ---The callback function for when a car jumped event occurs
+    ---@param carIndex integer
     [OnCarEventType.Jumped] = function (carIndex)
       -- Inform the accident manager about the car reset
       AccidentManager.informAboutCarReset(carIndex)

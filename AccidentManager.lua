@@ -5,14 +5,23 @@ local AccidentManager = {}
 
 local accidentCompletableIndex = CompletableIndexCollectionManager.createNewIndex()
 
+---@type table<integer, integer>
 AccidentManager.accidents_carIndex = {}
+---@type table<integer, vec3>
 AccidentManager.accidents_worldPosition = {}
+---@type table<integer, number>
 AccidentManager.accidents_splinePosition = {}
+---@type table<integer, boolean>
 AccidentManager.accidents_collidedWithTrack = {}
+---@type table<integer, integer>
 AccidentManager.accidents_collidedWithCarIndex = {}
+---@type table<integer, integer>
 AccidentManager.accidents_yellowFlagZoneIndex = {}
+---@type table<integer, boolean>
 AccidentManager.accidents_resolved = {}
 
+---Marks the given accident as resolved and done
+---@param accidentIndex integer
 local setAccidentAsResolved = function(accidentIndex)
         AccidentManager.accidents_carIndex[accidentIndex] = nil
         AccidentManager.accidents_worldPosition[accidentIndex] = nil
@@ -44,6 +53,8 @@ local setAccidentAsResolved = function(accidentIndex)
         CompletableIndexCollectionManager.updateFirstNonResolvedIndex(accidentCompletableIndex, AccidentManager.accidents_resolved)
 end
 
+---Resolve any accident the given car is a culprit in
+---@param carIndex number
 AccidentManager.informAboutCarReset = function(carIndex)
     local accidentIndexAsCulprit = CarManager.cars_culpritInAccidentIndex[carIndex]
     -- Logger.log(string.format("[AccidentManager] informAboutCarReset called for car #%d. culpritInAccident #%d.  Total accidents: %d", carIndex, accidentIndexAsCulprit, #AccidentManager.accidents_carIndex))
@@ -55,6 +66,9 @@ AccidentManager.informAboutCarReset = function(carIndex)
     end
 end
 
+---Registers a collision accident for the given culprit car index
+---@param culpritCarIndex integer
+---@return integer? accidentIndex
 AccidentManager.registerCollision = function(culpritCarIndex)
 
     -- TODO: need to handle what happens when a player car is the culprit car
@@ -139,6 +153,10 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     return accidentIndex
 end
 
+---Sets that the given car is navigating around the given accident and car
+---@param carIndex integer
+---@param accidentIndex integer?
+---@param carToNavigateAroundIndex integer?
 AccidentManager.setCarNavigatingAroundAccident = function(carIndex, accidentIndex, carToNavigateAroundIndex)
     CarManager.cars_navigatingAroundAccidentIndex[carIndex] = accidentIndex
     CarManager.cars_navigatingAroundCarIndex[carIndex] = carToNavigateAroundIndex
@@ -146,7 +164,7 @@ end
 
 ---Andreas: this function is O(n) where n is the total number of accidents
 ---@param car ac.StateCar?
----@return integer|nil accidentIndex, integer closestCarIndex
+---@return integer? accidentIndex, integer closestCarIndex
 AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident)
     local lastAccidentIndexCreated = CompletableIndexCollectionManager.getLastIndexCreated(accidentCompletableIndex)
     if lastAccidentIndexCreated == 0 then
