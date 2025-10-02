@@ -155,7 +155,8 @@ CarOperations.setAICaution = function(carIndex, caution)
 end
 
 CarOperations.removeAICaution = function(carIndex)
-  CarOperations.setAICaution(carIndex, 1)
+  local storage = StorageManager.getStorage()
+  CarOperations.setAICaution(carIndex, storage.defaultAICaution)
 end
 
 ---Forces AI to brake for a specified amount of time. Originally, this mechanism is used to get AIs to brake after an incident.

@@ -10,13 +10,36 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 
 end
 
--- UPDATE FUNCTION
+---UPDATE FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     -- make the driver more aggressive while overtaking
     -- CarOperations.setAICaution(carIndex, 0) -- andreas: commenting this because they get way too aggressive
+
+    local car = sortedCarsList[sortedCarsListIndex]
+    local carTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
+
+    -- TODO: If an upcoming corner if coming ac.getTrackUpcomingTurn(), don't drop the cautio to zero
+
+    local carFront = sortedCarsList[sortedCarsListIndex - 1]
+    if carFront then
+        -- if the car in front of us is not in front of us, we can drop the caution to 0 to speed up overtaking
+        local carFrontTrackLateralOffset = CarManager.getActualTrackLateralOffset(carFront.position)
+        local lateralOffsetsDelta = math.abs(carTrackLateralOffset - carFrontTrackLateralOffset)
+        CarOperations.setAICaution(carIndex, lateralOffsetsDelta > 0.5 and 0 or storage.defaultAICaution)
+    end
 end
 
--- TRANSITION FUNCTION
+--- TRANSITION FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     local car = sortedCarsList[sortedCarsListIndex]
 

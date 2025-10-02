@@ -18,6 +18,7 @@ local StorageManager = {}
 ---@field overtakeRampRelease_mps number
 ---@field clearAhead_meters number
 ---@field minAISpeed_kmh number
+---@field defaultAICaution integer
 ---@field distanceFromAccidentToSeeYellowFlag_meters number
 ---@field distanceToStartNavigatingAroundCarInAccident_meters number
 ---@field customAIFlood_enabled boolean
@@ -44,6 +45,7 @@ local storageTable = {
     overtakeRampRelease_mps = 0.4,
     clearAhead_meters = 6.0,
     minAISpeed_kmh = 35.0,
+    defaultAICaution = 1,
     distanceFromAccidentToSeeYellowFlag_meters = 200.0,
     distanceToStartNavigatingAroundCarInAccident_meters = 30.0,
     customAIFlood_enabled = false,
