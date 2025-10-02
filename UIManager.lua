@@ -376,29 +376,34 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily. (EXPERIMENTAL)') end
 
-    if ui.checkbox('Handle overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
-    if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
-
     if ui.checkbox('Handle side checking while yielding/overtaking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
-    if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding.') end
+    if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding/overtaking.') end
 
     storage.defaultAICaution =  ui.slider('Default AI Caution', storage.defaultAICaution, 3, 16) -- do not drop the minimum below 2 because 1 is used while overtaking
     if ui.itemHovered() then ui.setTooltip('Base AI caution level (higher = more cautious, slower but less accident prone).') end
 
+    storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, 0.1, 1.0)
+    if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
+
+    ui.separator()
+
+    ui.text('Yielding')
+
     storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
-
-    storage.yieldMaxOffset_normalized =  ui.slider('Side offset', storage.yieldMaxOffset_normalized, 0.1, 1.0)
-    if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding (0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
-
-    -- storage.minSpeedDelta_kmh =  ui.slider('Min speed delta (km/h)', storage.minSpeedDelta_kmh, 0, 30)
-    -- if ui.itemHovered() then ui.setTooltip('Require some closing speed before asking AI to yield.') end
 
     storage.rampSpeed_mps =  ui.slider('Yield Offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when yielding.') end
 
     storage.rampRelease_mps =  ui.slider('Offset release (m/s)', storage.rampRelease_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset returns to normal once an overtaking car has fully driven past the yielding car.') end
+
+    ui.separator()
+
+    ui.text('Overtaking')
+
+    if ui.checkbox('Handle overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
 
     storage.overtakeRampSpeed_mps =  ui.slider('Overtake offset ramp (m/s)', storage.overtakeRampSpeed_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when overtaking another car.') end

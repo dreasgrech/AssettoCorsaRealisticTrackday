@@ -46,7 +46,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- the drive to side is to be opposite side to the the yielding side
     -- local driveToSide = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
     local driveToSide = RaceTrackManager.getOvertakingSide()
-    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, storage.yieldMaxOffset_normalized, storage.overtakeRampSpeed_mps, storage.overrideAiAwareness)
+    local targetOffset = storage.maxLateralOffset_normalized
+    local rampSpeed_mps = storage.overtakeRampSpeed_mps
+    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
     if not droveSafelyToSide then
         -- TODO: Continue here
         -- TODO: Continue here

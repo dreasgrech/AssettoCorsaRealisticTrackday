@@ -36,7 +36,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarList[sortedCarListIndex]
       local yieldSide = storage.yieldSide
 
-      local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, storage.yieldMaxOffset_normalized, storage.rampSpeed_mps, storage.overrideAiAwareness)
+      local targetOffset = storage.maxLateralOffset_normalized
+      local rampSpeed_mps = storage.rampSpeed_mps
+      local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
       if not droveSafelyToSide then
         -- reduce the car speed so that we can find a gap
         CarOperations.setAIThrottleLimit(carIndex, 0.4)

@@ -42,7 +42,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local yieldSide = RaceTrackManager.getYieldingSide()
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
       local easeOutYieldSide = (yieldSide == RaceTrackManager.TrackSide.LEFT) and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
-      local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, 0, storage.rampRelease_mps, storage.overrideAiAwareness)
+      local targetOffset = 0
+      local rampSpeed_mps = storage.rampRelease_mps
+      local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
       -- can't ease out yield because the side is blocked, just wait
       if not droveSafelyToSide then

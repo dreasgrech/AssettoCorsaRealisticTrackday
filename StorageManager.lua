@@ -10,7 +10,7 @@ local StorageManager = {}
 ---@field handleAccidents boolean
 ---@field handleOvertaking boolean
 ---@field detectCarBehind_meters number
----@field yieldMaxOffset_normalized number
+---@field maxLateralOffset_normalized number
 ---@field rampSpeed_mps number
 ---@field rampRelease_mps number
 ---@field overtakeRampSpeed_mps number
@@ -35,7 +35,7 @@ local storageTable = {
     handleOvertaking = true,
     detectCarBehind_meters = 70,
     -- minSpeedDelta_kmh = 0.0,
-    yieldMaxOffset_normalized = 0.8,
+    maxLateralOffset_normalized = 0.8,
     rampSpeed_mps = 0.5,
     rampRelease_mps = 0.3,
     overtakeRampSpeed_mps = 0.7,

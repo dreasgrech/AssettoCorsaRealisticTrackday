@@ -35,7 +35,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local driveToSide = storage.yieldSide
     local driveToSide = RaceTrackManager.getYieldingSide()
     local targetOffset = 0
-    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, storage.overtakeRampRelease_mps, storage.overrideAiAwareness)
+    local rampSpeed_mps = storage.overtakeRampRelease_mps
+    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
     if not droveSafelyToSide then
         -- TODO: Continue here: what should we do if we can't ease out the overtake because the side is blocked?
     end
