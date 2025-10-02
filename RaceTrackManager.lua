@@ -24,7 +24,7 @@ local sim = ac.getSim()
 local trackLength_meters = sim.trackLengthM
 
 --- Returns the total track length in meters
----@return number
+---@return number trackLength_meters
 RaceTrackManager.getTrackLengthMeters = function()
     return trackLength_meters
 end
@@ -35,6 +35,14 @@ end
 ---@return number
 RaceTrackManager.splineSpanToMeters = function(splineValue)
     return splineValue * trackLength_meters
+end
+
+---Converts a distance in meters to a spline span value representing a fraction of the track length (0..1)
+---Example: 200m on a 1000m track = 0.2
+---@param meters number
+---@return number
+RaceTrackManager.metersToSplineSpan = function(meters)
+    return meters / trackLength_meters
 end
 
 --- Returns RIGHT if given LEFT and vice versa
