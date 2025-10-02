@@ -56,6 +56,14 @@ local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
 local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
 local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
 
+--[===[
+https://discord.com/channels/453595061788344330/962668819933982720/1423344738576109741
+
+* Caution affects how hard they're trying to avoid other cars front to back
+* Aggression affects how hard they're trying to avoid other cars left to right
+* Difficulty (level) affects how fast they drive through corners as well as how hard they press the throttle
+--]===]
+
 ---@enum CarOperations.CarPedals
 CarOperations.CarPedals = {
   Gas = 1,
