@@ -51,12 +51,15 @@ CarManager.cars_averageSpeedKmh = {}
 CarManager.cars_culpritInAccidentIndex = {}
 CarManager.cars_navigatingAroundAccidentIndex = {}
 CarManager.cars_navigatingAroundCarIndex = {}
+-- CarManager.cars_justTeleportedDueToCustomAIFlood = {}
 
 CarManager.cars_AABBSIZE = {}
 CarManager.cars_HALF_AABSIZE = {}
 
----@type table<ac.StateCar>
+---@type table<integer,ac.StateCar>
 CarManager.currentSortedCarsList = {}
+---@type table<number,number>
+CarManager.sortedCarList_carIndexToSortedIndex = {} -- [carIndex] = sortedListIndex
 
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
@@ -100,6 +103,8 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_culpritInAccidentIndex[carIndex] = 0
   -- CarManager.cars_navigatingAroundAccidentIndex[carIndex] = nil
   -- CarManager.cars_navigatingAroundCarIndex[carIndex] = nil
+  CarManager.sortedCarList_carIndexToSortedIndex[carIndex] = nil
+  -- CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] = false
   AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
   CarStateMachine.initializeCarInStateMachine(carIndex)
 
@@ -197,8 +202,8 @@ end
 -- end
 
 ---Sorts the given car list by track position, with the car furthest ahead first
----@param carList table<ac.StateCar>
----@return table<ac.StateCar> carList 
+---@param carList table<integer,ac.StateCar>
+---@return table<integer,ac.StateCar> carList 
 function CarManager.sortCarListByTrackPosition(carList)
   table.sort(carList, isFirstCarSplinePositionGreater)
   return carList

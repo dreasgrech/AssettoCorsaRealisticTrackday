@@ -20,6 +20,7 @@ local CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE = {
   [CarStateMachine.CarStateType.EASING_OUT_OVERTAKE] = ColorManager.RGBM_Colors.Cyan,
   [CarStateMachine.CarStateType.NAVIGATING_AROUND_ACCIDENT] = ColorManager.RGBM_Colors.MediumPurple,
   [CarStateMachine.CarStateType.DRIVING_IN_YELLOW_FLAG_ZONE] = ColorManager.RGBM_Colors.Yellow,
+  -- [CarStateMachine.CarStateType.AFTER_CUSTOMAIFLOOD_TELEPORT] = ColorManager.RGBM_Colors.LightGray,
 }
 
 local carTableColumns_name = { }
@@ -31,7 +32,8 @@ local carTableColumns_tooltip = { }
 local carTableColumns_dataBeforeDoD = {
   { name = '#', orderDirection = 0, width = 35, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
-  { name = 'Spline', orderDirection = 0, width = 70, tooltip='Spline Position' },
+  { name = 'SplinePosition', orderDirection = 0, width = 70, tooltip='Spline Position' },
+  { name = 'SplineSides', orderDirection = 0, width = 85, tooltip='Spline Sides' },
   { name = 'Speed', orderDirection = 0, width = 70, tooltip='Current velocity' },
   { name = 'AverageSpeed', orderDirection = 0, width = 70, tooltip='Average speed' },
   { name = 'RealOffset', orderDirection = 0, width = 75, tooltip='Actual Lateral offset from centerline' },
@@ -70,6 +72,20 @@ end
 UIManager.drawMainWindowContent = function()
   local storage = StorageManager.getStorage()
   ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
+
+  --[====[
+  if ui.button('Teleport', ui.ButtonFlags.None) then
+    local carIndex = 1
+    local car = ac.getCar(carIndex)
+    -- local splinePosition = 0.1
+    -- local worldPosition = ac.trackProgressToWorldCoordinate(splinePosition, false)
+    -- -- local direction = car.look
+    -- local direction = car.look
+    -- physics.setCarPosition(carIndex, worldPosition, direction)
+
+    -- CustomAIFloodManager.teleportCar(car, .1)
+  end
+  --]====]
 
   --[====[
   -- Andreas: testing the indicator lights issue here
@@ -147,6 +163,9 @@ UIManager.drawMainWindowContent = function()
       -- local trackUpcomingTurn = ac.getTrackUpcomingTurn(carIndex)
       local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)
 
+      local carSplinePosition = car.splinePosition
+      local trackAISplineSides = ac.getTrackAISplineSides(carSplinePosition)
+
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
         Logger.error(string.format('Car #%d (current: %s, previous:%s) is both yielding to car #%d and overtaking car #%d at the same time!', carIndex, CarStateMachine.CarStateTypeStrings[state],CarStateMachine.CarStateTypeStrings[previousCarState], currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
@@ -190,7 +209,8 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
       -- ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", car.splinePosition), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.3f", carSplinePosition), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.2f|%.2f", trackAISplineSides.x, trackAISplineSides.y), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d km/h", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d km/h", math.floor(CarManager.cars_averageSpeedKmh[carIndex] or 0)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", actualTrackLateralOffset), uiColor); ui.nextColumn()
@@ -394,8 +414,23 @@ function UIManager.renderUIOptionsControls()
     storage.distanceToStartNavigatingAroundCarInAccident_meters =  ui.slider('Distance to start navigating around car in accident (m)', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100)
     if ui.itemHovered() then ui.setTooltip('Distance from accident at which AI will start navigating around the car in accident.') end
 
+  --[====[
+    ui.separator()
+
+    ui.text('Custom AI Flood')
+
+    if ui.checkbox('Custom AI Flood Enabled', storage.customAIFlood_enabled) then storage.customAIFlood_enabled = not storage.customAIFlood_enabled end
+    if ui.itemHovered() then ui.setTooltip('Master switch for the custom AI flood feature.') end
+
+    storage.customAIFlood_distanceBehindPlayerToCycle_meters = ui.slider('Distance behind player to cycle (m)', storage.customAIFlood_distanceBehindPlayerToCycle_meters, 0, 500)
+    if ui.itemHovered() then ui.setTooltip('Distance behind the player car at which AI cars will start to cycle.') end
+
+    storage.customAIFlood_distanceAheadOfPlayerToCycle_meters = ui.slider('Distance ahead of player to cycle (m)', storage.customAIFlood_distanceAheadOfPlayerToCycle_meters, 0, 500)
+    if ui.itemHovered() then ui.setTooltip('Distance ahead of the player car at which AI cars will start to cycle.') end
+
     -- storage.distanceToFrontCarToOvertake =  ui.slider('Min distance to front car to overtake (m)', storage.distanceToFrontCarToOvertake, 1.0, 20.0)
     -- if ui.itemHovered() then ui.setTooltip('Minimum distance to the car in front before an AI car will consider overtaking it.') end
+  --]====]
 end
 
 return UIManager

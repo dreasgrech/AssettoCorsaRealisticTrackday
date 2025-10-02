@@ -29,6 +29,7 @@ CarStateMachine.CarStateType = {
   EASING_OUT_OVERTAKE = 4096,
   NAVIGATING_AROUND_ACCIDENT = 8192,
   DRIVING_IN_YELLOW_FLAG_ZONE = 16384,
+  -- AFTER_CUSTOMAIFLOOD_TELEPORT = 32768,
 }
 
 --[====[
@@ -164,9 +165,13 @@ CarStateMachine.initializeCarInStateMachine = function(carIndex)
     cars_state[carIndex] = nil
 
     -- queue up the DRIVING_NORMALLY state for the car so that it will take effect in the next frame
-    queuedStatesToTransitionInto[carIndex] = CarStateMachine.CarStateType.DRIVING_NORMALLY
+    CarStateMachine.queueStateTransition(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
     -- Logger.log(string.format("CarStateMachine: Car %d Just added normally state: %d", carIndex, queuedStatesToTransitionInto[carIndex]))
     --CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
+end
+
+CarStateMachine.queueStateTransition = function(carIndex, newState)
+    queuedStatesToTransitionInto[carIndex] = newState
 end
 
 CarStateMachine.handleQueuedAccidents = function()
@@ -181,7 +186,7 @@ CarStateMachine.handleQueuedAccidents = function()
         local accidentCarIndex = QueueManager.dequeue(queuedCollidedWithCarAccidents)
         
         Logger.log(string.format("CarStateMachine: #%d collided with another car, switching to COLLIDED_WITH_CAR state", accidentCarIndex))
-        queuedStatesToTransitionInto[accidentCarIndex] = CarStateMachine.CarStateType.COLLIDED_WITH_CAR
+        CarStateMachine.queueStateTransition(accidentCarIndex, CarStateMachine.CarStateType.COLLIDED_WITH_CAR)
     end
 
     while QueueManager.queueLength(queuedCarCollidedWithMeAccidents) > 0 do
@@ -190,7 +195,7 @@ CarStateMachine.handleQueuedAccidents = function()
         Logger.log(string.format("CarStateMachine: #%d was collided into by another car, switching to ANOTHER_CAR_COLLIDED_INTO_ME state", accidentCarIndex))
         -- Logger.log(string.format("%d %d ", carIndex, QueueManager.queueLength(queuedCarCollidedWithMeAccidents)))
         -- Logger.log(string.format("%d", carIndex))
-        queuedStatesToTransitionInto[accidentCarIndex] = CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME
+        CarStateMachine.queueStateTransition(accidentCarIndex, CarStateMachine.CarStateType.ANOTHER_CAR_COLLIDED_INTO_ME)
     end
 end
 
@@ -281,7 +286,7 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
       -- execute the state's exit function
       CarStateMachine.states_exitFunctions[state](carIndex, dt, sortedCarList, sortedCarListIndex, storage)
 
-      queuedStatesToTransitionInto[carIndex] = newState
+      CarStateMachine.queueStateTransition(carIndex, newState)
     end
 end
 

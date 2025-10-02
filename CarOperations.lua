@@ -115,8 +115,23 @@ CarOperations.resetAIThrottleLimit = function(carIndex)
   CarOperations.setAIThrottleLimit(carIndex, 1)
 end
 
-CarOperations.removeAICaution = function(carIndex)
-  CarOperations.setAICaution(carIndex, 1)
+---Limits AI top speed. Use `math.huge` (or just 1e9) to remove limitation.
+---Andreas: I don't think physics.setAITopSpeed works as intended because it doesn't seem to have any effect on the car speed.
+---@param carIndex integer @0-based car index.
+---@param limit number @Speed in km/h.
+CarOperations.setAITopSpeed = function(carIndex, limit)
+    physics.setAITopSpeed(carIndex, limit)
+
+    --[===[
+    -- Andreas: since physics.setAITopSpeed doesn't seem to work on ai cars atm, I'm also calling the homebrew function here
+    CarOperations.limitTopSpeed(carIndex, limit)
+    --]===]
+
+    CarManager.cars_aiTopSpeed[carIndex] = limit
+end
+
+CarOperations.removeAITopSpeed = function(carIndex)
+  CarOperations.setAITopSpeed(carIndex, math.huge)
 end
 
 ---Changes AI caution, altering the distance it keeps from the car in front of it. Default value: `1`. Experimental.
@@ -127,17 +142,8 @@ CarOperations.setAICaution = function(carIndex, caution)
     CarManager.cars_aiCaution[carIndex] = caution
 end
 
----Limits AI top speed. Use `math.huge` (or just 1e9) to remove limitation.
----Andreas: I don't think physics.setAITopSpeed works as intended because it doesn't seem to have any effect on the car speed.
----@param carIndex integer @0-based car index.
----@param limit number @Speed in km/h.
-CarOperations.setAITopSpeed = function(carIndex, limit)
-    physics.setAITopSpeed(carIndex, limit)
-    CarManager.cars_aiTopSpeed[carIndex] = limit
-end
-
-CarOperations.removeAITopSpeed = function(carIndex)
-  CarOperations.setAITopSpeed(carIndex, math.huge)
+CarOperations.removeAICaution = function(carIndex)
+  CarOperations.setAICaution(carIndex, 1)
 end
 
 ---Forces AI to brake for a specified amount of time. Originally, this mechanism is used to get AIs to brake after an incident.
@@ -244,6 +250,38 @@ function CarOperations.toggleTurningLights(carIndex, turningLights)
     -- CarManager.cars_hasTL[carIndex] = car.hasTurningLights
 end
 
+--[======[
+---Tries to limit the top speed of the car by adjusting the gas and brake pedals.
+---Andreas: I wrote this function because physics.setAITopSpeed doesn't seem to work on ai cars right now
+---Andreas: Update: I can't do proper pedal modulation because the api doesn't allow me to set absolute pedal values and always chooses the maximum of my value and the original ai value.
+---@param carIndex number
+---@param maxSpeedKmh number
+CarOperations.limitTopSpeed = function(carIndex, maxSpeedKmh)
+    local car = ac.getCar(carIndex)
+    if not car then return end
+
+    --[===[
+    -- determine the amount of brake we need to apply to keep the car at or below the max speed
+    local brakeAmount = math.min(math.max((car.speedKmh - maxSpeedKmh) / 50, 0), 1)
+
+    if car.speedKmh > maxSpeedKmh then
+        CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, brakeAmount)
+        CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0)
+    else
+        CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+        CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
+    end
+    --]===]
+
+
+    --[===[
+    local sim = ac.getSim()
+    local dt = sim.dt
+    CarSpeedLimiter.limitTopSpeed(carIndex, maxSpeedKmh, dt)
+    --]===]
+end
+--]======]
+
 --- Drives the car to the specified side while making sure there are no cars blocking the side we're trying to drive to.
 ---@param carIndex number
 ---@param dt number
@@ -262,6 +300,9 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
     end
 
       -- todo: should these two operations be here?
+      -- todo: should these two operations be here?
+      -- todo: should these two operations be here?
+      -- todo: should these two operations be here?
       CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
       CarOperations.setAIThrottleLimit(carIndex, 1) -- remove any speed limit we may have applied while waiting for a gap
 
@@ -278,6 +319,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
       -- local targetSplineOffset = storage.yieldMaxOffset_normalized * sideSign
       -- TODO: limit the target offset when we are approaching a corner or in mid corner!
       -- TODO: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/issues/41
+      -- TODO: also maybe take a look at physics.setExtraAIGrip
       local targetSplineOffset = driveToSideMaxOffset * sideSign
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
 

@@ -12,13 +12,16 @@ end
 
 -- UPDATE FUNCTION
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+    --[===[
     CarOperations.setAICaution(carIndex, 3)
+    --]===]
     CarOperations.setAITopSpeed(carIndex, 50)
-    CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Accelerate, 0.2)
-    CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1)
+    --todo: this pressing of multiple isn't good.  i think you gonna need to write your own limit speed function which fiddles around with the pedals to limit the speed
+    -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 1)
+    -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.5)
+    -- CarOperations.limitTopSpeed(carIndex, 50)
 
     CarOperations.toggleTurningLights(carIndex, ac.TurningLights.Hazards)
-
 end
 
 -- TRANSITION FUNCTION

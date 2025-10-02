@@ -20,9 +20,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     end
 
     --CarOperations.setAICaution(carIndex, 6)
-    CarOperations.setAITopSpeed(carIndex, 50)
-    CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Accelerate, 0.2)
-    --CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.2)
+    CarOperations.setAITopSpeed(carIndex, 10)
+    -- CarOperations.limitTopSpeed(carIndex, 10)
+    -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.3)
+    -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.8)
 
     local car = sortedCarsList[sortedCarsListIndex]
 
@@ -95,6 +96,13 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         targetOffset = carToNavigateAroundLateralOffset * -1
     end
 
+    ----------------------
+    ----------------------
+    -- targetOffset = -10
+    -- physics.setAISplineAbsoluteOffset(carIndex, targetOffset, true)
+    ----------------------
+    ----------------------
+
     local sideToDriveTo = targetOffset < 0 and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
     CarOperations.driveSafelyToSide(carIndex, dt, car, sideToDriveTo, math.abs(targetOffset), 5, true)
 end
@@ -133,7 +141,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- end
     -- end
 
-    -- if we are now past the car we are currently navigating around, and are some distance away from it, return to normal driving
     local carToNavigateAroundIndex = CarManager.cars_navigatingAroundCarIndex[carIndex]
     local carToNavigateAround = ac.getCar(carToNavigateAroundIndex)
     if not carToNavigateAround then
@@ -142,6 +149,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         CarStateMachine.setStateExitReason(carIndex, StateExitReason.CarToNavigateAroundNotFound)
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
     end
+
+    -- if we are now past the car we are currently navigating around, and are some distance away from it, return to normal driving
 
     -- make sure that the car we're navigating around is behind us
     local carToNavigateAroundSplineDistance = carToNavigateAround.splinePosition
@@ -183,7 +192,7 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     CarOperations.removeAICaution(carIndex)
     CarOperations.removeAITopSpeed(carIndex)
-    CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Accelerate)
+    CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
     CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
 
     -- todo: do not clear here because we use it when changing accident

@@ -12,6 +12,7 @@ MathHelpers = require("MathHelpers")
 CarOperations = require("CarOperations")
 CarManager = require("CarManager")
 CameraManager = require("CameraManager")
+
 Strings = require("Strings.Strings")
 Strings_ReasonWhyCantYield = require("Strings.Strings_ReasonWhyCantYield")
 Strings_ReasonWhyCantOvertake = require("Strings.Strings_ReasonWhyCantOvertake")
@@ -32,10 +33,13 @@ CarState_StayingOnOvertakingLane = require("CarStateMachine.States.CarState_Stay
 CarState_EasingOutOvertake = require("CarStateMachine.States.CarState_EasingOutOvertake")
 CarState_NavigatingAroundAccident = require("CarStateMachine.States.CarState_NavigatingAroundAccident")
 CarState_DrivingInYellowFlagZone = require("CarStateMachine.States.CarState_DrivingInYellowFlagZone")
+CarState_AfterCustomAIFloodTeleport = require("CarStateMachine.States.CarState_AfterCustomAIFloodTeleport")
 
 AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
 UIManager = require("UIManager")
+-- CarSpeedLimiter = require("CarSpeedLimiter")
+-- CustomAIFloodManager = require("CustomAIFloodManager")
 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
@@ -103,6 +107,21 @@ function script.MANIFEST__UPDATE(dt)
   local sim = ac.getSim()
   if sim.isPaused then return end
 
+  -------------------
+  -- physics.setAITopSpeed(6,30)
+    -- CarSpeedLimiter.limitTopSpeed(6, 30, dt)
+  --[====[
+  if true then
+    --CarSpeedLimiter.limitTopSpeed(0, 30, dt)
+    CarOperations.setPedalPosition(0, CarOperations.CarPedals.Gas, 0.1)
+    CarOperations.setPedalPosition(0, CarOperations.CarPedals.Brake, 0.01)
+    -- CarOperations.setPedalPosition(0, CarOperations.CarPedals.Clutch, 0.5)
+     -- physics.setAIBrakeHint(0, 1)
+    return
+  end
+  --]====]
+  -------------------
+
   local storage = StorageManager.getStorage()
   local playerCar = ac.getCar(0)
 
@@ -130,6 +149,7 @@ function script.MANIFEST__UPDATE(dt)
   -- end
 
   -- build the sorted car list and do any per-car operations that doesn't require the sorted list
+  ---@type table<integer,ac.StateCar>
   local carList = {}
   for i, car in ac.iterateCars() do
     carList[i] = car
@@ -156,6 +176,7 @@ function script.MANIFEST__UPDATE(dt)
   for i = 1, totalCars do
     local car = sortedCars[i]
     local carIndex = car.index
+    CarManager.sortedCarList_carIndexToSortedIndex[carIndex] = i -- save the mapping of carIndex to sorted list index
     if car.isAIControlled then -- including the player car if it's AI controlled
       -- execute the state machine for this car
       CarStateMachine.updateCar(carIndex, dt, sortedCars, i, storage)
@@ -165,6 +186,11 @@ function script.MANIFEST__UPDATE(dt)
       -- CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
     end
   end
+
+  --[===[
+  local localPlayerSortedCarListIndex = CarManager.sortedCarList_carIndexToSortedIndex[0]
+  CustomAIFloodManager.handleFlood(sortedCars, localPlayerSortedCarListIndex)
+  --]===]
 end
 
 ---
