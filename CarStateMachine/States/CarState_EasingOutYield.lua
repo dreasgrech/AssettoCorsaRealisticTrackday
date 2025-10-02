@@ -27,7 +27,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   CarManager.cars_yieldTime[carIndex] = 0
 
   -- remove the yielding car throttle limit since we will now start easing out the yield
-  CarOperations.setAIThrottleLimit(carIndex, 1)
+  CarOperations.resetAIThrottleLimit(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
 
   -- reset the yielding car caution back to normal

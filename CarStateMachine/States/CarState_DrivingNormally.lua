@@ -25,15 +25,12 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 
       -- turn off turning lights
       CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
-      
-    -- start driving normally
-    -- CarStateMachine.changeState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
 
       -- reset the yielding car caution back to normal
       CarOperations.removeAICaution(carIndex)
 
       -- remove the yielding car throttle limit since we will now be driving normally
-      CarOperations.setAIThrottleLimit(carIndex, 1)
+      CarOperations.resetAIThrottleLimit(carIndex)
       
       CarOperations.setDefaultAIGrip(carIndex)
 end
