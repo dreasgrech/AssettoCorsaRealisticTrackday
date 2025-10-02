@@ -128,14 +128,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
-    -- --  check if we need to yield to a car behind us
-    -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-    -- if newStateDueToCarBehind then
-        -- CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil -- clear reference to the overtaking car since we'll now start yielding to the car behind us
-        -- return newStateDueToCarBehind
-    -- end
-
-    -- check if there's currently a car behind us
+    -- check if there's currently a car behind us which we might need to yield to
     if carBehind then
         -- check if the car behind us is the same car we're overtaking
         local isCarBehindSameAsCarWeAreOvertaking = carBehind.index == currentlyOvertakingCarIndex
