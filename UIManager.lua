@@ -374,7 +374,7 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Handle side checking while yielding/overtaking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
     if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding.') end
 
-    if ui.checkbox('Handle accidents', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
+    if ui.checkbox('Handle accidents (WORK IN PROGRESS)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
 
     if ui.checkbox('Draw Debug Gizmos', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
