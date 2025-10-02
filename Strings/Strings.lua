@@ -1,5 +1,6 @@
 local Strings = {}
 
+---@enum Strings.StringCategories
 Strings.StringCategories = {
     None = 0,
     ReasonWhyCantYield = 1,
@@ -7,6 +8,7 @@ Strings.StringCategories = {
     StateExitReason = 3,
 }
 
+---@type table<Strings.StringCategories,any>
 Strings.StringNames = {}
 Strings.StringValues = {}
 Strings.StringSaveFunctions = {}

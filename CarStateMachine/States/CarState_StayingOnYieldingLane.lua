@@ -54,7 +54,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarsList[sortedCarsListIndex]
       local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
       CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
-      -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1)
+      
+      -- press some brake to help slow down the car a bit because the top speed limit is broken in csp atm in trackday ai flood mode
+      -- Andreas: be careful about this because if the ai keeps on pressing the gas while we're pressing the brake here, the car can spin out...
+      -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1) 
       -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.8)
 
       -- TODO: Here continue driving to the side but using the real offset

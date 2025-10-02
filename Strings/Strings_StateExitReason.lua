@@ -1,5 +1,6 @@
 local STRING_CATEGORY = Strings.StringCategories.StateExitReason
 
+---@enum Strings.StringNames.StringCategories.StateExitReason
 local stringNames = {
     None = 0,
     YieldingToCar = 1,

@@ -146,6 +146,15 @@ UIManager.drawMainWindowContent = function()
       end
 
       local carInput = ac.overrideCarControls(carIndex)
+      local carInputClutch = -1
+      local carInputGas = -1
+      local carInputBrake = -1
+      if carInput then
+        carInputClutch = carInput.clutch
+        carInputGas = carInput.gas
+        carInputBrake = carInput.brake
+      end
+
       local currentlyYieldingCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
       local currentlyYielding = currentlyYieldingCarIndex
       local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
@@ -161,8 +170,7 @@ UIManager.drawMainWindowContent = function()
       -- local lastStateExitReason = CarManager.cars_statesExitReason[carIndex][previousCarState] or ''
       local lastStateExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousCarState]) or ''
 
-      -- local trackUpcomingTurn = ac.getTrackUpcomingTurn(carIndex)
-      local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)
+      -- local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)
 
       local carSplinePosition = car.splinePosition
       local trackAISplineSides = ac.getTrackAISplineSides(carSplinePosition)
@@ -220,7 +228,7 @@ UIManager.drawMainWindowContent = function()
       -- ui.textColored(string.format("%.3f", trackUpcomingTurn.x, uiColor)); ui.nextColumn()
       -- ui.textColored(string.format("%.3f", distanceToUpcomingTurn, uiColor)); ui.nextColumn()
       -- ui.textColored(string.format("%.3f", trackUpcomingTurn.y, uiColor)); ui.nextColumn()
-      ui.textColored(string.format("%.1f|%.1f|%.1f", carInput.clutch, carInput.brake, carInput.gas), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.1f|%.1f|%.1f", carInputClutch, carInputBrake, carInputGas), uiColor); ui.nextColumn()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
