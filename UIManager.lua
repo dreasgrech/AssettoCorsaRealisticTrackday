@@ -395,10 +395,10 @@ function UIManager.renderUIOptionsControls()
     storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, 5, 90)
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
 
-    storage.rampSpeed_mps =  ui.slider('Yield Offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
+    storage.rampSpeed_mps =  ui.slider('Yield offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when yielding.') end
 
-    storage.rampRelease_mps =  ui.slider('Offset release (m/s)', storage.rampRelease_mps, 0.1, 3.0)
+    storage.rampRelease_mps =  ui.slider('Yield offset release (m/s)', storage.rampRelease_mps, 0.1, 3.0)
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset returns to normal once an overtaking car has fully driven past the yielding car.') end
 
     ui.separator()

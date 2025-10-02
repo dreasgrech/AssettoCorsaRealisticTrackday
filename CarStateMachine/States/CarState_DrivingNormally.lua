@@ -53,6 +53,13 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
       local car = sortedCarsList[sortedCarsListIndex]
 
+      -- don't do anything if we're in the pits
+      -- TODO: This should be changed such that being in pits should have it's own separate state for the state machine
+      local areWeInPits = CarOperations.isCarInPits(car)
+      if areWeInPits then
+        return
+      end
+
       -- if not carBehind then
         -- CarManager.cars_reasonWhyCantYield[carIndex] = 'No overtaking car so not yielding'
         -- return
