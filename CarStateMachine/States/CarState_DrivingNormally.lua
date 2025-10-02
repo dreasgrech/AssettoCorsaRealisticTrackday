@@ -7,6 +7,11 @@ local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitRe
 local ReasonWhyCantYield = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield]
 
 -- ENTRY FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
       CarManager.cars_yieldTime[carIndex] = 0
       CarManager.cars_currentSplineOffset[carIndex] = 0
@@ -40,6 +45,11 @@ end
 
 -- TRANSITION FUNCTION
 -- CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
 
@@ -92,6 +102,11 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 end
 
 -- EXIT FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)

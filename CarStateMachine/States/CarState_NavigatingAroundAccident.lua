@@ -11,6 +11,11 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 end
 
 -- UPDATE FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     local accidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
     if accidentIndex == 0 then
@@ -108,6 +113,11 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 end
 
 -- TRANSITION FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     local accidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
     if accidentIndex == 0 then
@@ -189,6 +199,11 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 end
 
 -- EXIT FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     CarOperations.removeAICaution(carIndex)
     CarOperations.removeAITopSpeed(carIndex)

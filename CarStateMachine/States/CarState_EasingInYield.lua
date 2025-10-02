@@ -6,6 +6,11 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
 -- ENTRY FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
   -- make sure the state before us has saved the carIndex of the car we're yielding to
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
@@ -32,6 +37,11 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 end
 
 -- UPDATE FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       local car = sortedCarList[sortedCarListIndex]
       local yieldSide = RaceTrackManager.getYieldingSide()
@@ -59,6 +69,11 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 end
 
 -- TRANSITION FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       local car = sortedCarList[sortedCarListIndex]
       -- local carBehind = sortedCarList[sortedCarListIndex + 1]
@@ -103,6 +118,11 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 end
 
 -- EXIT FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
     CarOperations.resetAIThrottleLimit(carIndex)

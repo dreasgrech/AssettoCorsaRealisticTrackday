@@ -19,6 +19,11 @@ local AICAUTION_WHILE_YIELDING = 4 -- the AI caution level while yielding
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
 -- ENTRY FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
   -- make sure the state before us has saved the carIndex of the car we're yielding to
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
@@ -31,6 +36,11 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 end
 
 -- UPDATE FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       -- local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
@@ -67,6 +77,11 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 end
 
 -- TRANSITION FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       local car = sortedCarsList[sortedCarsListIndex]
 
@@ -148,6 +163,11 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 end
 
 -- EXIT FUNCTION
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
   CarOperations.removeAICaution(carIndex)
   CarOperations.removeAITopSpeed(carIndex)
