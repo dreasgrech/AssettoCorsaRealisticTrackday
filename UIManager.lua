@@ -70,6 +70,8 @@ for i, col in ipairs(carTableColumns_dataBeforeDoD) do
   carTableColumns_tooltip[i] = col.tooltip
 end
 
+carTableColumns_dataBeforeDoD = nil  -- free memory
+
 UIManager.drawMainWindowContent = function()
   local storage = StorageManager.getStorage()
   ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
@@ -379,26 +381,26 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Handle side checking while yielding/overtaking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
     if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding/overtaking.') end
 
-    storage.defaultAICaution =  ui.slider('Default AI Caution', storage.defaultAICaution, 3, 16) -- do not drop the minimum below 2 because 1 is used while overtaking
+    storage.defaultAICaution =  ui.slider('Default AI Caution', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution]) -- do not drop the minimum below 2 because 1 is used while overtaking
     if ui.itemHovered() then ui.setTooltip('Base AI caution level (higher = more cautious, slower but less accident prone).') end
 
-    storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, 0.1, 1.0)
+    storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, StorageManager.options_min[StorageManager.Options.MaxLateralOffset_normalized], StorageManager.options_max[StorageManager.Options.MaxLateralOffset_normalized])
     if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
 
-    storage.clearAhead_meters = ui.slider('The distance (m) which determines whether a car is far enough ahead of another car', storage.clearAhead_meters, 4, 20)
+    storage.clearAhead_meters = ui.slider('The distance (m) which determines whether a car is far enough ahead of another car', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters])
     if ui.itemHovered() then ui.setTooltip('When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.'); end
 
     ui.separator()
 
     ui.text('Yielding')
 
-    storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, 5, 90)
+    storage.detectCarBehind_meters =  ui.slider('Detect radius (m)', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters])
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
 
-    storage.rampSpeed_mps =  ui.slider('Yield offset ramp (m/s)', storage.rampSpeed_mps, 0.1, 3.0)
+    storage.rampSpeed_mps =  ui.slider('Yield offset ramp (m/s)', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps])
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when yielding.') end
 
-    storage.rampRelease_mps =  ui.slider('Yield offset release (m/s)', storage.rampRelease_mps, 0.1, 3.0)
+    storage.rampRelease_mps =  ui.slider('Yield offset release (m/s)', storage.rampRelease_mps, StorageManager.options_min[StorageManager.Options.RampRelease_mps], StorageManager.options_max[StorageManager.Options.RampRelease_mps])
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset returns to normal once an overtaking car has fully driven past the yielding car.') end
 
     ui.separator()
@@ -408,10 +410,10 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Handle overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
 
-    storage.overtakeRampSpeed_mps =  ui.slider('Overtake offset ramp (m/s)', storage.overtakeRampSpeed_mps, 0.1, 3.0)
+    storage.overtakeRampSpeed_mps =  ui.slider('Overtake offset ramp (m/s)', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps])
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset ramps up when overtaking another car.') end
 
-    storage.overtakeRampRelease_mps =  ui.slider('Overtake offset release (m/s)', storage.overtakeRampRelease_mps, 0.1, 3.0)
+    storage.overtakeRampRelease_mps =  ui.slider('Overtake offset release (m/s)', storage.overtakeRampRelease_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampRelease_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampRelease_mps])
     if ui.itemHovered() then ui.setTooltip('How quickly the side offset returns to normal once an overtaking car has fully driven past the overtaken car.') end
 
     ui.separator()
