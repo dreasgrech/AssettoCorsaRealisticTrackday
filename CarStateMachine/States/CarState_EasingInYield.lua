@@ -34,7 +34,7 @@ end
 -- UPDATE FUNCTION
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
       local car = sortedCarList[sortedCarListIndex]
-      local yieldSide = storage.yieldSide
+      local yieldSide = RaceTrackManager.getYieldingSide()
 
       local targetOffset = storage.maxLateralOffset_normalized
       local rampSpeed_mps = storage.rampSpeed_mps

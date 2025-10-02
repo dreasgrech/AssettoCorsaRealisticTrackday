@@ -38,45 +38,18 @@ end
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarListIndex, storage)
       local car = sortedCarsList[sortedCarListIndex]
 
-      -- local yieldSide = storage.yieldSide
-      local yieldSide = RaceTrackManager.getYieldingSide()
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
-      local easeOutYieldSide = (yieldSide == RaceTrackManager.TrackSide.LEFT) and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
+      local easeOutYieldSide = RaceTrackManager.getOvertakingSide() -- always ease out yield to the overtaking side
       local targetOffset = 0
       local rampSpeed_mps = storage.rampRelease_mps
       local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
       -- can't ease out yield because the side is blocked, just wait
       if not droveSafelyToSide then
-        -- -- isSafeToDriveToTheSide already logs the reason why we can't yield
-        -- -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
-        -- return
+        -- Andreas: isSafeToDriveToTheSide already logs the reason why we can't yield
+        -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
         return
       end
-
-      -- local sideSafeToYield = CarStateMachine.isSafeToDriveToTheSide(carIndex, easeOutYieldSide)
-      -- if not sideSafeToYield then
-        -- -- isSafeToDriveToTheSide already logs the reason why we can't yield
-        -- -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
-        -- return
-      -- end
-
-      -- -- todo move the targetsplineoffset assignment to trying to start easing out yield state?
-      -- local targetSplineOffset = 0
-      -- local splineOffsetTransitionSpeed = storage.rampRelease_mps
-      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-      -- currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
-
-      -- -- set the spline offset on the yielding car
-      -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
-      -- physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
-
-      -- -- keep inverted turning lights on while easing out yield (inverted yield direction since the car is now going back to center)
-      -- local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
-      -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
-
-      -- CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
-      -- CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 end
 
 -- TRANSITION FUNCTION

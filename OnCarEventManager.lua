@@ -8,13 +8,16 @@ local OnCarEventType = {
 
 local onCarEventExecutions = {
     [OnCarEventType.Collision] = function (carIndex)
-      -- Register an accident for the car collision
-      local accidentIndex = AccidentManager.registerCollision(carIndex)
-      if not accidentIndex then
-          return
-      end
+        local storage = StorageManager.getStorage()
+        if storage.handleAccidents then
+            -- Register an accident for the car collision
+            local accidentIndex = AccidentManager.registerCollision(carIndex)
+            if not accidentIndex then
+                return
+            end
 
-      CarStateMachine.informAboutAccident(accidentIndex)
+            CarStateMachine.informAboutAccident(accidentIndex)
+        end
     end,
     [OnCarEventType.Jumped] = function (carIndex)
       -- Inform the accident manager about the car reset

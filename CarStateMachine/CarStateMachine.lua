@@ -135,7 +135,6 @@ CarStateMachine.states_updateFunctions = {}
 CarStateMachine.states_transitionFunctions = {}
 CarStateMachine.states_exitFunctions = {}
 
--- todo: wip
 local queuedCollidedWithTrackAccidents = QueueManager.createQueue()
 local queuedCollidedWithCarAccidents = QueueManager.createQueue()
 local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()

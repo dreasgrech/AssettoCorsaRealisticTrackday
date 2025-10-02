@@ -56,10 +56,6 @@ AccidentManager.informAboutCarReset = function(carIndex)
 end
 
 AccidentManager.registerCollision = function(culpritCarIndex)
-    -- local storage = StorageManager.getStorage()
-    -- if not storage.handleAccidents then
-        -- return
-    -- end
 
     -- TODO: need to handle what happens when a player car is the culprit car
     -- TODO: need to handle what happens when a player car is the culprit car
@@ -95,18 +91,12 @@ AccidentManager.registerCollision = function(culpritCarIndex)
         --Logger.warn(string.format("#%d collided with the track but ignoring track collisions for now", culpritCarIndex))
         return
     end
-    
-    -- if the car didn’t collide with the track, we need to subtract 1 from the index to get the actual car index since colliderWidth 0 is track
-    -- if not collidedWithTrack then
-        collidedWith = collidedWith - 1
-    -- end
+
+    -- we need to subtract 1 from the index to get the actual car index since colliderWidth 0 is track
+    collidedWith = collidedWith - 1
 
     -- ac.areCarsColliding
     -- physics.setCarBodyDamage(carIndex, bodyDamage)
-
-    -- length of table: #tableName
-
-    -- local collisionCarAccidentsInvolvedIn = CarManager.cars_culpritInAccident[culpritCarIndex]
 
     local collidedWithAnotherCar = not collidedWithTrack
     if collidedWithAnotherCar then
@@ -126,13 +116,10 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     end
 
     -- register a new accident
-    -- lastAccidentIndexCreated = lastAccidentIndexCreated + 1
-    -- local accidentIndex = lastAccidentIndexCreated
     local accidentIndex = CompletableIndexCollectionManager.incrementLastIndexCreated(accidentCompletableIndex)
 
     local carSplinePosition = culpritCar.splinePosition
 
-    -- todo: also save the track spline progress
     AccidentManager.accidents_carIndex[accidentIndex] = culpritCarIndex
     AccidentManager.accidents_worldPosition[accidentIndex] = culpritCar.position
     AccidentManager.accidents_splinePosition[accidentIndex] = carSplinePosition
@@ -171,8 +158,6 @@ AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident
     local carSplinePosition = car.splinePosition
     local carWorldPosition = car.position
 
-    -- TODO: the return of this loop is not considering all the accidents!  it's just using the first one
-
     --[====[
     * For all accidents that are not yet resolved
         * Check which car (culprit or victim) is closest to our car
@@ -183,9 +168,6 @@ AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident
 
     --]====]
 
-    -- TODO: Are you sure there's isn't a better way of doing this?  Such as using the sortedCarList and find the next car that is in an accident??
-    -- TODO: Are you sure there's isn't a better way of doing this?  Such as using the sortedCarList and find the next car that is in an accident??
-    -- TODO: Are you sure there's isn't a better way of doing this?  Such as using the sortedCarList and find the next car that is in an accident??
     -- TODO: Are you sure there's isn't a better way of doing this?  Such as using the sortedCarList and find the next car that is in an accident??
 
     local currentClosestAccidentIndex = nil
@@ -255,58 +237,9 @@ AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident
                     end
                 end
             end
-
---[=====[
-            -- local culpritCarSplinePosition = 
-
-            -- check which car is closest to our car by comparing spline positions
-            local culpritCarSplineDistance = math.huge
-            local victimCarSplineDistance = math.huge
-            if culpritCar then
-                culpritCarSplineDistance = math.abs(carSplinePosition - culpritCar.splinePosition)
-            end
-            if victimCar then
-                victimCarSplineDistance = math.abs(carSplinePosition - victimCar.splinePosition)
-            end
-
-            -- local culpritCarSplineDistance = math.abs(carSplinePosition - culpritCar.splinePosition)
-            -- local victimCarSplineDistance = math.abs(carSplinePosition - victimCar.splinePosition)
-            if culpritCarSplineDistance < victimCarSplineDistance then
-                closestCar = culpritCar
-                closestCarSplineDistance = culpritCarSplineDistance
-            else
-                closestCar = victimCar
-                closestCarSplineDistance = victimCarSplineDistance
-            end
-
-            -- TODO: need to make sure that the car hasn't already passed the closest car spline position!!!
-            -- TODO: need to make sure that the car hasn't already passed the closest car spline position!!!
-            -- TODO: need to make sure that the car hasn't already passed the closest car spline position!!!
-            -- TODO: need to make sure that the car hasn't already passed the closest car spline position!!!
-
-            -- todo: get this 0.02 value out of here!!
-            if closestCar and closestCarSplineDistance < 0.02 then
-                local closestCarIndex = closestCar.index
-                return accidentIndex, closestCarIndex
-            end
-
-            --[===[
-            -- TODO: THIS IS NOT GOOD BECAUSE THE ACCIDENT POSITION IS POINTLESS
-            -- TODO: WE NEED TO CHECK BOTH POSITIONS OF THE CARS THAT ARE INVOLVED IN THE ACCIDENT
-            local accidentSplinePosition = AccidentManager.accidents_splinePosition[i]
-            local carIsCloseButHasntYetPassedTheAccidentPosition =
-                carSplinePosition < accidentSplinePosition and
-                accidentSplinePosition - carSplinePosition < 0.02
-
-            if carIsCloseButHasntYetPassedTheAccidentPosition then
-                return i
-            end
-            --]===]
---]=====]
         end
     end
 
-    -- return nil, -1
     return currentClosestAccidentIndex, currentClosestAccidentClosestCarIndex
 end
 

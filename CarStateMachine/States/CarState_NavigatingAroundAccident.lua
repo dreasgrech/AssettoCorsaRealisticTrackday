@@ -195,6 +195,6 @@ CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCars
     CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
     CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
 
-    -- todo: do not clear here because we use it when changing accident
+    -- Andreas: do not clear here because we use it when changing accident
     -- CarManager.cars_navigatingAroundAccidentIndex[carIndex] = 0
 end

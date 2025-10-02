@@ -65,21 +65,17 @@ end
 -- Monitor car collisions so we can register an accident
 ac.onCarCollision(-1, function (carIndex)
     if (not shouldAppRun()) then return end
-    local storage = StorageManager.getStorage()
-    if not storage.handleAccidents then
-        return
-    end
+    local car = ac.getCar(carIndex)
+    if not car then return end
 
     OnCarEventManager.enqueueOnCarEvent(OnCarEventManager.OnCarEventType.Collision, carIndex)
 end)
 
 -- Monitor flood ai cars cycle event so that we also reset our state
 ac.onCarJumped(-1, function(carIndex)
-  if (not shouldAppRun()) then return end
-  local car = ac.getCar(carIndex)
-  if not car then
-    return
-  end
+    if (not shouldAppRun()) then return end
+    local car = ac.getCar(carIndex)
+    if not car then return end
 
     OnCarEventManager.enqueueOnCarEvent(OnCarEventManager.OnCarEventType.Jumped, carIndex)
 end)
