@@ -1,4 +1,3 @@
---[==========[
 local CustomAIFloodManager = {}
 
 --[===[
@@ -112,7 +111,9 @@ end
 ---@param sortedCarListMainCarIndex number
 CustomAIFloodManager.handleFlood = function(sortedCarList, sortedCarListMainCarIndex)
   local storage = StorageManager.getStorage()
-  if not storage.customAIFlood_enabled then
+  -- TODO: Andreas: Disabling the custom flood manager for now because of the issues mentioned in the comment at the top of this file
+  -- if not storage.customAIFlood_enabled then
+  if true then
     return
   end
 
@@ -194,4 +195,3 @@ CustomAIFloodManager.handleFlood = function(sortedCarList, sortedCarListMainCarI
 end
 
 return CustomAIFloodManager
---]==========]

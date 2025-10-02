@@ -21,9 +21,9 @@ local onCarEventExecutions = {
       AccidentManager.informAboutCarReset(carIndex)
 
       -- finally reset all our car data
-      -- if not CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] then
+      if not CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] then
         CarManager.setInitializedDefaults(carIndex)
-      -- end
+      end
     end,
 }
 

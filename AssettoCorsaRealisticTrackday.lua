@@ -39,7 +39,7 @@ AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
 UIManager = require("UIManager")
 -- CarSpeedLimiter = require("CarSpeedLimiter")
--- CustomAIFloodManager = require("CustomAIFloodManager")
+CustomAIFloodManager = require("CustomAIFloodManager")
 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
@@ -187,10 +187,8 @@ function script.MANIFEST__UPDATE(dt)
     end
   end
 
-  --[===[
   local localPlayerSortedCarListIndex = CarManager.sortedCarList_carIndexToSortedIndex[0]
   CustomAIFloodManager.handleFlood(sortedCars, localPlayerSortedCarListIndex)
-  --]===]
 end
 
 ---

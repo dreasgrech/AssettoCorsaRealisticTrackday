@@ -20,9 +20,9 @@ local StorageManager = {}
 ---@field minAISpeed_kmh number
 ---@field distanceFromAccidentToSeeYellowFlag_meters number
 ---@field distanceToStartNavigatingAroundCarInAccident_meters number
--- ---@field customAIFlood_enabled boolean
--- ---@field customAIFlood_distanceBehindPlayerToCycle_meters number
--- ---@field customAIFlood_distanceAheadOfPlayerToCycle_meters number
+---@field customAIFlood_enabled boolean
+---@field customAIFlood_distanceBehindPlayerToCycle_meters number
+---@field customAIFlood_distanceAheadOfPlayerToCycle_meters number
 
 ---@type StorageTable
 local storageTable = {
@@ -46,9 +46,9 @@ local storageTable = {
     minAISpeed_kmh = 35.0,
     distanceFromAccidentToSeeYellowFlag_meters = 200.0,
     distanceToStartNavigatingAroundCarInAccident_meters = 30.0,
-    -- customAIFlood_enabled = true,
-    -- customAIFlood_distanceBehindPlayerToCycle_meters = 200,
-    -- customAIFlood_distanceAheadOfPlayerToCycle_meters = 100,
+    customAIFlood_enabled = false,
+    customAIFlood_distanceBehindPlayerToCycle_meters = 200,
+    customAIFlood_distanceAheadOfPlayerToCycle_meters = 100,
 }
 
 local storage = ac.storage(storageTable)

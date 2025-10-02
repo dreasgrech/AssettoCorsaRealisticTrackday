@@ -1,4 +1,3 @@
---[==========[
 local STATE = CarStateMachine.CarStateType.AFTER_CUSTOMAIFLOOD_TELEPORT
 
 --[===[
@@ -13,6 +12,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
       physics.setCarFuel(carIndex, 100)
       physics.engageGear(carIndex, 3)
       physics.setEngineRPM(carIndex, 5000)
+      physics.setAIStopCounter(carIndex, 0)
 end
 
 -- UPDATE FUNCTION
@@ -26,6 +26,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       -- physics.addForce
       physics.awakeCar(carIndex)
       physics.setAINoInput(carIndex, false, false)
+      physics.setAIStopCounter(carIndex, 0)
       -- physics.setCarFuel(carIndex, 100)
       -- physics.engageGear(carIndex, 3)
       -- physics.setEngineRPM(carIndex, 5000)
@@ -42,10 +43,10 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- return CarStateMachine.CarStateType.DRIVING_NORMALLY
     -- end
 
-    local timeInCurrentState =CarManager.cars_timeInCurrentState[carIndex]
-    if timeInCurrentState > 20.0 then
-        return CarStateMachine.CarStateType.DRIVING_NORMALLY
-    end
+    -- local timeInCurrentState =CarManager.cars_timeInCurrentState[carIndex]
+    -- if timeInCurrentState > 20.0 then
+        -- return CarStateMachine.CarStateType.DRIVING_NORMALLY
+    -- end
 end
 
 -- EXIT FUNCTION
@@ -55,4 +56,3 @@ CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCars
 
       CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] = false
 end
---]==========]
