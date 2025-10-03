@@ -294,7 +294,7 @@ function CarOperations.stopCarAfterAccident(carIndex)
     CarOperations.setAITopSpeed(carIndex, 0)
     CarOperations.setAIStopCounter(carIndex, 1)
     CarOperations.setGentleStop(carIndex, true)
-    CarOperations.setAICaution(carIndex, 16) -- be very cautious
+    CarOperations.setAICaution(carIndex, CarManager.AICautionValues.AFTER_ACCIDENT) -- be very cautious
 
     physics.preventAIFromRetiring(carIndex)
 end
@@ -420,7 +420,7 @@ CarOperations.calculateAICautionWhileOvertaking = function(overtakingCar, yieldi
     local overtakingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(overtakingCar.position)
 
     -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
-    local aiCaution = CarManager.AICautionValues.WHILE_OVERTAKING
+    local aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
 
     -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
     if yieldingCar then
@@ -429,7 +429,7 @@ CarOperations.calculateAICautionWhileOvertaking = function(overtakingCar, yieldi
         local lateralOffsetsDelta = math.abs(overtakingCarTrackLateralOffset - yieldingCarTrackLateralOffset)
         if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
             -- aiCaution = AICAUTION_WHILE_OVERTAKING_AND_NO_OBSTACLE_INFRONT
-            aiCaution = CarManager.AICautionValues.OVERTAKING_AND_NO_OBSTACLE_INFRONT
+            aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
         end
     end
 
@@ -437,7 +437,7 @@ CarOperations.calculateAICautionWhileOvertaking = function(overtakingCar, yieldi
     local overtakingCarIndex = overtakingCar.index
     local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(overtakingCarIndex)
     if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION then
-        aiCaution = CarManager.AICautionValues.WHILE_INCORNER
+        aiCaution = CarManager.AICautionValues.OVERTAKING_WHILE_INCORNER
     end
 
     return aiCaution

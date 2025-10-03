@@ -40,7 +40,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
     { name = StorageManager.Options.MaxLateralOffset_normalized, default=0.8, min=0.1, max=1.0 },
 
-    { name = StorageManager.Options.DetectCarBehind_meters, default=70, min=5, max=90 },
+    { name = StorageManager.Options.DetectCarBehind_meters, default=70, min=10, max=90 },
     { name = StorageManager.Options.RampSpeed_mps, default=0.5, min=0.1, max=3.0 },
     { name = StorageManager.Options.RampRelease_mps, default=0.3, min=0.1, max=3.0 },
 

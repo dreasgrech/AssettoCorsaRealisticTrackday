@@ -69,10 +69,13 @@ for i, car in ac.iterateCars() do
 end
 
 ---@enum CarManager.AICautionValues
+---Holds the different AI Caution levels used in different situations
 CarManager.AICautionValues = {
-  OVERTAKING_AND_NO_OBSTACLE_INFRONT = 0,
-  WHILE_OVERTAKING = 1,
-  WHILE_INCORNER = 2
+  OVERTAKING_WITH_NO_OBSTACLE_INFRONT = 0,
+  OVERTAKING_WITH_OBSTACLE_INFRONT = 1,
+  OVERTAKING_WHILE_INCORNER = 2,
+  YIELDING = 4,
+  AFTER_ACCIDENT = 16
 }
 
 ---Sets all the default values for a car
