@@ -96,6 +96,14 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         end
       end
 
+      -- If there's a different car to the one we're currently overtaking in front of us, check if we can overtake it as well
+      local newStateDueToOvertakingNextCar = CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking(carIndex, car, carFront, carBehind, storage, currentlyOvertakingCarIndex)
+      if newStateDueToOvertakingNextCar then
+          CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
+          -- return newStateDueToOvertakingNextCar
+          return CarStateMachine.CarStateType.EASING_IN_OVERTAKE -- since we're currently easing out overtake, we need to go to easing in overtake first before going to staying on overtaking lane
+      end
+
       -- if we're back to the center, return to normal driving
       -- -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
       -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
