@@ -410,6 +410,39 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
       return true
 end
 
+local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level
+
+---Calculated the overtaking car's ai caution value while overtaking another car.
+---@param overtakingCar ac.StateCar
+---@param yieldingCar ac.StateCar?
+---@return integer
+CarOperations.calculateAICautionWhileOvertaking = function(overtakingCar, yieldingCar)
+    local overtakingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(overtakingCar.position)
+
+    -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
+    local aiCaution = CarManager.AICautionValues.WHILE_OVERTAKING
+
+    -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
+    if yieldingCar then
+        -- if the car in front of us is not in front of us, we can drop the caution to 0 to speed up overtaking
+        local yieldingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(yieldingCar.position)
+        local lateralOffsetsDelta = math.abs(overtakingCarTrackLateralOffset - yieldingCarTrackLateralOffset)
+        if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
+            -- aiCaution = AICAUTION_WHILE_OVERTAKING_AND_NO_OBSTACLE_INFRONT
+            aiCaution = CarManager.AICautionValues.OVERTAKING_AND_NO_OBSTACLE_INFRONT
+        end
+    end
+
+    -- If an upcoming corner is coming , increase the caution a bit so that we don't go flying off the track
+    local overtakingCarIndex = overtakingCar.index
+    local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(overtakingCarIndex)
+    if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION then
+        aiCaution = CarManager.AICautionValues.WHILE_INCORNER
+    end
+
+    return aiCaution
+end
+
 -- Returns the six lateral anchor points plus some helpers
 ---@return table
 -- local getSideAnchorPoints = function(carPosition, carForward, carLeft, carUp, halfAABBSize)

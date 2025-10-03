@@ -5,13 +5,6 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
--- todo: these need to be extracted to one place
-local AICAUTION_WHILE_OVERTAKING_AND_NO_OBSTACLE_INFRONT = 0
-local AICAUTION_WHILE_OVERTAKING = 1
-local AICAUTION_WHILE_INCORNER = 2
-
-local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_CAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level
-
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
 
@@ -27,30 +20,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- make the driver more aggressive while overtaking
     -- CarOperations.setAICaution(carIndex, 0) -- andreas: commenting this because they get way too aggressive
 
+    -- set the ai caution while we're overtaking
     local car = sortedCarsList[sortedCarsListIndex]
-    local carTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
-
-    -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
-    local aiCaution = AICAUTION_WHILE_OVERTAKING
-
-    -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
     local carFront = sortedCarsList[sortedCarsListIndex - 1]
-    if carFront then
-        -- if the car in front of us is not in front of us, we can drop the caution to 0 to speed up overtaking
-        local carFrontTrackLateralOffset = CarManager.getActualTrackLateralOffset(carFront.position)
-        local lateralOffsetsDelta = math.abs(carTrackLateralOffset - carFrontTrackLateralOffset)
-        if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
-            aiCaution = AICAUTION_WHILE_OVERTAKING_AND_NO_OBSTACLE_INFRONT
-        end
-    end
-
-    -- If an upcoming corner is coming , increase the caution a bit so that we don't go flying off the track
-    local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)
-    if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_CAUTION then
-        aiCaution = AICAUTION_WHILE_INCORNER
-    end
-
-    -- set the ai caution based on our calculations above
+    local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
     CarOperations.setAICaution(carIndex, aiCaution)
 end
 

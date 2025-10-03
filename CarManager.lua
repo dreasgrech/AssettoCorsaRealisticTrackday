@@ -63,10 +63,17 @@ CarManager.sortedCarList_carIndexToSortedIndex = {} -- [carIndex] = sortedListIn
 -- local evacuating = {}
 
 -- calculate the max top speeds of each car
-  for i, car in ac.iterateCars() do
-    local carIndex = car.index
-    CarManager.cars_MAXTOPSPEED[carIndex] = CarOperations.calculateMaxTopSpeed(carIndex)
-  end
+for i, car in ac.iterateCars() do
+  local carIndex = car.index
+  CarManager.cars_MAXTOPSPEED[carIndex] = CarOperations.calculateMaxTopSpeed(carIndex)
+end
+
+---@enum CarManager.AICautionValues
+CarManager.AICautionValues = {
+  OVERTAKING_AND_NO_OBSTACLE_INFRONT = 0,
+  WHILE_OVERTAKING = 1,
+  WHILE_INCORNER = 2
+}
 
 ---Sets all the default values for a car
 ---@param carIndex number
