@@ -78,6 +78,12 @@ CarManager.AICautionValues = {
   AFTER_ACCIDENT = 16
 }
 
+---@enum CarManager.GripValues
+CarManager.GripValues = {
+  NORMAL = 1, -- todo: physics.setExtraAIGrip says that the default value is 1 but also says that AI cars have 120% grip
+  DRIVING_TO_THE_SIDE = 1.3
+}
+
 ---Sets all the default values for a car
 ---@param carIndex number
 CarManager.setInitializedDefaults = function(carIndex)
