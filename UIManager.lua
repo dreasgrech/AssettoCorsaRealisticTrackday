@@ -34,6 +34,7 @@ local carTableColumns_dataBeforeDoD = {
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
   { name = 'SplinePosition', orderDirection = 0, width = 70, tooltip='Spline Position' },
   { name = 'SplineSides', orderDirection = 0, width = 85, tooltip='Spline Sides' },
+  -- { name = 'MaxSpeed', orderDirection = 0, width = 70, tooltip='Max Speed' },
   { name = 'Speed', orderDirection = 0, width = 70, tooltip='Current velocity' },
   { name = 'AverageSpeed', orderDirection = 0, width = 100, tooltip='Average speed' },
   { name = 'RealOffset', orderDirection = 0, width = 75, tooltip='Actual Lateral offset from centerline' },
@@ -222,6 +223,7 @@ UIManager.drawMainWindowContent = function()
       -- ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", carSplinePosition), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.2f|%.2f", trackAISplineSides.x, trackAISplineSides.y), uiColor); ui.nextColumn()
+      -- ui.textColored(string.format("%d km/h", CarManager.cars_MAXTOPSPEED[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d km/h", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%d km/h", math.floor(CarManager.cars_averageSpeedKmh[carIndex] or 0)), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.3f", actualTrackLateralOffset), uiColor); ui.nextColumn()

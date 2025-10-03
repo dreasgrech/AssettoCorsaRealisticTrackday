@@ -6,6 +6,7 @@ local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 local CAR_SPEEDS_BUFFER_SIZE = 600
 
 CarManager.cars_initialized = {}
+CarManager.cars_MAXTOPSPEED = {} -- do not reset this
 
 CarManager.cars_currentSplineOffset = {}
 CarManager.cars_targetSplineOffset = {}
@@ -60,6 +61,12 @@ CarManager.sortedCarList_carIndexToSortedIndex = {} -- [carIndex] = sortedListIn
 
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
+
+-- calculate the max top speeds of each car
+  for i, car in ac.iterateCars() do
+    local carIndex = car.index
+    CarManager.cars_MAXTOPSPEED[carIndex] = CarOperations.calculateMaxTopSpeed(carIndex)
+  end
 
 ---Sets all the default values for a car
 ---@param carIndex number

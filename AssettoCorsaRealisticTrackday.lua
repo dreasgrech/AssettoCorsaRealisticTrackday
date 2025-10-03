@@ -155,6 +155,10 @@ function script.MANIFEST__UPDATE(dt)
 
     CarManager.saveCarSpeed(car)
 
+    -- clear the reason why we can't yield/overtake for this car, we'll resave it below if needed
+    CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
+    CarStateMachine.setReasonWhyCantOvertake(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantOvertake].None)
+
     -- local isCarComingUpToAccident = AccidentManager.isCarComingUpToAccident(car)
     -- if isCarComingUpToAccident then
     -- end

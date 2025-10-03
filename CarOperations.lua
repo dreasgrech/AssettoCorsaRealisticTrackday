@@ -716,6 +716,23 @@ CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH = function(carIndex)
   end
 end
 
+--- Calculates the maximum top speed of the car by checking all gears.
+--- Andreas: This is a bit pointless because family cars were returning higher speeds than gt3 cars with this
+---@param carIndex integer
+---@return number
+CarOperations.calculateMaxTopSpeed = function(carIndex)
+  local car = ac.getCar(carIndex)
+  if not car then return 0 end
+
+  -- todo: could you just use highest gear available instead of checking all gears?
+  local maxSpeed = 0
+  local gearCount = car.gearCount
+  for gearIndex = 1, gearCount do
+    maxSpeed = math.max(maxSpeed, ac.getCarMaxSpeedWithGear(carIndex, gearIndex))
+  end
+  return maxSpeed
+end
+
 -- CarOperations.renderCarBlockCheckRays_PARALLELLINES = function(carIndex)
   -- local car = ac.getCar(carIndex)
   -- if not car then return end
