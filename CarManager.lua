@@ -259,6 +259,12 @@ function CarManager.saveCarSpeed(car)
   local carIndex = car.index
   local currentSpeedKmh = car.speedKmh
 
+  -- don't record the speed if the car is barely moving or stopped
+  local carStopped = currentSpeedKmh < 1
+  if carStopped then
+    return
+  end
+
   local currentSpeedBufferIndex = CarManager.cars_speedBufferIndex[carIndex]
   local speedThatWillBeReplaced = CarManager.cars_speedBuffer[carIndex][currentSpeedBufferIndex] or 0
   local speedBufferTotal = CarManager.cars_speedBufferTotal[carIndex]
