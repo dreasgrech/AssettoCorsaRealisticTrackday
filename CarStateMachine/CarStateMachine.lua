@@ -53,6 +53,8 @@ local debug_state = CarStateMachine.CarStateType.DRIVING_NORMALLY
 ac.log(string.format("CarStateMachine debug_state = %d", debug_state))
 --]====]
 
+local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+
 local changeState = function(carIndex, newState)
     -- save a reference to the current state before changing it
     local currentState = CarStateMachine.getCurrentState(carIndex)
@@ -329,6 +331,32 @@ CarStateMachine.handleYellowFlagZone = function(carIndex, car)
       return CarStateMachine.CarStateType.NAVIGATING_AROUND_ACCIDENT
     end
     --]====]
+end
+
+---Returns the STAYING_ON_YIELDING_LANE state if we can overtake the car in front of us while we're currently overtaking another car
+---@param carIndex integer
+---@param car ac.StateCar
+---@param carFront ac.StateCar
+---@param carBehind ac.StateCar
+---@param storage StorageTable
+---@param currentlyOvertakingCarIndex integer
+---@return CarStateMachine.CarStateType|nil
+CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking = function(carIndex, car, carFront, carBehind, storage, currentlyOvertakingCarIndex)
+    if not carFront then
+      return
+    end
+
+    -- If there's a car in front of us, check if we can overtake it as well
+    local carFrontIndex = carFront.index
+    local isCarInFrontSameAsWeAreOvertaking = carFrontIndex == currentlyOvertakingCarIndex
+    if not isCarInFrontSameAsWeAreOvertaking then
+        local newStateDueToCarInFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
+        if newStateDueToCarInFront then
+            CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
+            CarManager.cars_currentlyOvertakingCarIndex[carIndex] = carFrontIndex -- start overtaking the new car in front of us
+            return CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
+        end
+    end
 end
 
 ---Returns the EASING_IN_OVERTAKE state if the car passes all the checks required to start overtaking a car behind it
