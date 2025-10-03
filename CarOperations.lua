@@ -44,10 +44,6 @@ CarOperations.CarDirectionsStrings = {
   [CarOperations.CarDirections.RearRightAngled] = "RearRightAngled",
 }
 
----This 1.2 default value is fetched from the comment of physics.setExtraAIGrip
----which says that the default AI cars grip is 120%
-local DEFAULT_AICARS_GRIP = 1.2
-
 local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 3.0
 local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
 
@@ -194,8 +190,7 @@ end
 ---Sets the AI grip back to the default value.
 ---@param carIndex integer
 CarOperations.setDefaultAIGrip = function(carIndex)
-  -- todo: physics.setExtraAIGrip says that the default value is 1 but also says that AI cars have 120% grip
-  CarOperations.setGrip(carIndex, DEFAULT_AICARS_GRIP)
+  CarOperations.setGrip(carIndex, CarManager.GripValues.NORMAL)
 end
 
 ---Activates or deactivates gentle stopping.
@@ -376,7 +371,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
       -- todo: should these operations be here?
       CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
       CarOperations.resetAIThrottleLimit(carIndex) -- remove any speed limit we may have applied while waiting for a gap
-      CarOperations.setGrip(carIndex, 1.4) -- increase grip while driving to the side
+      CarOperations.setGrip(carIndex, CarManager.GripValues.DRIVING_TO_THE_SIDE) -- increase grip while driving to the side
 
       -- if we are driving at high speed, we need to decrease the ramp speed so that our car doesn't jolt out of control
       -- local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
