@@ -362,7 +362,10 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
     local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
     if not isSideSafeToDrive then
         -- return false since we can't drive to the side safely
-        return false
+        -- return false
+        -- drive to the other side to avoid colliding with the car on this side
+        side = RaceTrackManager.getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
+        driveToSideMaxOffset = driveToSideMaxOffset * 0.5 -- drive to the other side but not fully
     end
 
       -- todo: should these operations be here?
