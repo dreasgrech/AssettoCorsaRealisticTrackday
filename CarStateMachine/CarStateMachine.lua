@@ -7,11 +7,15 @@ local CarStateMachine = {}
 local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
 -- [Flags]
+---@type table<CarStateMachine.CarStateType,string>
 CarStateMachine.CarStateTypeStrings = {}
+---@type table<integer,number>
 CarStateMachine.states_minimumTimeInState = { }
 
+---@type table<integer,CarStateMachine.CarStateType>
 local cars_state = {}
 
+---@type table<integer,CarStateMachine.CarStateType>
 CarStateMachine.cars_previousState = {}
 
 ---@enum CarStateMachine.CarStateType
@@ -55,6 +59,9 @@ ac.log(string.format("CarStateMachine debug_state = %d", debug_state))
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
+---Changes the state of the car to the new state
+---@param carIndex integer
+---@param newState CarStateMachine.CarStateType
 local changeState = function(carIndex, newState)
     -- save a reference to the current state before changing it
     local currentState = CarStateMachine.getCurrentState(carIndex)
@@ -79,15 +86,23 @@ local changeState = function(carIndex, newState)
     cars_state[carIndex] = newState
 end
 
+---Returns the current state of the car
+---@param carIndex integer
+---@return CarStateMachine.CarStateType
 CarStateMachine.getCurrentState = function(carIndex)
     return cars_state[carIndex]
 end
 
+---Returns the previous state of the car
+---@param carIndex integer
+---@return CarStateMachine.CarStateType
 CarStateMachine.getPreviousState = function(carIndex)
     return CarStateMachine.cars_previousState[carIndex]
 end
 
+---@type Strings.ReasonWhyCantYield
 local ReasonWhyCantYieldStringNames = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield]
+---@type Strings.ReasonWhyCantOvertake
 local ReasonWhyCantOvertakeStringNames = Strings.StringNames[Strings.StringCategories.ReasonWhyCantOvertake]
 
 --- TODO: This function should probably be moved to CarOperations
@@ -132,9 +147,13 @@ CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
     return true
 end
 
+---@type table<CarStateMachine.CarStateType,function>
 CarStateMachine.states_entryFunctions = {}
+---@type table<CarStateMachine.CarStateType,function>
 CarStateMachine.states_updateFunctions = {}
+---@type table<CarStateMachine.CarStateType,function>
 CarStateMachine.states_transitionFunctions = {}
+---@type table<CarStateMachine.CarStateType,function>
 CarStateMachine.states_exitFunctions = {}
 
 local queuedCollidedWithTrackAccidents = QueueManager.createQueue()
@@ -144,12 +163,16 @@ local queuedCarCollidedWithMeAccidents = QueueManager.createQueue()
 -- Logger.log("[CarStateMachine] Initialized 3 queues: "..queuedCollidedWithTrackAccidents..", "..queuedCollidedWithCarAccidents..", "..queuedCarCollidedWithMeAccidents)
 
 -- a dictionary which holds, if available, the state to transition to next in the upcoming frame
+---@type table<integer,CarStateMachine.CarStateType>
 local queuedStatesToTransitionInto = {}
 
 CarStateMachine.setReasonWhyCantYield = function(carIndex, reason)
   StringsManager.setString(carIndex, Strings.StringCategories.ReasonWhyCantYield, reason)
 end
 
+--- Sets the reason why the car can't overtake
+---@param carIndex integer
+-- ---@param reason Strings.ReasonWhyCantOvertake
 CarStateMachine.setReasonWhyCantOvertake = function(carIndex, reason)
   StringsManager.setString(carIndex, Strings.StringCategories.ReasonWhyCantOvertake, reason)
 end
@@ -412,7 +435,7 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   local carFrontDrivingOnYieldingLane = CarManager.isCarDrivingOnSide(carFrontIndex, RaceTrackManager.getYieldingSide())
   if not carFrontDrivingOnYieldingLane then
     -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car in front not on yielding lane so not overtaking'
-    CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.YieldingCarNotOnYieldingLane)
+    CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.YieldingCarIsNotOnYieldingSide)
     return
   end
 

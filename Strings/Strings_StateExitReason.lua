@@ -1,6 +1,27 @@
 local STRING_CATEGORY = Strings.StringCategories.StateExitReason
 
----@enum Strings.StringNames.StringCategories.StateExitReason
+---@class Strings.StateExitReason
+---@field None integer
+---@field YieldingToCar integer
+---@field OvertakingCar integer
+---@field OvertakingCarNoLongerExists integer
+---@field ArrivedAtOvertakingLane integer
+---@field OvertakingCarIsClearlyAhead integer
+---@field ArrivedAtYieldingLane integer
+---@field ArrivedToNormal integer
+---@field ContinuingOvertakingNextCar integer
+---@field ClearlyAheadOfYieldingCar integer
+---@field OvertakingCarIsClearlyBehind integer
+---@field YieldingCarIsFasterThenOvertakingCar integer
+---@field OvertakingCarNotOnOvertakingSide integer
+---@field NavigatingAroundAccident integer
+---@field NoAccidentIndexToNavigateAround integer
+---@field FoundCloserAccidentToNavigateAround integer
+---@field AccidentIsFarBehindUs integer
+---@field EnteringYellowFlagZone integer
+---@field ExitedYellowFlagZone integer
+
+---@type Strings.StateExitReason
 local stringNames = {
     None = 0,
     YieldingToCar = 1,
@@ -44,6 +65,8 @@ local stringValues = {
     [stringNames.ExitedYellowFlagZone] = const("Exited yellow flag zone"),
 }
 
+-- ---@param carIndex integer
+-- ---@param stringName Strings.StateExitReason
 local stringSaveFunction = function (carIndex, stringName)
     local state = CarStateMachine.getCurrentState(carIndex)
     CarManager.cars_statesExitReason_NAME[carIndex][state] = stringName

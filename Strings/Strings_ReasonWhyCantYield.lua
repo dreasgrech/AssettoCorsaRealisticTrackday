@@ -1,5 +1,19 @@
 local STRING_CATEGORY = Strings.StringCategories.ReasonWhyCantYield
 
+---@class Strings.ReasonWhyCantYield
+---@field None integer
+---@field TargetSideBlocked integer
+---@field CarInBlindSpot integer
+---@field OvertakingCarInPits integer
+---@field OvertakingCarTooFarBehind integer
+---@field OvertakingCarNotBehind integer
+---@field OvertakingCarBelowMinimumSpeed integer
+---@field YieldingCarBelowMinimumSpeed integer
+---@field WeAreFasterThanOvertakingCar integer
+---@field OvertakingCarNotOnOvertakingSide integer
+
+-- ---@enum Strings.ReasonWhyCantYield
+---@type Strings.ReasonWhyCantYield
 local stringNames = {
     None = 0,
     TargetSideBlocked = 1,

@@ -1,12 +1,21 @@
 local STRING_CATEGORY = Strings.StringCategories.ReasonWhyCantOvertake
 
+---@class Strings.ReasonWhyCantOvertake
+---@field None integer
+---@field YieldingCarInPits integer
+---@field YieldingCarTooFarAhead integer
+---@field YieldingCarIsFaster integer
+---@field YieldingCarIsNotOnYieldingSide integer
+---@field AnotherCarBehindTooClose integer
+
+---@type Strings.ReasonWhyCantOvertake
 local stringNames = {
     None = 0,
     YieldingCarInPits = 1,
     YieldingCarTooFarAhead = 2,
     YieldingCarIsFaster = 3,
     YieldingCarIsNotOnYieldingSide = 4,
-    AnotherCarBehindTooClose = 5
+    AnotherCarBehindTooClose = 5,
 }
 
 local stringValues = {

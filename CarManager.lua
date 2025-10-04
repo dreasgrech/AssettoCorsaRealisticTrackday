@@ -5,53 +5,83 @@ local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 
 local CAR_SPEEDS_BUFFER_SIZE = 600
 
+---@type table<integer,boolean>
 CarManager.cars_initialized = {}
+---@type table<integer,number>
 CarManager.cars_MAXTOPSPEED = {} -- do not reset this
 
+---@type table<integer,number>
 CarManager.cars_currentSplineOffset = {}
+---@type table<integer,number>
 CarManager.cars_targetSplineOffset = {}
 
+---@type table<integer,number>
 CarManager.cars_maxSideMargin = {}
+---@type table<integer,number>
 CarManager.cars_currentNormalizedTrackProgress = {}
+---@type table<integer,integer>
 CarManager.cars_reasonWhyCantYield_NAME = {}
+---@type table<integer,integer>
 CarManager.cars_reasonWhyCantOvertake_NAME = {}
+---@type table<integer,table<integer,integer>>
 CarManager.cars_statesExitReason_NAME = {}
+---@type table<integer,number>
 CarManager.cars_yieldTime = {}
 -- CarManager.cars_currentTurningLights = {}
 -- CarManager.cars_indLeft = {}
 -- CarManager.cars_indRight = {}
 -- CarManager.cars_indPhase = {}
 -- CarManager.cars_hasTL = {}
-CarManager.cars_evacuating = {}
+-- CarManager.cars_evacuating = {}
 
 -- CarManager.cars_anchorPoints = {}
+---@type table<integer,integer>
 CarManager.cars_totalSideBlockRaysData = {} -- {[carIndex] = 1, [carIndex] = 0, ...}
+---@type table<integer,table>
 CarManager.cars_sideBlockRaysData = {} -- Example: one ray=> {pos,dir,len}. two rays: {pos,dir,len,pos,dir,len}
 
+---@type table<integer,number>
 CarManager.cars_throttleLimit = {}
+---@type table<integer,integer>
 CarManager.cars_aiCaution = {}
+---@type table<integer,number>
 CarManager.cars_aiTopSpeed = {}
+---@type table<integer,number>
 CarManager.cars_aiStopCounter = {}
+---@type table<integer,boolean>
 CarManager.cars_gentleStop = {}
+---@type table<integer,integer>
 CarManager.cars_currentlyOvertakingCarIndex = {} -- car index of the car we're currently overtaking
+---@type table<integer,integer>
 CarManager.cars_currentlyYieldingCarToIndex = {} -- car index of the car we're currently yielding to
+---@type table<integer,number>
 CarManager.cars_timeInCurrentState = {} -- time spent in the current state (seconds)
+---@type table<integer,table<integer,number>>
 CarManager.cars_speedBuffer = {}
+---@type table<integer,integer>
 CarManager.cars_speedBufferIndex = {}
+---@type table<integer,number>
 CarManager.cars_speedBufferTotal = {}
+---@type table<integer,number>
 CarManager.cars_averageSpeedKmh = {}
 -- CarManager.cars_involvedInAccidents = {}
 -- CarManager.cars_totalAccidentsInvolvedIn = {}
+---@type table<integer,integer>
 CarManager.cars_culpritInAccidentIndex = {}
+---@type table<integer,integer>
 CarManager.cars_navigatingAroundAccidentIndex = {}
+---@type table<integer,integer>
 CarManager.cars_navigatingAroundCarIndex = {}
 
+---@type table<integer,boolean>
 CarManager.cars_justTeleportedDueToCustomAIFlood = {}
 
 ---@type table<integer,number>
 CarManager.cars_grip = {}
 
+---@type table<integer,vec3>
 CarManager.cars_AABBSIZE = {}
+---@type table<integer,vec3>
 CarManager.cars_HALF_AABSIZE = {}
 
 ---@type table<integer,ac.StateCar>
@@ -102,7 +132,7 @@ CarManager.setInitializedDefaults = function(carIndex)
   -- CarManager.cars_indRight[carIndex] = false
   -- CarManager.cars_indPhase[carIndex] = false
   -- CarManager.cars_hasTL[carIndex] = false
-  CarManager.cars_evacuating[carIndex] = false
+  -- CarManager.cars_evacuating[carIndex] = false
   -- CarManager.cars_anchorPoints[carIndex] = nil
   CarManager.cars_totalSideBlockRaysData[carIndex] = 0
   CarManager.cars_sideBlockRaysData[carIndex] = {} -- since this is used as a list, initialize to empty list

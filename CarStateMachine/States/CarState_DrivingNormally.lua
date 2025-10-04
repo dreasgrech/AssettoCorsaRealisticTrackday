@@ -3,7 +3,9 @@ local STATE = CarStateMachine.CarStateType.DRIVING_NORMALLY
 CarStateMachine.CarStateTypeStrings[STATE] = "DrivingNormally"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
+---@type Strings.StateExitReason
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+---@type Strings.ReasonWhyCantYield
 local ReasonWhyCantYield = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield]
 
 -- ENTRY FUNCTION
@@ -39,9 +41,7 @@ end
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
 end
 
-
 -- TRANSITION FUNCTION
--- CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
 ---@param carIndex integer
 ---@param dt number
 ---@param sortedCarsList table<integer,ac.StateCar>
@@ -67,10 +67,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         return
       end
 
-      -- if not carBehind then
-        -- CarManager.cars_reasonWhyCantYield[carIndex] = 'No overtaking car so not yielding'
-        -- return
-      -- end
       local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
@@ -106,6 +102,5 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
 end
