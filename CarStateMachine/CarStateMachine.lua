@@ -223,6 +223,12 @@ CarStateMachine.handleQueuedAccidents = function()
     end
 end
 
+---comment
+---@param carIndex integer
+---@param dt number
+---@param sortedCarList table<integer,ac.StateCar>
+---@param sortedCarListIndex integer #1-based index of the car in sortedCarList
+---@param storage StorageTable
 CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     -- CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
     CarManager.cars_totalSideBlockRaysData[carIndex] = 0
@@ -457,36 +463,12 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   return CarStateMachine.CarStateType.EASING_IN_OVERTAKE
 end
 
--- ---Returns the EASING_IN_YIELD state if the car passes all the checks required to start yielding to a car behind it
--- ---@param carIndex integer
--- ---@param car ac.StateCar
--- ---@param carBehind ac.StateCar
--- ---@param carFront ac.StateCar
--- ---@param storage StorageTable
--- ---@return CarStateMachine.CarStateType|nil
--- CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehind, carFront, storage)
-
-
----Returns the EASING_IN_YIELD state if the car passes all the checks required to start yielding to a car behind it
----@param sortedCarsList table<integer, ac.StateCar>
----@param sortedCarsListIndex integer
+---@param car ac.StateCar
+---@param carBehind ac.StateCar
 ---@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
-CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sortedCarsListIndex, storage)
-
-    local car = sortedCarsList[sortedCarsListIndex]
+local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storage)
     local carIndex = car.index
-    local carBehind = sortedCarsList[sortedCarsListIndex + 1]
-
-    -- if there's no car behind us, do nothing
-    if not carBehind then
-      return
-    end
-
-    -- TODO Here we need to consider not only the first car behind us but all the cars within our detection radius!
-    -- TODO Here we need to consider not only the first car behind us but all the cars within our detection radius!
-    -- TODO Here we need to consider not only the first car behind us but all the cars within our detection radius!
-    -- TODO Here we need to consider not only the first car behind us but all the cars within our detection radius!
 
     if CarOperations.isCarInPits(carBehind) then
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarInPits)
@@ -548,6 +530,48 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sorted
     -- Since all the checks have passed, the yielding car can now start to yield
     CarManager.cars_currentlyYieldingCarToIndex[carIndex] = carBehindIndex
     return CarStateMachine.CarStateType.EASING_IN_YIELD
+end
+
+-- ---Returns the EASING_IN_YIELD state if the car passes all the checks required to start yielding to a car behind it
+-- ---@param carIndex integer
+-- ---@param car ac.StateCar
+-- ---@param carBehind ac.StateCar
+-- ---@param carFront ac.StateCar
+-- ---@param storage StorageTable
+-- ---@return CarStateMachine.CarStateType|nil
+-- CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehind, carFront, storage)
+
+---Returns the EASING_IN_YIELD state if the car passes all the checks required to start yielding to a car behind it
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer #1-based index of the car in sortedCarList
+---@param storage StorageTable
+---@return CarStateMachine.CarStateType|nil
+CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sortedCarsListIndex, storage)
+    local car = sortedCarsList[sortedCarsListIndex]
+
+    --Check all the cars behind us within our detection radius to see if we need to yield to any of them
+    local detectedCarBehind_meters = storage.detectCarBehind_meters
+    -- for loop through all the cars behind us within our detection radius
+    local totalCarsBehindUs = #sortedCarsList - sortedCarsListIndex
+    for i = 1, totalCarsBehindUs do
+      local carBehind = sortedCarsList[sortedCarsListIndex + i]
+      -- todo: there must be a better way of checking the distance between the cars
+      local distanceFromCarBehindToUs = MathHelpers.distanceBetweenVec3s(carBehind.position, car.position)
+      local isCarBehindWithinRadius = distanceFromCarBehindToUs <= detectedCarBehind_meters
+      if isCarBehindWithinRadius then
+        local stateDueToYield = handleShouldWeYieldToBehindCar_singleCar(car, carBehind, storage)
+        if stateDueToYield then
+          return stateDueToYield
+        end
+      else 
+        -- if the car is outside our detection radius, we can stop checking further cars behind us
+        break
+      end
+    end
+
+    -- old way (checking only the car directly behind us):
+    -- local carBehind = sortedCarsList[sortedCarsListIndex + 1]
+    -- return handleShouldWeYieldToBehindCar_singleCar(car, carBehind, storage)
 end
 
 

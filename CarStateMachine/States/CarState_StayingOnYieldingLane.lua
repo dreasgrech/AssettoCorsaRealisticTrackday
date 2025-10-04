@@ -90,11 +90,12 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         return newStateDueToYellowFlagZone
       end
 
-      local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
-      local carWeAreYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
-      local carBehind = sortedCarsList[sortedCarsListIndex + 1]
-      local carFront = sortedCarsList[sortedCarsListIndex - 1]
+      -- local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
+      -- local carWeAreYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
+      -- local carBehind = sortedCarsList[sortedCarsListIndex + 1]
+      -- local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
+      --[====[
       if carBehind then
         -- check if the current car behind us is the same car we're yielding to
         local carBehindIndex = carBehind.index
@@ -108,12 +109,25 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
             -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to new car behind #%d instead", carBehindIndex))
             CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
-            CarManager.cars_currentlyYieldingCarToIndex[carIndex] = carBehindIndex -- continue yielding to the new car behind us
+            -- CarManager.cars_currentlyYieldingCarToIndex[carIndex] = carBehindIndex -- continue yielding to the new car behind us
             -- return newStateDueToCarBehind
             return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
           end
         end
       end
+      --]====]
+
+      local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
+      if newStateDueToCarBehind then
+        -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
+        -- return newStateDueToCarBehind
+        -- return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
+        return -- we're already yielding so stay in this state
+      end
+
+      local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
+      local carWeAreYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
 
       --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
       --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
