@@ -434,18 +434,36 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   return CarStateMachine.CarStateType.EASING_IN_OVERTAKE
 end
 
+-- ---Returns the EASING_IN_YIELD state if the car passes all the checks required to start yielding to a car behind it
+-- ---@param carIndex integer
+-- ---@param car ac.StateCar
+-- ---@param carBehind ac.StateCar
+-- ---@param carFront ac.StateCar
+-- ---@param storage StorageTable
+-- ---@return CarStateMachine.CarStateType|nil
+-- CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehind, carFront, storage)
+
+
 ---Returns the EASING_IN_YIELD state if the car passes all the checks required to start yielding to a car behind it
----@param carIndex integer
----@param car ac.StateCar
----@param carBehind ac.StateCar
----@param carFront ac.StateCar
+---@param sortedCarsList table<integer, ac.StateCar>
+---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
-CarStateMachine.handleShouldWeYieldToBehindCar = function(carIndex, car, carBehind, carFront, storage)
+CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sortedCarsListIndex, storage)
+
+    local car = sortedCarsList[sortedCarsListIndex]
+    local carIndex = car.index
+    local carBehind = sortedCarsList[sortedCarsListIndex + 1]
+
     -- if there's no car behind us, do nothing
     if not carBehind then
       return
     end
+
+    -- TODO Here we need to consider not only the first car behind us but all the cars within our detection radius!
+    -- TODO Here we need to consider not only the first car behind us but all the cars within our detection radius!
+    -- TODO Here we need to consider not only the first car behind us but all the cars within our detection radius!
+    -- TODO Here we need to consider not only the first car behind us but all the cars within our detection radius!
 
     if CarOperations.isCarInPits(carBehind) then
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarInPits)

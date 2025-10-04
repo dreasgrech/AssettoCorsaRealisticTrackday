@@ -102,7 +102,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         
         -- if the car behind us is not the same car we're yielding to, check if we should start yielding to the new car behind us instead
         if not isBehindCarSameCarWeAreYieldingTo then
-          local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+          -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
+          local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
           if newStateDueToCarBehind then
             -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
             -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to new car behind #%d instead", carBehindIndex))
