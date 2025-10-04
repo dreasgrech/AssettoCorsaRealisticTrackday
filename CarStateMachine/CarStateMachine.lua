@@ -224,7 +224,7 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
         local previousState = CarStateMachine.getPreviousState(carIndex)
         if timeInStateBeforeChange < 0.1 then
           -- local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
-          local cars_statesExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousState]) or ''
+          local stateExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousState]) or ''
           Logger.warn(string.format(
           "CarStateMachine: Car %d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
           carIndex,
@@ -232,7 +232,7 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
           CarStateMachine.CarStateTypeStrings[CarStateMachine.getCurrentState(carIndex)],
           CarStateMachine.CarStateTypeStrings[previousState],
           CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame],
-          cars_statesExitReason))
+          stateExitReason))
         end
       end
 
