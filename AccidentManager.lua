@@ -5,19 +5,19 @@ local AccidentManager = {}
 
 local accidentCompletableIndex = CompletableIndexCollectionManager.createNewIndex()
 
----@type table<integer, integer>
+---@type table<integer,integer>
 AccidentManager.accidents_carIndex = {}
----@type table<integer, vec3>
+---@type table<integer,vec3>
 AccidentManager.accidents_worldPosition = {}
----@type table<integer, number>
+---@type table<integer,number>
 AccidentManager.accidents_splinePosition = {}
----@type table<integer, boolean>
+---@type table<integer,boolean>
 AccidentManager.accidents_collidedWithTrack = {}
----@type table<integer, integer>
+---@type table<integer,integer>
 AccidentManager.accidents_collidedWithCarIndex = {}
----@type table<integer, integer>
+---@type table<integer,integer>
 AccidentManager.accidents_yellowFlagZoneIndex = {}
----@type table<integer, boolean>
+---@type table<integer,boolean>
 AccidentManager.accidents_resolved = {}
 
 ---Marks the given accident as resolved and done
