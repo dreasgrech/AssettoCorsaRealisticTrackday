@@ -61,6 +61,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
       local car = sortedCarsList[sortedCarsListIndex]
       local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
+      topSpeed = math.max(topSpeed, 60) -- don't let the top speed drop too much
       CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
       
       -- press some brake to help slow down the car a bit because the top speed limit is broken in csp atm in trackday ai flood mode
@@ -72,6 +73,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       -- TODO: Here continue driving to the side but using the real offset
       -- TODO: Here continue driving to the side but using the real offset
       -- TODO: Here continue driving to the side but using the real offset
+      local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
 end
 
 -- TRANSITION FUNCTION
@@ -120,7 +122,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
       if newStateDueToCarBehind then
         -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
+        -- CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
         -- return newStateDueToCarBehind
         -- return CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
         return -- we're already yielding so stay in this state

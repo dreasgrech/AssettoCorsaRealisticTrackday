@@ -44,11 +44,12 @@ end
 ---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       local car = sortedCarsList[sortedCarsListIndex]
-      local yieldSide = RaceTrackManager.getYieldingSide()
+      --local yieldSide = RaceTrackManager.getYieldingSide()
+      --local targetOffset = storage.maxLateralOffset_normalized
+      --local rampSpeed_mps = storage.rampSpeed_mps
+      --local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
-      local targetOffset = storage.maxLateralOffset_normalized
-      local rampSpeed_mps = storage.rampSpeed_mps
-      local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
+      local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
       if not droveSafelyToSide then
         -- reduce the car speed so that we can find a gap
         CarOperations.setAIThrottleLimit(carIndex, 0.4)
