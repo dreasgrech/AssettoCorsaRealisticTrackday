@@ -366,6 +366,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
         -- drive to the other side to avoid colliding with the car on this side
         side = RaceTrackManager.getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
         driveToSideMaxOffset = driveToSideMaxOffset * 0.5 -- drive to the other side but not fully
+        rampSpeed_mps = rampSpeed_mps * 0.5 -- drive more slowly to the other side
     end
 
       -- todo: should these operations be here?
@@ -382,14 +383,12 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
 
       local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
       local sideSign = drivingToTheLeft and -1 or 1
-      -- local currentSplineOffset = CarManager.cars_currentSplineOffset[carIndex]
-      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
-      -- local currentSplineOffset = CarManager.getActualTrackLateralOffset(car.position)
+      -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+      local currentSplineOffset = CarManager.getActualTrackLateralOffset(car.position)
 
       -- local targetSplineOffset = storage.maxLateralOffset_normalized * sideSign
       -- TODO: limit the target offset when we are approaching a corner or in mid corner!
       -- TODO: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/issues/41
-      -- TODO: also maybe take a look at physics.setExtraAIGrip
       local targetSplineOffset = driveToSideMaxOffset * sideSign
       currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
 
@@ -408,17 +407,27 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
       return true
 end
 
+function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
+    local driveToSide = RaceTrackManager.getOvertakingSide()
+    local targetOffset = storage.maxLateralOffset_normalized
+    local rampSpeed_mps = storage.overtakeRampSpeed_mps
+    local overrideAiAwareness = storage.overrideAiAwareness
+
+    return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness)
+end
+
 ---@param carIndex integer
 ---@param dt number
 ---@param car ac.StateCar
 ---@param storage StorageTable
 ---@return boolean
 function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
-      local yieldSide = RaceTrackManager.getYieldingSide()
+      local driveToSide = RaceTrackManager.getYieldingSide()
       local targetOffset = storage.maxLateralOffset_normalized
       local rampSpeed_mps = storage.rampSpeed_mps
       local overrideAiAwareness = storage.overrideAiAwareness
-      return CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, targetOffset, rampSpeed_mps, overrideAiAwareness)
+
+      return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness)
 end
 
 local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level

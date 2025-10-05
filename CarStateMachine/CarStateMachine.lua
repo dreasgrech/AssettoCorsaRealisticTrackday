@@ -478,7 +478,6 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
     local carBehindIndex = carBehind.index
 
     -- If this car is not close to the overtaking car, do nothing
-    -- local distanceFromOvertakingCarToYieldingCar = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, car.position))
     local distanceFromOvertakingCarToYieldingCar = MathHelpers.distanceBetweenVec3s(carBehind.position, car.position)
     local radius = storage.detectCarBehind_meters
     local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCar <= radius
@@ -506,23 +505,14 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
       return
     end
 
-    -- local playerCarHasClosingSpeedToAiCar = (overtakingCarSpeedKmh - carSpeedKmh) >= storage.minSpeedDelta_kmh
-    -- if not playerCarHasClosingSpeedToAiCar then
-      -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Player does not have closing speed so not yielding'
-    -- end
-
     -- check if the car overtaking car is actually driving on the overtaking lane
-    -- local yieldSide = storage.yieldSide
-    -- local overtakeSide = RaceTrackManager.getOppositeSide(yieldSide)
-    -- local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakeSide)
-    local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, RaceTrackManager.getOvertakingSide())
+    local overtakingSide = RaceTrackManager.getOvertakingSide()
+    local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakingSide)
     if not isOvertakingCarOnOvertakingLane then
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.WeAreFasterThanOvertakingCar)
       return
     end
 
-    -- TODO: also check if our car is a lot more powerful than the overtaking car, think twice before yielding
-    -- TODO: also check if our car is a lot more powerful than the overtaking car, think twice before yielding
     -- TODO: also check if our car is a lot more powerful than the overtaking car, think twice before yielding
 
     -- CarManager.cars_reasonWhyCantYield[carIndex] = nil

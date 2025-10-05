@@ -25,6 +25,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local carFront = sortedCarsList[sortedCarsListIndex - 1]
     local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
     CarOperations.setAICaution(carIndex, aiCaution)
+
+    -- keep driving to the overtaking side even while staying on the overtaking lane since sometimes the cars still end up drifting back to the normal lanes mostly because of high speed corners
+    local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
 end
 
 --- TRANSITION FUNCTION

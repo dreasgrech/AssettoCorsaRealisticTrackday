@@ -57,15 +57,14 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
     CarOperations.setAICaution(carIndex, aiCaution)
 
-    -- the drive to side is to be opposite side to the the yielding side
-    -- local driveToSide = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and RaceTrackManager.TrackSide.RIGHT or RaceTrackManager.TrackSide.LEFT
-    local driveToSide = RaceTrackManager.getOvertakingSide()
-    local targetOffset = storage.maxLateralOffset_normalized
-    local rampSpeed_mps = storage.overtakeRampSpeed_mps
-    local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
-    -- if not droveSafelyToSide then
-    -- end
+    -- -- the drive to side is to be opposite side to the the yielding side
+    -- local driveToSide = RaceTrackManager.getOvertakingSide()
+    -- local targetOffset = storage.maxLateralOffset_normalized
+    -- local rampSpeed_mps = storage.overtakeRampSpeed_mps
+    -- local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
+    -- ease in to the overtaking lane
+    local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
 end
 
 -- TRANSITION FUNCTION
