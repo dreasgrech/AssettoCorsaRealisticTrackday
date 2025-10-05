@@ -41,14 +41,14 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.MaxLateralOffset_normalized, default=0.8, min=0.1, max=1.0 },
 
     { name = StorageManager.Options.DetectCarBehind_meters, default=70, min=10, max=90 },
-    { name = StorageManager.Options.RampSpeed_mps, default=0.5, min=0.1, max=3.0 },
-    { name = StorageManager.Options.RampRelease_mps, default=0.3, min=0.1, max=3.0 },
+    { name = StorageManager.Options.RampSpeed_mps, default=0.5, min=0.1, max=2.0 },
+    { name = StorageManager.Options.RampRelease_mps, default=0.3, min=0.1, max=2.0 },
 
     { name = StorageManager.Options.HandleOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DetectCarAhead_meters, default=100, min=50, max=500 },
     { name = StorageManager.Options.ClearAhead_meters, default=6.0, min=4.0, max=20.0 },
-    { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.7, min=0.1, max=3.0 },
-    { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.4, min=0.1, max=3.0 },
+    { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.7, min=0.1, max=2.0 },
+    { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.4, min=0.1, max=2.0 },
 
     { name = StorageManager.Options.CustomAIFlood_enabled, default=false, min=nil, max=nil },
     { name = StorageManager.Options.CustomAIFlood_distanceBehindPlayerToCycle_meters, default=200, min=50, max=500 },

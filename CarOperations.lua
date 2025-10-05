@@ -383,14 +383,15 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
 
       local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
       local sideSign = drivingToTheLeft and -1 or 1
-      -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
-      local currentSplineOffset = CarManager.getActualTrackLateralOffset(car.position)
+      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+      -- local currentSplineOffset = CarManager.getActualTrackLateralOffset(car.position)
 
       -- local targetSplineOffset = storage.maxLateralOffset_normalized * sideSign
       -- TODO: limit the target offset when we are approaching a corner or in mid corner!
       -- TODO: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/issues/41
       local targetSplineOffset = driveToSideMaxOffset * sideSign
-      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, splineOffsetTransitionSpeed * dt)
+      local step = splineOffsetTransitionSpeed * dt
+      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, step)
 
       -- set the spline offset on the ai car
       -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
