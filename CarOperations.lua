@@ -263,7 +263,7 @@ end
 ---@param carSpeedKmh number
 ---@param rampSpeed number
 ---@return number rampSpeed
-function CarOperations.limitSplitOffsetRampUpSpeed(carSpeedKmh, rampSpeed)
+function CarOperations.limitSplineOffsetRampUpSpeed(carSpeedKmh, rampSpeed)
   if carSpeedKmh > 300 then
     return rampSpeed * 0.1
   elseif carSpeedKmh > 200 then
@@ -379,7 +379,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
 
       -- if we are driving at high speed, we need to decrease the ramp speed so that our car doesn't jolt out of control
       -- local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
-      local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, rampSpeed_mps)
+      local splineOffsetTransitionSpeed = CarOperations.limitSplineOffsetRampUpSpeed(car.speedKmh, rampSpeed_mps)
 
       local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
       local sideSign = drivingToTheLeft and -1 or 1
