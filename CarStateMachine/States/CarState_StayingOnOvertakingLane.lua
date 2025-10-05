@@ -68,8 +68,9 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     -- If there's a different car to the one we're currently overtaking in front of us, check if we can overtake it as well
     local newStateDueToOvertakingNextCar = CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking(carIndex, car, carFront, carBehind, storage, currentlyOvertakingCarIndex)
     if newStateDueToOvertakingNextCar then
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
-        return newStateDueToOvertakingNextCar
+        -- CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
+        -- return newStateDueToOvertakingNextCar
+        return -- since we're already on the overtaking lane, just continue staying on it
     end
 
     -- if we're now clearly ahead of the car we're overtaking, we can ease out our overtaking
