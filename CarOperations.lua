@@ -408,9 +408,26 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
       return true
 end
 
+---@param carIndex integer
+---@param dt number
+---@param car ac.StateCar
+---@param storage StorageTable
+---@return boolean
+function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
+      local yieldSide = RaceTrackManager.getYieldingSide()
+      local targetOffset = storage.maxLateralOffset_normalized
+      local rampSpeed_mps = storage.rampSpeed_mps
+      local overrideAiAwareness = storage.overrideAiAwareness
+      return CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, targetOffset, rampSpeed_mps, overrideAiAwareness)
+end
+
 local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level
 
 ---Calculated the overtaking car's ai caution value while overtaking another car.
+---TODO: This function needs to also check more cars in front and not just the first car in front
+---TODO: This function needs to also check more cars in front and not just the first car in front
+---TODO: This function needs to also check more cars in front and not just the first car in front
+---TODO: This function needs to also check more cars in front and not just the first car in front
 ---@param overtakingCar ac.StateCar
 ---@param yieldingCar ac.StateCar?
 ---@return integer
