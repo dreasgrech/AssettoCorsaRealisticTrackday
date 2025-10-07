@@ -456,8 +456,11 @@ function UIManager.renderUIOptionsControls()
 
     ui.text('Debugging')
 
-    if ui.checkbox('Draw Debug Gizmos', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
-    if ui.itemHovered() then ui.setTooltip('Shows 3D debug information about the cars') end
+    if ui.checkbox('Show car state overhead text', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
+    if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
+
+    if ui.checkbox('Draw tyres side offtrack gizmos', storage.debugDrawSideOfftrack) then storage.debugDrawSideOfftrack = not storage.debugDrawSideOfftrack end
+    if ui.itemHovered() then ui.setTooltip('Shows gizmos for the car\'s tyres when offtrack') end
 
     if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
     if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end

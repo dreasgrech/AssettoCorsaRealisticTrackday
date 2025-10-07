@@ -28,7 +28,8 @@ StorageManager.Options ={
     DistanceToStartNavigatingAroundCarInAccident_meters = 20,
 
     DebugDraw = 21,
-    DrawCarList = 22,
+    DebugDrawSideOfftrack = 22,
+    DrawCarList = 23,
 }
 
 -- only used to build the actual tables that hold the runtime values
@@ -59,6 +60,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters, default=30.0, min=10.0, max=100.0 },
 
     { name = StorageManager.Options.DebugDraw, default=false, min=nil, max=nil },
+    { name = StorageManager.Options.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DrawCarList, default=true, min=nil, max=nil },
 }
 
@@ -97,6 +99,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field distanceFromAccidentToSeeYellowFlag_meters number
 ---@field distanceToStartNavigatingAroundCarInAccident_meters number
 ---@field debugDraw boolean
+---@field debugDrawSideOfftrack boolean
 ---@field drawCarList boolean
 
 ---@type StorageTable
@@ -127,6 +130,7 @@ local storageTable = {
     distanceToStartNavigatingAroundCarInAccident_meters = StorageManager.options_default[StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters],
 
     debugDraw = StorageManager.options_default[StorageManager.Options.DebugDraw],
+    debugDrawSideOfftrack = StorageManager.options_default[StorageManager.Options.DebugDrawSideOfftrack],
     drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],
 }
 

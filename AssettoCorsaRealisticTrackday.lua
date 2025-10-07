@@ -301,23 +301,17 @@ function script.MANIFEST__TRANSPARENT(dt)
   -- ----------------------------------------------------------------
   
 
-
-  if storage.debugDraw then
-    local sim = ac.getSim()
-    -- for carIndex = 1, sim.carsCount - 1 do
-    -- for carIndex, car in ac.iterateCars() do
+  if storage.debugDrawSideOfftrack then
     for i, car in ac.iterateCars() do
       local carIndex = car.index
-      -- local carAnchorPoints = CarManager.cars_anchorPoints[carIndex]
-      -- if carAnchorPoints then
-        -- CarOperations.drawSideAnchorPoints(carIndex)
-        
-        -- CarOperations.renderCarBlockCheckRays(carIndex)
-        -- CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
-        CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
+      CarOperations.renderCarSideOffTrack(carIndex)
+    end
+  end
 
-        CarOperations.renderCarSideOffTrack(carIndex)
-      -- end
+  if storage.debugDraw then
+    for i, car in ac.iterateCars() do
+      local carIndex = car.index
+        CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
     end
   end
 
