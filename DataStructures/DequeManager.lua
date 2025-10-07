@@ -6,7 +6,8 @@ local lastCreatedDequeIndex = 0
 
 local deques = {}
 
---- Wikipedia: A double-ended queue (deque) is an abstract data type that generalizes a queue, for which elements can be added to or removed from either the front (head) or back (tail).
+---Creates a new deque (double-ended queue) and returns the index to it.
+---Wikipedia: A double-ended queue (deque) is an abstract data type that generalizes a queue, for which elements can be added to or removed from either the front (head) or back (tail).
 ---@return integer
 function DequeManager.createDeque()
     lastCreatedDequeIndex = lastCreatedDequeIndex + 1
@@ -14,6 +15,9 @@ function DequeManager.createDeque()
     return lastCreatedDequeIndex
 end
 
+---Pushes a value to the left side (front/head) of the deque
+---@param dequeIndex integer
+---@param value any
 function DequeManager.pushLeft(dequeIndex, value)
     local deque = deques[dequeIndex]
     local first = deque.first - 1
@@ -21,6 +25,9 @@ function DequeManager.pushLeft(dequeIndex, value)
     deque[first] = value
 end
 
+--- Pushes a value to the right side (back/tail) of the deque
+---@param dequeIndex integer
+---@param value any
 function DequeManager.pushRight(dequeIndex, value)
     local deque = deques[dequeIndex]
     local last = deque.last + 1
@@ -28,6 +35,9 @@ function DequeManager.pushRight(dequeIndex, value)
     deque[last] = value
 end
 
+---Pops a value from the left side (front/head) of the deque
+---@param dequeIndex integer
+---@return any
 function DequeManager.popLeft(dequeIndex)
     local deque = deques[dequeIndex]
     local first = deque.first
@@ -38,6 +48,9 @@ function DequeManager.popLeft(dequeIndex)
     return value
 end
 
+---Pops a value from the right side (back/tail) of the deque
+---@param dequeIndex integer
+---@return any
 function DequeManager.popRight(dequeIndex)
     local deque = deques[dequeIndex]
     local last = deque.last
@@ -48,7 +61,9 @@ function DequeManager.popRight(dequeIndex)
     return value
 end
 
--- todo: I wrote this so check it it thouroughly!
+--Returns the number of items currently in the deque
+---@param dequeIndex integer
+---@return integer
 function DequeManager.dequeLength(dequeIndex)
     local deque = deques[dequeIndex]
     return deque.last - deque.first + 1
