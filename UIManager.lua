@@ -49,6 +49,8 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'Grip', orderDirection = 0, width = 40, tooltip='AI grip level' },
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
+  { name = 'Closing speed', orderDirection = 0, width = 40, tooltip='Closing speed' },
+  { name = 'Time to collision', orderDirection = 0, width = 60, tooltip='Time to collision' },
   { name = 'PreviousState', orderDirection = 0, width = 170, tooltip='Previous state' },
   { name = 'CurrentState', orderDirection = 0, width = 170, tooltip='Current state' },
   { name = 'StateTime', orderDirection = 0, width = 75, tooltip='Time spent in current state' },
@@ -178,6 +180,9 @@ UIManager.drawMainWindowContent = function()
       local carSplinePosition = car.splinePosition
       local trackAISplineSides = ac.getTrackAISplineSides(carSplinePosition)
 
+      local carFront = sortedCarsList[n-1]
+      local closingSpeed, timeToCollision = CarManager.getClosingSpeed(car, carFront)
+
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
         Logger.error(string.format('Car #%d (current: %s, previous:%s) is both yielding to car #%d and overtaking car #%d at the same time!', carIndex, CarStateMachine.CarStateTypeStrings[state],CarStateMachine.CarStateTypeStrings[previousCarState], currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
@@ -237,6 +242,8 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.2f", CarManager.cars_grip[carIndex] or 0), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.2f", closingSpeed), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.2f", timeToCollision), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui.nextColumn()
@@ -319,7 +326,7 @@ function UIManager.draw3DOverheadText()
   local storage = StorageManager.getStorage()
   if not storage.debugDraw then return end
   local sim = ac.getSim()
-  local depthModeBeforeModification = render.DepthMode
+  -- local depthModeBeforeModification = render.DepthMode
   -- if storage.drawOnTop then
     -- -- draw over everything (no depth testing)
     -- render.setDepthMode(render.DepthMode.Off)
@@ -327,9 +334,17 @@ function UIManager.draw3DOverheadText()
     -- -- respect existing depth, don’t write to depth (debug text won’t “punch holes”)
     -- render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
   -- end
-    render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
-    render.setCullMode(render.CullMode.Front)
+
+    -- render.setDepthMode(render.DepthMode.WriteOnly)
+    -- render.setCullMode(render.CullMode.Wireframe)
+
     -- render.CullMode
+
+  -- local prevDepth = render.DepthMode
+  -- local prevBlend = render.BlendMode
+
+--render.setDepthMode(render.DepthMode.WriteOnly)   -- test against scene, don’t write
+  --render.setBlendMode(render.BlendMode.BlendPremultiplied)        -- act like opaque even in transparent pass  (SDK: OpaqueForced)
 
   -- for i = 1, sim.carsCount - 1 do
   for i = 0, sim.carsCount do
@@ -356,12 +371,15 @@ function UIManager.draw3DOverheadText()
         -- render.debugText(car.position + vec3(0, 2.0, 0), txt)
 
         local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
-        render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState])
+        render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState])--, render.FontAlign.Center)
       end
     end
   end
 
-  render.setDepthMode(depthModeBeforeModification)
+  -- render.setBlendMode(prevBlend)
+  -- render.setDepthMode(prevDepth)
+
+  -- render.setDepthMode(depthModeBeforeModification)
 end
 
 function UIManager.renderUIOptionsControls()

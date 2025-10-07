@@ -191,6 +191,48 @@ function script.MANIFEST__UPDATE(dt)
   CustomAIFloodManager.handleFlood(sortedCars, localPlayerSortedCarListIndex)
 end
 
+--[====[
+--Andreas: experimenting with drawing a 3D overhead text label above the player car that respects geometry occlusion
+-- a small canvas we’ll draw the string into
+local nameplate = ui.ExtraCanvas(256, 64)
+
+-- draw/update the text (do this once now; call again whenever text changes)
+local function setNameplate(text, color)
+  nameplate:update(function()
+    ui.beginTransparentWindow("np", vec2(0,0), vec2(256,64), true, false)
+      ui.drawRectFilled(vec2(0,0), vec2(256,64), rgbm(0,0,0,0))     -- fully transparent
+      ui.setCursor(vec2(10,10))
+      ui.textColored(text, color or rgbm(1,1,1,1))
+    ui.endTransparentWindow()
+  end)
+end
+
+setNameplate("AI #12", rgbm(1,1,1,1))   -- example label; re-call when you want a new string
+
+-- minimal shadered quad descriptor (camera-facing billboard)
+local plate = {
+  textures = { tx = nameplate },
+  shader   = [[ float4 main(PS_IN pin){ return pin.ApplyFog(tx.Sample(samAnisotropic, pin.Tex)); } ]]
+}
+-- draw after opaque geometry so the depth buffer is ready
+render.on('main.root.transparent', function()
+  -- Logger.log("Drawing nameplate")
+  -- depth: read-only (respect geometry), blend: regular alpha
+  render.setDepthMode(render.DepthMode.ReadOnlyLessEqual)
+  render.setBlendMode(render.BlendMode.AlphaBlend)
+
+  -- position a little above the car roof; size in meters
+  local car = ac.getCar(0)                           -- pick your car index
+  local pos = car.position + vec3(0, 1.8, 0)
+  plate.pos    = pos
+  plate.width  = 0.7                                 -- world width (m)
+  plate.height = 0.18                                -- world height (m)
+  plate.up     = vec3(0,1,0)                         -- keep upright
+
+  render.shaderedQuad(plate)
+end)
+--]====]
+
 ---
 -- wiki: called when transparent objects are finished rendering
 ---
@@ -273,6 +315,8 @@ function script.MANIFEST__TRANSPARENT(dt)
         -- CarOperations.renderCarBlockCheckRays(carIndex)
         -- CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
         CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
+
+        CarOperations.renderCarSideOffTrack(carIndex)
       -- end
     end
   end

@@ -360,13 +360,23 @@ end
 function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMaxOffset,rampSpeed_mps, overrideAiAwareness)
     -- make sure there isn't any car on the side we're trying to drive to so we don't crash into it
     local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
-    if not isSideSafeToDrive then
+    local isCarOffTrack = CarManager.isCarOffTrack(car, side)
+    local sideNotSafe = not isSideSafeToDrive
+    -- if not isSideSafeToDrive then
+    if sideNotSafe or isCarOffTrack then
         -- return false since we can't drive to the side safely
         -- return false
         -- drive to the other side to avoid colliding with the car on this side
         side = RaceTrackManager.getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
         driveToSideMaxOffset = driveToSideMaxOffset * 0.5 -- drive to the other side but not fully
-        rampSpeed_mps = rampSpeed_mps * 0.5 -- drive more slowly to the other side
+        rampSpeed_mps = rampSpeed_mps-- * 0.5 -- drive more slowly to the other side
+
+        -- do another side check on the other side since we're driving to the other side now
+        local isOtherSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
+        if not isOtherSideSafeToDrive then
+          -- both sides are blocked, so we can't drive to either side safely
+          return false
+        end
     end
 
       -- todo: should these operations be here?
@@ -771,6 +781,45 @@ CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH = function(carIndex)
 
     -- Logger.log(string.format("CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH: car #%d pos: %s, dir: %s, len: %s", carIndex, tostring(pos), tostring(dir), tostring(len)))
     render.debugLine(pos, pos + dir * len, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
+  end
+end
+
+CarOperations.renderCarSideOffTrack = function(carIndex)
+  local car = ac.getCar(carIndex)
+  if not car then return end
+
+  local carWheels = car.wheels
+  local carOffTrackLeft = CarManager.isCarOffTrack(car, RaceTrackManager.TrackSide.LEFT)
+  local carOffTrackRight = CarManager.isCarOffTrack(car, RaceTrackManager.TrackSide.RIGHT)
+  -- local carOffTrack = carOffTrackLeft or carOffTrackRight
+
+  for w = 0, 3 do
+    local wheel = carWheels[w]
+    local wheelPosition = wheel.position
+    local tyreWidth = wheel.tyreWidth
+    local tyreRadius = wheel.tyreRadius
+    local debugBoxSize = vec3(tyreWidth, tyreRadius, tyreRadius)-- * 0.5
+    -- local color
+    -- if w == 0 then
+      -- color = ColorManager.RGBM_Colors.Red
+    -- elseif w == 1 then
+      -- color = ColorManager.RGBM_Colors.Green
+    -- elseif w == 2 then
+      -- color = ColorManager.RGBM_Colors.Blue
+    -- else
+      -- color = ColorManager.RGBM_Colors.Yellow
+    -- end
+
+    -- local color = carOffTrack and ColorManager.RGBM_Colors.Red or ColorManager.RGBM_Colors.LimeGreen
+
+    local color = ColorManager.RGBM_Colors.LimeGreen
+    if carOffTrackLeft and (w == CarManager.CAR_WHEELS_INDEX.FRONT_LEFT or w == CarManager.CAR_WHEELS_INDEX.REAR_LEFT) then
+      color = ColorManager.RGBM_Colors.Red
+    elseif carOffTrackRight and (w == CarManager.CAR_WHEELS_INDEX.FRONT_RIGHT or w == CarManager.CAR_WHEELS_INDEX.REAR_RIGHT) then
+      color = ColorManager.RGBM_Colors.Red
+    end
+
+    render.debugBox(wheelPosition, debugBoxSize, color)
   end
 end
 

@@ -64,6 +64,11 @@ CarManager.cars_speedBufferIndex = {}
 CarManager.cars_speedBufferTotal = {}
 ---@type table<integer,number>
 CarManager.cars_averageSpeedKmh = {}
+---@type table<integer,number>
+CarManager.cars_closingSpeed = {}
+---@type table<integer,number>
+CarManager.cars_timeToCollision = {}
+
 -- CarManager.cars_involvedInAccidents = {}
 -- CarManager.cars_totalAccidentsInvolvedIn = {}
 ---@type table<integer,integer>
@@ -144,6 +149,8 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_speedBufferIndex[carIndex] = 0
   CarManager.cars_speedBufferTotal[carIndex] = 0
   CarManager.cars_averageSpeedKmh[carIndex] = 0
+  CarManager.cars_closingSpeed[carIndex] = 0
+  CarManager.cars_timeToCollision[carIndex] = math.huge
   -- CarManager.cars_involvedInAccidents[carIndex] = {}
   CarManager.cars_culpritInAccidentIndex[carIndex] = 0
   -- CarManager.cars_navigatingAroundAccidentIndex[carIndex] = nil
@@ -270,17 +277,75 @@ function CarManager.isCarMidCorner(carIndex)
   return isMidCorner, distanceToUpcomingTurn
 end
 
----Returns a boolean value indicating whether the car is off track (more than 1.5 lanes away from center)
----@param carIndex number
+-- ---Returns a boolean value indicating whether the car is off track (more than 1.5 lanes away from center)
+-- ---@param carIndex number
+-- ---@return boolean
+-- function CarManager.isCarOffTrack(carIndex)
+  -- local car = ac.getCar(carIndex)
+  -- if not car then
+    -- return false
+  -- end
+
+  -- local carActualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
+  -- return math.abs(carActualTrackLateralOffset) > 1.5
+-- end
+
+---The indices of the car wheels as used in car.wheels[]
+---Andreas: I found these indexes by drawing a debugBox at each wheel position with different colors
+---@enum CarManager.CAR_WHEELS_INDEX
+CarManager.CAR_WHEELS_INDEX = {
+  FRONT_LEFT = 0,
+  FRONT_RIGHT = 1,
+  REAR_LEFT = 2,
+  REAR_RIGHT = 3
+}
+
+---Returns a boolean value indicating whether the car is off track depending on the given side (if any wheel on that side is off track)
+---@param car ac.StateCar
+---@param side RaceTrackManager.TrackSide
 ---@return boolean
-function CarManager.isCarOffTrack(carIndex)
-  local car = ac.getCar(carIndex)
+function CarManager.isCarOffTrack(car, side)
   if not car then
     return false
   end
 
-  local carActualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
-  return math.abs(carActualTrackLateralOffset) > 1.5
+  local carWheels = car.wheels
+
+  -- Andreas: the following loop assumes that the wheel indices are always 0,1,2,3 for FL,FR,RL,RR
+  -- First I determine which index to start the loop from (FRONT_LEFT or FRONT_RIGHT)
+  -- then the loop iterates over both wheels on the given side by incrementing by 2 to skip the tyre in between
+  local loopStart
+  if side == RaceTrackManager.TrackSide.LEFT then
+    loopStart = CarManager.CAR_WHEELS_INDEX.FRONT_LEFT
+  else
+    loopStart = CarManager.CAR_WHEELS_INDEX.FRONT_RIGHT
+  end
+
+  -- this loop won't run more than twice since there are only two wheels on each side
+  local loopEnd = loopStart + 2
+  for i = loopStart, loopEnd, 2 do
+    local wheel = carWheels[i]
+    if wheel then -- Andreas: is this wheel check neccessary? can there be vehicles with less than 4 wheels?
+      local wheelOffTrack = not wheel.surfaceValidTrack
+      if wheelOffTrack then
+        -- todo: should we check both wheels on the side or just one?
+        return true
+      end
+    end
+  end
+
+  return false
+
+  -- for i = 0, 1 do
+    -- local wheelIndex
+    -- if side == RaceTrackManager.TrackSide.LEFT then
+      -- wheelIndex = i * 2 -- 0,2
+    -- else
+      -- wheelIndex = i * 2 + 1 -- 1,3
+    -- end
+
+    -- local wheel = carWheels[wheelIndex]
+  -- end
 end
 
 ---comment
@@ -307,6 +372,40 @@ function CarManager.saveCarSpeed(car)
 
   -- log the entire speed buffer
   -- Logger.log(string.format("Car %d speed buffer: %s, average: %.2f", carIndex, table.concat(CarManager.cars_speedBuffer[carIndex], ", "), CarManager.cars_averageSpeedKmh[carIndex] or 0))
+end
+
+---Returns the closing speed (m/s) and time to collision (s) between two cars
+---If the closing speed is negative, then the cars are moving apart (not closing)
+---@param car ac.StateCar
+---@param carFront ac.StateCar
+---@return number closingSpeed_ms
+---@return number TTC
+CarManager.getClosingSpeed = function(car, carFront)
+  if not car or not carFront then return -1,-1 end
+
+  -- positions
+  local deltaPositions = carFront.position - car.position
+  local distanceBetweenPositions = deltaPositions:length()
+  if distanceBetweenPositions < 1e-3 then return -1, -1 end
+  local rhat = deltaPositions / distanceBetweenPositions
+
+  -- closing speed in m/s (positive = closing, negative = opening)
+  local deltaVelocities = carFront.velocity - car.velocity
+  local closingSpeed_ms = -math.dot(deltaVelocities, rhat)
+
+  -- -- (optional) smooth a bit to reduce noise
+  -- local previousClosingSpeed = CarManager.cars_closingSpeed[car.index] or 0
+  -- local alpha = const(0.2)
+  -- closing_ms = previousClosingSpeed and (previousClosingSpeed*(1-alpha) + closing_ms*alpha) or closing_ms
+
+  -- time-to-collision if still closing and paths roughly align
+  local timeToCollision = (closingSpeed_ms > 0.1) and (distanceBetweenPositions / closingSpeed_ms) or math.huge
+
+  -- local carBehindIndex = car.index
+  -- CarManager.cars_closingSpeed[carBehindIndex] = closing_ms
+  -- CarManager.cars_timeToCollision[carBehindIndex] = TTC
+
+  return closingSpeed_ms, timeToCollision
 end
 
 -- -- Utility: compute world right-vector at a given progress on the AI spline
