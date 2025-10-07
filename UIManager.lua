@@ -322,7 +322,7 @@ end
 
 local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 
-function UIManager.draw3DOverheadText()
+function UIManager.drawCarStateOverheadText()
   local storage = StorageManager.getStorage()
   if not storage.debugDraw then return end
   local sim = ac.getSim()
@@ -349,7 +349,7 @@ function UIManager.draw3DOverheadText()
   -- for i = 1, sim.carsCount - 1 do
   for i = 0, sim.carsCount do
   -- for i, car in ac.iterateCars() do
-    CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
+    -- CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
     -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
     local carState = CarStateMachine.getCurrentState(i)
     if CarManager.cars_initialized[i] and carState ~= CarStateMachine.CarStateType.DRIVING_NORMALLY then
@@ -371,7 +371,7 @@ function UIManager.draw3DOverheadText()
         -- render.debugText(car.position + vec3(0, 2.0, 0), txt)
 
         local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
-        render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState])--, render.FontAlign.Center)
+        render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState], 1, render.FontAlign.Center)--, render.FontAlign.Center)
       end
     end
   end
@@ -464,6 +464,9 @@ function UIManager.renderUIOptionsControls()
 
     if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
     if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
+
+    if ui.checkbox('Log fast AI state changes', storage.debugLogFastStateChanges) then storage.debugLogFastStateChanges = not storage.debugLogFastStateChanges end
+    if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car changes from one state to another very quickly') end
 
 --[===[
     ui.separator()

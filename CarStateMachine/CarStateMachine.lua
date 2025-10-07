@@ -6,7 +6,6 @@ local CarStateMachine = {}
 -- local LOG_CAR_STATEMACHINE_IN_CSP_LOG = true
 local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
--- [Flags]
 ---@type table<CarStateMachine.CarStateType,string>
 CarStateMachine.CarStateTypeStrings = {}
 ---@type table<integer,number>
@@ -247,21 +246,24 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
       queuedStatesToTransitionInto[carIndex] = nil
 
       -- If this is not our first state, check if we've been in the previous state for at least some time, otherwise warn because there might be an issue
-      local currentStateBeforeChange = CarStateMachine.getCurrentState(carIndex)
-      if currentStateBeforeChange then
-        local timeInStateBeforeChange = CarManager.cars_timeInCurrentState[carIndex]
-        local previousState = CarStateMachine.getPreviousState(carIndex)
-        if timeInStateBeforeChange < 0.1 then
-          -- local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
-          local stateExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousState]) or ''
-          Logger.warn(string.format(
-          "CarStateMachine: Car %d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
-          carIndex,
-          timeInStateBeforeChange,
-          CarStateMachine.CarStateTypeStrings[CarStateMachine.getCurrentState(carIndex)],
-          CarStateMachine.CarStateTypeStrings[previousState],
-          CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame],
-          stateExitReason))
+      local logFastStateChanges = storage.debugLogFastStateChanges
+      if logFastStateChanges then
+        local currentStateBeforeChange = CarStateMachine.getCurrentState(carIndex)
+        if currentStateBeforeChange then
+          local timeInStateBeforeChange = CarManager.cars_timeInCurrentState[carIndex]
+          local previousState = CarStateMachine.getPreviousState(carIndex)
+          if timeInStateBeforeChange < 0.1 then
+            -- local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
+            local stateExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousState]) or ''
+            Logger.warn(string.format(
+            "CarStateMachine: Car %d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
+            carIndex,
+            timeInStateBeforeChange,
+            CarStateMachine.CarStateTypeStrings[CarStateMachine.getCurrentState(carIndex)],
+            CarStateMachine.CarStateTypeStrings[previousState],
+            CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame],
+            stateExitReason))
+          end
         end
       end
 
@@ -499,6 +501,10 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
     local overtakingCarSpeedKmh = CarManager.cars_averageSpeedKmh[carBehindIndex]
 
     -- Check if we're faster than the overtaking car
+    -- TODO: HERE ALSO CHECK THE CLOSING SPEED AND IF THE CLOSING SPEED IS HIGH >5, THEN STILL YIELD EVEN IF THE AVERAGE SPEED IS LOWER
+    -- TODO: HERE ALSO CHECK THE CLOSING SPEED AND IF THE CLOSING SPEED IS HIGH >5, THEN STILL YIELD EVEN IF THE AVERAGE SPEED IS LOWER
+    -- TODO: HERE ALSO CHECK THE CLOSING SPEED AND IF THE CLOSING SPEED IS HIGH >5, THEN STILL YIELD EVEN IF THE AVERAGE SPEED IS LOWER
+    -- TODO: HERE ALSO CHECK THE CLOSING SPEED AND IF THE CLOSING SPEED IS HIGH >5, THEN STILL YIELD EVEN IF THE AVERAGE SPEED IS LOWER
     local isYieldingCarSlowerThanOvertakingCar = yieldingCarSpeedKmh < overtakingCarSpeedKmh
     if not isYieldingCarSlowerThanOvertakingCar then
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.WeAreFasterThanOvertakingCar)

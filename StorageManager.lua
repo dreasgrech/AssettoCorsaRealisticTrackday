@@ -8,14 +8,14 @@ StorageManager.Options ={
     OverrideAiAwareness = 4,
     DefaultAICaution = 5,
     MaxLateralOffset_normalized = 6,
+    ClearAhead_meters = 7,
 
-    DetectCarBehind_meters = 7,
-    RampSpeed_mps = 8,
-    RampRelease_mps = 9,
+    DetectCarBehind_meters = 8,
+    RampSpeed_mps = 9,
+    RampRelease_mps = 10,
 
-    HandleOvertaking = 10,
-    DetectCarAhead_meters = 11,
-    ClearAhead_meters = 12,
+    HandleOvertaking = 11,
+    DetectCarAhead_meters = 12,
     OvertakeRampSpeed_mps = 13,
     OvertakeRampRelease_mps = 14,
 
@@ -30,6 +30,7 @@ StorageManager.Options ={
     DebugDraw = 21,
     DebugDrawSideOfftrack = 22,
     DrawCarList = 23,
+    DebugLogFastStateChanges = 24,
 }
 
 -- only used to build the actual tables that hold the runtime values
@@ -40,16 +41,16 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.OverrideAiAwareness, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
     { name = StorageManager.Options.MaxLateralOffset_normalized, default=0.8, min=0.1, max=1.0 },
+    { name = StorageManager.Options.ClearAhead_meters, default=10.0, min=4.0, max=20.0 },
 
-    { name = StorageManager.Options.DetectCarBehind_meters, default=70, min=10, max=90 },
-    { name = StorageManager.Options.RampSpeed_mps, default=0.5, min=0.1, max=2.0 },
-    { name = StorageManager.Options.RampRelease_mps, default=0.3, min=0.1, max=2.0 },
+    { name = StorageManager.Options.DetectCarBehind_meters, default=90, min=10, max=90 },
+    { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=2.0 },
+    { name = StorageManager.Options.RampRelease_mps, default=0.1, min=0.1, max=2.0 },
 
     { name = StorageManager.Options.HandleOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DetectCarAhead_meters, default=100, min=50, max=500 },
-    { name = StorageManager.Options.ClearAhead_meters, default=6.0, min=4.0, max=20.0 },
-    { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.7, min=0.1, max=2.0 },
-    { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.4, min=0.1, max=2.0 },
+    { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=2.0 },
+    { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.5, min=0.1, max=2.0 },
 
     { name = StorageManager.Options.CustomAIFlood_enabled, default=false, min=nil, max=nil },
     { name = StorageManager.Options.CustomAIFlood_distanceBehindPlayerToCycle_meters, default=200, min=50, max=500 },
@@ -62,6 +63,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DebugDraw, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DrawCarList, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.DebugLogFastStateChanges, default=false, min=nil, max=nil },
 }
 
 StorageManager.options_default = {}
@@ -101,6 +103,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field debugDraw boolean
 ---@field debugDrawSideOfftrack boolean
 ---@field drawCarList boolean
+---@field debugLogFastStateChanges boolean
 
 ---@type StorageTable
 local storageTable = {
@@ -132,6 +135,7 @@ local storageTable = {
     debugDraw = StorageManager.options_default[StorageManager.Options.DebugDraw],
     debugDrawSideOfftrack = StorageManager.options_default[StorageManager.Options.DebugDrawSideOfftrack],
     drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],
+    debugLogFastStateChanges = StorageManager.options_default[StorageManager.Options.DebugLogFastStateChanges],
 }
 
 local storage = ac.storage(storageTable)

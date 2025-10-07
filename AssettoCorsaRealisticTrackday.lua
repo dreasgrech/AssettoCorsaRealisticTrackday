@@ -239,7 +239,14 @@ end)
 function script.MANIFEST__TRANSPARENT(dt)
   if (not shouldAppRun()) then return end
   local storage = StorageManager.getStorage()
-  UIManager.draw3DOverheadText()
+
+  if storage.debugDrawSideOfftrack then
+    for i, car in ac.iterateCars() do
+      local carIndex = car.index
+      CarOperations.renderCarSideOffTrack(carIndex)
+    end
+  end
+  UIManager.drawCarStateOverheadText()
 
   -- render.debugSphere(playerCarPosition, 1, rgbm(1, 0, 0, 1))
   -- render.debugBox(playerCarPosition + vec3(0, 1, 0), vec3(1, 1, 1), rgbm(0, 1, 0, 1))
@@ -300,13 +307,6 @@ function script.MANIFEST__TRANSPARENT(dt)
 -- CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays(0, RaceTrackManager.TrackSide.LEFT)
   -- ----------------------------------------------------------------
   
-
-  if storage.debugDrawSideOfftrack then
-    for i, car in ac.iterateCars() do
-      local carIndex = car.index
-      CarOperations.renderCarSideOffTrack(carIndex)
-    end
-  end
 
   if storage.debugDraw then
     for i, car in ac.iterateCars() do
