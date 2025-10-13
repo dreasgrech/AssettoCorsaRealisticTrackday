@@ -65,7 +65,6 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
       CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
 
-      CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
 end
 
 -- TRANSITION FUNCTION

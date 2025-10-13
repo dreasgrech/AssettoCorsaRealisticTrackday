@@ -51,8 +51,6 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
-      CarManager.cars_yieldTime[carIndex] = CarManager.cars_yieldTime[carIndex] + dt
-
       -- make the yielding car leave more space in between the car in front while driving on the yielding lane
       CarOperations.setAICaution(carIndex, CarManager.AICautionValues.YIELDING)
 

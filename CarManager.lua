@@ -25,9 +25,6 @@ CarManager.cars_reasonWhyCantYield_NAME = {}
 CarManager.cars_reasonWhyCantOvertake_NAME = {}
 ---@type table<integer,table<integer,integer>>
 CarManager.cars_statesExitReason_NAME = {}
----TODO: obsolete, unused, remove.
----@type table<integer,number>
-CarManager.cars_yieldTime = {}
 -- CarManager.cars_currentTurningLights = {}
 -- CarManager.cars_indLeft = {}
 -- CarManager.cars_indRight = {}
@@ -132,7 +129,6 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_currentNormalizedTrackProgress[carIndex] = -1
   CarManager.cars_reasonWhyCantYield_NAME[carIndex] = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None
   CarManager.cars_reasonWhyCantOvertake_NAME[carIndex] = Strings.StringNames[Strings.StringCategories.ReasonWhyCantOvertake].None
-  CarManager.cars_yieldTime[carIndex] = 0
   -- CarManager.cars_currentTurningLights[carIndex] = nil
   -- CarManager.cars_indLeft[carIndex] = false
   -- CarManager.cars_indRight[carIndex] = false
