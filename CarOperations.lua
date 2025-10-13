@@ -418,6 +418,12 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMax
       return true
 end
 
+--- Drives the car to the overtaking lane while making sure there are no cars blocking the side.
+---@param carIndex integer
+---@param dt number
+---@param car ac.StateCar
+---@param storage StorageTable
+---@return boolean
 function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
     local driveToSide = RaceTrackManager.getOvertakingSide()
     local targetOffset = storage.maxLateralOffset_normalized
@@ -427,6 +433,7 @@ function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
     return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness)
 end
 
+--- Drives the car to the yielding lane while making sure there are no cars blocking the side.
 ---@param carIndex integer
 ---@param dt number
 ---@param car ac.StateCar
