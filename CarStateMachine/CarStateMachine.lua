@@ -481,6 +481,8 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
 
     -- If this car is not close to the overtaking car, do nothing
     local distanceFromOvertakingCarToYieldingCar = MathHelpers.distanceBetweenVec3s(carBehind.position, car.position)
+    --TODO: here we should use the full detection radius if the carBehind is directly behind us,
+    --TODO: but if the car behind is in in between other cars behind us, then use a small radius since we can't see the car coming that much because there are other cars in the way
     local radius = storage.detectCarBehind_meters
     local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCar <= radius
     if not isYieldingCarCloseToOvertakingCar then

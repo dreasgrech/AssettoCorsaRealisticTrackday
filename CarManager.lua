@@ -25,6 +25,7 @@ CarManager.cars_reasonWhyCantYield_NAME = {}
 CarManager.cars_reasonWhyCantOvertake_NAME = {}
 ---@type table<integer,table<integer,integer>>
 CarManager.cars_statesExitReason_NAME = {}
+---TODO: obsolete, unused, remove.
 ---@type table<integer,number>
 CarManager.cars_yieldTime = {}
 -- CarManager.cars_currentTurningLights = {}
