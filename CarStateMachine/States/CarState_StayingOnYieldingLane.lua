@@ -136,11 +136,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
       local carWeAreYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
 
-      --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
-      --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
-      --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
-      --todo: make sure that if there's a car behind us that's very close, we don't ease out yield
-
       -- if we don't have an overtaking car anymore, we can ease out our yielding
       if not carWeAreYieldingTo then
         -- CarStateMachine.setStateExitReason(carIndex, 'No overtaking car so not staying on yielding lane')
