@@ -62,33 +62,32 @@ local function shouldAppRun()
         and storage.enabled
 end
 
-OnCarEventManager.OnCarEventExecutions = {
-    ---The callback function for when a car collision event occurs
-    ---@param carIndex integer
-    [OnCarEventManager.OnCarEventType.Collision] = function (carIndex)
-        local storage = StorageManager.getStorage()
-        if storage.handleAccidents then
-            -- Register an accident for the car collision
-            local accidentIndex = AccidentManager.registerCollision(carIndex)
-            if not accidentIndex then
-                return
-            end
-
-            CarStateMachine.informAboutAccident(accidentIndex)
-        end
-    end,
-    ---The callback function for when a car jumped event occurs
-    ---@param carIndex integer
-    [OnCarEventManager.OnCarEventType.Jumped] = function (carIndex)
-      -- Inform the accident manager about the car reset
-      AccidentManager.informAboutCarReset(carIndex)
-
-      -- finally reset all our car data
-      if not CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] then
-        CarManager.setInitializedDefaults(carIndex)
+---The callback function for when a car collision event occurs
+---@param carIndex integer
+OnCarEventManager.OnCarEventExecutions[OnCarEventManager.OnCarEventType.Collision] = function (carIndex)
+  local storage = StorageManager.getStorage()
+  if storage.handleAccidents then
+      -- Register an accident for the car collision
+      local accidentIndex = AccidentManager.registerCollision(carIndex)
+      if not accidentIndex then
+          return
       end
-    end,
-}
+
+      CarStateMachine.informAboutAccident(accidentIndex)
+  end
+end
+
+---The callback function for when a car jumped event occurs
+---@param carIndex integer
+OnCarEventManager.OnCarEventExecutions[OnCarEventManager.OnCarEventType.Jumped] = function (carIndex)
+  -- Inform the accident manager about the car reset
+  AccidentManager.informAboutCarReset(carIndex)
+
+  -- finally reset all our car data
+  if not CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] then
+    CarManager.setInitializedDefaults(carIndex)
+  end
+end
 
 -- Monitor car collisions so we can register an accident
 ac.onCarCollision(-1, function (carIndex)
