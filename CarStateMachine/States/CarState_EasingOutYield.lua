@@ -49,14 +49,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local easeOutYieldSide = RaceTrackManager.getOvertakingSide() -- always ease out yield to the overtaking side
       local targetOffset = 0
       local rampSpeed_mps = storage.rampRelease_mps
-      local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
-
-      -- can't ease out yield because the side is blocked, just wait
-      if not droveSafelyToSide then
-        -- Andreas: isSafeToDriveToTheSide already logs the reason why we can't yield
-        -- CarManager.cars_reasonWhyCantYield[carIndex] = string.format('Target side %s blocked so not easing out yield', RaceTrackManager.TrackSideStrings[easeOutYieldSide])
-        return
-      end
+      CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 end
 
 -- TRANSITION FUNCTION
