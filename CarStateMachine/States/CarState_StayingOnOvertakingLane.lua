@@ -22,8 +22,11 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
     -- set the ai caution while we're overtaking
     local car = sortedCarsList[sortedCarsListIndex]
-    local carFront = sortedCarsList[sortedCarsListIndex - 1]
-    local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
+    -- local carFront = sortedCarsList[sortedCarsListIndex - 1]
+    -- local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
+    local yieldingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
+    local yieldingCar = ac.getCar(yieldingCarIndex)
+    local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, yieldingCar)
     CarOperations.setAICaution(carIndex, aiCaution)
 
     -- keep driving to the overtaking side even while staying on the overtaking lane since sometimes the cars still end up drifting back to the normal lanes mostly because of high speed corners

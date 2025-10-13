@@ -54,7 +54,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     --storage.yieldSide 
 
     -- set the ai caution while we're overtaking
-    local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
+    local yieldingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex] -- fetch the index of the car we're overtaking
+    local yieldingCar = ac.getCar(yieldingCarIndex)
+    -- local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
+    local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, yieldingCar)
     CarOperations.setAICaution(carIndex, aiCaution)
 
     -- -- the drive to side is to be opposite side to the the yielding side

@@ -444,10 +444,6 @@ end
 local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level
 
 ---Calculated the overtaking car's ai caution value while overtaking another car.
----TODO: This function needs to also check more cars in front and not just the first car in front
----TODO: This function needs to also check more cars in front and not just the first car in front
----TODO: This function needs to also check more cars in front and not just the first car in front
----TODO: This function needs to also check more cars in front and not just the first car in front
 ---@param overtakingCar ac.StateCar
 ---@param yieldingCar ac.StateCar?
 ---@return integer
