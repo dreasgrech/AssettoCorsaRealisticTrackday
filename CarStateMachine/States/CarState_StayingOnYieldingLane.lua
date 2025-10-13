@@ -56,23 +56,30 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       -- make the yielding car leave more space in between the car in front while driving on the yielding lane
       CarOperations.setAICaution(carIndex, CarManager.AICautionValues.YIELDING)
 
-      -- limit the yielding car throttle while driving on the yielding lane
-      CarOperations.setAIThrottleLimit(carIndex, 0.5)
-
       local car = sortedCarsList[sortedCarsListIndex]
-      local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
-      topSpeed = math.max(topSpeed, 60) -- don't let the top speed drop too much
-      CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
+      local carPosition = car.position
+      local carWeAreCurrentlyYieldingToPosition = carWeAreCurrentlyYieldingTo.position
+      local distanceBetweenCars = MathHelpers.distanceBetweenVec3s(carPosition, carWeAreCurrentlyYieldingToPosition)
       
-      -- press some brake to help slow down the car a bit because the top speed limit is broken in csp atm in trackday ai flood mode
-      -- Andreas: be careful about this because if the ai keeps on pressing the gas while we're pressing the brake here, the car can spin out...
-      -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1) 
-      -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.8)
+      -- if the overtaking car is very close behind us, limit our speed to let it pass more easily
+      local limitSpeedToLetOvertakingCarPass = distanceBetweenCars < 10
+      if limitSpeedToLetOvertakingCarPass then
+        -- limit the yielding car throttle while driving on the yielding lane
+        CarOperations.setAIThrottleLimit(carIndex, 0.5)
 
-      -- TODO: Here continue driving to the side but using the real offset
-      -- TODO: Here continue driving to the side but using the real offset
-      -- TODO: Here continue driving to the side but using the real offset
-      -- TODO: Here continue driving to the side but using the real offset
+        local car = sortedCarsList[sortedCarsListIndex]
+        local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
+        topSpeed = math.max(topSpeed, 60) -- don't let the top speed drop too much
+        CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
+        
+        -- press some brake to help slow down the car a bit because the top speed limit is broken in csp atm in trackday ai flood mode
+        -- Andreas: be careful about this because if the ai keeps on pressing the gas while we're pressing the brake here, the car can spin out...
+        -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1) 
+        -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.8)
+
+      end
+
+      -- continue driving to the yielding side so that if we got pushed a bit off the side, we drive back to the correct side
       local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
 end
 
