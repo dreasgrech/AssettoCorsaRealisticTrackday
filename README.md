@@ -1,18 +1,100 @@
-My main objective with this Assetto Corsa app is to force the AI traffic on the Nordschleife to only move to the right when other cars want to overtake them.
+# Assetto Corsa Realistic Trackday
+**Assetto Corsa Realistic Trackday** is an app for <a href="https://store.steampowered.com/app/244210/Assetto_Corsa/" target="_blank">Assetto Corsa</a> which alters the AI cars' behaviour to act like humans driving on a track day aware of other cars as opposed to bots with horse blinkers constantly driving the racing line.  
 
-![assetto_aiovertake_video1_export_1920x1080-optimize](https://github.com/user-attachments/assets/7e70ad67-8aa5-435e-8da1-5f6fb3c87325)
+Using this app, AI cars will yield to faster cars by driving to the side and only yielding to one pre-defined side (left or right) as is the way during trackdays, particularly on the Nordschliefe.  AI cars will also overtake other cars on the other side and return back to the racing line once it's safe to do so.
 
-This is because I want to recreate the true **Nordschleife Touristenfahrten** experience where by law you are required to overtake only on the left and thus yielding cars always need yield to the right.
+This provides the user a smooth single-player driving experience with AI cars where the vehicles respect each other while driving and act like real drivers do.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7e70ad67-8aa5-435e-8da1-5f6fb3c87325"/>
+</p>
+
+Video of an old working draft: https://www.youtube.com/watch?v=v83cmlmwVZs
+<br><br><br>
+My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm410?si=A4LDo-DjJOClf2i4&t=312" target="_blank">**Nordschleife Touristenfahrten**</a> experience where by law you are required to overtake only on the left and thus yielding cars always need yield to the right.
+<br/><br/>
+<img width="931" height="238" alt="image" src="https://github.com/user-attachments/assets/6080f0a1-425d-4202-a7d8-81662d4f33c2" />
+
+*Source: https://nuerburgring.de/info/company/gtc/driving-regulations*
 
 
 
-![a9kxf-wbv96](https://github.com/user-attachments/assets/2eab7f0d-0f95-429b-84c0-96b82ca2b9ad)
+## Installation
+The app requires <a href="https://acstuff.club/patch/" target="_blank">Custom Shaders Patch</a> extension installed and doesn't work online since it can, *obviously*, only control AI cars.
 
-Currently a work in progress but it's already showing positive, working results.  
+### Stable
+Download the zip file from the Releases page: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/releases
 
-The app also allows for both right AND left yielding so it can be used for street road tracks in other countries.
+Copy the `AssettoCorsaRealisticTrackday` directory to `\steamapps\common\assettocorsa\apps\lua\`
 
----
+### Cutting Edge
+If you want to install the app directly using the latest source code, you can download the entire repository and put all files in: `\steamapps\common\assettocorsa\apps\lua\AssettoCorsaRealisticTrackday\`
 
-Video of first working draft: https://www.youtube.com/watch?v=v83cmlmwVZs
+*There's no guarantee everything will work as expected when using the cutting edge "nightly" code here since I am constantly commiting in untested code when I'm working on the app.*
+<br><br><br><br>
+You should end up with this file structure once the files are copied:
+
+<img width="768" height="789" alt="image" src="https://github.com/user-attachments/assets/1a4a5f7b-5445-458b-a599-de0d2eadcd6b" />
+
+## Settings
+The app offers a number of settings to allow for customizing the experience as much as possible, starting from the general driving of the AI to specific settings regarding yielding and overtaking:
+
+<img width="796" height="706" alt="image" src="https://github.com/user-attachments/assets/c7602b5a-700d-4eeb-86b1-339e909e6863" />
+
+There are also a number of settings that help with understanding what the app is doing under the hood.  One of the main debugging tools is the custom UI table that shows the full relevent data about the cars:
+
+<img width="2560" height="333" alt="image" src="https://github.com/user-attachments/assets/153256c0-9eba-4d31-935b-419e053c7d9a" />
+
+This table shows you a lot of information about each other including the current state the car is in, if it's yielding or overtaking and who's the other car involved, and also reasons why they can't yield or overtake at the time beind.  It's invaluable for understanding the behaviour of the cars.
+
+## How It Works
+### Car States
+Each AI car is represented as a state machine where each car can be in one state at a time.
+
+These are all the current states AI cars can be in:
+
+#### Default Driving States
+
+##### Driving Normally
+The default state where cars are driving the normal racing line while not currently yielding or overtaking other cars.  In this state, a car is constantly monitoring the cars around it to determine whether it needs to overtake the car in front or yield to the car in the rear.
+If a car needs to start yielding to a car behind, it will transition to the **Easing In Yield** state or the **Easing In Overtake** if it needs to overtake a car in front of it.
+<br><br>
+
+#### Yielding States
+
+##### Easing In Yield
+In this state cars are driving laterally from their current lateral position on the track to the yielding lane to let faster cars behind them overtake on the overtaking lane.  To ease into the yielding lane, cars drive slowly to the side while checking to make sure there are no other cars on the side they are driving lateral to.  If they encounter cars on their side while easing in yielding, they will slow down and wait for a gap to fit in on the yielding lane to let the overtaking car pass.  
+When a car has fully reached the yielding lane, they will move on to the **Staying on Yielding Lane** state.
+
+##### Staying on Yielding Lane
+When a car is in the **Staying on Yielding Lane** state, a car will keep driving on the yielding lane side as much as possible to let the overtaking cars pass .  While in this state, cars will try drive a bit safer by keeping a two car gap on the yielding lane.
+When a car determines that there's no one else behind it that needs yielding, it will transition to the **Easing Out Yield** state.
+
+##### Easing Out Yield
+When back to the **Easing Out Yield** state, a car will drive laterally from the yielding lane over to the normal racing line and will transition back to the **Driving Normally** state once it reaches the racing line spline.  If it encounters a car on its side while driving laterally, it will stop driving to the side and wait until the car on the side has created a gap before it returns to the racing line.
+
+<br><br>
+#### Overtaking States
+
+##### Easing In Overtake
+While in the **Easing In Overtake**, a car will drive laterally from their current lateral position on the track to the overtaking lane so that they can overtake the car or cars in front of them.  
+
+##### Staying On Overtaking lane
+After a car overtakes another car, it will check if it should stay on the overtaking lane to continue overtaking the upcoming car before returning back to the normal driving line through the **Easing Out Overtake** state.  
+Once an overtaking car has determined it's far enough from the yielding car and there's no more close cars that can be overtaken, it will start returning back to the normal racing line via the **Easing Out Overtake** state.
+
+##### Easing Out Overtake
+When back on the **Easing Out Overtake** state, a car will drive laterally from the overtaking over to the normal racing line and will transition back to the **Driving Normally** state once it reaches the racing line spline.  If it encounters a car on its side while driving laterally, it will stop driving to the side and wait until the car on the side has created a gap before it returns to the racing line.
+
+<br><br>
+#### Accident States (WORK IN PROGRESS)
+
+##### Collided with Car (WIP)
+##### Collided with Track (WIP)
+##### Another Car Collided Into Me (WIP)
+
+## Thank You
+This app has taken many many hours of development work to get it in the state it is today, so if you enjoy using it, please consider buying me a coffee.  It will be immensely appreciated.
+
+<a href="https://buymeacoffee.com/dreasgrech" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
