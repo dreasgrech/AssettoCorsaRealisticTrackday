@@ -347,7 +347,8 @@ function UIManager.drawCarStateOverheadText()
   --render.setBlendMode(render.BlendMode.BlendPremultiplied)        -- act like opaque even in transparent pass  (SDK: OpaqueForced)
 
   -- for i = 1, sim.carsCount - 1 do
-  for i = 0, sim.carsCount do
+  local carsCount = sim.carsCount
+  for i = 0, carsCount do
   -- for i, car in ac.iterateCars() do
     -- CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
     -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
