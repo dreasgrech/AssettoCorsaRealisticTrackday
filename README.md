@@ -98,7 +98,8 @@ When back on the **Easing Out Overtake** state, a car will drive laterally from 
 ## Known Issues
 - Some cars don't use the indicator lights when yielding or overtaking (like the Alfa Mito), and some cars (like the MX5) seem to have invertly-set indicator lights i.e. they turn on the left indicator light when going right and vice versa.  This seems to be an issue either with the CSP API or with the specific individual cars.
 - As of CSP v0.2.12-preview1, there seems to be a bug with the API in regards to speed-limit functions on the API cars (specifically the `physics.setAIThrottleLimit` and `physics.setAITopSpeed` functions) which prevents the AI cars slowing down while yielding to another car.
-- The 3d overhead text that shows the current state the ai cars are in is currently not occluded by the game geometry i.e. it's rendered on top of everything thus making them seen from everywhere.  *One partial workaround for this is to limit the ones which are displayed by distance to the currently focused car.*  
+- The 3d overhead text that shows the current state the ai cars are in is currently not occluded by the game geometry i.e. it's rendered on top of everything thus making them seen from everywhere.  *One partial workaround for this is to limit the ones which are displayed by distance to the currently focused car.*
+- More TODOs and issues listed on the Issues page: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/issues
 
 ## Thank You
 This app has taken many many hours of development work to get it in the state it is today, so if you enjoy using it, please consider buying me a coffee.  It will be immensely appreciated.
