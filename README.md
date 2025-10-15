@@ -20,7 +20,9 @@ My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm
 
 
 ## Installation
-The app requires <a href="https://acstuff.club/patch/" target="_blank">Custom Shaders Patch</a> extension installed and doesn't work online since it can, *obviously*, only control AI cars.
+The app requires <a href="https://acstuff.club/patch/" target="_blank">Custom Shaders Patch</a> (CSP) extension installed and doesn't work online since it can, *obviously*, only control AI cars.
+
+I have been testing using CSP v0.2.12-preview1
 
 ### Stable
 Download the zip file from the Releases page: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/releases
@@ -35,6 +37,9 @@ If you want to install the app directly using the latest source code, you can do
 You should end up with this file structure once the files are copied:
 
 <img width="768" height="789" alt="image" src="https://github.com/user-attachments/assets/1a4a5f7b-5445-458b-a599-de0d2eadcd6b" />
+
+## How To Use
+[COMING SOON]
 
 ## Settings
 The app offers a number of settings to allow for customizing the experience as much as possible, starting from the general driving of the AI to specific settings regarding yielding and overtaking:
@@ -59,7 +64,6 @@ These are all the current states AI cars can be in:
 The default state where cars are driving the normal racing line while not currently yielding or overtaking other cars.  In this state, a car is constantly monitoring the cars around it to determine whether it needs to overtake the car in front or yield to the car in the rear.
 If a car needs to start yielding to a car behind, it will transition to the **Easing In Yield** state or the **Easing In Overtake** if it needs to overtake a car in front of it.
 <br><br>
-
 #### Yielding States
 
 ##### Easing In Yield
@@ -72,7 +76,6 @@ When a car determines that there's no one else behind it that needs yielding, it
 
 ##### Easing Out Yield
 When back to the **Easing Out Yield** state, a car will drive laterally from the yielding lane over to the normal racing line and will transition back to the **Driving Normally** state once it reaches the racing line spline.  If it encounters a car on its side while driving laterally, it will stop driving to the side and wait until the car on the side has created a gap before it returns to the racing line.
-
 <br><br>
 #### Overtaking States
 
@@ -85,13 +88,17 @@ Once an overtaking car has determined it's far enough from the yielding car and 
 
 ##### Easing Out Overtake
 When back on the **Easing Out Overtake** state, a car will drive laterally from the overtaking over to the normal racing line and will transition back to the **Driving Normally** state once it reaches the racing line spline.  If it encounters a car on its side while driving laterally, it will stop driving to the side and wait until the car on the side has created a gap before it returns to the racing line.
-
 <br><br>
 #### Accident States (WORK IN PROGRESS)
 
 ##### Collided with Car (WIP)
 ##### Collided with Track (WIP)
 ##### Another Car Collided Into Me (WIP)
+
+## Known Issues
+- Some cars don't use the indicator lights when yielding or overtaking (like the Alfa Mito), and some cars (like the MX5) seem to have invertly-set indicator lights i.e. they turn on the left indicator light when going right and vice versa.  This seems to be an issue either with the CSP API or with the specific individual cars.
+- As of CSP v0.2.12-preview1, there seems to be a bug with the API in regards to speed-limit functions on the API cars (specifically the `physics.setAIThrottleLimit` and `physics.setAITopSpeed` functions) which prevents the AI cars slowing down while yielding to another car.
+- The 3d overhead text that shows the current state the ai cars are in is currently not occluded by the game geometry i.e. it's rendered on top of everything thus making them seen from everywhere.  *One partial workaround for this is to limit the ones which are displayed by distance to the currently focused car.*  
 
 ## Thank You
 This app has taken many many hours of development work to get it in the state it is today, so if you enjoy using it, please consider buying me a coffee.  It will be immensely appreciated.
