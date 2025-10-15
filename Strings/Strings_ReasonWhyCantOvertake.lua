@@ -20,11 +20,11 @@ local stringNames = {
 
 local stringValues = {
     [stringNames.None] = const('No reason'),
-    [stringNames.YieldingCarInPits] = const('Car in front is in pits so not overtaking'),
-    [stringNames.YieldingCarTooFarAhead] = const('Car too front ahead so not overtaking'),
-    [stringNames.YieldingCarIsFaster] = const('Car in front is faster so not overtaking'),
-    [stringNames.YieldingCarIsNotOnYieldingSide] = const('Car in front not on overtaking lane so not overtaking'),
-    [stringNames.AnotherCarBehindTooClose] = const('Another car behind us too close so not overtaking'),
+    [stringNames.YieldingCarInPits] = const('Car in front is in pits'),
+    [stringNames.YieldingCarTooFarAhead] = const('Car too front ahead'),
+    [stringNames.YieldingCarIsFaster] = const('Car in front is faster'),
+    [stringNames.YieldingCarIsNotOnYieldingSide] = const('Car in front not on overtaking lane'),
+    [stringNames.AnotherCarBehindTooClose] = const('Another car behind us too close'),
 }
 
 local stringSaveFunction = function (carIndex, stringName)
