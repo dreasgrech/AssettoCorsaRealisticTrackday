@@ -22,7 +22,7 @@ My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm
 ## Installation
 The app requires <a href="https://acstuff.club/patch/" target="_blank">Custom Shaders Patch</a> (CSP) extension installed and doesn't work online since it can, *obviously*, only control AI cars.
 
-I have been testing using CSP v0.2.12-preview1
+I have been testing using CSP `v0.2.12-preview1`
 
 ### Stable
 Download the zip file from the Releases page: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/releases
@@ -97,7 +97,7 @@ When back on the **Easing Out Overtake** state, a car will drive laterally from 
 
 ## Known Issues
 - Some cars don't use the indicator lights when yielding or overtaking (like the Alfa Mito), and some cars (like the MX5) seem to have invertly-set indicator lights i.e. they turn on the left indicator light when going right and vice versa.  This seems to be an issue either with the CSP API or with the specific individual cars.
-- As of CSP v0.2.12-preview1, there seems to be a bug with the API in regards to speed-limit functions on the API cars (specifically the `physics.setAIThrottleLimit` and `physics.setAITopSpeed` functions) which prevents the AI cars slowing down while yielding to another car.
+- As of CSP `v0.2.12-preview1`, there seems to be a bug with the API in regards to speed-limit functions on the API cars (specifically the `physics.setAIThrottleLimit` and `physics.setAITopSpeed` functions) which prevents the AI cars slowing down while yielding to another car.
 - The 3d overhead text that shows the current state the ai cars are in is currently not occluded by the game geometry i.e. it's rendered on top of everything thus making them seen from everywhere.  *One partial workaround for this is to limit the ones which are displayed by distance to the currently focused car.*
 - More TODOs and issues listed on the Issues page: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/issues
 
