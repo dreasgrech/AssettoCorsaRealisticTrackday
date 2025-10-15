@@ -37,8 +37,8 @@ local carTableColumns_dataBeforeDoD = {
   -- { name = 'MaxSpeed', orderDirection = 0, width = 70, tooltip='Max Speed' },
   { name = 'Speed', orderDirection = 0, width = 70, tooltip='Current velocity' },
   { name = 'AverageSpeed', orderDirection = 0, width = 100, tooltip='Average speed' },
-  { name = 'RealOffset', orderDirection = 0, width = 75, tooltip='Actual Lateral offset from centerline' },
-  { name = 'Offset', orderDirection = 0, width = 60, tooltip='Lateral offset from centerline' },
+  { name = 'ActualOffset', orderDirection = 0, width = 88, tooltip='Actual Lateral offset from centerline' },
+  { name = 'CalculatedOffset', orderDirection = 0, width = 110, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
   -- { name = 'UT Distance', orderDirection = 0, width = 90, tooltip='Upcoming Turn distance' },
   -- { name = 'UT TurnAngle', orderDirection = 0, width = 90, tooltip='Upcoming Turn turn-angle' },
@@ -49,18 +49,18 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'Grip', orderDirection = 0, width = 40, tooltip='AI grip level' },
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
-  { name = 'Closing speed', orderDirection = 0, width = 40, tooltip='Closing speed' },
-  { name = 'Time to collision', orderDirection = 0, width = 60, tooltip='Time to collision' },
+  { name = 'ClosingSpeed', orderDirection = 0, width = 95, tooltip='Closing speed to car in front' },
+  { name = 'TimeToCollide', orderDirection = 0, width = 95, tooltip='Time to collision to car in front' },
   { name = 'PreviousState', orderDirection = 0, width = 170, tooltip='Previous state' },
   { name = 'CurrentState', orderDirection = 0, width = 170, tooltip='Current state' },
-  { name = 'StateTime', orderDirection = 0, width = 75, tooltip='Time spent in current state' },
+  { name = 'TimeInState', orderDirection = 0, width = 90, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
-  { name = 'InvolvedInAccident', orderDirection = 0, width = 120, tooltip='Involved in accident status' },
-  { name = 'NavigatingAccident', orderDirection = 0, width = 120, tooltip='Navigating accident status' },
+  -- { name = 'InvolvedInAccident', orderDirection = 0, width = 120, tooltip='Involved in accident status' },
+  -- { name = 'NavigatingAccident', orderDirection = 0, width = 120, tooltip='Navigating accident status' },
   { name = 'PreviousStateExitReason', orderDirection = 0, width = 250, tooltip='Reason for last state exit' },
-  { name = "CantYieldReason", orderDirection = 0, width = 300, tooltip="Reason why the car can't yield" },
-  { name = "CantOvertakeReason", orderDirection = 0, width = 800, tooltip="Reason why the car can't overtake" },
+  { name = "CantYieldReason", orderDirection = 0, width = 260, tooltip="Reason why the car can't yield" },
+  { name = "CantOvertakeReason", orderDirection = 0, width = 260, tooltip="Reason why the car can't overtake" },
 }
 
 local uiCarListSelectedIndex = 0
@@ -242,8 +242,8 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
       ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.2f", CarManager.cars_grip[carIndex] or 0), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.2f", closingSpeed), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.2f", timeToCollision), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.2f km/h", closingSpeed), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.2fs", timeToCollision), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui.nextColumn()
@@ -265,23 +265,23 @@ UIManager.drawMainWindowContent = function()
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
-      -- if involvedInAccidentIndex and involvedInAccidentIndex > 0 then
+      
+      --[===[
       if involvedInAccidentIndex then
-        -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
-        -- ui.textColored(string.format("yes"), uiColor)
         ui.textColored(string.format("yes #%d", involvedInAccidentIndex), uiColor)
       else
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
+
       if currentlyNavigatingAroundAccidentIndex and currentlyNavigatingAroundAccidentIndex > 0 then
-        -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
-        -- ui.textColored(string.format("yes"), uiColor)
         ui.textColored(string.format("yes #%d (car: #%d)", currentlyNavigatingAroundAccidentIndex, CarManager.cars_navigatingAroundCarIndex[carIndex]), uiColor)
       else
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
+      --]===]
+
       ui.textColored(lastStateExitReason, uiColor); ui.nextColumn()
       ui.textColored(cantYieldReason, uiColor); ui.nextColumn()
       ui.textColored(cantOvertakeReason, uiColor); ui.nextColumn()
