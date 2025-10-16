@@ -54,7 +54,8 @@ More information about the car list table below.
 ## Settings
 The app offers a number of settings to allow for customizing the experience as much as possible, starting from the general driving of the AI to specific settings regarding yielding and overtaking:
 
-<img width="796" height="706" alt="image" src="https://github.com/user-attachments/assets/c7602b5a-700d-4eeb-86b1-339e909e6863" />
+<img width="769" height="678" alt="image" src="https://github.com/user-attachments/assets/76fefa12-afd2-4987-8a74-f5e3fc1d784a" />
+
 
 There are also a number of settings that help with understanding what the app is doing under the hood.  One of the main debugging tools is the custom UI table that shows the full relevent data about the cars:
 
@@ -106,7 +107,7 @@ When back on the **Easing Out Overtake** state, a car will drive laterally from 
 ##### Another Car Collided Into Me (WIP)
 
 ## Troubleshooting
-- If you don't see the car list table and want to enable it, you can enable it from the Settings window.
+- If you don't see the car list table and want to enable it, you can enable it from the Settings called `Draw Car List`.
 - If the AI cars are frequently going off track while yielding/overtaking, reduce the `Max Side Offset` value from the Settings:
   
   <img width="645" height="82" alt="image" src="https://github.com/user-attachments/assets/d9bb3a39-b36a-4aa9-b7fc-08ae8bc18608" />
