@@ -1,5 +1,8 @@
 # Assetto Corsa Realistic Trackday
-**Assetto Corsa Realistic Trackday** is an app for <a href="https://store.steampowered.com/app/244210/Assetto_Corsa/" target="_blank">Assetto Corsa</a> which alters the AI cars' behaviour to act like humans driving on a track day aware of other cars as opposed to bots with horse blinkers constantly driving the racing line.  
+<img width="128" height="128" align="right" alt="AssettoCorsaRealisticTrackday_Icon" src="https://github.com/user-attachments/assets/ad8cd56e-59d9-4f5e-9205-4c51013f69c4" />
+
+**Assetto Corsa Realistic Trackday** is an app for <a href="https://store.steampowered.com/app/244210/Assetto_Corsa/" target="_blank">Assetto Corsa</a> which alters the AI cars' behaviour to act like humans driving on a track day aware of other cars as opposed to bots with horse blinkers constantly driving the racing line.
+
 
 Using this app, AI cars will yield to faster cars by driving to the side and only yielding to one pre-defined side (left or right) as is the way during trackdays, particularly on the Nordschliefe.  AI cars will also overtake other cars on the other side and return back to the racing line once it's safe to do so.
 
