@@ -394,14 +394,19 @@ end
 function UIManager.renderUIOptionsControls()
     local storage = StorageManager.getStorage()
 
+    -- Draw the app icon at the top-right of the settings window
     local settingsWindowSize = ui.windowSize()
     settingsWindowIconPosition.x = settingsWindowSize.x - (APP_ICON_SIZE.x + 10)
     settingsWindowIconPositionBottomLeft.x = settingsWindowIconPosition.x + APP_ICON_SIZE.x
     settingsWindowIconPositionBottomLeft.y = settingsWindowIconPosition.y + APP_ICON_SIZE.y
-
     ui.drawImage(APP_ICON_PATH, settingsWindowIconPosition, settingsWindowIconPositionBottomLeft, ui.ImageFit.Fit)
 
-    if ui.checkbox('Enabled', storage.enabled) then storage.enabled = not storage.enabled end
+    -- Draw the Enabled checkbox
+    local appEnabled = storage.enabled
+    local enabledCheckBoxColor = appEnabled and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
+    ui.pushStyleColor(ui.StyleColor.Text, enabledCheckBoxColor)
+    if ui.checkbox('Enabled', appEnabled) then storage.enabled = not storage.enabled end
+    ui.popStyleColor(1)
     if ui.itemHovered() then ui.setTooltip('Master switch for this app.') end
 
     -- if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
