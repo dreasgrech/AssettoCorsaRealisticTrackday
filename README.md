@@ -9,7 +9,9 @@ This provides the user a smooth single-player driving experience with AI cars wh
   <img src="https://github.com/user-attachments/assets/7e70ad67-8aa5-435e-8da1-5f6fb3c87325"/>
 </p>
 
-Video of an old working draft: https://www.youtube.com/watch?v=v83cmlmwVZs
+Short video of Realistic Trackday v0.5: https://www.youtube.com/watch?v=v83cmlmwVZs
+
+Full Nordschleife lap on Realistic Trackday v0.9: https://www.youtube.com/watch?v=s0Gfu2ucrX8
 <br><br><br>
 My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm410?si=A4LDo-DjJOClf2i4&t=312" target="_blank">**Nordschleife Touristenfahrten**</a> experience where by law you are required to overtake only on the left and thus yielding cars always need yield to the right.
 <br/><br/>
