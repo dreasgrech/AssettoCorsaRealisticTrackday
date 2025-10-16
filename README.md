@@ -5,21 +5,23 @@ Using this app, AI cars will yield to faster cars by driving to the side and onl
 
 This provides the user a smooth single-player driving experience with AI cars where the vehicles respect each other while driving and act like real drivers do.
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/7e70ad67-8aa5-435e-8da1-5f6fb3c87325"/>
-</p>
-
-Short video of Realistic Trackday v0.5: https://www.youtube.com/watch?v=v83cmlmwVZs
-
-Full Nordschleife lap on Realistic Trackday v0.9: https://www.youtube.com/watch?v=s0Gfu2ucrX8
-<br><br><br>
+<br><br>
 My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm410?si=A4LDo-DjJOClf2i4&t=312" target="_blank">**Nordschleife Touristenfahrten**</a> experience where by law you are required to overtake only on the left and thus yielding cars always need yield to the right.
 <br/><br/>
 <img width="931" height="238" alt="image" src="https://github.com/user-attachments/assets/6080f0a1-425d-4202-a7d8-81662d4f33c2" />
 
 *Source: https://nuerburgring.de/info/company/gtc/driving-regulations*
 
+## Videos
+Full Nordschleife lap on Realistic Trackday v0.9: https://www.youtube.com/watch?v=s0Gfu2ucrX8
 
+https://github.com/user-attachments/assets/968fa828-86cc-4aba-b6db-5c0471d45557
+
+<br><br>
+Short video of Realistic Trackday v0.5: https://www.youtube.com/watch?v=v83cmlmwVZs
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7e70ad67-8aa5-435e-8da1-5f6fb3c87325"/>
+</p>
 
 ## Installation
 The app requires <a href="https://acstuff.club/patch/" target="_blank">Custom Shaders Patch</a> (CSP) extension installed and doesn't work online since it can, *obviously*, only control AI cars.
