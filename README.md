@@ -74,19 +74,38 @@ These are all the current states AI cars can be in:
 ##### Driving Normally
 The default state where cars are driving the normal racing line while not currently yielding or overtaking other cars.  In this state, a car is constantly monitoring the cars around it to determine whether it needs to overtake the car in front or yield to the car in the rear.
 If a car needs to start yielding to a car behind, it will transition to the **Easing In Yield** state or the **Easing In Overtake** if it needs to overtake a car in front of it.
-<br><br>
+
+<p align="center">
+  <img width="566" height="456" alt="image" src="https://github.com/user-attachments/assets/46072143-593e-415b-abfb-ac46bb9ac7db" />
+</p>
+<br>
+
 #### Yielding States
 
 ##### Easing In Yield
 In this state cars are driving laterally from their current lateral position on the track to the yielding lane to let faster cars behind them overtake on the overtaking lane.  To ease into the yielding lane, cars drive slowly to the side while checking to make sure there are no other cars on the side they are driving lateral to.  If they encounter cars on their side while easing in yielding, they will slow down and wait for a gap to fit in on the yielding lane to let the overtaking car pass.  
 When a car has fully reached the yielding lane, they will move on to the **Staying on Yielding Lane** state.
 
+<p align="center">
+  <img width="566" height="456" alt="image" src="https://github.com/user-attachments/assets/3a1df57f-d1a3-4c51-bb1e-c512834e5ba6" />
+</p>
+
+
 ##### Staying on Yielding Lane
 When a car is in the **Staying on Yielding Lane** state, a car will keep driving on the yielding lane side as much as possible to let the overtaking cars pass .  While in this state, cars will try drive a bit safer by keeping a two car gap on the yielding lane.
 When a car determines that there's no one else behind it that needs yielding, it will transition to the **Easing Out Yield** state.
 
+<p align="center">
+  <img width="566" height="456" alt="image" src="https://github.com/user-attachments/assets/d3411593-52d2-4297-b4f9-0bcaed8f6cb7" />
+</p>
+
 ##### Easing Out Yield
 When back to the **Easing Out Yield** state, a car will drive laterally from the yielding lane over to the normal racing line and will transition back to the **Driving Normally** state once it reaches the racing line spline.  If it encounters a car on its side while driving laterally, it will stop driving to the side and wait until the car on the side has created a gap before it returns to the racing line.
+
+<p align="center">
+  <img width="566" height="456" alt="image" src="https://github.com/user-attachments/assets/23a55a35-eaba-4949-b882-e292ec3f894f" />
+</p>
+
 <br><br>
 #### Overtaking States
 
