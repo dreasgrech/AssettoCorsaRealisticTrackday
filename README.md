@@ -110,7 +110,11 @@ When back to the **Easing Out Yield** state, a car will drive laterally from the
 #### Overtaking States
 
 ##### Easing In Overtake
-While in the **Easing In Overtake**, a car will drive laterally from their current lateral position on the track to the overtaking lane so that they can overtake the car or cars in front of them.  
+While in the **Easing In Overtake**, a car will drive laterally from their current lateral position on the track to the overtaking lane so that they can overtake the car or cars in front of them.
+
+<p align="center">
+  <img width="566" height="456" alt="image" src="https://github.com/user-attachments/assets/5bf42378-e19a-4419-972a-6e62e9f43cdd" />
+</p>
 
 ##### Staying On Overtaking lane
 After a car overtakes another car, it will check if it should stay on the overtaking lane to continue overtaking the upcoming car before returning back to the normal driving line through the **Easing Out Overtake** state.  
