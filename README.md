@@ -43,7 +43,13 @@ You should end up with this file structure once the files are copied:
 <img width="768" height="789" alt="image" src="https://github.com/user-attachments/assets/1a4a5f7b-5445-458b-a599-de0d2eadcd6b" />
 
 ## How To Use
-[COMING SOON]
+Once installed, the app will run automatically when Assetto Corsa is running.
+
+To view the car list table in the window, open the app from the side bar in the game listed as `Realistic Trackday`:
+
+<img width="241" height="27" alt="image" src="https://github.com/user-attachments/assets/a315ab48-cd4d-434e-920a-4bf0c304aba1" />
+
+More information about the car list table below.
 
 ## Settings
 The app offers a number of settings to allow for customizing the experience as much as possible, starting from the general driving of the AI to specific settings regarding yielding and overtaking:
@@ -98,6 +104,9 @@ When back on the **Easing Out Overtake** state, a car will drive laterally from 
 ##### Collided with Car (WIP)
 ##### Collided with Track (WIP)
 ##### Another Car Collided Into Me (WIP)
+
+## Troubleshooting
+[COMING SOON]
 
 ## Known Issues
 - Some cars don't use the indicator lights when yielding or overtaking (like the Alfa Mito), and some cars (like the MX5) seem to have invertly-set indicator lights i.e. they turn on the left indicator light when going right and vice versa.  This seems to be an issue either with the CSP API or with the specific individual cars.
