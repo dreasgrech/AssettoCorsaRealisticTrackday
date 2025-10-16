@@ -106,7 +106,23 @@ When back on the **Easing Out Overtake** state, a car will drive laterally from 
 ##### Another Car Collided Into Me (WIP)
 
 ## Troubleshooting
-[COMING SOON]
+- If you don't see the car list table and want to enable it, you can enable it from the Settings window.
+- If the AI cars are frequently going off track while yielding/overtaking, reduce the `Max Side Offset` value from the Settings:
+  
+  <img width="645" height="82" alt="image" src="https://github.com/user-attachments/assets/d9bb3a39-b36a-4aa9-b7fc-08ae8bc18608" />
+
+- If nothing seems to be working, open the Lua Debug app:
+  
+  <img width="250" height="186" alt="image" src="https://github.com/user-attachments/assets/374bace7-6d85-41a3-9295-c8cf296caf2b" />
+
+  Enable the `Realistic Trackday` app:
+
+  <img width="921" height="95" alt="image" src="https://github.com/user-attachments/assets/3552f0e3-f622-437f-ab61-720a55ba5023" />
+
+  And check if there are any errors listed in the window (*the yellow logs in the below image are from the `Log fast AI state changes` option*):
+
+  <img width="1529" height="330" alt="image" src="https://github.com/user-attachments/assets/b9c28077-3c33-4143-8849-c07e590b5050" />
+
 
 ## Known Issues
 - Some cars don't use the indicator lights when yielding or overtaking (like the Alfa Mito), and some cars (like the MX5) seem to have invertly-set indicator lights i.e. they turn on the left indicator light when going right and vice versa.  This seems to be an issue either with the CSP API or with the specific individual cars.
