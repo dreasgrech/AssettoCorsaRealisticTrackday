@@ -75,6 +75,12 @@ end
 
 carTableColumns_dataBeforeDoD = nil  -- free memory
 
+-- Values for drawing the app icon in the settings window
+local APP_ICON_PATH = Constants.APP_ICON_PATH
+local APP_ICON_SIZE = Constants.APP_ICON_SIZE
+local settingsWindowIconPosition = vec2(0,10) -- the x value is updated dynamically depending on the window size since we want to always draw the image at the top-right corner of the window
+local settingsWindowIconPositionBottomLeft = vec2(0,0) -- this is needed for the ui.drawImage function and is also calculated dynamically
+
 UIManager.drawMainWindowContent = function()
   local storage = StorageManager.getStorage()
   ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
@@ -167,8 +173,10 @@ UIManager.drawMainWindowContent = function()
       -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
       local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
 
+      --[===[
       local involvedInAccidentIndex = false
       local currentlyNavigatingAroundAccidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
+      --]===]
 
       -- local previousCarState = CarStateMachine.cars_previousState[carIndex]
       local previousCarState = CarStateMachine.getPreviousState(carIndex)
@@ -385,6 +393,13 @@ end
 
 function UIManager.renderUIOptionsControls()
     local storage = StorageManager.getStorage()
+
+    local settingsWindowSize = ui.windowSize()
+    settingsWindowIconPosition.x = settingsWindowSize.x - (APP_ICON_SIZE.x + 10)
+    settingsWindowIconPositionBottomLeft.x = settingsWindowIconPosition.x + APP_ICON_SIZE.x
+    settingsWindowIconPositionBottomLeft.y = settingsWindowIconPosition.y + APP_ICON_SIZE.y
+
+    ui.drawImage(APP_ICON_PATH, settingsWindowIconPosition, settingsWindowIconPositionBottomLeft, ui.ImageFit.Fit)
 
     if ui.checkbox('Enabled', storage.enabled) then storage.enabled = not storage.enabled end
     if ui.itemHovered() then ui.setTooltip('Master switch for this app.') end
