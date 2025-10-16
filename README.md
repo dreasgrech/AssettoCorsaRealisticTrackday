@@ -29,7 +29,7 @@ Short video of Realistic Trackday v0.5: https://www.youtube.com/watch?v=v83cmlmw
 ## Installation
 The app requires <a href="https://acstuff.club/patch/" target="_blank">Custom Shaders Patch</a> (CSP) extension installed and doesn't work online since it can, *obviously*, only control AI cars.
 
-I have been testing using CSP `v0.2.12-preview1`
+I have been testing the app using <a href="https://www.patreon.com/posts/few-quick-fixes-131261828" target="_blank">CSP v0.2.12-preview1</a>.
 
 ### Stable
 Download the zip file from the Releases page: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/releases
@@ -78,6 +78,8 @@ There are also a number of settings that help with understanding what the app is
 <img width="2560" height="333" alt="image" src="https://github.com/user-attachments/assets/153256c0-9eba-4d31-935b-419e053c7d9a" />
 
 This table shows you a lot of information about each other including the current state the car is in, if it's yielding or overtaking and who's the other car involved, and also reasons why they can't yield or overtake at the time beind.  It's invaluable for understanding the behaviour of the cars.
+
+**Keep the car list table and all other Debugging options disabled during regular usage of the app so that you don't incur the performance hit they entail.**
 
 ## How It Works
 ### Car States
