@@ -49,7 +49,20 @@ To view the car list table in the window, open the app from the side bar in the 
 
 <img width="241" height="27" alt="image" src="https://github.com/user-attachments/assets/a315ab48-cd4d-434e-920a-4bf0c304aba1" />
 
-More information about the car list table below.
+*More information about the car list table below.*
+
+I have tested this app mostly using the `AI Flood` setting which cycles the AI cars during a Trackday around the player so that there's a constant stream of cars behind and in front of the player car.
+
+It can be enabled from `Content Manager -> Settings -> Custom Shaders Patch -> New AI Behaviour`:
+
+<img width="2533" height="131" alt="image" src="https://github.com/user-attachments/assets/7498a1e9-883c-44a4-90b0-679ab7bea411" />
+
+That said, the app should theoratically work in all modes (except Online) on tracks that have an AI Spline set.
+
+Here's a typical scenario which can be used:
+
+<img width="1353" height="794" alt="image" src="https://github.com/user-attachments/assets/4826abbb-b497-4463-b822-b18a43d2e7e4" />
+
 
 ## Settings
 The app offers a number of settings to allow for customizing the experience as much as possible, starting from the general driving of the AI to specific settings regarding yielding and overtaking:
