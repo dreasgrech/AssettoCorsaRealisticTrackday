@@ -120,8 +120,17 @@ While in the **Easing In Overtake**, a car will drive laterally from their curre
 After a car overtakes another car, it will check if it should stay on the overtaking lane to continue overtaking the upcoming car before returning back to the normal driving line through the **Easing Out Overtake** state.  
 Once an overtaking car has determined it's far enough from the yielding car and there's no more close cars that can be overtaken, it will start returning back to the normal racing line via the **Easing Out Overtake** state.
 
+<p align="center">
+  <img width="566" height="456" alt="image" src="https://github.com/user-attachments/assets/baf90110-a9cf-4e51-a0af-fbc13bd1c9db" />
+</p>
+
 ##### Easing Out Overtake
 When back on the **Easing Out Overtake** state, a car will drive laterally from the overtaking over to the normal racing line and will transition back to the **Driving Normally** state once it reaches the racing line spline.  If it encounters a car on its side while driving laterally, it will stop driving to the side and wait until the car on the side has created a gap before it returns to the racing line.
+
+<p align="center">
+  <img width="566" height="456" alt="image" src="https://github.com/user-attachments/assets/5ca3100b-6995-4fb4-a249-f86f845dfdb6" />
+</p>
+
 <br><br>
 #### Accident States (WORK IN PROGRESS)
 
