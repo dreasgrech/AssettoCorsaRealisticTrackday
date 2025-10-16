@@ -16,15 +16,16 @@ My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm
 *Source: https://nuerburgring.de/info/company/gtc/driving-regulations*
 
 ## Videos
-Full Nordschleife lap on Realistic Trackday v0.9: https://www.youtube.com/watch?v=s0Gfu2ucrX8
 
 https://github.com/user-attachments/assets/968fa828-86cc-4aba-b6db-5c0471d45557
 
-<br><br>
-Short video of Realistic Trackday v0.5: https://www.youtube.com/watch?v=v83cmlmwVZs
+Full Nordschleife lap on Realistic Trackday v0.9: https://www.youtube.com/watch?v=s0Gfu2ucrX8
+<br><br><br>
 <p align="center">
   <img src="https://github.com/user-attachments/assets/7e70ad67-8aa5-435e-8da1-5f6fb3c87325"/>
 </p>
+
+Short video of Realistic Trackday v0.5: https://www.youtube.com/watch?v=v83cmlmwVZs
 
 ## Installation
 The app requires <a href="https://acstuff.club/patch/" target="_blank">Custom Shaders Patch</a> (CSP) extension installed and doesn't work online since it can, *obviously*, only control AI cars.
