@@ -464,7 +464,7 @@ function UIManager.renderUIOptionsControls()
 
     ui.text('Accidents')
 
-    if ui.checkbox('Handle accidents (WORK IN PROGRESS)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
+    if ui.checkbox('Handle accidents (WORK IN PROGRESS - BEST NOT USED FOR NOW)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
 
     storage.distanceFromAccidentToSeeYellowFlag_meters =  ui.slider('Distance from accident to see yellow flag (m)', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500)
