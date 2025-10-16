@@ -182,6 +182,7 @@ When back on the **Easing Out Overtake** state, a car will drive laterally from 
 - The 3d overhead text that shows the current state the ai cars are in is currently not occluded by the game geometry i.e. it's rendered on top of everything thus making them seen from everywhere.  *One partial workaround for this is to limit the ones which are displayed by distance to the currently focused car.*
 - Accident handling hasn't yet been enabled in the app, even though it's almost fully developed.  This involves having the cars stop after accidents, a yellow flag being shown to the player indicating there's an accident, no overtaking of cars in yellow flag zone, everyone driving at 50km/h and also ai cars navigating around the cars in the accident on the track.  But I haven't enabled it yet because of the issue in the current CSP `v0.2.12-preview1` which doesn't have the ai speed limiting code working (see point above for more info) and I need the speed limiting to work for the cars to navigate accidents.
 - Since accidents aren't implemented yet, cars will now sometimes drive back to the track after they crash so beware of that.
+- Currently the settings are saved globally in the app, but it would be better to have them saved on a track-by-track basis.  Issue [#52](https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/issues/52) Suggestion by |/ 𝑫𝒂𝒎𝒈𝒂𝒎 |/
 - More TODOs and issues listed on the Issues page: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/issues
 
 ## Thank You
