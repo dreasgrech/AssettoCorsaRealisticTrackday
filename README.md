@@ -9,7 +9,7 @@ Using this app, AI cars will yield to faster cars by driving to the side and onl
 This provides the user a smooth single-player driving experience with AI cars where the vehicles respect each other while driving and act like real drivers do.
 
 <br><br>
-My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm410?si=A4LDo-DjJOClf2i4&t=312" target="_blank">**Nordschleife Touristenfahrten**</a> experience where by law you are required to overtake only on the left and thus yielding cars always need yield to the right.
+My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm410?si=A4LDo-DjJOClf2i4&t=312" target="_blank">Nordschleife Touristenfahrten</a> experience where by law you are required to overtake only on the left and thus yielding cars always need yield to the right.
 <br/><br/>
 <img width="931" height="238" alt="image" src="https://github.com/user-attachments/assets/6080f0a1-425d-4202-a7d8-81662d4f33c2" />
 
