@@ -22,6 +22,7 @@ end
 -- UPDATE FUNCTION
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
     CarOperations.stopCarAfterAccident(carIndex)
+    CarOperations.toggleCarCollisions(carIndex, false)
 end
 
 -- TRANSITION FUNCTION

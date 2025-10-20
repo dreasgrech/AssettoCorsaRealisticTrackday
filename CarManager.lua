@@ -69,8 +69,8 @@ CarManager.cars_timeToCollision = {}
 
 -- CarManager.cars_involvedInAccidents = {}
 -- CarManager.cars_totalAccidentsInvolvedIn = {}
----@type table<integer,integer>
-CarManager.cars_culpritInAccidentIndex = {}
+-- ---@type table<integer,integer>
+-- CarManager.cars_culpritInAccidentIndex = {}
 ---@type table<integer,integer>
 CarManager.cars_navigatingAroundAccidentIndex = {}
 ---@type table<integer,integer>
@@ -149,7 +149,7 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_closingSpeed[carIndex] = 0
   CarManager.cars_timeToCollision[carIndex] = math.huge
   -- CarManager.cars_involvedInAccidents[carIndex] = {}
-  CarManager.cars_culpritInAccidentIndex[carIndex] = 0
+  -- CarManager.cars_culpritInAccidentIndex[carIndex] = 0
   -- CarManager.cars_navigatingAroundAccidentIndex[carIndex] = nil
   -- CarManager.cars_navigatingAroundCarIndex[carIndex] = nil
   CarManager.sortedCarList_carIndexToSortedIndex[carIndex] = nil
@@ -169,6 +169,9 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Clutch )
+
+  CarOperations.toggleCarCollisions(carIndex, true) -- TODO: make sure this doesn't interfere with CSP's disabling of car collisions when an ai flood car cycles to a new position
+  -- CarOperations.toggleCarCollisions(carIndex, false) -- TODO: SETTING TO FALSE TO SEE IF IT ACTUALLY WORKS
 
   local car = ac.getCar(carIndex)
   if car then

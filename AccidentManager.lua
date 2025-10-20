@@ -20,9 +20,16 @@ AccidentManager.accidents_yellowFlagZoneIndex = {}
 ---@type table<integer,boolean>
 AccidentManager.accidents_resolved = {}
 
+---@type table<integer,integer>
+AccidentManager.cars_culpritInAccidentIndex = {}
+
+---@type table<integer,integer>
+AccidentManager.cars_victimInAccidentIndex = {}
+
 ---Marks the given accident as resolved and done
 ---@param accidentIndex integer
 local setAccidentAsResolved = function(accidentIndex)
+        local culpritCarIndex = AccidentManager.accidents_carIndex[accidentIndex]
         AccidentManager.accidents_carIndex[accidentIndex] = nil
         AccidentManager.accidents_worldPosition[accidentIndex] = nil
         AccidentManager.accidents_splinePosition[accidentIndex] = nil
@@ -34,7 +41,8 @@ local setAccidentAsResolved = function(accidentIndex)
         RaceTrackManager.removeYellowFlagZone(yellowFlagZoneIndex)
         AccidentManager.accidents_yellowFlagZoneIndex[accidentIndex] = nil
 
-        --CarManager.cars_culpritInAccidentIndex[carIndex] = nil
+        AccidentManager.cars_culpritInAccidentIndex[culpritCarIndex] = 0
+        AccidentManager.cars_victimInAccidentIndex[culpritCarIndex] = 0
 
         --[==[
         AccidentManager.accidents_resolved[accidentIndex] = true
@@ -56,9 +64,9 @@ end
 ---Resolve any accident the given car is a culprit in
 ---@param carIndex number
 AccidentManager.informAboutCarReset = function(carIndex)
-    local accidentIndexAsCulprit = CarManager.cars_culpritInAccidentIndex[carIndex]
+    local accidentIndexAsCulprit = AccidentManager.cars_culpritInAccidentIndex[carIndex]
     -- Logger.log(string.format("[AccidentManager] informAboutCarReset called for car #%d. culpritInAccident #%d.  Total accidents: %d", carIndex, accidentIndexAsCulprit, #AccidentManager.accidents_carIndex))
-    if accidentIndexAsCulprit > 0 then
+    if accidentIndexAsCulprit and accidentIndexAsCulprit > 0 then
         -- Logger.log(string.format("AccidentManager: Car #%d has reset, clearing it from accident #%d", carIndex, accidentIndexAsCulprit))
         Logger.log(string.format("[AccidentManager] Car #%d has reset, clearing accident #%d", carIndex, accidentIndexAsCulprit))
 
@@ -86,8 +94,8 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     if not culpritCar then return end
 
     -- if the culprit car is already a culprit in another accident, ignore this collision
-    local culpritCarAsCulpritInAnotherAccidentIndex = CarManager.cars_culpritInAccidentIndex[culpritCarIndex]
-    if culpritCarAsCulpritInAnotherAccidentIndex > 0 then
+    local culpritCarAsCulpritInAnotherAccidentIndex = AccidentManager.cars_culpritInAccidentIndex[culpritCarIndex]
+    if culpritCarAsCulpritInAnotherAccidentIndex and culpritCarAsCulpritInAnotherAccidentIndex > 0 then
         -- Logger.log(string.format("#%d is already a culprit in accident #%d, ignoring new collision", culpritCarIndex, CarManager.cars_culpritInAccident[culpritCarIndex]))
         return
     end
@@ -115,7 +123,7 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     local collidedWithAnotherCar = not collidedWithTrack
     if collidedWithAnotherCar then
         -- if the victim car the culprit car collided with is already in an accident with the culprit car, ignore this collision
-        local victimCarCulpritInAnotherAccidentIndex = CarManager.cars_culpritInAccidentIndex[collidedWith]
+        local victimCarCulpritInAnotherAccidentIndex = AccidentManager.cars_culpritInAccidentIndex[collidedWith]
         if victimCarCulpritInAnotherAccidentIndex and victimCarCulpritInAnotherAccidentIndex > 0 then
             local victimCulpritAccidentCollidedWithCarIndex = AccidentManager.accidents_collidedWithCarIndex[victimCarCulpritInAnotherAccidentIndex]
             if victimCulpritAccidentCollidedWithCarIndex and victimCulpritAccidentCollidedWithCarIndex == culpritCarIndex then
@@ -142,11 +150,24 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     AccidentManager.accidents_resolved[accidentIndex] = false
 
     -- mark the culprit car as being in an accident
-    CarManager.cars_culpritInAccidentIndex[culpritCarIndex] = accidentIndex
+    AccidentManager.cars_culpritInAccidentIndex[culpritCarIndex] = accidentIndex
+
+    -- mark the victim car as being in an accident if the culprit collided with another car
+    if collidedWithAnotherCar then
+        AccidentManager.cars_victimInAccidentIndex[collidedWith] = accidentIndex
+    end
 
     -- create a yellow flag zone for this accident
     local yellowFlagZoneIndex = RaceTrackManager.declareYellowFlagZone(carSplinePosition)
     AccidentManager.accidents_yellowFlagZoneIndex[accidentIndex] = yellowFlagZoneIndex
+
+    -----------------------------
+    -- Disabling car collisions for culprit and victim cars while working on accident navigation
+    CarOperations.toggleCarCollisions(culpritCarIndex, false)
+    if collidedWithAnotherCar then
+        CarOperations.toggleCarCollisions(collidedWith, false)
+    end
+    -----------------------------
 
     Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", culpritCarIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), accidentIndex, #AccidentManager.accidents_carIndex))
 

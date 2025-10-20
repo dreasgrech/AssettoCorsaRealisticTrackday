@@ -24,6 +24,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         return
     end
 
+    CarOperations.setAICaution(carIndex, 1)
     --CarOperations.setAICaution(carIndex, 6)
     CarOperations.setAITopSpeed(carIndex, 10)
     -- CarOperations.limitTopSpeed(carIndex, 10)
@@ -90,6 +91,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local distanceToAccident = car.position:distance(accidentWorldPosition)
 
     local carToNavigateAroundLateralOffset = CarManager.getActualTrackLateralOffset(carToNavigateAround.position)
+
+    --[=====[
     -- local signOfLateralOffset = carToNavigateAroundLateralOffset < 0 and -1 or 1
     -- now we need to calculate our own offset to use to go around the car to navigating around
     if (math.abs(carToNavigateAroundLateralOffset) < 0.1) then
@@ -100,6 +103,11 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         -- targetOffset = (carToNavigateAroundLateralOffset * signOfLateralOffset) + (2.0 * signOfLateralOffset)
         targetOffset = carToNavigateAroundLateralOffset * -1
     end
+    --]=====]
+
+    local carToNavigateAroundSide = RaceTrackManager.getSideFromLateralOffset(carToNavigateAroundLateralOffset)
+    local carToNavigateAroundOppositeSide = RaceTrackManager.getOppositeSide(carToNavigateAroundSide)
+    targetOffset = carToNavigateAroundOppositeSide == RaceTrackManager.TrackSide.LEFT and -2 or 2
 
     ----------------------
     ----------------------
@@ -108,8 +116,13 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     ----------------------
     ----------------------
 
+    --[=====[
     local sideToDriveTo = targetOffset < 0 and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
     CarOperations.driveSafelyToSide(carIndex, dt, car, sideToDriveTo, math.abs(targetOffset), 5, true)
+    --]=====]
+    CarOperations.driveSafelyToSide(carIndex, dt, car, carToNavigateAroundOppositeSide, math.abs(targetOffset), 5, true)
+
+    CarOperations.toggleCarCollisions(carIndex, false)
 end
 
 -- TRANSITION FUNCTION
@@ -130,6 +143,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
     local car = sortedCarsList[sortedCarsListIndex]
 
+    --[====[
+    --Andreas: removed this because it's already being handled in the update function which is better because here we switch to the same state and prevents us from resetting data in the exit function
     -- check if there's an even closer accident that we should be navigating around instead
     local distanceToStartNavigatingAroundCarInAccident_meters = storage.distanceToStartNavigatingAroundCarInAccident_meters
     local upcomingAccidentIndex, upcomingAccidentClosestCarIndex = AccidentManager.isCarComingUpToAccident(car, distanceToStartNavigatingAroundCarInAccident_meters)
@@ -141,6 +156,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             return CarStateMachine.CarStateType.NAVIGATING_AROUND_ACCIDENT
         end
     end
+    --]====]
 
     -- local newStateDueToAccident = CarStateMachine.handleYellowFlagZone(carIndex, car)
     -- if newStateDueToAccident then
@@ -211,5 +227,6 @@ CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCars
     CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
 
     -- Andreas: do not clear here because we use it when changing accident
-    -- CarManager.cars_navigatingAroundAccidentIndex[carIndex] = 0
+    -- Andreas: Update: re-enabled it here because we handle changing accident in the update function now, not in the transition function
+    CarManager.cars_navigatingAroundAccidentIndex[carIndex] = 0 -- clear the accident we're navigating around since we're now exiting the state
 end

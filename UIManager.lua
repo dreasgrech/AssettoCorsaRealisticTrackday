@@ -56,8 +56,8 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'TimeInState', orderDirection = 0, width = 90, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
-  -- { name = 'InvolvedInAccident', orderDirection = 0, width = 120, tooltip='Involved in accident status' },
-  -- { name = 'NavigatingAccident', orderDirection = 0, width = 120, tooltip='Navigating accident status' },
+  { name = 'InvolvedInAccident', orderDirection = 0, width = 120, tooltip='Involved in accident status' },
+  { name = 'NavigatingAccident', orderDirection = 0, width = 120, tooltip='Navigating accident status' },
   { name = 'PreviousStateExitReason', orderDirection = 0, width = 250, tooltip='Reason for last state exit' },
   { name = "CantYieldReason", orderDirection = 0, width = 260, tooltip="Reason why the car can't yield" },
   { name = "CantOvertakeReason", orderDirection = 0, width = 260, tooltip="Reason why the car can't overtake" },
@@ -173,10 +173,8 @@ UIManager.drawMainWindowContent = function()
       -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
       local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
 
-      --[===[
-      local involvedInAccidentIndex = false
+      local involvedInAccidentIndex = AccidentManager.cars_culpritInAccidentIndex[carIndex] or AccidentManager.cars_victimInAccidentIndex[carIndex]
       local currentlyNavigatingAroundAccidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
-      --]===]
 
       -- local previousCarState = CarStateMachine.cars_previousState[carIndex]
       local previousCarState = CarStateMachine.getPreviousState(carIndex)
@@ -274,7 +272,6 @@ UIManager.drawMainWindowContent = function()
       end
       ui.nextColumn()
       
-      --[===[
       if involvedInAccidentIndex then
         ui.textColored(string.format("yes #%d", involvedInAccidentIndex), uiColor)
       else
@@ -288,7 +285,6 @@ UIManager.drawMainWindowContent = function()
         ui.textColored("no", uiColor)
       end
       ui.nextColumn()
-      --]===]
 
       ui.textColored(lastStateExitReason, uiColor); ui.nextColumn()
       ui.textColored(cantYieldReason, uiColor); ui.nextColumn()

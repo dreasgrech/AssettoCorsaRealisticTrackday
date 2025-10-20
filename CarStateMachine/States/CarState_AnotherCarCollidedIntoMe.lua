@@ -9,7 +9,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     -- todo: look at ac.setDriverDoorOpen(carIndex, isOpen, instant)
     -- todo: look at ac.setBodyDirt(carIndex, dirt)
     -- todo: look at ac.overrideTyreSmoke(tyreIndex, intensity, thickness, surfaceHeat)
-    CarOperations.stopCarAfterAccident(carIndex)
+    -- CarOperations.stopCarAfterAccident(carIndex)
 
     -- CarManager.cars_reasonWhyCantYield[carIndex] = 'Another car collided into me so we are stopped'
 
@@ -21,7 +21,9 @@ end
 
 -- UPDATE FUNCTION
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+    CarOperations.stopCarAfterAccident(carIndex)
 
+    CarOperations.toggleCarCollisions(carIndex, false)
 end
 
 -- TRANSITION FUNCTION

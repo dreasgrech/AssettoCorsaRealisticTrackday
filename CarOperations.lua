@@ -193,6 +193,13 @@ CarOperations.setDefaultAIGrip = function(carIndex)
   CarOperations.setGrip(carIndex, CarManager.GripValues.NORMAL)
 end
 
+---Toggles a car's colliders
+---@param carIndex integer
+---@param collisionsEnabled boolean
+CarOperations.toggleCarCollisions = function(carIndex, collisionsEnabled)
+  physics.disableCarCollisions(carIndex, not collisionsEnabled, true)
+end
+
 ---Activates or deactivates gentle stopping.
 ---@param carIndex integer @0-based car index.
 ---@param stop boolean? @Default value: `true`.
@@ -291,6 +298,13 @@ function CarOperations.stopCarAfterAccident(carIndex)
     CarOperations.setGentleStop(carIndex, true)
     CarOperations.setAICaution(carIndex, CarManager.AICautionValues.AFTER_ACCIDENT) -- be very cautious
 
+    CarOperations.preventAIFromRetiring(carIndex)
+end
+
+---Prevent an AI from retiring for some time. 
+---If not moving, they will still retire some time after this function is called, unless you’ll keep calling it.
+---@param carIndex integer @0-based car index.
+function CarOperations.preventAIFromRetiring(carIndex)
     physics.preventAIFromRetiring(carIndex)
 end
 

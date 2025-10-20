@@ -32,6 +32,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- CarOperations.limitTopSpeed(carIndex, 50)
 
     CarOperations.toggleTurningLights(carIndex, ac.TurningLights.Hazards)
+
+    CarOperations.toggleCarCollisions(carIndex, false)
 end
 
 -- TRANSITION FUNCTION
@@ -67,5 +69,6 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+    CarOperations.removeAITopSpeed(carIndex)
     CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
 end
