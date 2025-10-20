@@ -766,7 +766,7 @@ Returns country name based on nation code (three symbols for country ID).
 
   - `string`
 ## Function ac.readDataFile(filename)
-Can be used to access files in “data.acd” and, for example, read car specs.
+Reads a file and returns it as a text. Aware of “data.acd”, so can be used to access files in “data.acd” and, for example, read car specs.
 
   Parameters:
 
@@ -808,7 +808,7 @@ Returns full track ID (name of track folder and layout folder joined by some str
 
   Parameters:
 
-  1. `separator`: `string?` Default value: '-'.
+  1. `separator`: `string??` Default value: '-'.
 
   Returns:
 
@@ -1352,7 +1352,7 @@ is returned. If it’s missing there, a fallback “ITA” is returned. If there
 
   Returns:
 
-  - `string`
+  - `ac.NationCode`
 ## Function ac.getDriverNationality(carIndex)
 Get full nationality of a driver of a certain car. Usually, it’s a full country name. If nationality is not set, a value from JSON
 is returned. If it’s missing there, a fallback “Italy” is returned. If there is no such car, returns `nil`.
@@ -1467,6 +1467,12 @@ Returns steering input from -1 to 1.
   - `number`
 ## Function ac.isControllerGasPressed()
 Is gas input pressed (pedal, gamepad axis, keyboard button but not mouse button).
+
+  Returns:
+
+  - `boolean`
+## Function ac.isControllerBrakePressed()
+Is brake input pressed (pedal, gamepad axis, keyboard button but not mouse button).
 
   Returns:
 
@@ -1888,7 +1894,7 @@ Sets a callback which will be called when a user disconnects (doesn’t do anyth
 
   Parameters:
 
-  1. `callback`: `fun(connectedCarIndex: integer, connectedSessionID: integer)`
+  1. `callback`: `fun(disconnectedCarIndex: integer, disconnectedSessionID: integer)`
 
   Returns:
 
@@ -2215,6 +2221,16 @@ Sets given text to the clipboard.
   Returns:
 
   - `boolean` Returns `false` if failed.
+## Function ac.onReplay(callback)
+Sets a callback which will be called when replay activates, deactivates or jumps around when active (could be good, for things, to clear out particles).
+
+  Parameters:
+
+  1. `callback`: `fun(event: 'start'|'stop'|'jump')`
+
+  Returns:
+
+  - `ac.Disposable`
 ## Function ac.onCarJumped(carIndex, callback)
 Sets a callback which will be called when a car teleports somewhere or its state gets reset.
 
@@ -2406,6 +2422,18 @@ Gets file attributes.
   Returns:
 
   - `io.FileAttributes`
+## Function io.setAttributes(filename, attributes)
+Sets file attributes. Returns `false` if failed.
+
+  Parameters:
+
+  1. `filename`: `path`
+
+  2. `attributes`: `io.FileAttributes`
+
+  Returns:
+
+  - `boolean`
 ## Function io.getMainExecutable()
 Gets full filename of the main AC executable (“…/acs.exe” for most cases).
 Not available to scripts without I/O access.
@@ -2413,6 +2441,12 @@ Not available to scripts without I/O access.
   Returns:
 
   - `path`
+## Function io.getExecutableAttributes(filename)
+Gets extra attributes associated with EXE or DLL files.
+
+  Parameters:
+
+  1. `filename`: `path`
 ## Function io.load(filename, fallbackData)
 Reads file content into a string, if such file exists, otherwise returns fallback data or `nil`.
 
@@ -2483,6 +2517,16 @@ Checks if directory exists. If there is a file in its place, it would return `fa
   - `boolean`
 ## Function io.fileExists(filename)
 Checks if file exists. If there is a directory in its place, it would return `false`.
+
+  Parameters:
+
+  1. `filename`: `path`
+
+  Returns:
+
+  - `boolean`
+## Function io.fileInUse(filename)
+Checks if file is currently being used by another process by trying to open it without allowing any sharing.
 
   Parameters:
 
@@ -2565,6 +2609,18 @@ Returns parent path for given filename.
   Returns:
 
   - `string`
+## Function io.arePathsEqual(path0, path1)
+Compares two paths ignoring case and “/” vs “\” mismatches. Skips repeating slashes. For now, doesn’t account for “/./” or “/dummy/../”.
+
+  Parameters:
+
+  1. `path0`: `string?`
+
+  2. `path1`: `string?`
+
+  Returns:
+
+  - `boolean`
 ## Function io.getFileName(filename, noExtension)
 Returns file name path for given filename.
 
@@ -2622,8 +2678,8 @@ Given an absolute or a relative path, find an actual absolute path. If script do
   Returns:
 
   - `string|nil`
-## Function io.copyFile(existingFilename, newFilename, failIfExists)
-Copies a file to a new place, returns `true` if moved successfully.
+## Function io.copyFile(existingFilename, newFilename, failIfExists, attemptHardlink)
+Copies a file to a new place, returns `true` if copied successfully.
 Not available to scripts without I/O access.
 
   Parameters:
@@ -2633,6 +2689,24 @@ Not available to scripts without I/O access.
   2. `newFilename`: `path`
 
   3. `failIfExists`: `boolean?` Set to `false` to silently overwrite existing files. Default value: `true`.
+
+  4. `attemptHardlink`: `boolean?` If `true` and source and destination share the same drive, try to use hardlink first. Default value: `false`.
+
+  Returns:
+
+  - `boolean`
+## Function io.replaceFile(destination, source)
+Replaces one file with another file. The replacement file assumes the name of the replaced file and its identity. Good if you want to implement
+secure saving (save a file with a new name and then use this function to replace main file with this one: great way to update crucial files
+without risking data corruption in a case of power loss and such). Note: `io.save()` and `io.saveAsync()` already use this safe mechanism if you’re
+setting `ensure` to `true`.
+Not available to scripts without I/O access.
+
+  Parameters:
+
+  1. `destination`: `path`
+
+  2. `source`: `path`
 
   Returns:
 
@@ -2663,6 +2737,8 @@ Not available to scripts without I/O access.
 ## Function io.recycle(filename)
 Moves file to Windows Recycle Bin, returns `true` if file was moved successfully. Note: this operation is much slower than removing a file with `io.deleteFile()`
 or removing an empty directory with `io.deleteDir()`.
+
+ Note: before 0.3.0, doesn’t use recycle bin and just deletes any file or a folder passed to it.
 Not available to scripts without I/O access.
 
   Parameters:
@@ -2741,19 +2817,7 @@ Not available to scripts without I/O access.
 
   2. `entries`: `table<string, io.ZipEntry>` Keys store entry names (use “/” as separator for creating sub-folders), and values store either binary data or tables in `io.ZipEntry` format.
 
-  3. `callback`: `fun(err: string?, response: binary??)` Callback will contain reference to binary data if `filename` is `nil`.
-## Function io.arrtest1()
-Not available to scripts without I/O access.
-
-  Returns:
-
-  - `string`
-## Function io.arrtest2()
-Not available to scripts without I/O access.
-
-  Returns:
-
-  - `string`
+  3. `callback`: `fun(err: string?, response: binary?)` Callback will contain reference to binary data if `filename` is `nil`.
 ## Function os.preciseClock()
 Returns time in seconds from script start (with high precision).
 
@@ -2918,9 +2982,9 @@ Returns original weather conditions without any filtering or sanity checks. For 
 
   1. `r`: `ac.ConditionsSet`
 ## Function ac.getTrackDateTime()
-Returns floading point number of seconds since 1970/01/01 that can be used for driving track animations in such a way that if time multiplier is set to
+Returns floating point number of seconds since 1970/01/01 that can be used for driving track animations in such a way that if time multiplier is set to
 0 or above 1, things would still happen at normal speed, although out of sync with the clock. Ensures to keep things online as well. Currently might not
-work that well with replays, futher updates will improve some edge cases.
+work that well with replays, further updates will improve some edge cases.
 
 Note: if time is still being estimated, returns 0, be sure to check for that case.
 
@@ -4214,7 +4278,7 @@ Searches and replaces all the substrings.
 
   2. `replacee`: `string` String to find.
 
-  3. `replacer`: `string?` String to replace. Default value: ``.
+  3. `replacer`: `string?` String to replace. Default value: `''` (empty string, fixed in 0.3.0).
 
   4. `limit`: `integer?` Maximum number of found strings to replace. Default value: `math.huge`.
 
@@ -4298,7 +4362,7 @@ Checks if the end of a string matches another string. If string to match is long
 
   2. `another`: `string` String to match.
 
-  3. `offset`: `integer?` Optional offset for the matching end. Default value: `0`.
+  3. `offset`: `integer?` Optional offset from the end for the matching end. Default value: `0`.
 
   Returns:
 
@@ -4807,7 +4871,7 @@ with both array and non-array tables. If callback is missing, actual table eleme
 
   1. `t`: `{[TKey]: T}`
 
-  2. `callback`: `fun(item: T, index: TKey, callbackData: TCallbackData): number`
+  2. `callback`: `fun(item: T, index: TKey, callbackData: TCallbackData): number?`
 
   3. `callbackData`: `TCallbackData?`
 
@@ -4822,7 +4886,7 @@ with both array and non-array tables. If callback is missing, actual table eleme
 
   1. `t`: `{[TKey]: T}`
 
-  2. `callback`: `fun(item: T, index: TKey, callbackData: TCallbackData): number`
+  2. `callback`: `fun(item: T, index: TKey, callbackData: TCallbackData): number?`
 
   3. `callbackData`: `TCallbackData?`
 
@@ -4852,7 +4916,7 @@ and non-array tables.
 
   1. `t`: `{[TKey]: T}`
 
-  2. `callback`: `nil|fun(item: T, key: TKey, callbackData: TCallbackData): any`
+  2. `callback`: `nil|fun(item: T, key: TKey, callbackData: TCallbackData): any|nil`
 
   3. `callbackData`: `TCallbackData?`
 ## Function table.findLeftOfIndex(t, testCallback, testCallbackData)
@@ -4929,6 +4993,66 @@ if not, values are simply added to a list).
 
   - `T`
 
+# Module common/internal.lua
+
+## Function setTimeout(callback, delay, uniqueKey)
+Runs callback after certain time. Returns cancellation ID.
+Note: all callbacks will be ran before `update()` call,
+and they would only ran when script runs. So if your script is executed each frame and AC runs at 60 FPS, smallest interval
+would be 0.016 s, and anything lower that you’d set would still act like 0.016 s. Also, intervals would only be called once
+per frame.
+
+  Parameters:
+
+  1. `callback`: `fun()`
+
+  2. `delay`: `number?` Delay time in seconds. Default value: 0.
+
+  3. `uniqueKey`: `any?` Unique key: if set, timer wouldn’t be added unless there is no more active timers with such ID.
+
+  Returns:
+
+  - `integer`
+## Function setInterval(callback, period, uniqueKey)
+Repeteadly runs callback after certain time. Returns cancellation ID.
+Note: all callbacks will be ran before `update()` call,
+and they would only ran when script runs. So if your script is executed each frame and AC runs at 60 FPS, smallest interval
+would be 0.016 s, and anything lower that you’d set would still act like 0.016 s. Also, intervals would only be called once
+per frame.
+
+  Parameters:
+
+  1. `callback`: `fun(): function?` Return `clearInterval` (actual function) to clear interval.
+
+  2. `period`: `number?` Period time in seconds. Default value: 0.
+
+  3. `uniqueKey`: `any?` Unique key: if set, timer wouldn’t be added unless there is no more active timers with such ID.
+
+  Returns:
+
+  - `integer`
+## Function clearTimeout(cancellationID)
+Stops timeout. If called with an ID from `setInterval`, works as well.
+
+  Parameters:
+
+  1. `cancellationID`: `integer` Value earlier retuned by `setTimeout()`. If a non-numerical value is passed (like a `nil`), call is ignored and returns `false`.
+
+  Returns:
+
+  - `boolean` True if timeout with such ID has been found and stopped.
+## Function clearInterval(cancellationID)
+Stops interval. Return this value from a callback to cancel out an interval.
+If called with an ID from `setTimeout`, works as well.
+
+  Parameters:
+
+  1. `cancellationID`: `integer` Value earlier retuned by `setInterval()`. If a non-numerical value is passed (like a `nil`), call is ignored and returns `false`.
+
+  Returns:
+
+  - `boolean` True if interval with such ID has been found and stopped.
+
 # Module common/io.lua
 
 ## Class io.FileAttributes
@@ -5001,65 +5125,6 @@ to AC process to shut down with AC (works only on Windows 8 and newer).
   1. `params`: `{filename: string, arguments: string[], rawArguments: boolean, workingDirectory: string, timeout: integer, environment: table, inheritEnvironment: boolean, stdin: string, separateStderr: boolean, terminateWithScript: boolean|'disposable', assignJob: boolean, dataCallback: fun(err: boolean, data: string)}|`{` filename = '', arguments = {} }` "Table with properties:\n- `filename` (`string`): Application filename.\n- `arguments` (`string[]`): Arguments (quotes will be added automatically unless `rawArguments` is set to true).\n- `rawArguments` (`boolean`): Set to `true` to disable any arguments processing and pass them as they are, simply joining them with a space symbol.\n- `workingDirectory` (`string`): Working directory.\n- `timeout` (`integer`): Timeout in milliseconds. If above zero, process will be killed after given time has passed.\n- `environment` (`table`): If set to a table, values from that table will be used as environment variables instead of inheriting ones from AC process.\n- `inheritEnvironment` (`boolean`): Set to `true` to inherit AC environment variables before adding custom ones.\n- `stdin` (`string`): Optional data to pass to a process in stdin pipe.\n- `separateStderr` (`boolean`): Store stderr data in a separate string.\n- `terminateWithScript` (`boolean|'disposable'`): Terminate process if this Lua script were to terminate (for example, during reload). Since 0.2.10, pass `'disposable'` instead to get `ac.Disposable` back, allowing to terminate the process manually.\n- `assignJob` (`boolean`): Set to `false` to stop CSP from tying the process to AC process (doing so ensures child process would shut down with AC closing).\n- `dataCallback` (`fun(err: boolean, data: string)`): If set to a function, data written in stdout and stderr will be passed to the function instead as it arrives."
 
   2. `callback`: `nil|fun(err: string, data: os.ConsoleProcessResult)`
-
-# Module common/timer.lua
-
-## Function setTimeout(callback, delay, uniqueKey)
-Runs callback after certain time. Returns cancellation ID.
-Note: all callbacks will be ran before `update()` call,
-and they would only ran when script runs. So if your script is executed each frame and AC runs at 60 FPS, smallest interval
-would be 0.016 s, and anything lower that you’d set would still act like 0.016 s. Also, intervals would only be called once
-per frame.
-
-  Parameters:
-
-  1. `callback`: `fun()`
-
-  2. `delay`: `number?` Delay time in seconds. Default value: 0.
-
-  3. `uniqueKey`: `any?` Unique key: if set, timer wouldn’t be added unless there is no more active timers with such ID.
-
-  Returns:
-
-  - `integer`
-## Function setInterval(callback, period, uniqueKey)
-Repeteadly runs callback after certain time. Returns cancellation ID.
-Note: all callbacks will be ran before `update()` call,
-and they would only ran when script runs. So if your script is executed each frame and AC runs at 60 FPS, smallest interval
-would be 0.016 s, and anything lower that you’d set would still act like 0.016 s. Also, intervals would only be called once
-per frame.
-
-  Parameters:
-
-  1. `callback`: `fun(): function?` Return `clearInterval` (actual function) to clear interval.
-
-  2. `period`: `number?` Period time in seconds. Default value: 0.
-
-  3. `uniqueKey`: `any?` Unique key: if set, timer wouldn’t be added unless there is no more active timers with such ID.
-
-  Returns:
-
-  - `integer`
-## Function clearTimeout(cancellationID)
-Stops timeout.
-
-  Parameters:
-
-  1. `cancellationID`: `integer` Value earlier retuned by `setTimeout()`. If a non-numerical value is passed (like a `nil`), call is ignored and returns `false`.
-
-  Returns:
-
-  - `boolean` True if timeout with such ID has been found and stopped.
-## Function clearInterval(cancellationID)
-Stops interval.
-
-  Parameters:
-
-  1. `cancellationID`: `integer` Value earlier retuned by `setInterval()`.
-
-  Returns:
-
-  - `boolean` True if interval with such ID has been found and stopped.
 
 # Module common/ac_enums.lua
 
@@ -6050,17 +6115,6 @@ well with mods. If that file is missing, returns nil.
 
 # Module common/ac_social.lua
 
-## Function ac.DriverTags(driverName)
-Faster way to deal with driver tags. Any request of unsupported fields will return `false` for further extendability.
-Scripts with access to I/O can also alter fields.
-
-  Parameters:
-
-  1. `driverName`: `string`
-
-  Returns:
-
-  - `ac.DriverTags`
 ## Class ac.DriverTags
 Faster way to deal with driver tags. Any request of unsupported fields will return `false` for further extendability.
 Scripts with access to I/O can also alter fields.
@@ -10679,11 +10733,13 @@ loaded as well, but not shown, and instead kept in a pool.
 
     - `self` Returns self for easy chaining.
 
-- `ac.SceneReference:setVisible(visible)`
+- `ac.SceneReference:setVisible(visible, resetMotion)`
 
   Parameters:
 
     1. `visible`: `boolean|`true`|`false``
+
+    2. `resetMotion`: `boolean?` Default value: `true`. Pass `false` to not reset object motion (if you teleport object somewhere and make it visible all at once without using this option, it’ll appear blurry). Note: you can always use `:clearMotion()` to reset motion manually. Doesn’t have an effect if object has already been visible (in this case, this function doesn’t do anything). 
 
   Returns:
 
@@ -11023,7 +11079,7 @@ contains several objects, parents of all of them will be collected.
 
 - `ac.SceneReference:raycast(ray, outSceneRef, outPosRef, outNormalRef, outUVRef, culling)`
 
-  Casts a ray prepared by something like `render.createRay(pos, dir, length)` or `render.createMouseRay()`. Accounts for ray length (since 0.2.10).
+  Casts a ray prepared by something like `render.createRay(pos, dir, length)` or `render.createMouseRay()`. Accounts for ray length (since 0.2.10). You can use this method on individual meshes, lists of meshes, or nodes as well (it’ll go over all the child meshes, but the actual expensive raycast would happen only if ray intersects a mesh bounding sphere).
 
 If you need to access a mesh that was hit, set second argument to true:
 ```lua
@@ -11308,6 +11364,19 @@ end
 
     - `string`
 
+- `ac.SceneReference:hintAsObscured(hide)`
+
+  Hint to CSP chunkenizator that this track mesh (or node, in case of “AC_POBJECT” ones, for example) can’t be seen, so it could exclude it from the scene
+if convinient. Affects Advanced Chunkenization. Might not have an effect.
+
+  Parameters:
+
+    1. `hide`: `boolean|`true`|`false`` Pass `true` to mark it as hidden, or `false` to undo.
+
+  Returns:
+
+    - `self`
+
 - `ac.SceneReference:applyHumanMaterials(neck, modelName, carIndex)`
 
   Parameters:
@@ -11381,9 +11450,11 @@ ac.findNodes('carRoot:0'):applySkin({
 })
 ```
 
+Since 0.3.0, this function can also receive a single string pointing to a skin folder.
+
   Parameters:
 
-    1. `skin`: `table<string, string>`
+    1. `skin`: `table<string, string>|string`
 
   Returns:
 
@@ -12923,6 +12994,172 @@ Create a new track physics mesh (could be a wall or a road). Requires AC to use 
   Returns:
 
   - `ac.Disposable`
+## Function ac.getAppWindows()
+Collect information about available windows.
+## Function ac.accessAppWindow(windowName)
+Looks for a certain window of either an original AC app, a Python or a Lua app. Use `ac.getAppWindows()` to get a list of available apps.
+If found, this wrapper can be used to move or hide an app, or switch it to a different render layer.
+
+  Parameters:
+
+  1. `windowName`: `string`
+
+  Returns:
+
+  - `ac.AppWindowAccessor`
+## Class ac.AppWindowAccessor
+Wrapper for interacting with any AC app. Might not work as intended with some apps not expecting such intrusion though.
+
+- `ac.AppWindowAccessor:valid()`
+
+  Window reference is valid (some references might become invalid if the window is deleted).
+
+  Returns:
+
+    - `boolean`
+
+- `ac.AppWindowAccessor:visible()`
+
+  Checks if window is visible.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.AppWindowAccessor:setVisible(value)`
+
+  Changes visible state of the window.
+
+  Parameters:
+
+    1. `value`: `boolean?` Default value: `true`.
+
+  Returns:
+
+    - `ac.AppWindowAccessor`
+
+- `ac.AppWindowAccessor:pinned()`
+
+  Checks if window is pinned.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.AppWindowAccessor:setPinned(value)`
+
+  Changes pinned state of the window. Works with IMGUI apps with CSP v0.2.3-preview62 or newer.
+
+  Parameters:
+
+    1. `value`: `boolean?` Default value: `true`.
+
+  Returns:
+
+    - `ac.AppWindowAccessor`
+
+- `ac.AppWindowAccessor:position()`
+
+  Returns window position.
+
+  Returns:
+
+    - `vec2`
+
+- `ac.AppWindowAccessor:size()`
+
+  Returns window size (Python apps might draw things to extends exceeding this size).
+
+  Returns:
+
+    - `vec2`
+
+- `ac.AppWindowAccessor:move(value)`
+
+  Moves window to a different position. Works with IMGUI apps with CSP v0.2.3-preview62 or newer.
+
+  Parameters:
+
+    1. `value`: `vec2`
+
+  Returns:
+
+    - `ac.AppWindowAccessor`
+
+- `ac.AppWindowAccessor:resize(value)`
+
+  Resizes a window. Works with IMGUI apps only.
+
+  Parameters:
+
+    1. `value`: `vec2`
+
+  Returns:
+
+    - `ac.AppWindowAccessor`
+
+- `ac.AppWindowAccessor:redirectLayer()`
+
+  Returns redirect layer, or 0 if redirect is disabled. Redirected apps can be accessed via `dynamic::hud::redirected::N` textures.
+
+  Returns:
+
+    - `integer` 0 if redirect is disabled.
+
+- `ac.AppWindowAccessor:setRedirectLayer(layer, duplicate)`
+
+  Moves window to a different render layer, or back to existance with `0` passed as `layer`. Windows in separate layers don’t get mouse
+commands (but this wrapper can be used to send fake commands instead).
+
+  Parameters:
+
+    1. `layer`: `integer?` Default value: `0`.
+
+    2. `duplicate`: `boolean?` Set to `true` to clone a window to a different layer instead of moving it there. Be careful: this might break some Python apps. Default value: `false`.
+
+  Returns:
+
+    - `ac.AppWindowAccessor`
+
+- `ac.AppWindowAccessor:onMouseMove(position)`
+
+  Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
+
+  Parameters:
+
+    1. `position`: `vec2`
+
+  Returns:
+
+    - `ac.AppWindowAccessor`
+
+- `ac.AppWindowAccessor:onMouseDown(position, button)`
+
+  Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
+
+  Parameters:
+
+    1. `position`: `vec2`
+
+    2. `button`: `ui.MouseButton?` Default value: `ui.MouseButton.Left`.
+
+  Returns:
+
+    - `ac.AppWindowAccessor`
+
+- `ac.AppWindowAccessor:onMouseUp(position, button)`
+
+  Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
+
+  Parameters:
+
+    1. `position`: `vec2`
+
+    2. `button`: `ui.MouseButton?` Default value: `ui.MouseButton.Left`.
+
+  Returns:
+
+    - `ac.AppWindowAccessor`
 ## Function ac.writeReplayBlob(key, data)
 Writes additional data to replay. Use `ac.readReplayBlob()` to extract data later in replay mode. Data written this way is not tied to frames.
 Don’t bother compressing data too much: when writing, data will be compressed automatically.
@@ -13753,11 +13990,6 @@ Finishes texture shading. All geometry drawn between `ui.beginTextureShade()` an
 ## Function ui.pushClipRectFullScreen()
 Pretty much fully disables clipping until next `ui.popClipRect()` call.
 function ui.pushClipRectFullScreen() end
-## Function ui.popClipRect()
-
-  Returns:
-
-  - `boolean`
 ## Function ui.drawRect(p1, p2, color, rounding, roundingFlags, thickness)
 
   Parameters:
@@ -14266,10 +14498,6 @@ Does actual transformation. Call this function after calling `ui.beginTransformM
   Parameters:
 
   1. `count`: `integer?` Default value: 1.
-
-  Returns:
-
-  - `boolean`
 ## Function ui.styleColor(varID, styleSet)
 
   Parameters:
@@ -14293,40 +14521,21 @@ Does actual transformation. Call this function after calling `ui.beginTransformM
   Parameters:
 
   1. `count`: `integer?` Default value: 1.
-
-  Returns:
-
-  - `boolean`
 ## Function ui.pushFont(fontType)
 
   Parameters:
 
   1. `fontType`: `ui.Font`
-## Function ui.popFont()
-
-  Returns:
-
-  - `boolean`
 ## Function ui.pushItemWidth(itemWidth)
 
   Parameters:
 
   1. `itemWidth`: `number`
-## Function ui.popItemWidth()
-
-  Returns:
-
-  - `boolean`
 ## Function ui.pushTextWrapPosition(wrapPos)
 
   Parameters:
 
   1. `wrapPos`: `number`
-## Function ui.popTextWrapPosition()
-
-  Returns:
-
-  - `boolean`
 ## Function ui.areaVisible(size)
 Checks if area is visible (not clipped). Works great if you need to make a list with many elements and don’t want to render elements
 outside of scroll (just make sure to offset cursor instead of drawing them using, of example, `ui.offsetCursorY(itemHeight)`).
@@ -14868,11 +15077,6 @@ Draws some aligned text using TTF font with DirectWrite library. Make sure to se
   6. `allowWordWrapping`: `boolean?` Default value: `false`.
 
   7. `color`: `rgbm?` Default value: `rgbm.colors.white`.
-## Function ui.popID()
-
-  Returns:
-
-  - `boolean`
 ## Function ui.getLastID()
 
   Returns:
@@ -14942,15 +15146,6 @@ UI data, such as, for example, opened tab.
   1. `id`: `integer?` Default value: 0.
 
   2. `value`: `boolean?` Default value: `false`.
-## Function ui.columns(columns, border, id)
-
-  Parameters:
-
-  1. `columns`: `integer?` Default value: 1.
-
-  2. `border`: `boolean?` Default value: `true`.
-
-  3. `id`: `string|nil` Default value: `nil`.
 ## Function ui.setColumnWidth(columnIndex, width)
 
   Parameters:
@@ -14970,11 +15165,6 @@ UI data, such as, for example, opened tab.
 ## Function ui.pushColumnsBackground()
 Can be used to draw something spanning entire table.
 function ui.pushColumnsBackground() end
-## Function ui.popColumnsBackground()
-
-  Returns:
-
-  - `boolean`
 ## Function ui.columnSortingHeader(title, orderDirection, alignRight)
 Draws a column label with optional ordering arrow and advances to the next column.
 
@@ -14995,11 +15185,6 @@ Copyable text.
   Parameters:
 
   1. `label`: `string`
-## Function ui.popDisabled()
-
-  Returns:
-
-  - `boolean`
 ## Function ui.button(label, size, flags)
 Simple button.
  @overload fun(label: string, flags: ui.ButtonFlags)
@@ -15601,10 +15786,7 @@ Allow focusing using Tab/Shift+Tab, enabled by default but you can disable it fo
   1. `allowKeyboardFocus`: `boolean|`true`|`false``
 ## Function ui.popAllowKeyboardFocus()
 Removes last `ui.pushAllowKeyboardFocus()` modification.
-
-  Returns:
-
-  - `boolean`
+function ui.popAllowKeyboardFocus() end
 ## Function ui.pushButtonRepeat(repeatValue)
 In repeat mode, button functions return repeated true in a typematic manner.
 Note: you can call `ui.itemActive()` after any button to tell if the button is held in the current frame.
@@ -15614,10 +15796,7 @@ Note: you can call `ui.itemActive()` after any button to tell if the button is h
   1. `repeatValue`: `boolean|`true`|`false``
 ## Function ui.popButtonRepeat()
 Removes last `ui.pushButtonRepeat()` modification
-
-  Returns:
-
-  - `boolean`
+function ui.popButtonRepeat() end
 ## Function ui.indent(indentW)
 Move content position toward the right.
 
@@ -15727,9 +15906,12 @@ Get current window title.
   Returns:
 
   - `string`
-## Function ui.forceSimplifiedComposition()
+## Function ui.forceSimplifiedComposition(currentWindow)
 Stop frosted effect of semi-transparent IMGUI surfaces for a single frame.
-function ui.forceSimplifiedComposition() end
+
+  Parameters:
+
+  1. `currentWindow`: `boolean?` Set to `true` to make it affect this root window only (if you’re within HUD callback, it’ll affect the entire callback). Any window without frosty effect is drawn first, before anything with frosty effect. Option is added in 0.3.0. Default value: `false`.
 ## Function ui.passthroughIMGUI()
 Allow AC to see mouse events for a frame, even if IMGUI is handling them.
 function ui.passthroughIMGUI() end
@@ -15906,7 +16088,7 @@ Not available to car and track scripts.
   Returns:
 
   - `ac.Disposable`
-## Function ui.onExclusiveHUD(callback)
+## Function ui.onExclusiveHUD(callback, noPadding)
 Sets a callback for drawing UI which will be called first. Anything drawn here will likely be covered by other UI elements. Return `true`
 to stop the rest of UI to be drawn in this frame (including AC UI). Return `'debug'` to also show Lua Debug app, in case you’d need it
 for development. Use `mode` passed in your callback to determine the state of the game: chances are you’d need to draw your
@@ -15920,13 +16102,16 @@ Since 0.2.8, return `'finalize'` to allow `ui.popup()` and `ui.onUIFinale()`.
 
   Parameters:
 
-  1. `callback`: `fun(mode: 'menu'|'pause'|'results'|'replay'|'game'): 'debug'|'apps'|boolean?`
+  1. `callback`: `fun(mode: 'menu'|'pause'|'results'|'replay'|'game'): 'debug'|'debug-nonexclusive'|'apps'|'apps-nonexclusive'|boolean?`
+
+  2. `noPadding`: `boolean?` Default value: `false`.
 
   Returns:
 
   - `ac.Disposable`
 ## Function ui.modalPopup(title, msg, okText, cancelText, okIconID, cancelIconID, callback)
-Open modal popup message with OK and Cancel buttons, return user choice via callback.
+Open modal popup message with OK and Cancel buttons, return user choice via callback. Since 0.3.0, you can pass `'-'` as `cancelText` to have a dialog
+with a single button only.
 
   Parameters:
 
@@ -15955,7 +16140,7 @@ Open modal dialog with custom UI. Return `true` from callback when it’s time t
 
   2. `callback`: `fun(): boolean`
 
-  3. `autoclose`: `boolean?` Automatically close if clicked outside of dialog. Default value: `false`.
+  3. `autoclose`: `boolean?` Automatically close if clicked outside of dialog, or if Escape button is pressed. Default value: `false`.
 
   4. `closeCallback`: `fun()?` Default value: `nil`.
 ## Function ui.modalPrompt(title, msg, defaultValue, okText, cancelText, okIconID, cancelIconID, callback)
@@ -16037,7 +16222,7 @@ Adds mention of a driver in chat input.
 
   2. `autofocus`: `boolean?` Default value: `true`.
 ## Function ui.imageState(imageSource)
-Returns state of an image (might act strage with special textures, like the ones loaded from DLLs; new return values might be added later).
+Returns state of an image (might act strangely with special textures, like the ones loaded from DLLs; new return values might be added later).
 
   Parameters:
 
@@ -16607,6 +16792,10 @@ Sets name of an AI, announces new name online to other clients. Could be used fo
   2. `name`: `string` First and last name separated by a space.
 
   3. `nationCode`: `ac.NationCode|nil` 3 characters long nation code. If not set, current value is used. Default value: `nil`.
+
+  Returns:
+
+  - `boolean` Returns `false` if no changes have been made.
 ## Function physics.setAIDriverTeam(carIndex, team)
 Sets name of an AI’s team, announces new name online to other clients. Could be used for some hot driver swapping.
 
@@ -16755,14 +16944,16 @@ will be limited by track width as well.
   2. `offset`: `number` Offset in meters, negative for left, positive for right.
 
   3. `overrideAiAwareness`: `boolean?` Default value: `false`.
-## Function physics.setAISpline(carIndex, filename)
-If not loaded yet, loads new AI spline in background and uses it instead of main API spline. Experimental.
+## Function physics.setAISpline(carIndex, filename, aiHintsFilename)
+If not loaded yet, loads new AI spline in background and uses it instead of main API spline.
 
   Parameters:
 
   1. `carIndex`: `integer` 0-based car index.
 
-  2. `filename`: `string` Full path to a spline file.
+  2. `filename`: `string|nil` Path to a spline file. Pass `nil` to reset the spline. Default value: `nil`.
+
+  3. `aiHintsFilename`: `string|nil` Path to “ai_hints.ini” file. Added in 0.3.0. Each new value creates a new spline, so please don’t use it excessively. If you need to limit speed dynamically, consider using dedicated functinos. Default value: `nil`.
 
   Returns:
 
@@ -16884,6 +17075,27 @@ Disables quick pitstop menu.
   Parameters:
 
   1. `disable`: `boolean?` Default value: `true`.
+## Function ac.disableVirtualMirror(disable)
+Disables drawing of virtual mirror entirely.
+
+  Parameters:
+
+  1. `disable`: `boolean?` Default value: `true`.
+## Function ac.disableExtraHUDElements(idsMask, disable)
+Disables other HUD elements.
+Not available to scripts without I/O access.
+
+  Parameters:
+
+  1. `idsMask`: `'sessionTime'|'fuel'|'proximity'|'virtualMirror'|'quickPitsMenu'|'leaderboard'|'startingLights'|'wrongWay'|'ping'|'damage'|string[].` ID or list of IDs.
+
+  2. `disable`: `boolean?` Default value: `true`.
+## Function ac.disableNeckFXDriverModelMovement(disable)
+Disables Neck FX altering driver model.
+
+  Parameters:
+
+  1. `disable`: `boolean?` Default value: `true`.
 ## Function ac.setCurrentCamera(mode)
 Sets current camera mode.
 
@@ -16908,6 +17120,11 @@ Sets current track cameras set.
   Parameters:
 
   1. `set`: `integer` 0-based index of track cameras set (sim state has upper bound).
+## Function ac.recenterVR()
+
+  Returns:
+
+  - `boolean`
 ## Function ac.focusCar(index)
 Focus on a certain car.
 
@@ -16955,10 +17172,23 @@ Sets a callback which will be called each time a new chat message arrives. Retur
 and stop it from showing in chat apps.
 
 Second argument in callback stores car ID of a car that sent the message, or -1 if message comes from server.
+Not available to scripts without I/O access.
 
   Parameters:
 
-  1. `callback`: `fun(message: string, senderCarIndex: integer, senderSessionID: integer): boolean`
+  1. `callback`: `fun(message: string, senderCarIndex: integer, senderSessionID: integer): boolean` Callback which will be called each time new message arrives.
+
+  Returns:
+
+  - `ac.Disposable`
+## Function ac.onOutgoingChatMessage(callback)
+Sets a callback which will be called when user tries to send a message. Return `true` from callback to handle chat message
+and stop it from actually being sent (it’ll disappear from the chat as if sent).
+Not available to scripts without I/O access.
+
+  Parameters:
+
+  1. `callback`: `fun(message: string, senderCarIndex: integer, senderSessionID: integer): boolean` Callback which will be called each time new message is being sent.
 
   Returns:
 
@@ -17007,6 +17237,30 @@ Sets DOF distance of a free camera. Note: if you want to control camera fully, c
   Parameters:
 
   1. `distance`: `number` Value in meters, or 0 to disable DOF.
+## Function ac.hideMouseCursor(restorePosition)
+Hide mouse for a very short period of time. Call each frame if you want for it to stay hidden. Works similar to `ui.setMouseCursor(ui.MouseCursor.None)`,
+but this one can be called from `script.update()` and has an option to restore cursor position.
+
+  Parameters:
+
+  1. `restorePosition`: `boolean?` Set to `true` if you want for mouse to restore position when reappearing. Default value: `false`.
+## Function ac.accessMouseDelta(rawInput, restorePosition, force)
+Returns mouse delta since the last call in pixels, but also, hides mouse and fixes it in place, allowing to drag things around endlessly. Good for
+implementing first person cameras, or something like custom mouse steering, so that mouse is no longer bound by window or screen size. Mouse will be
+released and reappear shortly after this function has stopped being called. If delta is not available (for example, if `force` is not set to `true`,
+and mouse currently is hovering some UI element), returns `vec2(0, 0)`.
+
+  Parameters:
+
+  1. `rawInput`: `nil|boolean|'camera'` Set to `true` to use raw input, or to `'camera'` to use raw input only if that’s user’s preference for cameras.
+
+  2. `restorePosition`: `boolean?` Set to `true` to restore mouse position when mouse is released. Default value: `true`.
+
+  3. `force`: `boolean?` Set to `true` to force access even if mouse is currently busy interacting with UI or something like that. Default value: `false`.
+
+  Returns:
+
+  - `vec2`
 ## Function ui.onDriverContextMenu(callback)
 Sets a callback which will be called when drawing driver context menu. Within, `ui.` functions can be used to add additional information.
 
@@ -17025,7 +17279,10 @@ Returns `true` if resetting car is allowed in current session, invalidates lap.
   - `boolean`
 ## Function ac.resetCar()
 Resets car back to the track. Available in few basic modes in offline only (such as practice with a single car), invalidates lap.
-function ac.resetCar() end
+
+  Returns:
+
+  - `boolean` Return value added in 0.3.0.
 ## Function ac.takeAStepBack(offset)
 Resets car back to the track and moves it a bit back. Available in few basic modes in offline only (such as practice with a single car), invalidates lap.
 
@@ -17168,7 +17425,9 @@ Not available to scripts without I/O access.
 
   2. `data`: `string` INI config data.
 
-  3. `flags`: `integer?` Bit flags. 1: restore the state of track conditions, set by default. 2: partial mode (do not discard existing config loaded from INI file on a disk), set by default. 4: reload 3D-trees as well, set by default. 8: apply shader replacements from the config to the entire model, not just to meshes loaded from KN5. Use `bit.bor()` to combine flags. Default value: `uint(data_ac_ext_track_adjustments::load_adjustments_flags::default_value)`.
+  3. `flags`: `integer?` Bit flags. 1: restore the state of track conditions, set by default. 2: partial mode (do not discard existing config loaded from INI file on a disk), set by default. 4: reload 3D-trees as well, set by default. 8: apply shader replacements from the config to the entire model, not just to meshes loaded from KN5. Use `bit.bor()` to combine flags. Default value: 7.
+## Function ac.getAppWindows()
+Collect information about available windows.
 ## Function ac.pauseFilesWatching(pause)
 Pauses or un-pauses file system monitoring used for live reloading. Might be useful to pause it if you’re about to update a lot of configs, for example. Make sure
 to always re-enable watching afterwards though, or it’ll be re-enabled in a few seconds automatically.
@@ -17249,7 +17508,7 @@ Tries to reload a Python app with given name (name of its folder).
 
   - `boolean` Returns `false` if app with this name was not found.
 ## Function ac.configureCarForceFeedback(carIndex, ffbBase, ffbSteerAssist)
-Alter `FFMULT` and `STEER_ASSIST` from car.ini. Original values are available in car state.
+Alter `FFMULT` and `STEER_ASSIST` from car.ini. Original values are available in car state. Since 0.3.0, pass `0` to restore original values.
 
   Parameters:
 
@@ -17396,6 +17655,16 @@ to check the current state.
   Returns:
 
   - `boolean`
+## Function ac.toggleFullscreen(fullscreen)
+Toggle fullscreen state. Currently, doesn’t work with exclusive fullscreen. Returns `false` if no change has been made.
+
+  Parameters:
+
+  1. `fullscreen`: `boolean?` Pass `nil` to toggle.
+
+  Returns:
+
+  - `boolean`
 ## Function ac.overrideCameraClipPlanes(nearPlane, farPlane)
 Override camera clip planes. Pass distances in meters, or `nil` to disable the override.
 
@@ -17475,6 +17744,7 @@ Simulate CSP hotkey (one of ones listed in Patch section of control settings in 
 
   2. `frames`: `integer?` Number of frames to keep pressing button for. Default value: 3.
 ## Function ac.resetVRPose()
+Use `ac.recenterVR()`.
 
   Returns:
 
@@ -17546,7 +17816,7 @@ currently supported.
 
   Parameters:
 
-  1. `config`: `'controls.ini'|'video.ini'|'gameplay.ini'|'assetto_corsa.ini'|'proximity_indicator.ini'|'graphics.ini'|'graphics_adjustments.ini'|'custom_rendering_modes.ini'|'general.ini'|'walking_out.ini'`
+  1. `config`: `'controls.ini'|'video.ini'|'gameplay.ini'|'assetto_corsa.ini'|'mouse_hider.ini'|'proximity_indicator.ini'|'graphics.ini'|'graphics_adjustments.ini'|'custom_rendering_modes.ini'|'general.ini'|'walking_out.ini'`
 
   2. `data`: `string` Serialized INI data.
 ## Function ac.makeScreenshot(filename, format, callback)
@@ -18167,8 +18437,12 @@ Resets car setup to default values. Works only from setup menu, and only if setu
   Returns:
 
   - `boolean` Returns `true` if successful.
-## Function ac.stringifyCurrentSetup()
+## Function ac.stringifyCurrentSetup(includeMetadata)
 Exports current setup into a string.
+
+  Parameters:
+
+  1. `includeMetadata`: `boolean?` Default value: `true`.
 
   Returns:
 
@@ -18273,7 +18547,7 @@ manually (just add a new line with it in “.vscode/settings.json”).
 
   2. `data`: `serializable|nil` Data to pass to the script (will be available as `worker.input` value). Default value: `nil`.
 
-  3. `callback`: `fun(err: string, data: string|number|boolean)?` Default value: `nil`.
+  3. `callback`: `fun(err: string, data: string|number|boolean|table, ...)?` Default value: `nil`.
 ## Function ui.drawVirtualMirror(p1, p2, color)
 Draw virtual mirror. If Real Mirrors module is active and has its virtual mirrors option enabled, mirror might be drawn in two pieces 
 taking less space width-wise (for cars without middle mirror) or just drawn narrower. If that option is disabled, Real Mirrors will pause.
@@ -19125,6 +19399,17 @@ Draw a tooltip with custom content.
   Returns:
 
   - `T`
+## Function ui.columns(columns, border, id)
+Set `columns` above 1 to start a column layout. Set it back to 1 to stop the layout. Since 0.3.0, there is a new override
+taking flags. When layouting columns, use `ui.nextColumn()` to switch to the next column, or row if current column is the last one.
+
+  Parameters:
+
+  1. `columns`: `integer?` Default value: 1.
+
+  2. `border`: `boolean?` Default value: `true`.
+
+  3. `id`: `string|nil` Default value: `nil`.
 ## Function ui.childWindow(id, size, border, flags, content)
 Draw a child window: perfect for clipping content, for scrolling lists, etc. Think of it more like
 a HTML div with overflow set to either scrolling or hidden, for example.
@@ -19329,15 +19614,16 @@ included by default: simply pass a semi-transparent symbol here.
 
   3. `hint`: `string?` Optional hint appearing if mouse is hovering the icon.
 ## Function ui.atlasIconID(filename, uv1, uv2)
-Generates ID to use with `ui.icon()` to draw an icon from an atlas.
+Generates ID to use with `ui.icon()` to draw an icon from an atlas. Might be faster to safe the result
+of the call and reuse that, although it’s not that expensive if you only need to render a couple of icons.
 
   Parameters:
 
   1. `filename`: `string` Texture filename.
 
-  2. `uv1`: `vec2` UV coordinates of the upper left corner.
+  2. `uv1`: `number|vec2` UV coordinates of the upper left corner in 0…1 range, 0 for the top left corner.
 
-  3. `uv2`: `vec2` UV coordinates of the bottom right corner.
+  3. `uv2`: `number|vec2` UV coordinates of the bottom right corner in 0…1 range, 0 for the top left corner.
 
   Returns:
 
@@ -20528,6 +20814,19 @@ Collect list of material properties in KN5 file in a form of shader replacements
   Returns:
 
   - `string`
+## Function ac.overrideLODMultiplier(trackMultiplier, carsMultiplier)
+Adjusts LOD sliders from Graphics Adjustments live (adjustments remain in-place for as long as the script is alive).
+Pass `nil` to cancel a certain adjustment. Pass 1 for a regular LOD multiplier, or a value above 1 to increase details
+at distance. Pass `math.huge` to disable LODs.
+
+For scripts with Gameplay API access, there is also `ac.setExtraTrackLODMultiplier()` which would be applied on top of
+this multiplier.
+
+  Parameters:
+
+  1. `trackMultiplier`: `number?`
+
+  2. `carsMultiplier`: `number?`
 
 # Module common/ac_display.lua
 
@@ -20647,6 +20946,363 @@ and velocity and it would affect the smoke.
 Note: use carefully, smoke particles can only account for eight detractors at once, and some of them can be set
 by track config. Also, moving cars or exhaust flames push smoke away using the same system.
 
+# Module common/ac_extras_binaryinput.lua
+
+## Function ac.ControlButton(id, defaults)
+
+  Parameters:
+
+  1. `id`: `string` Name of a section in “controls.ini”. If you are adding a new input, use something like “your.namespace/Nice Name” (without square brackets or colons) to ensure there won’t be collisions and it would integrate nicely.
+
+  2. `defaults`: `{keyboard: nil|{key: ui.KeyIndex?, ctrl: boolean?, shift: boolean?, alt: boolean?}, gamepad: nil|ac.GamepadButton, period: nil|number, hold: nil|boolean}?` Default settings if user has not configured input yet. Parameter `period` can be used to create buttons which would keep reporting as pressed (or call `:onDown()`) while held, can be configured in “controls.ini” as “REPEAT_PERIOD”; by default repeating is disable. Set parameter `hold` to a boolean value and control widget will get a “hold” switch. Buttons configured in “hold” mode return `true` on `:pressed()` when both pressed and released, as well as trigger `:onPressed()` when released too. Note: if `ac.ControlButton()` is called multiple times within a race session, only defaults from the first run will be taken into account (but if subsequent calls will have a “hold” value, button editing widget will still get a “hold” switch).
+
+  Returns:
+
+  - `ac.ControlButton`
+## Class ac.ControlButton
+A good way to listen to user pressing buttons configured in AC control settings. Handles everything for you automatically, and if you’re working
+on a Lua app has a `:control()` method drawing a button showing current binding and allowing to change it in-game.
+
+Could be used for original AC button bindings, new bindings added by CSP, or even for creating custom bindings. For that, make sure to pass a
+reliably unique ID when creating a control button, maybe even prefixed by your app name.
+
+Note: inputs for car scripts (both display and physics ones) would work only if the car is currently controlled by the user and not in a replay.
+When possible, consider binding to car state instead. If your script runs at lower rate than graphics thread (skipping frames), either use `:down()`
+or, better yet, sign to events, `:pressed()` call might return `false`.
+
+- `ac.ControlButton:configured()`
+
+  Button is configured.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.ControlButton:disabled()`
+
+  Button is disabled.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.ControlButton:holdMode()`
+
+  Button is using hold mode.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.ControlButton:pressed()`
+
+  Button was just pressed. For buttons in hold mode returns `true` on both press and release.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.ControlButton:released()`
+
+  Button was just released. For buttons in hold mode returns `true` on both press and release.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.ControlButton:down()`
+
+  Button is held down. For buttons in hold mode works similar to `:pressed()`.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.ControlButton:onPressed(callback)`
+
+  Sets a callback to be called when the button is pressed. For buttons in hold mode calls callback on both presses and releases. If button is held down
+when this method is called, callback will be called the next frame.
+
+  Parameters:
+
+    1. `callback`: `fun()`
+
+  Returns:
+
+    - `ac.Disposable`
+
+- `ac.ControlButton:onReleased(callback)`
+
+  Sets a callback to be called when the button is released. For buttons in hold mode calls callback shortly after both presses and releases.
+
+  Parameters:
+
+    1. `callback`: `fun()`
+
+  Returns:
+
+    - `ac.Disposable`
+
+- `ac.ControlButton:setAlwaysActive(value)`
+
+  Always active buttons work even if AC is paused or in, for example, pits menu.
+
+  Parameters:
+
+    1. `value`: `boolean?` Default value: `true`.
+
+  Returns:
+
+    - `ac.ControlButton`
+
+- `ac.ControlButton:setDisabled(value)`
+
+  Disabled buttons ignore presses but remember their settings.
+
+  Parameters:
+
+    1. `value`: `boolean?` Default value: `true`.
+
+  Returns:
+
+    - `ac.ControlButton`
+
+- `ac.ControlButton:control(size, flags, emptyLabel)`
+
+  Use within UI function to draw an editing button. Not available for scripts without UI access.
+To change color of pressed button indicator, override `PlotLinesHovered` color.
+
+  Parameters:
+
+    1. `size`: `vec2?` If not set, or width is 0, uses next item width and regular button height.
+
+    2. `flags`: `ui.ControlButtonControlFlags?` Default value: `ac.ControlButtonControlFlags.None`.
+
+    3. `emptyLabel`: `string?` Default value: `'Click to assign'`.
+
+  Returns:
+
+    - `boolean`
+
+- `ac.ControlButton:boundTo()`
+
+  Returns text for displaying current binding, or `nil` if the button isn’t bound to anything.
+
+  Returns:
+
+    - `string`
+
+# Module common/ac_extras_yebiscolorcorrection.lua
+
+## Class ac.ColorCorrection
+Helper entity to set color corrections. Holds up to 200 corrections at once. Call `:reset()` if you want to start over, or just use `ac.setColorCorrection()` the way it’s meant to be used.
+
+- `ac.ColorCorrection:reset()`
+
+  Reset alterations.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:grayscale()`
+
+  Completely desaturate the image.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:negative()`
+
+  Invert image colors.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:saturation(v)`
+
+  Change image saturation.
+
+  Parameters:
+
+    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:brightness(v)`
+
+  Change image brightness (multiplies color by the parameter).
+
+  Parameters:
+
+    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:contrast(v)`
+
+  Change image contrast.
+
+  Parameters:
+
+    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:bias(v)`
+
+  Change image bias (adds the parameter to color).
+
+  Parameters:
+
+    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:fade(v, effectRatio)`
+
+  Add a fadeout transformation.
+
+  Parameters:
+
+    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:monotone(v, saturation, brightness)`
+
+  Turn image monotone.
+
+  Parameters:
+
+    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
+
+    2. `saturation`: `number?` Saturation factor. Default value: 0.
+
+    3. `brightness`: `number?` Brightness factor. Default value: 1.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:HSB(hueDegrees, saturation, brightness, keepLuminance)`
+
+  Alter hue, saturation and brightness.
+
+  Parameters:
+
+    1. `hueDegrees`: `number?` Degrees for hue shift. Default value: 0.
+
+    2. `saturation`: `number?` Saturation adjustment. Default value: 1.
+
+    3. `brightness`: `number?` Brightness adjustment. Default value: 1.
+
+    4. `keepLuminance`: `boolean?` Keep image luminance. Default value: `false`.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:whiteBalance(temperatureK, luminance)`
+
+  Alter image white balance.
+
+  Parameters:
+
+    1. `temperatureK`: `number?` Temperature in K. Default value: 6500.
+
+    2. `luminance`: `number?` Luminance. Default value: 1.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:temperature(temperatureK, luminance)`
+
+  Alter image temperature.
+
+  Parameters:
+
+    1. `temperatureK`: `number?` Temperature in K. Default value: 6500.
+
+    2. `luminance`: `number?` Luminance. Default value: 1.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:sepia(v)`
+
+  Shift tone to sepia.
+
+  Parameters:
+
+    1. `v`: `number?` Sepia amount. Default value: 1.
+
+  Returns:
+
+    - `self`
+
+- `ac.ColorCorrection:hue(hueDegrees, keepLuminance)`
+
+  Shift image hue.
+
+  Parameters:
+
+    1. `hueDegrees`: `number?` Degrees for hue shift. Default value: 0.
+
+    2. `keepLuminance`: `boolean?` Keep image luminance. Default value: `false`.
+
+  Returns:
+
+    - `self`
+## Function ac.setColorCorrection(targetLDR, priority)
+YEBIS uses color matrices to quickly adjust HDR (input 0…∞ range) and LDR (output 0…1 range) color. Tweaks such as saturation, brightness and
+contrast configured in YEBIS PP filter, or in video settings, all control those matrices.
+
+This function allows to easily tweak those matrices. Call it, optionally specifying target matrix and priority, and then use methods of returned
+entity to easily tweak the color. Chain methods together to achieve the desired effect:
+```lua
+ac.setColorCorrection():brightness(3):saturation(2)
+```
+
+Won’t have any effect if YEBIS is disabled, or if WeatherFX style script replaces YEBIS post-processing and doesn’t read
+HDR matrix correctly. For compatibility reasons, if WeatherFX style script doesn’t read LDR color matrix, it will be applied
+afterwards (in CSPs before 0.2.5, there wasn’t a method for WeatherFX style scripts to even access LDR color matrix, and
+Assetto Corsa didn’t alter it at all).
+
+Each time the function is called with the same target and priority parameters, its state will reset. Feel free to call this function every frame
+if you want for adjustments to transition smoothly, or just once if you just want to tweak the colors and forget about it.
+
+Note: you can keep a reference to returned value and tweak it instead, but then you’ll have to call `:reset()` manually. One tweak entity can
+hold up to 40 adjustments, mostly to make sure it’s used correctly. Actual adjustments are very cheap.
+
+Note: some scripts, such as online scripts, can access old API for color corrections, such as `ac.ColorCorrectionBrightness()`.
+Those things are obsolete now, please use this thing instead (with only exception being WeatherFX styles, those could still
+old API since it could be a tiny bit faster overall).
+
+  Parameters:
+
+  1. `targetLDR`: `boolean?` Set to `true` to alter final LDR image instead of original HDR image. Note: original AC never tweaked LDR color matrix at all. Default value: `false`.
+
+  2. `priority`: `integer?` Specifies order of execution. Higher numbers mean corrections will apply first. Can be an integer in -100…100 range. Default value: `0`.
+
+  Returns:
+
+  - `ac.ColorCorrection`
+
 # Module common/ac_physics.lua
 
 ## Class physics.CarControls
@@ -20755,175 +21411,6 @@ forcefully activates them (since 0.2.4).
   Returns:
 
   - `ac.Disposable`
-
-# Module common/ac_gameplay_apps.lua
-
-## Function ac.getAppWindows()
-Collect information about available windows.
-## Function ac.accessAppWindow(windowName)
-Looks for a certain window of either an original AC app, a Python or a Lua app. Use `ac.getAppWindows()` to get a list of available apps.
-If found, this wrapper can be used to move or hide an app, or switch it to a different render layer.
-
-  Parameters:
-
-  1. `windowName`: `string`
-
-  Returns:
-
-  - `ac.AppWindowAccessor`
-## Class ac.AppWindowAccessor
-Wrapper for interacting with any AC app. Might not work as intended with some apps not expecting such intrusion though.
-
-- `ac.AppWindowAccessor:valid()`
-
-  Window reference is valid (some references might become invalid if the window is deleted).
-
-  Returns:
-
-    - `boolean`
-
-- `ac.AppWindowAccessor:visible()`
-
-  Checks if window is visible.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.AppWindowAccessor:setVisible(value)`
-
-  Changes visible state of the window.
-
-  Parameters:
-
-    1. `value`: `boolean?` Default value: `true`.
-
-  Returns:
-
-    - `ac.AppWindowAccessor`
-
-- `ac.AppWindowAccessor:pinned()`
-
-  Checks if window is pinned.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.AppWindowAccessor:setPinned(value)`
-
-  Changes pinned state of the window. Works with IMGUI apps with CSP v0.2.3-preview62 or newer.
-
-  Parameters:
-
-    1. `value`: `boolean?` Default value: `true`.
-
-  Returns:
-
-    - `ac.AppWindowAccessor`
-
-- `ac.AppWindowAccessor:position()`
-
-  Returns window position.
-
-  Returns:
-
-    - `vec2`
-
-- `ac.AppWindowAccessor:size()`
-
-  Returns window size (Python apps might draw things to extends exceeding this size).
-
-  Returns:
-
-    - `vec2`
-
-- `ac.AppWindowAccessor:move(value)`
-
-  Moves window to a different position. Works with IMGUI apps with CSP v0.2.3-preview62 or newer.
-
-  Parameters:
-
-    1. `value`: `vec2`
-
-  Returns:
-
-    - `ac.AppWindowAccessor`
-
-- `ac.AppWindowAccessor:resize(value)`
-
-  Resizes a window. Works with IMGUI apps only.
-
-  Parameters:
-
-    1. `value`: `vec2`
-
-  Returns:
-
-    - `ac.AppWindowAccessor`
-
-- `ac.AppWindowAccessor:redirectLayer()`
-
-  Returns redirect layer, or 0 if redirect is disabled. Redirected apps can be accessed via `dynamic::hud::redirected::N` textures.
-
-  Returns:
-
-    - `integer` 0 if redirect is disabled.
-
-- `ac.AppWindowAccessor:setRedirectLayer(layer, duplicate)`
-
-  Moves window to a different render layer, or back to existance with `0` passed as `layer`. Windows in separate layers don’t get mouse
-commands (but this wrapper can be used to send fake commands instead).
-
-  Parameters:
-
-    1. `layer`: `integer?` Default value: `0`.
-
-    2. `duplicate`: `boolean?` Set to `true` to clone a window to a different layer instead of moving it there. Be careful: this might break some Python apps. Default value: `false`.
-
-  Returns:
-
-    - `ac.AppWindowAccessor`
-
-- `ac.AppWindowAccessor:onMouseMove(position)`
-
-  Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
-
-  Parameters:
-
-    1. `position`: `vec2`
-
-  Returns:
-
-    - `ac.AppWindowAccessor`
-
-- `ac.AppWindowAccessor:onMouseDown(position, button)`
-
-  Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
-
-  Parameters:
-
-    1. `position`: `vec2`
-
-    2. `button`: `ui.MouseButton?` Default value: `ui.MouseButton.Left`.
-
-  Returns:
-
-    - `ac.AppWindowAccessor`
-
-- `ac.AppWindowAccessor:onMouseUp(position, button)`
-
-  Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
-
-  Parameters:
-
-    1. `position`: `vec2`
-
-    2. `button`: `ui.MouseButton?` Default value: `ui.MouseButton.Left`.
-
-  Returns:
-
-    - `ac.AppWindowAccessor`
 
 # Module common/ac_game.lua
 
@@ -21282,360 +21769,3 @@ A helper structure to simulate some inputs for controlling the car.
   Returns:
 
   - `ac.CarExtraSwitchParams`
-
-# Module common/ac_extras_binaryinput.lua
-
-## Function ac.ControlButton(id, defaults)
-
-  Parameters:
-
-  1. `id`: `string` Name of a section in “controls.ini”. If you are adding a new input, use something like “your.namespace/Nice Name” (without square brackets or colons) to ensure there won’t be collisions and it would integrate nicely.
-
-  2. `defaults`: `{keyboard: nil|{key: ui.KeyIndex?, ctrl: boolean?, shift: boolean?, alt: boolean?}, gamepad: nil|ac.GamepadButton, period: nil|number, hold: nil|boolean}?` Default settings if user has not configured input yet. Parameter `period` can be used to create buttons which would keep reporting as pressed (or call `:onDown()`) while held, can be configured in “controls.ini” as “REPEAT_PERIOD”; by default repeating is disable. Set parameter `hold` to a boolean value and control widget will get a “hold” switch. Buttons configured in “hold” mode return `true` on `:pressed()` when both pressed and released, as well as trigger `:onPressed()` when released too. Note: if `ac.ControlButton()` is called multiple times within a race session, only defaults from the first run will be taken into account (but if subsequent calls will have a “hold” value, button editing widget will still get a “hold” switch).
-
-  Returns:
-
-  - `ac.ControlButton`
-## Class ac.ControlButton
-A good way to listen to user pressing buttons configured in AC control settings. Handles everything for you automatically, and if you’re working
-on a Lua app has a `:control()` method drawing a button showing current binding and allowing to change it in-game.
-
-Could be used for original AC button bindings, new bindings added by CSP, or even for creating custom bindings. For that, make sure to pass a
-reliably unique ID when creating a control button, maybe even prefixed by your app name.
-
-Note: inputs for car scripts (both display and physics ones) would work only if the car is currently controlled by the user and not in a replay.
-When possible, consider binding to car state instead. If your script runs at lower rate than graphics thread (skipping frames), either use `:down()`
-or, better yet, sign to events, `:pressed()` call might return `false`.
-
-- `ac.ControlButton:configured()`
-
-  Button is configured.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.ControlButton:disabled()`
-
-  Button is disabled.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.ControlButton:holdMode()`
-
-  Button is using hold mode.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.ControlButton:pressed()`
-
-  Button was just pressed. For buttons in hold mode returns `true` on both press and release.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.ControlButton:released()`
-
-  Button was just released. For buttons in hold mode returns `true` on both press and release.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.ControlButton:down()`
-
-  Button is held down. For buttons in hold mode works similar to `:pressed()`.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.ControlButton:onPressed(callback)`
-
-  Sets a callback to be called when the button is pressed. For buttons in hold mode calls callback on both presses and releases. If button is held down
-when this method is called, callback will be called the next frame.
-
-  Parameters:
-
-    1. `callback`: `fun()`
-
-  Returns:
-
-    - `ac.Disposable`
-
-- `ac.ControlButton:onReleased(callback)`
-
-  Sets a callback to be called when the button is released. For buttons in hold mode calls callback shortly after both presses and releases.
-
-  Parameters:
-
-    1. `callback`: `fun()`
-
-  Returns:
-
-    - `ac.Disposable`
-
-- `ac.ControlButton:setAlwaysActive(value)`
-
-  Always active buttons work even if AC is paused or in, for example, pits menu.
-
-  Parameters:
-
-    1. `value`: `boolean?` Default value: `true`.
-
-  Returns:
-
-    - `ac.ControlButton`
-
-- `ac.ControlButton:setDisabled(value)`
-
-  Disabled buttons ignore presses but remember their settings.
-
-  Parameters:
-
-    1. `value`: `boolean?` Default value: `true`.
-
-  Returns:
-
-    - `ac.ControlButton`
-
-- `ac.ControlButton:control(size, flags, emptyLabel)`
-
-  Use within UI function to draw an editing button. Not available for scripts without UI access.
-To change color of pressed button indicator, override `PlotLinesHovered` color.
-
-  Parameters:
-
-    1. `size`: `vec2?` If not set, or width is 0, uses next item width and regular button height.
-
-    2. `flags`: `ui.ControlButtonControlFlags?` Default value: `ac.ControlButtonControlFlags.None`.
-
-    3. `emptyLabel`: `string?` Default value: `'Click to assign'`.
-
-  Returns:
-
-    - `boolean`
-
-- `ac.ControlButton:boundTo()`
-
-  Returns text for displaying current binding, or `nil` if the button isn’t bound to anything.
-
-  Returns:
-
-    - `string`
-
-# Module common/ac_extras_yebiscolorcorrection.lua
-
-## Class ac.ColorCorrection
-Helper entity to set color corrections. Holds up to 200 corrections at once. Call `:reset()` if you want to start over, or just use `ac.setColorCorrection()` the way it’s meant to be used.
-
-- `ac.ColorCorrection:reset()`
-
-  Reset alterations.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:grayscale()`
-
-  Completely desaturate the image.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:negative()`
-
-  Invert image colors.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:saturation(v)`
-
-  Change image saturation.
-
-  Parameters:
-
-    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:brightness(v)`
-
-  Change image brightness (multiplies color by the parameter).
-
-  Parameters:
-
-    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:contrast(v)`
-
-  Change image contrast.
-
-  Parameters:
-
-    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:bias(v)`
-
-  Change image bias (adds the parameter to color).
-
-  Parameters:
-
-    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:fade(v, effectRatio)`
-
-  Add a fadeout transformation.
-
-  Parameters:
-
-    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:monotone(v, saturation, brightness)`
-
-  Turn image monotone.
-
-  Parameters:
-
-    1. `v`: `number|rgb|rgbm?` Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
-
-    2. `saturation`: `number?` Saturation factor. Default value: 0.
-
-    3. `brightness`: `number?` Brightness factor. Default value: 1.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:HSB(hueDegrees, saturation, brightness, keepLuminance)`
-
-  Alter hue, saturation and brightness.
-
-  Parameters:
-
-    1. `hueDegrees`: `number?` Degrees for hue shift. Default value: 0.
-
-    2. `saturation`: `number?` Saturation adjustment. Default value: 1.
-
-    3. `brightness`: `number?` Brightness adjustment. Default value: 1.
-
-    4. `keepLuminance`: `boolean?` Keep image luminance. Default value: `false`.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:whiteBalance(temperatureK, luminance)`
-
-  Alter image white balance.
-
-  Parameters:
-
-    1. `temperatureK`: `number?` Temperature in K. Default value: 6500.
-
-    2. `luminance`: `number?` Luminance. Default value: 1.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:temperature(temperatureK, luminance)`
-
-  Alter image temperature.
-
-  Parameters:
-
-    1. `temperatureK`: `number?` Temperature in K. Default value: 6500.
-
-    2. `luminance`: `number?` Luminance. Default value: 1.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:sepia(v)`
-
-  Shift tone to sepia.
-
-  Parameters:
-
-    1. `v`: `number?` Sepia amount. Default value: 1.
-
-  Returns:
-
-    - `self`
-
-- `ac.ColorCorrection:hue(hueDegrees, keepLuminance)`
-
-  Shift image hue.
-
-  Parameters:
-
-    1. `hueDegrees`: `number?` Degrees for hue shift. Default value: 0.
-
-    2. `keepLuminance`: `boolean?` Keep image luminance. Default value: `false`.
-
-  Returns:
-
-    - `self`
-## Function ac.setColorCorrection(targetLDR, priority)
-YEBIS uses color matrices to quickly adjust HDR (input 0…∞ range) and LDR (output 0…1 range) color. Tweaks such as saturation, brightness and
-contrast configured in YEBIS PP filter, or in video settings, all control those matrices.
-
-This function allows to easily tweak those matrices. Call it, optionally specifying target matrix and priority, and then use methods of returned
-entity to easily tweak the color. Chain methods together to achieve the desired effect:
-```lua
-ac.setColorCorrection():brightness(3):saturation(2)
-```
-
-Won’t have any effect if YEBIS is disabled, or if WeatherFX style script replaces YEBIS post-processing and doesn’t read
-HDR matrix correctly. For compatibility reasons, if WeatherFX style script doesn’t read LDR color matrix, it will be applied
-afterwards (in CSPs before 0.2.5, there wasn’t a method for WeatherFX style scripts to even access LDR color matrix, and
-Assetto Corsa didn’t alter it at all).
-
-Each time the function is called with the same target and priority parameters, its state will reset. Feel free to call this function every frame
-if you want for adjustments to transition smoothly, or just once if you just want to tweak the colors and forget about it.
-
-Note: you can keep a reference to returned value and tweak it instead, but then you’ll have to call `:reset()` manually. One tweak entity can
-hold up to 40 adjustments, mostly to make sure it’s used correctly. Actual adjustments are very cheap.
-
-Note: some scripts, such as online scripts, can access old API for color corrections, such as `ac.ColorCorrectionBrightness()`.
-Those things are obsolete now, please use this thing instead (with only exception being WeatherFX styles, those could still
-old API since it could be a tiny bit faster overall).
-
-  Parameters:
-
-  1. `targetLDR`: `boolean?` Set to `true` to alter final LDR image instead of original HDR image. Note: original AC never tweaked LDR color matrix at all. Default value: `false`.
-
-  2. `priority`: `integer?` Specifies order of execution. Higher numbers mean corrections will apply first. Can be an integer in -100…100 range. Default value: `0`.
-
-  Returns:
-
-  - `ac.ColorCorrection`

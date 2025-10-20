@@ -941,24 +941,24 @@ ac.CompressionType = {
 ---| `ac.NationCode.Anguilla` @Anguilla.
 ---| `ac.NationCode.Albania` @Albania.
 ---| `ac.NationCode.Andorra` @Andorra.
----| `ac.NationCode.United` @United.
+---| `ac.NationCode.UnitedArabEmirates` @United Arab Emirates.
 ---| `ac.NationCode.Argentina` @Argentina.
 ---| `ac.NationCode.Armenia` @Armenia.
----| `ac.NationCode.American` @American.
+---| `ac.NationCode.AmericanSamoa` @American Samoa.
 ---| `ac.NationCode.Antarctica` @Antarctica.
----| `ac.NationCode.Antigua` @Antigua.
+---| `ac.NationCode.AntiguaAndBarbuda` @Antigua and Barbuda.
 ---| `ac.NationCode.Australia` @Australia.
 ---| `ac.NationCode.Austria` @Austria.
 ---| `ac.NationCode.Azerbaijan` @Azerbaijan.
 ---| `ac.NationCode.Burundi` @Burundi.
 ---| `ac.NationCode.Belgium` @Belgium.
 ---| `ac.NationCode.Benin` @Benin.
----| `ac.NationCode.Burkina` @Burkina.
+---| `ac.NationCode.BurkinaFaso` @Burkina Faso.
 ---| `ac.NationCode.Bangladesh` @Bangladesh.
 ---| `ac.NationCode.Bulgaria` @Bulgaria.
 ---| `ac.NationCode.Bahrain` @Bahrain.
 ---| `ac.NationCode.Bahamas` @Bahamas.
----| `ac.NationCode.Bosnia` @Bosnia.
+---| `ac.NationCode.BosniaAndHerzegovina` @Bosnia and Herzegovina.
 ---| `ac.NationCode.Belarus` @Belarus.
 ---| `ac.NationCode.Belize` @Belize.
 ---| `ac.NationCode.Bermuda` @Bermuda.
@@ -968,65 +968,67 @@ ac.CompressionType = {
 ---| `ac.NationCode.Brunei` @Brunei.
 ---| `ac.NationCode.Bhutan` @Bhutan.
 ---| `ac.NationCode.Botswana` @Botswana.
----| `ac.NationCode.Central` @Central.
+---| `ac.NationCode.CentralAfricanRepublic` @Central African Republic.
 ---| `ac.NationCode.Canada` @Canada.
----| `ac.NationCode.Cocos` @Cocos.
+---| `ac.NationCode.CocosIslands` @Cocos Islands.
 ---| `ac.NationCode.Switzerland` @Switzerland.
 ---| `ac.NationCode.Chile` @Chile.
 ---| `ac.NationCode.China` @China.
----| `ac.NationCode.Cote` @Côte.
+---| `ac.NationCode.CoteDIvoire` @Côte d’Ivoire.
 ---| `ac.NationCode.Cameroon` @Cameroon.
----| `ac.NationCode.Congo` @Congo.
----| `ac.NationCode.Cook` @Cook.
+---| `ac.NationCode.DemocraticRepublicOfTheCongo` @Democratic Republic of the Congo.
+---| `ac.NationCode.RepublicOfTheCongo` @Republic of the Congo.
+---| `ac.NationCode.CookIslands` @Cook Islands.
 ---| `ac.NationCode.Colombia` @Colombia.
 ---| `ac.NationCode.Comoros` @Comoros.
----| `ac.NationCode.Cape` @Cape.
----| `ac.NationCode.Costa` @Costa.
+---| `ac.NationCode.CapeVerde` @Cape Verde.
+---| `ac.NationCode.CostaRica` @Costa Rica.
 ---| `ac.NationCode.Cuba` @Cuba.
----| `ac.NationCode.Cayman` @Cayman.
+---| `ac.NationCode.CaymanIslands` @Cayman Islands.
 ---| `ac.NationCode.Cyprus` @Cyprus.
----| `ac.NationCode.Czech` @Czech.
+---| `ac.NationCode.Czechia` @Czechia.
 ---| `ac.NationCode.Germany` @Germany.
 ---| `ac.NationCode.Djibouti` @Djibouti.
 ---| `ac.NationCode.Dominica` @Dominica.
 ---| `ac.NationCode.Denmark` @Denmark.
----| `ac.NationCode.Dominican` @Dominican.
+---| `ac.NationCode.DominicanRepublic` @Dominican Republic.
 ---| `ac.NationCode.Algeria` @Algeria.
 ---| `ac.NationCode.Ecuador` @Ecuador.
 ---| `ac.NationCode.Egypt` @Egypt.
 ---| `ac.NationCode.England` @England.
 ---| `ac.NationCode.Eritrea` @Eritrea.
----| `ac.NationCode.Western` @Western.
+---| `ac.NationCode.WesternSahara` @Western Sahara.
 ---| `ac.NationCode.Spain` @Spain.
 ---| `ac.NationCode.Estonia` @Estonia.
 ---| `ac.NationCode.Ethiopia` @Ethiopia.
 ---| `ac.NationCode.Finland` @Finland.
 ---| `ac.NationCode.Fiji` @Fiji.
 ---| `ac.NationCode.France` @France.
----| `ac.NationCode.Faroe` @Faroe.
+---| `ac.NationCode.FaroeIslands` @Faroe Islands.
 ---| `ac.NationCode.Micronesia` @Micronesia.
 ---| `ac.NationCode.Gabon` @Gabon.
----| `ac.NationCode.Great` @Great.
+---| `ac.NationCode.UnitedKingdom` @United Kingdom.
 ---| `ac.NationCode.Georgia` @Georgia.
 ---| `ac.NationCode.Guernsey` @Guernsey.
 ---| `ac.NationCode.Ghana` @Ghana.
 ---| `ac.NationCode.Gibraltar` @Gibraltar.
 ---| `ac.NationCode.Guinea` @Guinea.
 ---| `ac.NationCode.Gambia` @Gambia.
----| `ac.NationCode.Equatorial` @Equatorial.
+---| `ac.NationCode.GuineaBissau` @Guinea-Bissau.
+---| `ac.NationCode.EquatorialGuinea` @Equatorial Guinea.
 ---| `ac.NationCode.Greece` @Greece.
 ---| `ac.NationCode.Grenada` @Grenada.
 ---| `ac.NationCode.Greenland` @Greenland.
 ---| `ac.NationCode.Guatemala` @Guatemala.
 ---| `ac.NationCode.Guam` @Guam.
 ---| `ac.NationCode.Guyana` @Guyana.
----| `ac.NationCode.Hong` @Hong.
+---| `ac.NationCode.HongKong` @Hong Kong.
 ---| `ac.NationCode.Honduras` @Honduras.
 ---| `ac.NationCode.Croatia` @Croatia.
 ---| `ac.NationCode.Haiti` @Haiti.
 ---| `ac.NationCode.Hungary` @Hungary.
 ---| `ac.NationCode.Indonesia` @Indonesia.
----| `ac.NationCode.Isle` @Isle.
+---| `ac.NationCode.IsleOfMan` @Isle of Man.
 ---| `ac.NationCode.India` @India.
 ---| `ac.NationCode.Ireland` @Ireland.
 ---| `ac.NationCode.Iran` @Iran.
@@ -1043,14 +1045,16 @@ ac.CompressionType = {
 ---| `ac.NationCode.Kyrgyzstan` @Kyrgyzstan.
 ---| `ac.NationCode.Cambodia` @Cambodia.
 ---| `ac.NationCode.Kiribati` @Kiribati.
----| `ac.NationCode.Saint` @Saint.
----| `ac.NationCode.South` @South.
+---| `ac.NationCode.SaintKittsAndNevis` @Saint Kitts and Nevis.
+---| `ac.NationCode.SouthKorea` @South Korea.
 ---| `ac.NationCode.Kuwait` @Kuwait.
 ---| `ac.NationCode.Laos` @Laos.
 ---| `ac.NationCode.Lebanon` @Lebanon.
 ---| `ac.NationCode.Liberia` @Liberia.
+---| `ac.NationCode.Libya` @Libya.
+---| `ac.NationCode.SaintLucia` @Saint Lucia.
 ---| `ac.NationCode.Liechtenstein` @Liechtenstein.
----| `ac.NationCode.Sri` @Sri.
+---| `ac.NationCode.SriLanka` @Sri Lanka.
 ---| `ac.NationCode.Lesotho` @Lesotho.
 ---| `ac.NationCode.Lithuania` @Lithuania.
 ---| `ac.NationCode.Luxembourg` @Luxembourg.
@@ -1062,8 +1066,8 @@ ac.CompressionType = {
 ---| `ac.NationCode.Madagascar` @Madagascar.
 ---| `ac.NationCode.Maldives` @Maldives.
 ---| `ac.NationCode.Mexico` @Mexico.
----| `ac.NationCode.Marshall` @Marshall.
----| `ac.NationCode.Macedonia` @Macedonia.
+---| `ac.NationCode.MarshallIslands` @Marshall Islands.
+---| `ac.NationCode.NorthMacedonia` @North Macedonia.
 ---| `ac.NationCode.Mali` @Mali.
 ---| `ac.NationCode.Malta` @Malta.
 ---| `ac.NationCode.Myanmar` @Myanmar.
@@ -1077,77 +1081,83 @@ ac.CompressionType = {
 ---| `ac.NationCode.Malawi` @Malawi.
 ---| `ac.NationCode.Malaysia` @Malaysia.
 ---| `ac.NationCode.Namibia` @Namibia.
----| `ac.NationCode.New` @New.
+---| `ac.NationCode.NewCaledonia` @New Caledonia.
 ---| `ac.NationCode.Niger` @Niger.
 ---| `ac.NationCode.Nigeria` @Nigeria.
 ---| `ac.NationCode.Nicaragua` @Nicaragua.
----| `ac.NationCode.Northern` @Northern.
+---| `ac.NationCode.NorthernIreland` @Northern Ireland.
 ---| `ac.NationCode.Netherlands` @Netherlands.
 ---| `ac.NationCode.Norway` @Norway.
 ---| `ac.NationCode.Nepal` @Nepal.
 ---| `ac.NationCode.Nauru` @Nauru.
+---| `ac.NationCode.NewZealand` @New Zealand.
 ---| `ac.NationCode.Oman` @Oman.
 ---| `ac.NationCode.Pakistan` @Pakistan.
 ---| `ac.NationCode.Panama` @Panama.
 ---| `ac.NationCode.Peru` @Peru.
 ---| `ac.NationCode.Philippines` @Philippines.
 ---| `ac.NationCode.Palau` @Palau.
----| `ac.NationCode.Papua` @Papua.
+---| `ac.NationCode.PapuaNewGuinea` @Papua New Guinea.
 ---| `ac.NationCode.Poland` @Poland.
----| `ac.NationCode.Puerto` @Puerto.
+---| `ac.NationCode.PuertoRico` @Puerto Rico.
 ---| `ac.NationCode.Portugal` @Portugal.
 ---| `ac.NationCode.Paraguay` @Paraguay.
----| `ac.NationCode.French` @French.
+---| `ac.NationCode.FrenchPolynesia` @French Polynesia.
 ---| `ac.NationCode.Qatar` @Qatar.
 ---| `ac.NationCode.Romania` @Romania.
 ---| `ac.NationCode.Russia` @Russia.
 ---| `ac.NationCode.Rwanda` @Rwanda.
----| `ac.NationCode.Saudi` @Saudi.
+---| `ac.NationCode.SaudiArabia` @Saudi Arabia.
 ---| `ac.NationCode.Scotland` @Scotland.
 ---| `ac.NationCode.Sudan` @Sudan.
 ---| `ac.NationCode.Senegal` @Senegal.
 ---| `ac.NationCode.Singapore` @Singapore.
----| `ac.NationCode.Solomon` @Solomon.
----| `ac.NationCode.Sierra` @Sierra.
----| `ac.NationCode.El` @El.
----| `ac.NationCode.San` @San.
+---| `ac.NationCode.SolomonIslands` @Solomon Islands.
+---| `ac.NationCode.SierraLeone` @Sierra Leone.
+---| `ac.NationCode.ElSalvador` @El Salvador.
+---| `ac.NationCode.SanMarino` @San Marino.
 ---| `ac.NationCode.Somalia` @Somalia.
 ---| `ac.NationCode.Serbia` @Serbia.
----| `ac.NationCode.Sao` @Sao.
+---| `ac.NationCode.SouthSudan` @South Sudan.
+---| `ac.NationCode.SaoTomeAndPrincipe` @Sao Tome and Principe.
 ---| `ac.NationCode.Suriname` @Suriname.
 ---| `ac.NationCode.Slovakia` @Slovakia.
 ---| `ac.NationCode.Slovenia` @Slovenia.
 ---| `ac.NationCode.Sweden` @Sweden.
----| `ac.NationCode.Swaziland` @Swaziland.
+---| `ac.NationCode.Eswatini` @Eswatini.
 ---| `ac.NationCode.Seychelles` @Seychelles.
 ---| `ac.NationCode.Syria` @Syria.
----| `ac.NationCode.Turks` @Turks.
+---| `ac.NationCode.TurksAndCaicosIslands` @Turks and Caicos Islands.
 ---| `ac.NationCode.Chad` @Chad.
 ---| `ac.NationCode.Togo` @Togo.
 ---| `ac.NationCode.Thailand` @Thailand.
 ---| `ac.NationCode.Tajikistan` @Tajikistan.
 ---| `ac.NationCode.Turkmenistan` @Turkmenistan.
----| `ac.NationCode.Timor` @Timor.
+---| `ac.NationCode.TimorLeste` @Timor-Leste.
 ---| `ac.NationCode.Tonga` @Tonga.
----| `ac.NationCode.Trinidad` @Trinidad.
+---| `ac.NationCode.TrinidadAndTobago` @Trinidad and Tobago.
 ---| `ac.NationCode.Tunisia` @Tunisia.
----| `ac.NationCode.Turkey` @Turkey.
+---| `ac.NationCode.Turkiye` @Türkiye.
 ---| `ac.NationCode.Tuvalu` @Tuvalu.
 ---| `ac.NationCode.Taiwan` @Taiwan.
 ---| `ac.NationCode.Tanzania` @Tanzania.
 ---| `ac.NationCode.Uganda` @Uganda.
 ---| `ac.NationCode.Ukraine` @Ukraine.
 ---| `ac.NationCode.Uruguay` @Uruguay.
----| `ac.NationCode.USA` @USA.
+---| `ac.NationCode.UnitedStates` @United States.
 ---| `ac.NationCode.Uzbekistan` @Uzbekistan.
+---| `ac.NationCode.VaticanCity` @Vatican City.
+---| `ac.NationCode.SaintVincentAndTheGrenadines` @Saint Vincent and the Grenadines.
 ---| `ac.NationCode.Venezuela` @Venezuela.
----| `ac.NationCode.British` @British.
----| `ac.NationCode.Virgin` @Virgin.
+---| `ac.NationCode.BritishVirginIslands` @British Virgin Islands.
+---| `ac.NationCode.USVirginIslands` @US Virgin Islands.
 ---| `ac.NationCode.Vietnam` @Vietnam.
 ---| `ac.NationCode.Vanuatu` @Vanuatu.
 ---| `ac.NationCode.Wales` @Wales.
 ---| `ac.NationCode.Samoa` @Samoa.
+---| `ac.NationCode.Kosovo` @Kosovo.
 ---| `ac.NationCode.Yemen` @Yemen.
+---| `ac.NationCode.SouthAfrica` @South Africa.
 ---| `ac.NationCode.Zambia` @Zambia.
 ---| `ac.NationCode.Zimbabwe` @Zimbabwe.
 ac.NationCode = {
@@ -1157,24 +1167,24 @@ ac.NationCode = {
   Anguilla = 'AIA', ---@type ac.NationCode #Anguilla.
   Albania = 'ALB', ---@type ac.NationCode #Albania.
   Andorra = 'AND', ---@type ac.NationCode #Andorra.
-  United = 'ARE', ---@type ac.NationCode #United.
+  UnitedArabEmirates = 'ARE', ---@type ac.NationCode #United Arab Emirates.
   Argentina = 'ARG', ---@type ac.NationCode #Argentina.
   Armenia = 'ARM', ---@type ac.NationCode #Armenia.
-  American = 'ASM', ---@type ac.NationCode #American.
+  AmericanSamoa = 'ASM', ---@type ac.NationCode #American Samoa.
   Antarctica = 'ATA', ---@type ac.NationCode #Antarctica.
-  Antigua = 'ATG', ---@type ac.NationCode #Antigua.
+  AntiguaAndBarbuda = 'ATG', ---@type ac.NationCode #Antigua and Barbuda.
   Australia = 'AUS', ---@type ac.NationCode #Australia.
   Austria = 'AUT', ---@type ac.NationCode #Austria.
   Azerbaijan = 'AZE', ---@type ac.NationCode #Azerbaijan.
   Burundi = 'BDI', ---@type ac.NationCode #Burundi.
   Belgium = 'BEL', ---@type ac.NationCode #Belgium.
   Benin = 'BEN', ---@type ac.NationCode #Benin.
-  Burkina = 'BFA', ---@type ac.NationCode #Burkina.
+  BurkinaFaso = 'BFA', ---@type ac.NationCode #Burkina Faso.
   Bangladesh = 'BGD', ---@type ac.NationCode #Bangladesh.
   Bulgaria = 'BGR', ---@type ac.NationCode #Bulgaria.
   Bahrain = 'BHR', ---@type ac.NationCode #Bahrain.
   Bahamas = 'BHS', ---@type ac.NationCode #Bahamas.
-  Bosnia = 'BIH', ---@type ac.NationCode #Bosnia.
+  BosniaAndHerzegovina = 'BIH', ---@type ac.NationCode #Bosnia and Herzegovina.
   Belarus = 'BLR', ---@type ac.NationCode #Belarus.
   Belize = 'BLZ', ---@type ac.NationCode #Belize.
   Bermuda = 'BMU', ---@type ac.NationCode #Bermuda.
@@ -1184,65 +1194,67 @@ ac.NationCode = {
   Brunei = 'BRN', ---@type ac.NationCode #Brunei.
   Bhutan = 'BTN', ---@type ac.NationCode #Bhutan.
   Botswana = 'BWA', ---@type ac.NationCode #Botswana.
-  Central = 'CAF', ---@type ac.NationCode #Central.
+  CentralAfricanRepublic = 'CAF', ---@type ac.NationCode #Central African Republic.
   Canada = 'CAN', ---@type ac.NationCode #Canada.
-  Cocos = 'CCK', ---@type ac.NationCode #Cocos.
+  CocosIslands = 'CCK', ---@type ac.NationCode #Cocos Islands.
   Switzerland = 'CHE', ---@type ac.NationCode #Switzerland.
   Chile = 'CHL', ---@type ac.NationCode #Chile.
   China = 'CHN', ---@type ac.NationCode #China.
-  Cote = 'CIV', ---@type ac.NationCode #Côte.
+  CoteDIvoire = 'CIV', ---@type ac.NationCode #Côte d’Ivoire.
   Cameroon = 'CMR', ---@type ac.NationCode #Cameroon.
-  Congo = 'COG', ---@type ac.NationCode #Congo.
-  Cook = 'COK', ---@type ac.NationCode #Cook.
+  DemocraticRepublicOfTheCongo = 'COD', ---@type ac.NationCode #Democratic Republic of the Congo.
+  RepublicOfTheCongo = 'COG', ---@type ac.NationCode #Republic of the Congo.
+  CookIslands = 'COK', ---@type ac.NationCode #Cook Islands.
   Colombia = 'COL', ---@type ac.NationCode #Colombia.
   Comoros = 'COM', ---@type ac.NationCode #Comoros.
-  Cape = 'CPV', ---@type ac.NationCode #Cape.
-  Costa = 'CRI', ---@type ac.NationCode #Costa.
+  CapeVerde = 'CPV', ---@type ac.NationCode #Cape Verde.
+  CostaRica = 'CRI', ---@type ac.NationCode #Costa Rica.
   Cuba = 'CUB', ---@type ac.NationCode #Cuba.
-  Cayman = 'CYM', ---@type ac.NationCode #Cayman.
+  CaymanIslands = 'CYM', ---@type ac.NationCode #Cayman Islands.
   Cyprus = 'CYP', ---@type ac.NationCode #Cyprus.
-  Czech = 'CZE', ---@type ac.NationCode #Czech.
+  Czechia = 'CZE', ---@type ac.NationCode #Czechia.
   Germany = 'DEU', ---@type ac.NationCode #Germany.
   Djibouti = 'DJI', ---@type ac.NationCode #Djibouti.
   Dominica = 'DMA', ---@type ac.NationCode #Dominica.
   Denmark = 'DNK', ---@type ac.NationCode #Denmark.
-  Dominican = 'DOM', ---@type ac.NationCode #Dominican.
+  DominicanRepublic = 'DOM', ---@type ac.NationCode #Dominican Republic.
   Algeria = 'DZA', ---@type ac.NationCode #Algeria.
   Ecuador = 'ECU', ---@type ac.NationCode #Ecuador.
   Egypt = 'EGY', ---@type ac.NationCode #Egypt.
   England = 'ENG', ---@type ac.NationCode #England.
   Eritrea = 'ERI', ---@type ac.NationCode #Eritrea.
-  Western = 'ESH', ---@type ac.NationCode #Western.
+  WesternSahara = 'ESH', ---@type ac.NationCode #Western Sahara.
   Spain = 'ESP', ---@type ac.NationCode #Spain.
   Estonia = 'EST', ---@type ac.NationCode #Estonia.
   Ethiopia = 'ETH', ---@type ac.NationCode #Ethiopia.
   Finland = 'FIN', ---@type ac.NationCode #Finland.
   Fiji = 'FJI', ---@type ac.NationCode #Fiji.
   France = 'FRA', ---@type ac.NationCode #France.
-  Faroe = 'FRO', ---@type ac.NationCode #Faroe.
+  FaroeIslands = 'FRO', ---@type ac.NationCode #Faroe Islands.
   Micronesia = 'FSM', ---@type ac.NationCode #Micronesia.
   Gabon = 'GAB', ---@type ac.NationCode #Gabon.
-  Great = 'GBR', ---@type ac.NationCode #Great.
+  UnitedKingdom = 'GBR', ---@type ac.NationCode #United Kingdom.
   Georgia = 'GEO', ---@type ac.NationCode #Georgia.
   Guernsey = 'GGY', ---@type ac.NationCode #Guernsey.
   Ghana = 'GHA', ---@type ac.NationCode #Ghana.
   Gibraltar = 'GIB', ---@type ac.NationCode #Gibraltar.
-  Guinea = 'GNB', ---@type ac.NationCode #Guinea.
+  Guinea = 'GIN', ---@type ac.NationCode #Guinea.
   Gambia = 'GMB', ---@type ac.NationCode #Gambia.
-  Equatorial = 'GNQ', ---@type ac.NationCode #Equatorial.
+  GuineaBissau = 'GNB', ---@type ac.NationCode #Guinea-Bissau.
+  EquatorialGuinea = 'GNQ', ---@type ac.NationCode #Equatorial Guinea.
   Greece = 'GRC', ---@type ac.NationCode #Greece.
   Grenada = 'GRD', ---@type ac.NationCode #Grenada.
   Greenland = 'GRL', ---@type ac.NationCode #Greenland.
   Guatemala = 'GTM', ---@type ac.NationCode #Guatemala.
   Guam = 'GUM', ---@type ac.NationCode #Guam.
   Guyana = 'GUY', ---@type ac.NationCode #Guyana.
-  Hong = 'HKG', ---@type ac.NationCode #Hong.
+  HongKong = 'HKG', ---@type ac.NationCode #Hong Kong.
   Honduras = 'HND', ---@type ac.NationCode #Honduras.
   Croatia = 'HRV', ---@type ac.NationCode #Croatia.
   Haiti = 'HTI', ---@type ac.NationCode #Haiti.
   Hungary = 'HUN', ---@type ac.NationCode #Hungary.
   Indonesia = 'IDN', ---@type ac.NationCode #Indonesia.
-  Isle = 'IMN', ---@type ac.NationCode #Isle.
+  IsleOfMan = 'IMN', ---@type ac.NationCode #Isle of Man.
   India = 'IND', ---@type ac.NationCode #India.
   Ireland = 'IRL', ---@type ac.NationCode #Ireland.
   Iran = 'IRN', ---@type ac.NationCode #Iran.
@@ -1259,14 +1271,16 @@ ac.NationCode = {
   Kyrgyzstan = 'KGZ', ---@type ac.NationCode #Kyrgyzstan.
   Cambodia = 'KHM', ---@type ac.NationCode #Cambodia.
   Kiribati = 'KIR', ---@type ac.NationCode #Kiribati.
-  Saint = 'VCT', ---@type ac.NationCode #Saint.
-  South = 'ZAF', ---@type ac.NationCode #South.
+  SaintKittsAndNevis = 'KNA', ---@type ac.NationCode #Saint Kitts and Nevis.
+  SouthKorea = 'KOR', ---@type ac.NationCode #South Korea.
   Kuwait = 'KWT', ---@type ac.NationCode #Kuwait.
   Laos = 'LAO', ---@type ac.NationCode #Laos.
   Lebanon = 'LBN', ---@type ac.NationCode #Lebanon.
   Liberia = 'LBR', ---@type ac.NationCode #Liberia.
+  Libya = 'LBY', ---@type ac.NationCode #Libya.
+  SaintLucia = 'LCA', ---@type ac.NationCode #Saint Lucia.
   Liechtenstein = 'LIE', ---@type ac.NationCode #Liechtenstein.
-  Sri = 'LKA', ---@type ac.NationCode #Sri.
+  SriLanka = 'LKA', ---@type ac.NationCode #Sri Lanka.
   Lesotho = 'LSO', ---@type ac.NationCode #Lesotho.
   Lithuania = 'LTU', ---@type ac.NationCode #Lithuania.
   Luxembourg = 'LUX', ---@type ac.NationCode #Luxembourg.
@@ -1278,8 +1292,8 @@ ac.NationCode = {
   Madagascar = 'MDG', ---@type ac.NationCode #Madagascar.
   Maldives = 'MDV', ---@type ac.NationCode #Maldives.
   Mexico = 'MEX', ---@type ac.NationCode #Mexico.
-  Marshall = 'MHL', ---@type ac.NationCode #Marshall.
-  Macedonia = 'MKD', ---@type ac.NationCode #Macedonia.
+  MarshallIslands = 'MHL', ---@type ac.NationCode #Marshall Islands.
+  NorthMacedonia = 'MKD', ---@type ac.NationCode #North Macedonia.
   Mali = 'MLI', ---@type ac.NationCode #Mali.
   Malta = 'MLT', ---@type ac.NationCode #Malta.
   Myanmar = 'MMR', ---@type ac.NationCode #Myanmar.
@@ -1293,171 +1307,161 @@ ac.NationCode = {
   Malawi = 'MWI', ---@type ac.NationCode #Malawi.
   Malaysia = 'MYS', ---@type ac.NationCode #Malaysia.
   Namibia = 'NAM', ---@type ac.NationCode #Namibia.
-  New = 'NZL', ---@type ac.NationCode #New.
+  NewCaledonia = 'NCL', ---@type ac.NationCode #New Caledonia.
   Niger = 'NER', ---@type ac.NationCode #Niger.
   Nigeria = 'NGA', ---@type ac.NationCode #Nigeria.
   Nicaragua = 'NIC', ---@type ac.NationCode #Nicaragua.
-  Northern = 'NIR', ---@type ac.NationCode #Northern.
+  NorthernIreland = 'NIR', ---@type ac.NationCode #Northern Ireland.
   Netherlands = 'NLD', ---@type ac.NationCode #Netherlands.
   Norway = 'NOR', ---@type ac.NationCode #Norway.
   Nepal = 'NPL', ---@type ac.NationCode #Nepal.
   Nauru = 'NRU', ---@type ac.NationCode #Nauru.
+  NewZealand = 'NZL', ---@type ac.NationCode #New Zealand.
   Oman = 'OMN', ---@type ac.NationCode #Oman.
   Pakistan = 'PAK', ---@type ac.NationCode #Pakistan.
   Panama = 'PAN', ---@type ac.NationCode #Panama.
   Peru = 'PER', ---@type ac.NationCode #Peru.
   Philippines = 'PHL', ---@type ac.NationCode #Philippines.
   Palau = 'PLW', ---@type ac.NationCode #Palau.
-  Papua = 'PNG', ---@type ac.NationCode #Papua.
+  PapuaNewGuinea = 'PNG', ---@type ac.NationCode #Papua New Guinea.
   Poland = 'POL', ---@type ac.NationCode #Poland.
-  Puerto = 'PRI', ---@type ac.NationCode #Puerto.
+  PuertoRico = 'PRI', ---@type ac.NationCode #Puerto Rico.
   Portugal = 'PRT', ---@type ac.NationCode #Portugal.
   Paraguay = 'PRY', ---@type ac.NationCode #Paraguay.
-  French = 'PYF', ---@type ac.NationCode #French.
+  FrenchPolynesia = 'PYF', ---@type ac.NationCode #French Polynesia.
   Qatar = 'QAT', ---@type ac.NationCode #Qatar.
   Romania = 'ROU', ---@type ac.NationCode #Romania.
   Russia = 'RUS', ---@type ac.NationCode #Russia.
   Rwanda = 'RWA', ---@type ac.NationCode #Rwanda.
-  Saudi = 'SAU', ---@type ac.NationCode #Saudi.
+  SaudiArabia = 'SAU', ---@type ac.NationCode #Saudi Arabia.
   Scotland = 'SCT', ---@type ac.NationCode #Scotland.
   Sudan = 'SDN', ---@type ac.NationCode #Sudan.
   Senegal = 'SEN', ---@type ac.NationCode #Senegal.
   Singapore = 'SGP', ---@type ac.NationCode #Singapore.
-  Solomon = 'SLB', ---@type ac.NationCode #Solomon.
-  Sierra = 'SLE', ---@type ac.NationCode #Sierra.
-  El = 'SLV', ---@type ac.NationCode #El.
-  San = 'SMR', ---@type ac.NationCode #San.
+  SolomonIslands = 'SLB', ---@type ac.NationCode #Solomon Islands.
+  SierraLeone = 'SLE', ---@type ac.NationCode #Sierra Leone.
+  ElSalvador = 'SLV', ---@type ac.NationCode #El Salvador.
+  SanMarino = 'SMR', ---@type ac.NationCode #San Marino.
   Somalia = 'SOM', ---@type ac.NationCode #Somalia.
   Serbia = 'SRB', ---@type ac.NationCode #Serbia.
-  Sao = 'STP', ---@type ac.NationCode #Sao.
+  SouthSudan = 'SSD', ---@type ac.NationCode #South Sudan.
+  SaoTomeAndPrincipe = 'STP', ---@type ac.NationCode #Sao Tome and Principe.
   Suriname = 'SUR', ---@type ac.NationCode #Suriname.
   Slovakia = 'SVK', ---@type ac.NationCode #Slovakia.
   Slovenia = 'SVN', ---@type ac.NationCode #Slovenia.
   Sweden = 'SWE', ---@type ac.NationCode #Sweden.
-  Swaziland = 'SWZ', ---@type ac.NationCode #Swaziland.
+  Eswatini = 'SWZ', ---@type ac.NationCode #Eswatini.
   Seychelles = 'SYC', ---@type ac.NationCode #Seychelles.
   Syria = 'SYR', ---@type ac.NationCode #Syria.
-  Turks = 'TCA', ---@type ac.NationCode #Turks.
+  TurksAndCaicosIslands = 'TCA', ---@type ac.NationCode #Turks and Caicos Islands.
   Chad = 'TCD', ---@type ac.NationCode #Chad.
   Togo = 'TGO', ---@type ac.NationCode #Togo.
   Thailand = 'THA', ---@type ac.NationCode #Thailand.
   Tajikistan = 'TJK', ---@type ac.NationCode #Tajikistan.
   Turkmenistan = 'TKM', ---@type ac.NationCode #Turkmenistan.
-  Timor = 'TLS', ---@type ac.NationCode #Timor.
+  TimorLeste = 'TLS', ---@type ac.NationCode #Timor-Leste.
   Tonga = 'TON', ---@type ac.NationCode #Tonga.
-  Trinidad = 'TTO', ---@type ac.NationCode #Trinidad.
+  TrinidadAndTobago = 'TTO', ---@type ac.NationCode #Trinidad and Tobago.
   Tunisia = 'TUN', ---@type ac.NationCode #Tunisia.
-  Turkey = 'TUR', ---@type ac.NationCode #Turkey.
+  Turkiye = 'TUR', ---@type ac.NationCode #Türkiye.
   Tuvalu = 'TUV', ---@type ac.NationCode #Tuvalu.
   Taiwan = 'TWN', ---@type ac.NationCode #Taiwan.
   Tanzania = 'TZA', ---@type ac.NationCode #Tanzania.
   Uganda = 'UGA', ---@type ac.NationCode #Uganda.
   Ukraine = 'UKR', ---@type ac.NationCode #Ukraine.
   Uruguay = 'URY', ---@type ac.NationCode #Uruguay.
-  USA = 'USA', ---@type ac.NationCode #USA.
+  UnitedStates = 'USA', ---@type ac.NationCode #United States.
   Uzbekistan = 'UZB', ---@type ac.NationCode #Uzbekistan.
+  VaticanCity = 'VAT', ---@type ac.NationCode #Vatican City.
+  SaintVincentAndTheGrenadines = 'VCT', ---@type ac.NationCode #Saint Vincent and the Grenadines.
   Venezuela = 'VEN', ---@type ac.NationCode #Venezuela.
-  British = 'VGB', ---@type ac.NationCode #British.
-  Virgin = 'VIR', ---@type ac.NationCode #Virgin.
+  BritishVirginIslands = 'VGB', ---@type ac.NationCode #British Virgin Islands.
+  USVirginIslands = 'VIR', ---@type ac.NationCode #US Virgin Islands.
   Vietnam = 'VNM', ---@type ac.NationCode #Vietnam.
   Vanuatu = 'VUT', ---@type ac.NationCode #Vanuatu.
   Wales = 'WLS', ---@type ac.NationCode #Wales.
   Samoa = 'WSM', ---@type ac.NationCode #Samoa.
+  Kosovo = 'XKX', ---@type ac.NationCode #Kosovo.
   Yemen = 'YEM', ---@type ac.NationCode #Yemen.
+  SouthAfrica = 'ZAF', ---@type ac.NationCode #South Africa.
   Zambia = 'ZMB', ---@type ac.NationCode #Zambia.
   Zimbabwe = 'ZWE', ---@type ac.NationCode #Zimbabwe.
 }
 
 ---@alias ac.CSPModuleID
----| `ac.CSPModuleID.BrakeDiscFX` @Brake Disc FX.
----| `ac.CSPModuleID.CarInstruments` @Car instruments.
----| `ac.CSPModuleID.ChaserCamera` @Chaser Camera.
----| `ac.CSPModuleID.ChatShortcuts` @Chat shortcuts.
----| `ac.CSPModuleID.ColorfulShadowing` @Colorful shadowing.
----| `ac.CSPModuleID.CustomRenderingModes` @Mode tweaks: custom render modes.
----| `ac.CSPModuleID.DXGITweaks` @DXGI.
----| `ac.CSPModuleID.ExtraFX` @Extra FX.
----| `ac.CSPModuleID.FakeShadowsFX` @Fake Shadows FX.
----| `ac.CSPModuleID.FFBTweaks` @FFB Tweaks.
----| `ac.CSPModuleID.FreerCamera` @Freer Camera.
----| `ac.CSPModuleID.G27Lights` @Logitech G27/29.
----| `ac.CSPModuleID.GamepadFX` @Gamepad FX.
----| `ac.CSPModuleID.General` @General Patch settings.
----| `ac.CSPModuleID.GraphicsAdjustments` @Graphics adjustments.
----| `ac.CSPModuleID.GrassFX` @Grass FX.
----| `ac.CSPModuleID.GUI` @GUI.
----| `ac.CSPModuleID.LightingFX` @Lighting FX.
----| `ac.CSPModuleID.LuaTools` @Lua_tools.
----| `ac.CSPModuleID.MumblePlugin` @Mumble_plugin.
----| `ac.CSPModuleID.Music` @Music.
----| `ac.CSPModuleID.NeckFX` @Neck FX.
----| `ac.CSPModuleID.NewBehaviour` @New AI behavior.
----| `ac.CSPModuleID.NiceScreenshots` @Nice Screenshots.
----| `ac.CSPModuleID.ParticlesFX` @Particles FX.
----| `ac.CSPModuleID.RainFX` @Rain FX.
----| `ac.CSPModuleID.ReflectionsFX` @Reflections FX.
----| `ac.CSPModuleID.ShadowedWheels` @Shadowed wheels.
----| `ac.CSPModuleID.SkidmarksFX` @Skidmarks FX.
----| `ac.CSPModuleID.SmallTweaks` @Small tweaks.
----| `ac.CSPModuleID.SmartMirror` @Smart Mirror.
----| `ac.CSPModuleID.SmartShadows` @Smart Shadows.
----| `ac.CSPModuleID.Spectating` @Spectating.
----| `ac.CSPModuleID.Splashscreen` @New loading screen.
----| `ac.CSPModuleID.SurfacesFX` @Surfaces FX.
----| `ac.CSPModuleID.Taskbar` @Taskbar.
----| `ac.CSPModuleID.TrackAdjustments` @Track adjustments.
----| `ac.CSPModuleID.TripleCustom` @Mode tweaks: Triple.
----| `ac.CSPModuleID.TyresFX` @Tyres FX.
----| `ac.CSPModuleID.VRTweaks` @Mode tweaks: VR.
----| `ac.CSPModuleID.WalkingOut` @Walking_out.
----| `ac.CSPModuleID.WeatherFX` @Weather FX.
----| `ac.CSPModuleID.WindscreenFX` @Windscreen FX.
----| `ac.CSPModuleID.Yebisest` @Yebisest.
+---| `ac.CSPModuleID.CarInstruments` @Value: 'car_instruments'.
+---| `ac.CSPModuleID.ChaserCamera` @Value: 'chaser_camera'.
+---| `ac.CSPModuleID.ChatShortcuts` @Value: 'chat_shortcuts'.
+---| `ac.CSPModuleID.CustomRenderingModes` @Value: 'custom_rendering_modes'.
+---| `ac.CSPModuleID.DXGITweaks` @Value: 'dxgi_tweaks'.
+---| `ac.CSPModuleID.ExtraFX` @Value: 'extra_fx'.
+---| `ac.CSPModuleID.FFBTweaks` @Value: 'ffb_tweaks'.
+---| `ac.CSPModuleID.FreerCamera` @Value: 'freer_camera'.
+---| `ac.CSPModuleID.G27Lights` @Value: 'g27_lights'.
+---| `ac.CSPModuleID.GamepadFX` @Value: 'gamepad_fx'.
+---| `ac.CSPModuleID.General` @Value: 'general'.
+---| `ac.CSPModuleID.GraphicsAdjustments` @Value: 'graphics_adjustments'.
+---| `ac.CSPModuleID.GrassFX` @Value: 'grass_fx'.
+---| `ac.CSPModuleID.GUI` @Value: 'gui'.
+---| `ac.CSPModuleID.LightingFX` @Value: 'lighting_fx'.
+---| `ac.CSPModuleID.Music` @Value: 'music'.
+---| `ac.CSPModuleID.NeckFX` @Value: 'neck'.
+---| `ac.CSPModuleID.NewBehaviour` @Value: 'new_behaviour'.
+---| `ac.CSPModuleID.NiceScreenshots` @Value: 'nice_screenshots'.
+---| `ac.CSPModuleID.ParticlesFX` @Value: 'particles_fx'.
+---| `ac.CSPModuleID.RainFX` @Value: 'rain_fx'.
+---| `ac.CSPModuleID.ReflectionsFX` @Value: 'reflections_fx'.
+---| `ac.CSPModuleID.SkidmarksFX` @Value: 'skidmarks_fx'.
+---| `ac.CSPModuleID.SmallTweaks` @Value: 'small_tweaks'.
+---| `ac.CSPModuleID.SmartMirror` @Value: 'smart_mirror'.
+---| `ac.CSPModuleID.SmartShadows` @Value: 'smart_shadows'.
+---| `ac.CSPModuleID.Splashscreen` @Value: 'splashscreen'.
+---| `ac.CSPModuleID.SurfacesFX` @Value: 'surfaces_fx'.
+---| `ac.CSPModuleID.Taskbar` @Value: 'taskbar'.
+---| `ac.CSPModuleID.TrackAdjustments` @Value: 'track_adjustments'.
+---| `ac.CSPModuleID.TripleCustom` @Value: 'triple_custom'.
+---| `ac.CSPModuleID.TyresFX` @Value: 'tyres_fx'.
+---| `ac.CSPModuleID.VRTweaks` @Value: 'vr_tweaks'.
+---| `ac.CSPModuleID.WeatherFX` @Value: 'weather_fx'.
+---| `ac.CSPModuleID.WindscreenFX` @Value: 'windscreen_fx'.
+---| `ac.CSPModuleID.Yebisest` @Value: 'yebisest'.
 ac.CSPModuleID = {
-  BrakeDiscFX = 'brakedisc_fx', ---@type ac.CSPModuleID #Brake Disc FX.
-  CarInstruments = 'car_instruments', ---@type ac.CSPModuleID #Car instruments.
-  ChaserCamera = 'chaser_camera', ---@type ac.CSPModuleID #Chaser Camera.
-  ChatShortcuts = 'chat_shortcuts', ---@type ac.CSPModuleID #Chat shortcuts.
-  ColorfulShadowing = 'colorful_shadowing', ---@type ac.CSPModuleID #Colorful shadowing.
-  CustomRenderingModes = 'custom_rendering_modes', ---@type ac.CSPModuleID #Mode tweaks: custom render modes.
-  DXGITweaks = 'dxgi_tweaks', ---@type ac.CSPModuleID #DXGI.
-  ExtraFX = 'extra_fx', ---@type ac.CSPModuleID #Extra FX.
-  FakeShadowsFX = 'fake_shadows_fx', ---@type ac.CSPModuleID #Fake Shadows FX.
-  FFBTweaks = 'ffb_tweaks', ---@type ac.CSPModuleID #FFB Tweaks.
-  FreerCamera = 'freer_camera', ---@type ac.CSPModuleID #Freer Camera.
-  G27Lights = 'g27_lights', ---@type ac.CSPModuleID #Logitech G27/29.
-  GamepadFX = 'gamepad_fx', ---@type ac.CSPModuleID #Gamepad FX.
-  General = 'general', ---@type ac.CSPModuleID #General Patch settings.
-  GraphicsAdjustments = 'graphics_adjustments', ---@type ac.CSPModuleID #Graphics adjustments.
-  GrassFX = 'grass_fx', ---@type ac.CSPModuleID #Grass FX.
-  GUI = 'gui', ---@type ac.CSPModuleID #GUI.
-  LightingFX = 'lighting_fx', ---@type ac.CSPModuleID #Lighting FX.
-  LuaTools = 'lua_tools', ---@type ac.CSPModuleID #Lua_tools.
-  MumblePlugin = 'mumble_plugin', ---@type ac.CSPModuleID #Mumble_plugin.
-  Music = 'music', ---@type ac.CSPModuleID #Music.
-  NeckFX = 'neck', ---@type ac.CSPModuleID #Neck FX.
-  NewBehaviour = 'new_behaviour', ---@type ac.CSPModuleID #New AI behavior.
-  NiceScreenshots = 'nice_screenshots', ---@type ac.CSPModuleID #Nice Screenshots.
-  ParticlesFX = 'particles_fx', ---@type ac.CSPModuleID #Particles FX.
-  RainFX = 'rain_fx', ---@type ac.CSPModuleID #Rain FX.
-  ReflectionsFX = 'reflections_fx', ---@type ac.CSPModuleID #Reflections FX.
-  ShadowedWheels = 'shadowed_wheels', ---@type ac.CSPModuleID #Shadowed wheels.
-  SkidmarksFX = 'skidmarks_fx', ---@type ac.CSPModuleID #Skidmarks FX.
-  SmallTweaks = 'small_tweaks', ---@type ac.CSPModuleID #Small tweaks.
-  SmartMirror = 'smart_mirror', ---@type ac.CSPModuleID #Smart Mirror.
-  SmartShadows = 'smart_shadows', ---@type ac.CSPModuleID #Smart Shadows.
-  Spectating = 'spectating', ---@type ac.CSPModuleID #Spectating.
-  Splashscreen = 'splashscreen', ---@type ac.CSPModuleID #New loading screen.
-  SurfacesFX = 'surfaces_fx', ---@type ac.CSPModuleID #Surfaces FX.
-  Taskbar = 'taskbar', ---@type ac.CSPModuleID #Taskbar.
-  TrackAdjustments = 'track_adjustments', ---@type ac.CSPModuleID #Track adjustments.
-  TripleCustom = 'triple_custom', ---@type ac.CSPModuleID #Mode tweaks: Triple.
-  TyresFX = 'tyres_fx', ---@type ac.CSPModuleID #Tyres FX.
-  VRTweaks = 'vr_tweaks', ---@type ac.CSPModuleID #Mode tweaks: VR.
-  WalkingOut = 'walking_out', ---@type ac.CSPModuleID #Walking_out.
-  WeatherFX = 'weather_fx', ---@type ac.CSPModuleID #Weather FX.
-  WindscreenFX = 'windscreen_fx', ---@type ac.CSPModuleID #Windscreen FX.
-  Yebisest = 'yebisest', ---@type ac.CSPModuleID #Yebisest.
+  CarInstruments = 'car_instruments', ---@type ac.CSPModuleID #Value: 'car_instruments'.
+  ChaserCamera = 'chaser_camera', ---@type ac.CSPModuleID #Value: 'chaser_camera'.
+  ChatShortcuts = 'chat_shortcuts', ---@type ac.CSPModuleID #Value: 'chat_shortcuts'.
+  CustomRenderingModes = 'custom_rendering_modes', ---@type ac.CSPModuleID #Value: 'custom_rendering_modes'.
+  DXGITweaks = 'dxgi_tweaks', ---@type ac.CSPModuleID #Value: 'dxgi_tweaks'.
+  ExtraFX = 'extra_fx', ---@type ac.CSPModuleID #Value: 'extra_fx'.
+  FFBTweaks = 'ffb_tweaks', ---@type ac.CSPModuleID #Value: 'ffb_tweaks'.
+  FreerCamera = 'freer_camera', ---@type ac.CSPModuleID #Value: 'freer_camera'.
+  G27Lights = 'g27_lights', ---@type ac.CSPModuleID #Value: 'g27_lights'.
+  GamepadFX = 'gamepad_fx', ---@type ac.CSPModuleID #Value: 'gamepad_fx'.
+  General = 'general', ---@type ac.CSPModuleID #Value: 'general'.
+  GraphicsAdjustments = 'graphics_adjustments', ---@type ac.CSPModuleID #Value: 'graphics_adjustments'.
+  GrassFX = 'grass_fx', ---@type ac.CSPModuleID #Value: 'grass_fx'.
+  GUI = 'gui', ---@type ac.CSPModuleID #Value: 'gui'.
+  LightingFX = 'lighting_fx', ---@type ac.CSPModuleID #Value: 'lighting_fx'.
+  Music = 'music', ---@type ac.CSPModuleID #Value: 'music'.
+  NeckFX = 'neck', ---@type ac.CSPModuleID #Value: 'neck'.
+  NewBehaviour = 'new_behaviour', ---@type ac.CSPModuleID #Value: 'new_behaviour'.
+  NiceScreenshots = 'nice_screenshots', ---@type ac.CSPModuleID #Value: 'nice_screenshots'.
+  ParticlesFX = 'particles_fx', ---@type ac.CSPModuleID #Value: 'particles_fx'.
+  RainFX = 'rain_fx', ---@type ac.CSPModuleID #Value: 'rain_fx'.
+  ReflectionsFX = 'reflections_fx', ---@type ac.CSPModuleID #Value: 'reflections_fx'.
+  SkidmarksFX = 'skidmarks_fx', ---@type ac.CSPModuleID #Value: 'skidmarks_fx'.
+  SmallTweaks = 'small_tweaks', ---@type ac.CSPModuleID #Value: 'small_tweaks'.
+  SmartMirror = 'smart_mirror', ---@type ac.CSPModuleID #Value: 'smart_mirror'.
+  SmartShadows = 'smart_shadows', ---@type ac.CSPModuleID #Value: 'smart_shadows'.
+  Splashscreen = 'splashscreen', ---@type ac.CSPModuleID #Value: 'splashscreen'.
+  SurfacesFX = 'surfaces_fx', ---@type ac.CSPModuleID #Value: 'surfaces_fx'.
+  Taskbar = 'taskbar', ---@type ac.CSPModuleID #Value: 'taskbar'.
+  TrackAdjustments = 'track_adjustments', ---@type ac.CSPModuleID #Value: 'track_adjustments'.
+  TripleCustom = 'triple_custom', ---@type ac.CSPModuleID #Value: 'triple_custom'.
+  TyresFX = 'tyres_fx', ---@type ac.CSPModuleID #Value: 'tyres_fx'.
+  VRTweaks = 'vr_tweaks', ---@type ac.CSPModuleID #Value: 'vr_tweaks'.
+  WeatherFX = 'weather_fx', ---@type ac.CSPModuleID #Value: 'weather_fx'.
+  WindscreenFX = 'windscreen_fx', ---@type ac.CSPModuleID #Value: 'windscreen_fx'.
+  Yebisest = 'yebisest', ---@type ac.CSPModuleID #Value: 'yebisest'.
 }
 
 ---@alias ac.ObjectClass
@@ -2040,6 +2044,590 @@ ac.VAODebugMode = {
   ShowNormals = 5, ---@type ac.VAODebugMode #Value: 5.
 }
 
+---@alias ui.Icons
+---| `ui.Icons.Air` @![Icon](https://acstuff.club/images/icons_24/air.png)
+---| `ui.Icons.AppWindow` @![Icon](https://acstuff.club/images/icons_24/app_window.png)
+---| `ui.Icons.Apps` @![Icon](https://acstuff.club/images/icons_24/apps.png)
+---| `ui.Icons.ArrowDown` @![Icon](https://acstuff.club/images/icons_24/arrow_down.png)
+---| `ui.Icons.ArrowLeft` @![Icon](https://acstuff.club/images/icons_24/arrow_left.png)
+---| `ui.Icons.ArrowRight` @![Icon](https://acstuff.club/images/icons_24/arrow_right.png)
+---| `ui.Icons.ArrowUp` @![Icon](https://acstuff.club/images/icons_24/arrow_up.png)
+---| `ui.Icons.Assist` @![Icon](https://acstuff.club/images/icons_24/assist.png)
+---| `ui.Icons.Attention` @![Icon](https://acstuff.club/images/icons_24/attention.png)
+---| `ui.Icons.Avatar` @![Icon](https://acstuff.club/images/icons_24/avatar.png)
+---| `ui.Icons.Back` @![Icon](https://acstuff.club/images/icons_24/back.png)
+---| `ui.Icons.Backspace` @![Icon](https://acstuff.club/images/icons_24/backspace.png)
+---| `ui.Icons.Ballast` @![Icon](https://acstuff.club/images/icons_24/ballast.png)
+---| `ui.Icons.Ban` @![Icon](https://acstuff.club/images/icons_24/ban.png)
+---| `ui.Icons.Barcode` @![Icon](https://acstuff.club/images/icons_24/barcode.png)
+---| `ui.Icons.Bars` @![Icon](https://acstuff.club/images/icons_24/bars.png)
+---| `ui.Icons.BatteryEmpty` @![Icon](https://acstuff.club/images/icons_24/battery_empty.png)
+---| `ui.Icons.BatteryFull` @![Icon](https://acstuff.club/images/icons_24/battery_full.png)
+---| `ui.Icons.Befriend` @![Icon](https://acstuff.club/images/icons_24/befriend.png)
+---| `ui.Icons.Bell` @![Icon](https://acstuff.club/images/icons_24/bell.png)
+---| `ui.Icons.Binocoulars` @![Icon](https://acstuff.club/images/icons_24/binocoulars.png)
+---| `ui.Icons.Blackboard` @![Icon](https://acstuff.club/images/icons_24/blackboard.png)
+---| `ui.Icons.Blanket` @![Icon](https://acstuff.club/images/icons_24/blanket.png)
+---| `ui.Icons.Blast` @![Icon](https://acstuff.club/images/icons_24/blast.png)
+---| `ui.Icons.Bluetooth` @![Icon](https://acstuff.club/images/icons_24/bluetooth.png)
+---| `ui.Icons.Bomb` @![Icon](https://acstuff.club/images/icons_24/bomb.png)
+---| `ui.Icons.Book` @![Icon](https://acstuff.club/images/icons_24/book.png)
+---| `ui.Icons.Bookmark` @![Icon](https://acstuff.club/images/icons_24/bookmark.png)
+---| `ui.Icons.Box` @![Icon](https://acstuff.club/images/icons_24/box.png)
+---| `ui.Icons.Briefcase` @![Icon](https://acstuff.club/images/icons_24/briefcase.png)
+---| `ui.Icons.Bug` @![Icon](https://acstuff.club/images/icons_24/bug.png)
+---| `ui.Icons.Bulb` @![Icon](https://acstuff.club/images/icons_24/bulb.png)
+---| `ui.Icons.Burn` @![Icon](https://acstuff.club/images/icons_24/burn.png)
+---| `ui.Icons.Calculator` @![Icon](https://acstuff.club/images/icons_24/calculator.png)
+---| `ui.Icons.Calendar` @![Icon](https://acstuff.club/images/icons_24/calendar.png)
+---| `ui.Icons.CallBluetooth` @![Icon](https://acstuff.club/images/icons_24/call_bluetooth.png)
+---| `ui.Icons.Call` @![Icon](https://acstuff.club/images/icons_24/call.png)
+---| `ui.Icons.Camera` @![Icon](https://acstuff.club/images/icons_24/camera.png)
+---| `ui.Icons.Cancel` @![Icon](https://acstuff.club/images/icons_24/cancel.png)
+---| `ui.Icons.CarFront` @![Icon](https://acstuff.club/images/icons_24/car_front.png)
+---| `ui.Icons.Cards` @![Icon](https://acstuff.club/images/icons_24/cards.png)
+---| `ui.Icons.Cctv` @![Icon](https://acstuff.club/images/icons_24/cctv.png)
+---| `ui.Icons.Cellphone` @![Icon](https://acstuff.club/images/icons_24/cellphone.png)
+---| `ui.Icons.Chat` @![Icon](https://acstuff.club/images/icons_24/chat.png)
+---| `ui.Icons.Clapperboard` @![Icon](https://acstuff.club/images/icons_24/clapperboard.png)
+---| `ui.Icons.Clip` @![Icon](https://acstuff.club/images/icons_24/clip.png)
+---| `ui.Icons.Clipboard` @![Icon](https://acstuff.club/images/icons_24/clipboard.png)
+---| `ui.Icons.Clock` @![Icon](https://acstuff.club/images/icons_24/clock.png)
+---| `ui.Icons.Cloud` @![Icon](https://acstuff.club/images/icons_24/cloud.png)
+---| `ui.Icons.Code` @![Icon](https://acstuff.club/images/icons_24/code.png)
+---| `ui.Icons.Coffee` @![Icon](https://acstuff.club/images/icons_24/coffee.png)
+---| `ui.Icons.CollisionAlt` @![Icon](https://acstuff.club/images/icons_24/collision_alt.png)
+---| `ui.Icons.Collision` @![Icon](https://acstuff.club/images/icons_24/collision.png)
+---| `ui.Icons.CompassAlt` @![Icon](https://acstuff.club/images/icons_24/compass_alt.png)
+---| `ui.Icons.Compass` @![Icon](https://acstuff.club/images/icons_24/compass.png)
+---| `ui.Icons.Confirm` @![Icon](https://acstuff.club/images/icons_24/confirm.png)
+---| `ui.Icons.Constellation` @![Icon](https://acstuff.club/images/icons_24/constellation.png)
+---| `ui.Icons.Contacts` @![Icon](https://acstuff.club/images/icons_24/contacts.png)
+---| `ui.Icons.Contrast` @![Icon](https://acstuff.club/images/icons_24/contrast.png)
+---| `ui.Icons.Copy` @![Icon](https://acstuff.club/images/icons_24/copy.png)
+---| `ui.Icons.CreditCard` @![Icon](https://acstuff.club/images/icons_24/credit_card.png)
+---| `ui.Icons.Crop` @![Icon](https://acstuff.club/images/icons_24/crop.png)
+---| `ui.Icons.Crosshair` @![Icon](https://acstuff.club/images/icons_24/crosshair.png)
+---| `ui.Icons.Delete` @![Icon](https://acstuff.club/images/icons_24/delete.png)
+---| `ui.Icons.Dice` @![Icon](https://acstuff.club/images/icons_24/dice.png)
+---| `ui.Icons.Directions` @![Icon](https://acstuff.club/images/icons_24/directions.png)
+---| `ui.Icons.Document` @![Icon](https://acstuff.club/images/icons_24/document.png)
+---| `ui.Icons.DollarBill` @![Icon](https://acstuff.club/images/icons_24/dollar_bill.png)
+---| `ui.Icons.DownAlt` @![Icon](https://acstuff.club/images/icons_24/down_alt.png)
+---| `ui.Icons.Down` @![Icon](https://acstuff.club/images/icons_24/down.png)
+---| `ui.Icons.Download` @![Icon](https://acstuff.club/images/icons_24/download.png)
+---| `ui.Icons.Driver` @![Icon](https://acstuff.club/images/icons_24/driver.png)
+---| `ui.Icons.Earth` @![Icon](https://acstuff.club/images/icons_24/earth.png)
+---| `ui.Icons.Edit` @![Icon](https://acstuff.club/images/icons_24/edit.png)
+---| `ui.Icons.Eject` @![Icon](https://acstuff.club/images/icons_24/eject.png)
+---| `ui.Icons.Ellipsis` @![Icon](https://acstuff.club/images/icons_24/ellipsis.png)
+---| `ui.Icons.Enter` @![Icon](https://acstuff.club/images/icons_24/enter.png)
+---| `ui.Icons.Envelope` @![Icon](https://acstuff.club/images/icons_24/envelope.png)
+---| `ui.Icons.Exit` @![Icon](https://acstuff.club/images/icons_24/exit.png)
+---| `ui.Icons.Eye` @![Icon](https://acstuff.club/images/icons_24/eye.png)
+---| `ui.Icons.FastForward` @![Icon](https://acstuff.club/images/icons_24/fast_forward.png)
+---| `ui.Icons.File` @![Icon](https://acstuff.club/images/icons_24/file.png)
+---| `ui.Icons.FilmRoll` @![Icon](https://acstuff.club/images/icons_24/film_roll.png)
+---| `ui.Icons.Film` @![Icon](https://acstuff.club/images/icons_24/film.png)
+---| `ui.Icons.Finish` @![Icon](https://acstuff.club/images/icons_24/finish.png)
+---| `ui.Icons.FireExtinguisher` @![Icon](https://acstuff.club/images/icons_24/fire_extinguisher.png)
+---| `ui.Icons.Fireplace` @![Icon](https://acstuff.club/images/icons_24/fireplace.png)
+---| `ui.Icons.FlagAlt` @![Icon](https://acstuff.club/images/icons_24/flag_alt.png)
+---| `ui.Icons.Flag` @![Icon](https://acstuff.club/images/icons_24/flag.png)
+---| `ui.Icons.FM` @![Icon](https://acstuff.club/images/icons_24/fm.png)
+---| `ui.Icons.Folder` @![Icon](https://acstuff.club/images/icons_24/folder.png)
+---| `ui.Icons.Font` @![Icon](https://acstuff.club/images/icons_24/font.png)
+---| `ui.Icons.Fuel` @![Icon](https://acstuff.club/images/icons_24/fuel.png)
+---| `ui.Icons.Fullscreen` @![Icon](https://acstuff.club/images/icons_24/fullscreen.png)
+---| `ui.Icons.Gamepad` @![Icon](https://acstuff.club/images/icons_24/gamepad.png)
+---| `ui.Icons.Ghost` @![Icon](https://acstuff.club/images/icons_24/ghost.png)
+---| `ui.Icons.Global` @![Icon](https://acstuff.club/images/icons_24/global.png)
+---| `ui.Icons.GlowThick` @![Icon](https://acstuff.club/images/icons_24/glow_thick.png)
+---| `ui.Icons.Glow` @![Icon](https://acstuff.club/images/icons_24/glow.png)
+---| `ui.Icons.GPS` @![Icon](https://acstuff.club/images/icons_24/gps.png)
+---| `ui.Icons.Group` @![Icon](https://acstuff.club/images/icons_24/group.png)
+---| `ui.Icons.HammerAlt` @![Icon](https://acstuff.club/images/icons_24/hammer_alt.png)
+---| `ui.Icons.Hammer` @![Icon](https://acstuff.club/images/icons_24/hammer.png)
+---| `ui.Icons.Hazard` @![Icon](https://acstuff.club/images/icons_24/hazard.png)
+---| `ui.Icons.Headphones` @![Icon](https://acstuff.club/images/icons_24/headphones.png)
+---| `ui.Icons.HeartOutline` @![Icon](https://acstuff.club/images/icons_24/heart_outline.png)
+---| `ui.Icons.Heart` @![Icon](https://acstuff.club/images/icons_24/heart.png)
+---| `ui.Icons.Helmet` @![Icon](https://acstuff.club/images/icons_24/helmet.png)
+---| `ui.Icons.Hide` @![Icon](https://acstuff.club/images/icons_24/hide.png)
+---| `ui.Icons.Home` @![Icon](https://acstuff.club/images/icons_24/home.png)
+---| `ui.Icons.Horizontal` @![Icon](https://acstuff.club/images/icons_24/horizontal.png)
+---| `ui.Icons.Hourglass` @![Icon](https://acstuff.club/images/icons_24/hourglass.png)
+---| `ui.Icons.InboxEmpty` @![Icon](https://acstuff.club/images/icons_24/inbox_empty.png)
+---| `ui.Icons.InboxFull` @![Icon](https://acstuff.club/images/icons_24/inbox_full.png)
+---| `ui.Icons.Info` @![Icon](https://acstuff.club/images/icons_24/info.png)
+---| `ui.Icons.Key` @![Icon](https://acstuff.club/images/icons_24/key.png)
+---| `ui.Icons.Keyboard` @![Icon](https://acstuff.club/images/icons_24/keyboard.png)
+---| `ui.Icons.Kick` @![Icon](https://acstuff.club/images/icons_24/kick.png)
+---| `ui.Icons.Landscape` @![Icon](https://acstuff.club/images/icons_24/landscape.png)
+---| `ui.Icons.Laptop` @![Icon](https://acstuff.club/images/icons_24/laptop.png)
+---| `ui.Icons.Leaderboard` @![Icon](https://acstuff.club/images/icons_24/leaderboard.png)
+---| `ui.Icons.Leave` @![Icon](https://acstuff.club/images/icons_24/leave.png)
+---| `ui.Icons.Lens` @![Icon](https://acstuff.club/images/icons_24/lens.png)
+---| `ui.Icons.Levels` @![Icon](https://acstuff.club/images/icons_24/levels.png)
+---| `ui.Icons.LinkBroken` @![Icon](https://acstuff.club/images/icons_24/link_broken.png)
+---| `ui.Icons.Link` @![Icon](https://acstuff.club/images/icons_24/link.png)
+---| `ui.Icons.ListAlt` @![Icon](https://acstuff.club/images/icons_24/list_alt.png)
+---| `ui.Icons.List` @![Icon](https://acstuff.club/images/icons_24/list.png)
+---| `ui.Icons.Loading` @![Icon](https://acstuff.club/images/icons_24/loading.png)
+---| `ui.Icons.Location` @![Icon](https://acstuff.club/images/icons_24/location.png)
+---| `ui.Icons.Lua` @![Icon](https://acstuff.club/images/icons_24/lua.png)
+---| `ui.Icons.Magnet` @![Icon](https://acstuff.club/images/icons_24/magnet.png)
+---| `ui.Icons.Map` @![Icon](https://acstuff.club/images/icons_24/map.png)
+---| `ui.Icons.Maximize` @![Icon](https://acstuff.club/images/icons_24/maximize.png)
+---| `ui.Icons.Menu` @![Icon](https://acstuff.club/images/icons_24/menu.png)
+---| `ui.Icons.MicrophoneMuted` @![Icon](https://acstuff.club/images/icons_24/microphone_muted.png)
+---| `ui.Icons.Microphone` @![Icon](https://acstuff.club/images/icons_24/microphone.png)
+---| `ui.Icons.Minus` @![Icon](https://acstuff.club/images/icons_24/minus.png)
+---| `ui.Icons.Monitor` @![Icon](https://acstuff.club/images/icons_24/monitor.png)
+---| `ui.Icons.Moon` @![Icon](https://acstuff.club/images/icons_24/moon.png)
+---| `ui.Icons.Mouse` @![Icon](https://acstuff.club/images/icons_24/mouse.png)
+---| `ui.Icons.Music` @![Icon](https://acstuff.club/images/icons_24/music.png)
+---| `ui.Icons.Mute` @![Icon](https://acstuff.club/images/icons_24/mute.png)
+---| `ui.Icons.Navigation` @![Icon](https://acstuff.club/images/icons_24/navigation.png)
+---| `ui.Icons.New` @![Icon](https://acstuff.club/images/icons_24/new.png)
+---| `ui.Icons.Next` @![Icon](https://acstuff.club/images/icons_24/next.png)
+---| `ui.Icons.NotificationsAny` @![Icon](https://acstuff.club/images/icons_24/notifications_any.png)
+---| `ui.Icons.Notifications` @![Icon](https://acstuff.club/images/icons_24/notifications.png)
+---| `ui.Icons.PadlockUnlocked` @![Icon](https://acstuff.club/images/icons_24/padlock_unlocked.png)
+---| `ui.Icons.Padlock` @![Icon](https://acstuff.club/images/icons_24/padlock.png)
+---| `ui.Icons.Palette` @![Icon](https://acstuff.club/images/icons_24/palette.png)
+---| `ui.Icons.Paperclip` @![Icon](https://acstuff.club/images/icons_24/paperclip.png)
+---| `ui.Icons.Paste` @![Icon](https://acstuff.club/images/icons_24/paste.png)
+---| `ui.Icons.Pause` @![Icon](https://acstuff.club/images/icons_24/pause.png)
+---| `ui.Icons.Pedals` @![Icon](https://acstuff.club/images/icons_24/pedals.png)
+---| `ui.Icons.Person` @![Icon](https://acstuff.club/images/icons_24/person.png)
+---| `ui.Icons.Photograph` @![Icon](https://acstuff.club/images/icons_24/photograph.png)
+---| `ui.Icons.Pin` @![Icon](https://acstuff.club/images/icons_24/pin.png)
+---| `ui.Icons.PitStopAlt` @![Icon](https://acstuff.club/images/icons_24/pit_stop_alt.png)
+---| `ui.Icons.PitStop` @![Icon](https://acstuff.club/images/icons_24/pit_stop.png)
+---| `ui.Icons.Pitlane` @![Icon](https://acstuff.club/images/icons_24/pitlane.png)
+---| `ui.Icons.Plane` @![Icon](https://acstuff.club/images/icons_24/plane.png)
+---| `ui.Icons.Play` @![Icon](https://acstuff.club/images/icons_24/play.png)
+---| `ui.Icons.Plug` @![Icon](https://acstuff.club/images/icons_24/plug.png)
+---| `ui.Icons.Plus` @![Icon](https://acstuff.club/images/icons_24/plus.png)
+---| `ui.Icons.Preview` @![Icon](https://acstuff.club/images/icons_24/preview.png)
+---| `ui.Icons.Previous` @![Icon](https://acstuff.club/images/icons_24/previous.png)
+---| `ui.Icons.Print` @![Icon](https://acstuff.club/images/icons_24/print.png)
+---| `ui.Icons.Process` @![Icon](https://acstuff.club/images/icons_24/process.png)
+---| `ui.Icons.Puzzle` @![Icon](https://acstuff.club/images/icons_24/puzzle.png)
+---| `ui.Icons.Python` @![Icon](https://acstuff.club/images/icons_24/python.png)
+---| `ui.Icons.QR` @![Icon](https://acstuff.club/images/icons_24/qr.png)
+---| `ui.Icons.QuestionSign` @![Icon](https://acstuff.club/images/icons_24/question_sign.png)
+---| `ui.Icons.Question` @![Icon](https://acstuff.club/images/icons_24/question.png)
+---| `ui.Icons.Radio` @![Icon](https://acstuff.club/images/icons_24/radio.png)
+---| `ui.Icons.Recognition` @![Icon](https://acstuff.club/images/icons_24/recognition.png)
+---| `ui.Icons.RecordAlt` @![Icon](https://acstuff.club/images/icons_24/record_alt.png)
+---| `ui.Icons.Record` @![Icon](https://acstuff.club/images/icons_24/record.png)
+---| `ui.Icons.Redo` @![Icon](https://acstuff.club/images/icons_24/redo.png)
+---| `ui.Icons.Referee` @![Icon](https://acstuff.club/images/icons_24/referee.png)
+---| `ui.Icons.Repair` @![Icon](https://acstuff.club/images/icons_24/repair.png)
+---| `ui.Icons.Reset` @![Icon](https://acstuff.club/images/icons_24/reset.png)
+---| `ui.Icons.RestartWarning` @![Icon](https://acstuff.club/images/icons_24/restart_warning.png)
+---| `ui.Icons.Restart` @![Icon](https://acstuff.club/images/icons_24/restart.png)
+---| `ui.Icons.Restrictor` @![Icon](https://acstuff.club/images/icons_24/restrictor.png)
+---| `ui.Icons.Resume` @![Icon](https://acstuff.club/images/icons_24/resume.png)
+---| `ui.Icons.Rewind` @![Icon](https://acstuff.club/images/icons_24/rewind.png)
+---| `ui.Icons.Road` @![Icon](https://acstuff.club/images/icons_24/road.png)
+---| `ui.Icons.Rubber` @![Icon](https://acstuff.club/images/icons_24/rubber.png)
+---| `ui.Icons.SatelliteDishLow` @![Icon](https://acstuff.club/images/icons_24/satellite_dish_low.png)
+---| `ui.Icons.SatelliteDishNone` @![Icon](https://acstuff.club/images/icons_24/satellite_dish_none.png)
+---| `ui.Icons.SatelliteDish` @![Icon](https://acstuff.club/images/icons_24/satellite_dish.png)
+---| `ui.Icons.Save` @![Icon](https://acstuff.club/images/icons_24/save.png)
+---| `ui.Icons.Scissors` @![Icon](https://acstuff.club/images/icons_24/scissors.png)
+---| `ui.Icons.Sea` @![Icon](https://acstuff.club/images/icons_24/sea.png)
+---| `ui.Icons.Search` @![Icon](https://acstuff.club/images/icons_24/search.png)
+---| `ui.Icons.Send` @![Icon](https://acstuff.club/images/icons_24/send.png)
+---| `ui.Icons.Service` @![Icon](https://acstuff.club/images/icons_24/service.png)
+---| `ui.Icons.SettingsAlt` @![Icon](https://acstuff.club/images/icons_24/settings_alt.png)
+---| `ui.Icons.Settings` @![Icon](https://acstuff.club/images/icons_24/settings.png)
+---| `ui.Icons.ShieldWithLock` @![Icon](https://acstuff.club/images/icons_24/shield_with_lock.png)
+---| `ui.Icons.Shield` @![Icon](https://acstuff.club/images/icons_24/shield.png)
+---| `ui.Icons.ShiftActive` @![Icon](https://acstuff.club/images/icons_24/shift_active.png)
+---| `ui.Icons.Shift` @![Icon](https://acstuff.club/images/icons_24/shift.png)
+---| `ui.Icons.Shopping` @![Icon](https://acstuff.club/images/icons_24/shopping.png)
+---| `ui.Icons.Shuffle` @![Icon](https://acstuff.club/images/icons_24/shuffle.png)
+---| `ui.Icons.Skip` @![Icon](https://acstuff.club/images/icons_24/skip.png)
+---| `ui.Icons.Sleep` @![Icon](https://acstuff.club/images/icons_24/sleep.png)
+---| `ui.Icons.Sliders` @![Icon](https://acstuff.club/images/icons_24/sliders.png)
+---| `ui.Icons.SlowMotion` @![Icon](https://acstuff.club/images/icons_24/slow_motion.png)
+---| `ui.Icons.Smile` @![Icon](https://acstuff.club/images/icons_24/smile.png)
+---| `ui.Icons.Spaceship` @![Icon](https://acstuff.club/images/icons_24/spaceship.png)
+---| `ui.Icons.Speaker` @![Icon](https://acstuff.club/images/icons_24/speaker.png)
+---| `ui.Icons.Speedometer` @![Icon](https://acstuff.club/images/icons_24/speedometer.png)
+---| `ui.Icons.Spotify` @![Icon](https://acstuff.club/images/icons_24/spotify.png)
+---| `ui.Icons.SquaresHorizontal` @![Icon](https://acstuff.club/images/icons_24/squares_horizontal.png)
+---| `ui.Icons.SquaresVertical` @![Icon](https://acstuff.club/images/icons_24/squares_vertical.png)
+---| `ui.Icons.StarEmpty` @![Icon](https://acstuff.club/images/icons_24/star_empty.png)
+---| `ui.Icons.StarFull` @![Icon](https://acstuff.club/images/icons_24/star_full.png)
+---| `ui.Icons.StarHalf` @![Icon](https://acstuff.club/images/icons_24/star_half.png)
+---| `ui.Icons.Start` @![Icon](https://acstuff.club/images/icons_24/start.png)
+---| `ui.Icons.Stats` @![Icon](https://acstuff.club/images/icons_24/stats.png)
+---| `ui.Icons.Stay` @![Icon](https://acstuff.club/images/icons_24/stay.png)
+---| `ui.Icons.SteeringWheel` @![Icon](https://acstuff.club/images/icons_24/steering_wheel.png)
+---| `ui.Icons.StopAlt` @![Icon](https://acstuff.club/images/icons_24/stop_alt.png)
+---| `ui.Icons.Stop` @![Icon](https://acstuff.club/images/icons_24/stop.png)
+---| `ui.Icons.Stopwatch` @![Icon](https://acstuff.club/images/icons_24/stopwatch.png)
+---| `ui.Icons.Sweeping` @![Icon](https://acstuff.club/images/icons_24/sweeping.png)
+---| `ui.Icons.Tag` @![Icon](https://acstuff.club/images/icons_24/tag.png)
+---| `ui.Icons.Target` @![Icon](https://acstuff.club/images/icons_24/target.png)
+---| `ui.Icons.Team` @![Icon](https://acstuff.club/images/icons_24/team.png)
+---| `ui.Icons.Teleport` @![Icon](https://acstuff.club/images/icons_24/teleport.png)
+---| `ui.Icons.Tent` @![Icon](https://acstuff.club/images/icons_24/tent.png)
+---| `ui.Icons.Thermometer` @![Icon](https://acstuff.club/images/icons_24/thermometer.png)
+---| `ui.Icons.ThumbDown` @![Icon](https://acstuff.club/images/icons_24/thumb_down.png)
+---| `ui.Icons.ThumbUp` @![Icon](https://acstuff.club/images/icons_24/thumb_up.png)
+---| `ui.Icons.TimeRewind` @![Icon](https://acstuff.club/images/icons_24/time_rewind.png)
+---| `ui.Icons.TopHat` @![Icon](https://acstuff.club/images/icons_24/top_hat.png)
+---| `ui.Icons.TrafficLight` @![Icon](https://acstuff.club/images/icons_24/traffic_light.png)
+---| `ui.Icons.Transmission` @![Icon](https://acstuff.club/images/icons_24/transmission.png)
+---| `ui.Icons.Trash` @![Icon](https://acstuff.club/images/icons_24/trash.png)
+---| `ui.Icons.Treat` @![Icon](https://acstuff.club/images/icons_24/treat.png)
+---| `ui.Icons.Trophy` @![Icon](https://acstuff.club/images/icons_24/trophy.png)
+---| `ui.Icons.TurnSignalLeft` @![Icon](https://acstuff.club/images/icons_24/turn_signal_left.png)
+---| `ui.Icons.TurnSignalRight` @![Icon](https://acstuff.club/images/icons_24/turn_signal_right.png)
+---| `ui.Icons.Tv` @![Icon](https://acstuff.club/images/icons_24/tv.png)
+---| `ui.Icons.Tyre` @![Icon](https://acstuff.club/images/icons_24/tyre.png)
+---| `ui.Icons.Umbrella` @![Icon](https://acstuff.club/images/icons_24/umbrella.png)
+---| `ui.Icons.Undo` @![Icon](https://acstuff.club/images/icons_24/undo.png)
+---| `ui.Icons.UpAlt` @![Icon](https://acstuff.club/images/icons_24/up_alt.png)
+---| `ui.Icons.Up` @![Icon](https://acstuff.club/images/icons_24/up.png)
+---| `ui.Icons.User` @![Icon](https://acstuff.club/images/icons_24/user.png)
+---| `ui.Icons.Verified` @![Icon](https://acstuff.club/images/icons_24/verified.png)
+---| `ui.Icons.VideoCameraAlt` @![Icon](https://acstuff.club/images/icons_24/video_camera_alt.png)
+---| `ui.Icons.VideoCamera` @![Icon](https://acstuff.club/images/icons_24/video_camera.png)
+---| `ui.Icons.VIP` @![Icon](https://acstuff.club/images/icons_24/vip.png)
+---| `ui.Icons.VolumeHigh` @![Icon](https://acstuff.club/images/icons_24/volume_high.png)
+---| `ui.Icons.VolumeLow` @![Icon](https://acstuff.club/images/icons_24/volume_low.png)
+---| `ui.Icons.VolumeMedium` @![Icon](https://acstuff.club/images/icons_24/volume_medium.png)
+---| `ui.Icons.Wallet` @![Icon](https://acstuff.club/images/icons_24/wallet.png)
+---| `ui.Icons.Warning` @![Icon](https://acstuff.club/images/icons_24/warning.png)
+---| `ui.Icons.WeatherClear` @![Icon](https://acstuff.club/images/icons_24/weather_clear.png)
+---| `ui.Icons.WeatherCold` @![Icon](https://acstuff.club/images/icons_24/weather_cold.png)
+---| `ui.Icons.WeatherDrizzle` @![Icon](https://acstuff.club/images/icons_24/weather_drizzle.png)
+---| `ui.Icons.WeatherFewClouds` @![Icon](https://acstuff.club/images/icons_24/weather_few_clouds.png)
+---| `ui.Icons.WeatherFog` @![Icon](https://acstuff.club/images/icons_24/weather_fog.png)
+---| `ui.Icons.WeatherHail` @![Icon](https://acstuff.club/images/icons_24/weather_hail.png)
+---| `ui.Icons.WeatherHot` @![Icon](https://acstuff.club/images/icons_24/weather_hot.png)
+---| `ui.Icons.WeatherHurricane` @![Icon](https://acstuff.club/images/icons_24/weather_hurricane.png)
+---| `ui.Icons.WeatherOvercast` @![Icon](https://acstuff.club/images/icons_24/weather_overcast.png)
+---| `ui.Icons.WeatherRainLight` @![Icon](https://acstuff.club/images/icons_24/weather_rain_light.png)
+---| `ui.Icons.WeatherRain` @![Icon](https://acstuff.club/images/icons_24/weather_rain.png)
+---| `ui.Icons.WeatherSleet` @![Icon](https://acstuff.club/images/icons_24/weather_sleet.png)
+---| `ui.Icons.WeatherSnowLight` @![Icon](https://acstuff.club/images/icons_24/weather_snow_light.png)
+---| `ui.Icons.WeatherSnow` @![Icon](https://acstuff.club/images/icons_24/weather_snow.png)
+---| `ui.Icons.WeatherStormLight` @![Icon](https://acstuff.club/images/icons_24/weather_storm_light.png)
+---| `ui.Icons.WeatherStorm` @![Icon](https://acstuff.club/images/icons_24/weather_storm.png)
+---| `ui.Icons.WeatherTornado` @![Icon](https://acstuff.club/images/icons_24/weather_tornado.png)
+---| `ui.Icons.WeatherWarm` @![Icon](https://acstuff.club/images/icons_24/weather_warm.png)
+---| `ui.Icons.WeatherWindySun` @![Icon](https://acstuff.club/images/icons_24/weather_windy_sun.png)
+---| `ui.Icons.WeatherWindy` @![Icon](https://acstuff.club/images/icons_24/weather_windy.png)
+---| `ui.Icons.Webcam` @![Icon](https://acstuff.club/images/icons_24/webcam.png)
+---| `ui.Icons.Wheel` @![Icon](https://acstuff.club/images/icons_24/wheel.png)
+---| `ui.Icons.Wrench` @![Icon](https://acstuff.club/images/icons_24/wrench.png)
+---| `ui.Icons.YandexMusic` @![Icon](https://acstuff.club/images/icons_24/yandex_music.png)
+---| `ui.Icons.YoutubeSolid` @![Icon](https://acstuff.club/images/icons_24/youtube_solid.png)
+---| `ui.Icons.Youtube` @![Icon](https://acstuff.club/images/icons_24/youtube.png)
+---| `ui.Icons.ZoomIn` @![Icon](https://acstuff.club/images/icons_24/zoom_in.png)
+---| `ui.Icons.ZoomOut` @![Icon](https://acstuff.club/images/icons_24/zoom_out.png)
+---| `ui.Icons.LoadingSpinner` @Value: 'fx:loading'.
+ui.Icons = {
+  Air = 'AIR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/air.png)
+  AppWindow = 'APP_WINDOW', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/app_window.png)
+  Apps = 'APPS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/apps.png)
+  ArrowDown = 'ARROW_DOWN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/arrow_down.png)
+  ArrowLeft = 'ARROW_LEFT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/arrow_left.png)
+  ArrowRight = 'ARROW_RIGHT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/arrow_right.png)
+  ArrowUp = 'ARROW_UP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/arrow_up.png)
+  Assist = 'ASSIST', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/assist.png)
+  Attention = 'ATTENTION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/attention.png)
+  Avatar = 'AVATAR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/avatar.png)
+  Back = 'BACK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/back.png)
+  Backspace = 'BACKSPACE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/backspace.png)
+  Ballast = 'BALLAST', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/ballast.png)
+  Ban = 'BAN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/ban.png)
+  Barcode = 'BARCODE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/barcode.png)
+  Bars = 'BARS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/bars.png)
+  BatteryEmpty = 'BATTERY_EMPTY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/battery_empty.png)
+  BatteryFull = 'BATTERY_FULL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/battery_full.png)
+  Befriend = 'BEFRIEND', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/befriend.png)
+  Bell = 'BELL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/bell.png)
+  Binocoulars = 'BINOCOULARS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/binocoulars.png)
+  Blackboard = 'BLACKBOARD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/blackboard.png)
+  Blanket = 'BLANKET', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/blanket.png)
+  Blast = 'BLAST', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/blast.png)
+  Bluetooth = 'BLUETOOTH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/bluetooth.png)
+  Bomb = 'BOMB', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/bomb.png)
+  Book = 'BOOK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/book.png)
+  Bookmark = 'BOOKMARK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/bookmark.png)
+  Box = 'BOX', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/box.png)
+  Briefcase = 'BRIEFCASE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/briefcase.png)
+  Bug = 'BUG', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/bug.png)
+  Bulb = 'BULB', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/bulb.png)
+  Burn = 'BURN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/burn.png)
+  Calculator = 'CALCULATOR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/calculator.png)
+  Calendar = 'CALENDAR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/calendar.png)
+  CallBluetooth = 'CALL_BLUETOOTH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/call_bluetooth.png)
+  Call = 'CALL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/call.png)
+  Camera = 'CAMERA', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/camera.png)
+  Cancel = 'CANCEL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/cancel.png)
+  CarFront = 'CAR_FRONT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/car_front.png)
+  Cards = 'CARDS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/cards.png)
+  Cctv = 'CCTV', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/cctv.png)
+  Cellphone = 'CELLPHONE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/cellphone.png)
+  Chat = 'CHAT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/chat.png)
+  Clapperboard = 'CLAPPERBOARD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/clapperboard.png)
+  Clip = 'CLIP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/clip.png)
+  Clipboard = 'CLIPBOARD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/clipboard.png)
+  Clock = 'CLOCK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/clock.png)
+  Cloud = 'CLOUD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/cloud.png)
+  Code = 'CODE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/code.png)
+  Coffee = 'COFFEE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/coffee.png)
+  CollisionAlt = 'COLLISION_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/collision_alt.png)
+  Collision = 'COLLISION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/collision.png)
+  CompassAlt = 'COMPASS_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/compass_alt.png)
+  Compass = 'COMPASS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/compass.png)
+  Confirm = 'CONFIRM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/confirm.png)
+  Constellation = 'CONSTELLATION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/constellation.png)
+  Contacts = 'CONTACTS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/contacts.png)
+  Contrast = 'CONTRAST', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/contrast.png)
+  Copy = 'COPY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/copy.png)
+  CreditCard = 'CREDIT_CARD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/credit_card.png)
+  Crop = 'CROP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/crop.png)
+  Crosshair = 'CROSSHAIR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/crosshair.png)
+  Delete = 'DELETE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/delete.png)
+  Dice = 'DICE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/dice.png)
+  Directions = 'DIRECTIONS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/directions.png)
+  Document = 'DOCUMENT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/document.png)
+  DollarBill = 'DOLLAR_BILL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/dollar_bill.png)
+  DownAlt = 'DOWN_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/down_alt.png)
+  Down = 'DOWN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/down.png)
+  Download = 'DOWNLOAD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/download.png)
+  Driver = 'DRIVER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/driver.png)
+  Earth = 'EARTH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/earth.png)
+  Edit = 'EDIT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/edit.png)
+  Eject = 'EJECT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/eject.png)
+  Ellipsis = 'ELLIPSIS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/ellipsis.png)
+  Enter = 'ENTER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/enter.png)
+  Envelope = 'ENVELOPE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/envelope.png)
+  Exit = 'EXIT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/exit.png)
+  Eye = 'EYE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/eye.png)
+  FastForward = 'FAST_FORWARD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fast_forward.png)
+  File = 'FILE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/file.png)
+  FilmRoll = 'FILM_ROLL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/film_roll.png)
+  Film = 'FILM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/film.png)
+  Finish = 'FINISH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/finish.png)
+  FireExtinguisher = 'FIRE_EXTINGUISHER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fire_extinguisher.png)
+  Fireplace = 'FIREPLACE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fireplace.png)
+  FlagAlt = 'FLAG_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/flag_alt.png)
+  Flag = 'FLAG', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/flag.png)
+  FM = 'FM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fm.png)
+  Folder = 'FOLDER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/folder.png)
+  Font = 'FONT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/font.png)
+  Fuel = 'FUEL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fuel.png)
+  Fullscreen = 'FULLSCREEN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fullscreen.png)
+  Gamepad = 'GAMEPAD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/gamepad.png)
+  Ghost = 'GHOST', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/ghost.png)
+  Global = 'GLOBAL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/global.png)
+  GlowThick = 'GLOW_THICK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/glow_thick.png)
+  Glow = 'GLOW', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/glow.png)
+  GPS = 'GPS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/gps.png)
+  Group = 'GROUP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/group.png)
+  HammerAlt = 'HAMMER_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/hammer_alt.png)
+  Hammer = 'HAMMER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/hammer.png)
+  Hazard = 'HAZARD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/hazard.png)
+  Headphones = 'HEADPHONES', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/headphones.png)
+  HeartOutline = 'HEART_OUTLINE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/heart_outline.png)
+  Heart = 'HEART', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/heart.png)
+  Helmet = 'HELMET', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/helmet.png)
+  Hide = 'HIDE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/hide.png)
+  Home = 'HOME', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/home.png)
+  Horizontal = 'HORIZONTAL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/horizontal.png)
+  Hourglass = 'HOURGLASS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/hourglass.png)
+  InboxEmpty = 'INBOX_EMPTY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/inbox_empty.png)
+  InboxFull = 'INBOX_FULL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/inbox_full.png)
+  Info = 'INFO', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/info.png)
+  Key = 'KEY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/key.png)
+  Keyboard = 'KEYBOARD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/keyboard.png)
+  Kick = 'KICK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/kick.png)
+  Landscape = 'LANDSCAPE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/landscape.png)
+  Laptop = 'LAPTOP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/laptop.png)
+  Leaderboard = 'LEADERBOARD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/leaderboard.png)
+  Leave = 'LEAVE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/leave.png)
+  Lens = 'LENS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/lens.png)
+  Levels = 'LEVELS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/levels.png)
+  LinkBroken = 'LINK_BROKEN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/link_broken.png)
+  Link = 'LINK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/link.png)
+  ListAlt = 'LIST_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/list_alt.png)
+  List = 'LIST', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/list.png)
+  Loading = 'LOADING', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/loading.png)
+  Location = 'LOCATION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/location.png)
+  Lua = 'LUA', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/lua.png)
+  Magnet = 'MAGNET', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/magnet.png)
+  Map = 'MAP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/map.png)
+  Maximize = 'MAXIMIZE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/maximize.png)
+  Menu = 'MENU', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/menu.png)
+  MicrophoneMuted = 'MICROPHONE_MUTED', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/microphone_muted.png)
+  Microphone = 'MICROPHONE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/microphone.png)
+  Minus = 'MINUS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/minus.png)
+  Monitor = 'MONITOR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/monitor.png)
+  Moon = 'MOON', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/moon.png)
+  Mouse = 'MOUSE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/mouse.png)
+  Music = 'MUSIC', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/music.png)
+  Mute = 'MUTE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/mute.png)
+  Navigation = 'NAVIGATION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/navigation.png)
+  New = 'NEW', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/new.png)
+  Next = 'NEXT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/next.png)
+  NotificationsAny = 'NOTIFICATIONS_ANY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/notifications_any.png)
+  Notifications = 'NOTIFICATIONS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/notifications.png)
+  PadlockUnlocked = 'PADLOCK_UNLOCKED', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/padlock_unlocked.png)
+  Padlock = 'PADLOCK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/padlock.png)
+  Palette = 'PALETTE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/palette.png)
+  Paperclip = 'PAPERCLIP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/paperclip.png)
+  Paste = 'PASTE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/paste.png)
+  Pause = 'PAUSE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pause.png)
+  Pedals = 'PEDALS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pedals.png)
+  Person = 'PERSON', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/person.png)
+  Photograph = 'PHOTOGRAPH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/photograph.png)
+  Pin = 'PIN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pin.png)
+  PitStopAlt = 'PIT_STOP_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pit_stop_alt.png)
+  PitStop = 'PIT_STOP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pit_stop.png)
+  Pitlane = 'PITLANE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pitlane.png)
+  Plane = 'PLANE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/plane.png)
+  Play = 'PLAY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/play.png)
+  Plug = 'PLUG', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/plug.png)
+  Plus = 'PLUS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/plus.png)
+  Preview = 'PREVIEW', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/preview.png)
+  Previous = 'PREVIOUS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/previous.png)
+  Print = 'PRINT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/print.png)
+  Process = 'PROCESS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/process.png)
+  Puzzle = 'PUZZLE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/puzzle.png)
+  Python = 'PYTHON', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/python.png)
+  QR = 'QR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/qr.png)
+  QuestionSign = 'QUESTION_SIGN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/question_sign.png)
+  Question = 'QUESTION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/question.png)
+  Radio = 'RADIO', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/radio.png)
+  Recognition = 'RECOGNITION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/recognition.png)
+  RecordAlt = 'RECORD_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/record_alt.png)
+  Record = 'RECORD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/record.png)
+  Redo = 'REDO', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/redo.png)
+  Referee = 'REFEREE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/referee.png)
+  Repair = 'REPAIR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/repair.png)
+  Reset = 'RESET', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/reset.png)
+  RestartWarning = 'RESTART_WARNING', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/restart_warning.png)
+  Restart = 'RESTART', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/restart.png)
+  Restrictor = 'RESTRICTOR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/restrictor.png)
+  Resume = 'RESUME', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/resume.png)
+  Rewind = 'REWIND', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/rewind.png)
+  Road = 'ROAD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/road.png)
+  Rubber = 'RUBBER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/rubber.png)
+  SatelliteDishLow = 'SATELLITE_DISH_LOW', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/satellite_dish_low.png)
+  SatelliteDishNone = 'SATELLITE_DISH_NONE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/satellite_dish_none.png)
+  SatelliteDish = 'SATELLITE_DISH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/satellite_dish.png)
+  Save = 'SAVE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/save.png)
+  Scissors = 'SCISSORS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/scissors.png)
+  Sea = 'SEA', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/sea.png)
+  Search = 'SEARCH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/search.png)
+  Send = 'SEND', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/send.png)
+  Service = 'SERVICE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/service.png)
+  SettingsAlt = 'SETTINGS_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/settings_alt.png)
+  Settings = 'SETTINGS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/settings.png)
+  ShieldWithLock = 'SHIELD_WITH_LOCK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/shield_with_lock.png)
+  Shield = 'SHIELD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/shield.png)
+  ShiftActive = 'SHIFT_ACTIVE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/shift_active.png)
+  Shift = 'SHIFT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/shift.png)
+  Shopping = 'SHOPPING', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/shopping.png)
+  Shuffle = 'SHUFFLE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/shuffle.png)
+  Skip = 'SKIP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/skip.png)
+  Sleep = 'SLEEP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/sleep.png)
+  Sliders = 'SLIDERS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/sliders.png)
+  SlowMotion = 'SLOW_MOTION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/slow_motion.png)
+  Smile = 'SMILE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/smile.png)
+  Spaceship = 'SPACESHIP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/spaceship.png)
+  Speaker = 'SPEAKER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/speaker.png)
+  Speedometer = 'SPEEDOMETER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/speedometer.png)
+  Spotify = 'SPOTIFY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/spotify.png)
+  SquaresHorizontal = 'SQUARES_HORIZONTAL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/squares_horizontal.png)
+  SquaresVertical = 'SQUARES_VERTICAL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/squares_vertical.png)
+  StarEmpty = 'STAR_EMPTY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/star_empty.png)
+  StarFull = 'STAR_FULL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/star_full.png)
+  StarHalf = 'STAR_HALF', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/star_half.png)
+  Start = 'START', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/start.png)
+  Stats = 'STATS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stats.png)
+  Stay = 'STAY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stay.png)
+  SteeringWheel = 'STEERING_WHEEL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/steering_wheel.png)
+  StopAlt = 'STOP_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stop_alt.png)
+  Stop = 'STOP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stop.png)
+  Stopwatch = 'STOPWATCH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stopwatch.png)
+  Sweeping = 'SWEEPING', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/sweeping.png)
+  Tag = 'TAG', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/tag.png)
+  Target = 'TARGET', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/target.png)
+  Team = 'TEAM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/team.png)
+  Teleport = 'TELEPORT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/teleport.png)
+  Tent = 'TENT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/tent.png)
+  Thermometer = 'THERMOMETER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/thermometer.png)
+  ThumbDown = 'THUMB_DOWN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/thumb_down.png)
+  ThumbUp = 'THUMB_UP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/thumb_up.png)
+  TimeRewind = 'TIME_REWIND', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/time_rewind.png)
+  TopHat = 'TOP_HAT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/top_hat.png)
+  TrafficLight = 'TRAFFIC_LIGHT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/traffic_light.png)
+  Transmission = 'TRANSMISSION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/transmission.png)
+  Trash = 'TRASH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/trash.png)
+  Treat = 'TREAT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/treat.png)
+  Trophy = 'TROPHY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/trophy.png)
+  TurnSignalLeft = 'TURN_SIGNAL_LEFT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/turn_signal_left.png)
+  TurnSignalRight = 'TURN_SIGNAL_RIGHT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/turn_signal_right.png)
+  Tv = 'TV', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/tv.png)
+  Tyre = 'TYRE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/tyre.png)
+  Umbrella = 'UMBRELLA', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/umbrella.png)
+  Undo = 'UNDO', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/undo.png)
+  UpAlt = 'UP_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/up_alt.png)
+  Up = 'UP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/up.png)
+  User = 'USER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/user.png)
+  Verified = 'VERIFIED', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/verified.png)
+  VideoCameraAlt = 'VIDEO_CAMERA_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/video_camera_alt.png)
+  VideoCamera = 'VIDEO_CAMERA', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/video_camera.png)
+  VIP = 'VIP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/vip.png)
+  VolumeHigh = 'VOLUME_HIGH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/volume_high.png)
+  VolumeLow = 'VOLUME_LOW', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/volume_low.png)
+  VolumeMedium = 'VOLUME_MEDIUM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/volume_medium.png)
+  Wallet = 'WALLET', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/wallet.png)
+  Warning = 'WARNING', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/warning.png)
+  WeatherClear = 'WEATHER_CLEAR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_clear.png)
+  WeatherCold = 'WEATHER_COLD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_cold.png)
+  WeatherDrizzle = 'WEATHER_DRIZZLE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_drizzle.png)
+  WeatherFewClouds = 'WEATHER_FEW_CLOUDS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_few_clouds.png)
+  WeatherFog = 'WEATHER_FOG', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_fog.png)
+  WeatherHail = 'WEATHER_HAIL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_hail.png)
+  WeatherHot = 'WEATHER_HOT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_hot.png)
+  WeatherHurricane = 'WEATHER_HURRICANE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_hurricane.png)
+  WeatherOvercast = 'WEATHER_OVERCAST', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_overcast.png)
+  WeatherRainLight = 'WEATHER_RAIN_LIGHT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_rain_light.png)
+  WeatherRain = 'WEATHER_RAIN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_rain.png)
+  WeatherSleet = 'WEATHER_SLEET', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_sleet.png)
+  WeatherSnowLight = 'WEATHER_SNOW_LIGHT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_snow_light.png)
+  WeatherSnow = 'WEATHER_SNOW', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_snow.png)
+  WeatherStormLight = 'WEATHER_STORM_LIGHT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_storm_light.png)
+  WeatherStorm = 'WEATHER_STORM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_storm.png)
+  WeatherTornado = 'WEATHER_TORNADO', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_tornado.png)
+  WeatherWarm = 'WEATHER_WARM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_warm.png)
+  WeatherWindySun = 'WEATHER_WINDY_SUN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_windy_sun.png)
+  WeatherWindy = 'WEATHER_WINDY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_windy.png)
+  Webcam = 'WEBCAM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/webcam.png)
+  Wheel = 'WHEEL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/wheel.png)
+  Wrench = 'WRENCH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/wrench.png)
+  YandexMusic = 'YANDEX_MUSIC', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/yandex_music.png)
+  YoutubeSolid = 'YOUTUBE_SOLID', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/youtube_solid.png)
+  Youtube = 'YOUTUBE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/youtube.png)
+  ZoomIn = 'ZOOM_IN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/zoom_in.png)
+  ZoomOut = 'ZOOM_OUT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/zoom_out.png)
+  LoadingSpinner = 'fx:loading', ---@type ui.Icons #Value: 'fx:loading'.
+}
+
 --[[ common/common.lua ]]
 
 ---Path to a folder with currently running script.
@@ -2573,7 +3161,7 @@ function ac.lapTimeToString(time, allowHours) end
 ---@return string
 function ac.getCountryName(nationCode) end
 
----Can be used to access files in “data.acd” and, for example, read car specs.
+---Reads a file and returns it as a text. Aware of “data.acd”, so can be used to access files in “data.acd” and, for example, read car specs.
 ---@param filename string
 ---@return string
 function ac.readDataFile(filename) end
@@ -2598,7 +3186,7 @@ function ac.getTrackID() end
 function ac.getTrackLayout() end
 
 ---Returns full track ID (name of track folder and layout folder joined by some string, or just name of track folder if there is no layout).
----@param separator string? @Default value: '-'.
+---@param separator string?? @Default value: '-'.
 ---@return string
 function ac.getTrackFullID(separator) end
 
@@ -2920,7 +3508,7 @@ function ac.getDriverName(carIndex) end
 ---Get three character nation code of a driver of a certain car. Nation code is a three-letter uppercase country identifier. If nationality is not set, a value from JSON
 ---is returned. If it’s missing there, a fallback “ITA” is returned. If there is no such car, returns `nil`.
 ---@param carIndex integer @0-based car index.
----@return string?
+---@return ac.NationCode?
 function ac.getDriverNationCode(carIndex) end
 
 ---Get full nationality of a driver of a certain car. Usually, it’s a full country name. If nationality is not set, a value from JSON
@@ -2988,6 +3576,10 @@ function ac.getControllerSteerValue() end
 ---Is gas input pressed (pedal, gamepad axis, keyboard button but not mouse button).
 ---@return boolean
 function ac.isControllerGasPressed() end
+
+---Is brake input pressed (pedal, gamepad axis, keyboard button but not mouse button).
+---@return boolean
+function ac.isControllerBrakePressed() end
 
 ---Is gear up input pressed (pedal, gamepad button, keyboard button).
 ---@return boolean
@@ -3223,7 +3815,7 @@ function ac.onTyresSetChange(carIndex, callback) end
 function ac.onClientConnected(callback) end
 
 ---Sets a callback which will be called when a user disconnects (doesn’t do anything outside of online race).
----@param callback fun(connectedCarIndex: integer, connectedSessionID: integer)
+---@param callback fun(disconnectedCarIndex: integer, disconnectedSessionID: integer)
 ---@return ac.Disposable
 function ac.onClientDisconnected(callback) end
 
@@ -3418,6 +4010,11 @@ function ac.getCarBlindSpot(carIndex) end
 ---@return boolean @Returns `false` if failed.
 function ac.setClipboardText(text) end
 
+---Sets a callback which will be called when replay activates, deactivates or jumps around when active (could be good, for things, to clear out particles).
+---@param callback fun(event: 'start'|'stop'|'jump')
+---@return ac.Disposable
+function ac.onReplay(callback) end
+
 ---Sets a callback which will be called when a car teleports somewhere or its state gets reset.
 ---@param carIndex integer @0-based car index, or -1 for an event to be called for all cars.
 ---@param callback fun(carIndex: integer)
@@ -3520,10 +4117,21 @@ function io.scanDrives() end
 ---@return io.FileAttributes
 function io.getAttributes(filename) end
 
+---Sets file attributes. Returns `false` if failed.
+---@param filename path
+---@param attributes io.FileAttributes
+---@return boolean
+function io.setAttributes(filename, attributes) end
+
 ---Gets full filename of the main AC executable (“…/acs.exe” for most cases).
 ---Not available to scripts without I/O access.
 ---@return path
 function io.getMainExecutable() end
+
+---Gets extra attributes associated with EXE or DLL files.
+---@param filename path
+---@return {productName: string?, version: string?}
+function io.getExecutableAttributes(filename) end
 
 ---Reads file content into a string, if such file exists, otherwise returns fallback data or `nil`.
 ---@param filename path
@@ -3567,6 +4175,11 @@ function io.dirExists(filename) end
 ---@return boolean
 function io.fileExists(filename) end
 
+---Checks if file is currently being used by another process by trying to open it without allowing any sharing.
+---@param filename path
+---@return boolean
+function io.fileInUse(filename) end
+
 ---Calculates file size in bytes. Returns -1 if there was an error.
 ---@param filename path
 ---@return integer
@@ -3605,6 +4218,12 @@ function io.createFileDir(filename) end
 ---@return string
 function io.getParentPath(filename, level) end
 
+---Compares two paths ignoring case and “/” vs “\” mismatches. Skips repeating slashes. For now, doesn’t account for “/./” or “/dummy/../”.
+---@param path0 string?
+---@param path1 string?
+---@return boolean
+function io.arePathsEqual(path0, path1) end
+
 ---Returns file name path for given filename.
 ---@param filename string
 ---@param noExtension boolean? @Default value: `false`.
@@ -3634,13 +4253,24 @@ function io.move(existingFilename, newFilename, replaceExisting) end
 ---@return string|nil
 function io.findFile(filename) end
 
----Copies a file to a new place, returns `true` if moved successfully.
+---Copies a file to a new place, returns `true` if copied successfully.
 ---Not available to scripts without I/O access.
 ---@param existingFilename path
 ---@param newFilename path
 ---@param failIfExists boolean? @Set to `false` to silently overwrite existing files. Default value: `true`.
+---@param attemptHardlink boolean? @If `true` and source and destination share the same drive, try to use hardlink first. Default value: `false`.
 ---@return boolean
-function io.copyFile(existingFilename, newFilename, failIfExists) end
+function io.copyFile(existingFilename, newFilename, failIfExists, attemptHardlink) end
+
+---Replaces one file with another file. The replacement file assumes the name of the replaced file and its identity. Good if you want to implement
+---secure saving (save a file with a new name and then use this function to replace main file with this one: great way to update crucial files
+---without risking data corruption in a case of power loss and such). Note: `io.save()` and `io.saveAsync()` already use this safe mechanism if you’re
+---setting `ensure` to `true`.
+---Not available to scripts without I/O access.
+---@param destination path
+---@param source path
+---@return boolean
+function io.replaceFile(destination, source) end
 
 ---Deletes a file, returns `true` if file was deleted successfully. To delete empty directory, use `io.deleteDir()`. If you’re operating around important
 ---files, consider using `io.recycle()` instead.
@@ -3657,6 +4287,8 @@ function io.deleteDir(filename) end
 
 ---Moves file to Windows Recycle Bin, returns `true` if file was moved successfully. Note: this operation is much slower than removing a file with `io.deleteFile()`
 ---or removing an empty directory with `io.deleteDir()`.
+---
+--- Note: before 0.3.0, doesn’t use recycle bin and just deletes any file or a folder passed to it.
 ---Not available to scripts without I/O access.
 ---@param filename path
 ---@return boolean
@@ -3699,16 +4331,8 @@ function io.scanZip(zipFilename) end
 ---Not available to scripts without I/O access.
 ---@param filename path? @Pass `nil` to instead get the binary data in the callback.
 ---@param entries table<string, io.ZipEntry> @Keys store entry names (use “/” as separator for creating sub-folders), and values store either binary data or tables in `io.ZipEntry` format.
----@param callback fun(err: string?, response: binary??) @Callback will contain reference to binary data if `filename` is `nil`.
+---@param callback fun(err: string?, response: binary?) @Callback will contain reference to binary data if `filename` is `nil`.
 function io.createZipAsync(filename, entries, callback) end
-
----Not available to scripts without I/O access.
----@return string[]
-function io.arrtest1() end
-
----Not available to scripts without I/O access.
----@return string[]
-function io.arrtest2() end
 
 ---Returns time in seconds from script start (with high precision).
 ---@return number @Seconds.
@@ -3811,9 +4435,9 @@ function ac.getConditionsSet() end
 ---@param r ac.ConditionsSet
 function ac.getConditionsSetTo(r) end
 
----Returns floading point number of seconds since 1970/01/01 that can be used for driving track animations in such a way that if time multiplier is set to
+---Returns floating point number of seconds since 1970/01/01 that can be used for driving track animations in such a way that if time multiplier is set to
 ---0 or above 1, things would still happen at normal speed, although out of sync with the clock. Ensures to keep things online as well. Currently might not
----work that well with replays, futher updates will improve some edge cases.
+---work that well with replays, further updates will improve some edge cases.
 ---
 ---Note: if time is still being estimated, returns 0, be sure to check for that case.
 ---@return number
@@ -4017,7 +4641,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field brakesBiasLimitUp number @Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field brakesBiasStep number @Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field maxRelativePlankWear number @From 0 to 1. Physics-only (see `ac.CarState.physicsAvailable`), 0 if not available.
----@field year integer @Manufactoring year.
+---@field year integer @Manufacturing year.
 ---@field hShifter boolean @True if car has H-shifter in its physics data.
 ---@field adjustableTurbo boolean @Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field brakesCockpitBias boolean @Physics-only (see `ac.CarState.physicsAvailable`)
@@ -4037,6 +4661,9 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field hasCockpitSwitchForUserSpeedLimiter boolean @Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field hasHornAudioEvent boolean
 ---@field hasAnalogTelltale boolean @Car has max RPM arrow.
+---@field isRefueling string @Car is in pits and is currently being refueled.
+---@field isChangingTyres string @Car is in pits and is currently having its tyres changed.
+---@field isRepairing string @Car is in pits and is currently being repaired.
 ---@field tractionControlModes integer @0 if TC is not present. Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field absModes integer @0 if ABS is not present. Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field fuelMaps integer
@@ -4117,6 +4744,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field isCameraOnBoard boolean @True if camera is inside this car.
 ---@field isInPitlane boolean @True if car is in pits area.
 ---@field isInPit boolean @True if car is parked in its pit stop place.
+---@field isRequestingPitStop boolean @True if car is requesting to go to pits.
 ---@field isRetired boolean
 ---@field isEngineLimiterOn boolean
 ---@field isGearGrinding boolean
@@ -4187,6 +4815,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field bodyWetness number @How wet is car exterior, approximation from 0 to 1 (actual wetness is in 2D map).
 ---@field compass number @Angle of where car is heading, from 0 to 360 (0/360 for north, 90 for east, etc.)
 ---@field lapTimeMs integer @Time of current lap in milliseconds.
+---@field extrapolatedLapTimeMs integer @Graphics-corrected time of current lap in milliseconds: takes into account age of car state for the ultimate precision, but be warn: it might exceed actual lap time if car crosses the finishing line between last physics and current graphics frame.
 ---@field bestLapTimeMs integer @Time of best lap of this session in milliseconds.
 ---@field previousLapTimeMs integer @Time of last lap in milliseconds.
 ---@field lapCount integer @Number of completed laps in this session (within connection online), including spoiled laps.
@@ -4200,6 +4829,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field sessionLapCount integer
 ---@field compoundIndex integer @Index of currently selected tyre compounds.
 ---@field sessionID integer @Index of a car in an online race (differs from regular car index: sessionID is an index in entry list, but car.index of your car is always zero)
+---@field bestLapFromGhost boolean @If `true`, `lapTimeMs` is not from this session, but from the ghost player is racing against. Can’t be `true` online (ghost never sets the best lap time online).
 ---@field physicsAvailable boolean @Cars in replays, or remote cars online do not have regular physics component running, so some data will be missing. Such fields are marked as physics-only in comments.
 ---@field speedLimiterInAction boolean @Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field absInAction boolean @Physics-only (see `ac.CarState.physicsAvailable`)
@@ -4241,8 +4871,8 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field tractionControl2 number
 ---@field fuelMap integer @Current fuel map preset.
 ---@field steerTorque number
----@field ffbSteerAssist number @Value of `STEER_ASSIST` from car.ini. Physics-only (see `ac.CarState.physicsAvailable`)
----@field ffbBase number @Value of `FFMULT` from car.ini. Physics-only (see `ac.CarState.physicsAvailable`)
+---@field ffbSteerAssist number @Value of `STEER_ASSIST` from car.ini. Broken until 0.3.0.
+---@field ffbBase number @Value of `FFMULT` from car.ini.
 ---@field ffbFinal number
 ---@field ffbPure number
 ---@field ffbMultiplier number @For 100% FFB multiplier, this value is set to 1.
@@ -4328,6 +4958,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field worldDetailLevel integer @0 for very low, 5 for very high. Set in AC video settings
 ---@field windowSize vec2 @Size of AC window (not affected by UI scale).
 ---@field isFullscreen boolean @A value from AC video settings, does not change live.
+---@field isHDR boolean @If `true`, HDR is active.
 ---@field isVSyncActive boolean @A value from AC video settings, does not change live.
 ---@field isPostProcessingActive boolean @True if YEBIS post-processing is active.
 ---@field isVRMode boolean @True if AC was launched with either Oculus or OpenVR mode (not necessarily successfully connected).
@@ -4364,8 +4995,8 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field isMakingScreenshot boolean @If `true`, currently AC is doing an accumulation screenshot. You won’t be able to move camera, grabbed camera will be paused, replay position seeking and more will be postponed, but ideally just don’t do things that could mess up a screenshot in this mode.
 ---@field time number @Time in milliseconds counting from the start of Assetto Corsa.
 ---@field gameTime number @Time in seconds counting from the start of Assetto Corsa (same as .time, but divided by 1000, kept for compatibility)
----@field systemTime integer @System timestamp (time in seconds), pretty much the same as os.time()
----@field frame integer @Index of a current render frame.
+---@field systemTime number @System timestamp (time in seconds), pretty much the same as os.time()
+---@field frame number @Index of a current render frame.
 ---@field cameraPosition vec3
 ---@field cameraPositionDelta vec3 @How much camera has moved since the previous render step.
 ---@field cameraLook vec3 @Points forward (there was some confusion with older API).
@@ -4402,6 +5033,8 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field orbitOnboardCamera boolean @True if F5 camera acts as an orbit camera.
 ---@field cameraJumped boolean @True if camera has just suddenly moved.
 ---@field isMouseSteeringActive boolean @True if mouse steering is currently active.
+---@field isMouseDeltaActive boolean @True if mouse is caught for delta computing (see `ac.accessMouseDelta()` for more details)
+---@field isMouseCursorHidden boolean @True if mouse cursor is currently hidden.
 ---@field ambientLightingMultiplier number
 ---@field ambientTemperature number @Air temperature.
 ---@field roadTemperature number @Road temperature.
@@ -4435,7 +5068,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field speedLimitKmh number @Speed limit in pits in this session (80 in most cases, but session tweaks might alter the value).
 ---@field fps number @Current number of frames per second.
 ---@field fpsCapped number
----@field physicsLate number
+---@field physicsLate integer
 ---@field cpuOccupancy integer
 ---@field cpuTime number
 ---@field firstPersonCameraFOV number @Current value for first person camera FOV in degrees. Global value, applying for all cars.
@@ -5216,7 +5849,7 @@ function string.findIgnoreCase(self, needle, index) end
 ---Searches and replaces all the substrings.
 ---@param self string @String to find `replacee` and replace with `replacer` in.
 ---@param replacee string @String to find.
----@param replacer string? @String to replace. Default value: ``.
+---@param replacer string? @String to replace. Default value: `''` (empty string, fixed in 0.3.0).
 ---@param limit integer? @Maximum number of found strings to replace. Default value: `math.huge`.
 ---@param ignoreCase boolean? @Option for case-incensitive search. Default value: `false`.
 ---@return string, integer @Second value returned is for the number of replacements.
@@ -5240,7 +5873,7 @@ function string.codePointAt(self, start) end
 ---@param self string @String to search emojis in.
 ---@param start integer @Index (starts with 1, if below counts from the end).
 ---@return integer? @Returns 1-based starting index of an emojis, or `nil` if no emojis have been found.
----@return integer? @Returns 1-based ending index, or `nil` if no emojis have been found.
+---@return integer? @Returns 1-based starting index plus the length of the emoji, or `nil` if no emojis have been found.
 function string.nextEmoji(self, start) end
 
 ---Encodes URL argument.
@@ -5259,7 +5892,7 @@ function string.startsWith(self, another, offset) end
 ---Checks if the end of a string matches another string. If string to match is longer than the first one, always returns `false`.
 ---@param self string @String to check the end of.
 ---@param another string @String to match.
----@param offset integer? @Optional offset for the matching end. Default value: `0`.
+---@param offset integer? @Optional offset from the end for the matching end. Default value: `0`.
 ---@return boolean
 function string.endsWith(self, another, offset) end
 
@@ -5335,7 +5968,7 @@ function string.reggmatch(self, pattern, ignoreCase) end
 ---Note: regular expressions currently are in ECMAScript format, so backtracking is not supported. Also, in most cases they are slower than regular Lua patterns.
 ---@param self string @String to search in.
 ---@param pattern string @Regular expression.
----@param repl    string|table|function @Replacement value. Used in the same way as with `string.gsub()`, could be a table or a function.
+---@param repl    string|table|function @Replacement value. Used in the same way as with `string.gsub()`, could be a table or a function. If you want to insert groups, use `$1` (regular expressions style) instead of `%1` (Lua patterns style).
 ---@param limit integer? @Limit maximum number of replacements. Default value: `math.huge`.
 ---@param ignoreCase boolean? @Set to `true` to make search case-insensitive. Default value: `false`.
 ---@return string @String with found entries replaced.
@@ -5620,7 +6253,7 @@ function table.findByProperty(t, key, value) end
 ---@generic TKey
 ---@generic TCallbackData
 ---@param t {[TKey]: T}
----@param callback fun(item: T, index: TKey, callbackData: TCallbackData): number
+---@param callback fun(item: T, index: TKey, callbackData: TCallbackData): number?
 ---@param callbackData TCallbackData?
 ---@return T, TKey
 ---@nodiscard
@@ -5632,7 +6265,7 @@ function table.maxEntry(t, callback, callbackData) end
 ---@generic TKey
 ---@generic TCallbackData
 ---@param t {[TKey]: T}
----@param callback fun(item: T, index: TKey, callbackData: TCallbackData): number
+---@param callback fun(item: T, index: TKey, callbackData: TCallbackData): number?
 ---@param callbackData TCallbackData?
 ---@return T, TKey
 ---@nodiscard
@@ -5656,7 +6289,7 @@ function table.forEach(t, callback, callbackData) end
 ---@generic TKey
 ---@generic TCallbackData
 ---@param t {[TKey]: T}
----@param callback nil|fun(item: T, key: TKey, callbackData: TCallbackData): any
+---@param callback nil|fun(item: T, key: TKey, callbackData: TCallbackData): any|nil
 ---@param callbackData TCallbackData?
 ---@return {[TKey]: T}
 ---@nodiscard
@@ -5714,6 +6347,41 @@ function table.range(endingIndex, startingIndex, step, callback, callbackData) e
 ---@nodiscard
 function table.build(iterator, k, v) end
 
+--[[ common/internal.lua ]]
+
+---Runs callback after certain time. Returns cancellation ID.
+---Note: all callbacks will be ran before `update()` call,
+---and they would only ran when script runs. So if your script is executed each frame and AC runs at 60 FPS, smallest interval
+---would be 0.016 s, and anything lower that you’d set would still act like 0.016 s. Also, intervals would only be called once
+---per frame.
+---@param callback fun()
+---@param delay number? @Delay time in seconds. Default value: 0.
+---@param uniqueKey any? @Unique key: if set, timer wouldn’t be added unless there is no more active timers with such ID.
+---@return integer
+function setTimeout(callback, delay, uniqueKey) end
+
+---Repeteadly runs callback after certain time. Returns cancellation ID.
+---Note: all callbacks will be ran before `update()` call,
+---and they would only ran when script runs. So if your script is executed each frame and AC runs at 60 FPS, smallest interval
+---would be 0.016 s, and anything lower that you’d set would still act like 0.016 s. Also, intervals would only be called once
+---per frame.
+---@param callback fun(): function? @Return `clearInterval` (actual function) to clear interval.
+---@param period number? @Period time in seconds. Default value: 0.
+---@param uniqueKey any? @Unique key: if set, timer wouldn’t be added unless there is no more active timers with such ID.
+---@return integer
+function setInterval(callback, period, uniqueKey) end
+
+---Stops timeout. If called with an ID from `setInterval`, works as well.
+---@param cancellationID integer @Value earlier retuned by `setTimeout()`. If a non-numerical value is passed (like a `nil`), call is ignored and returns `false`.
+---@return boolean @True if timeout with such ID has been found and stopped.
+function clearTimeout(cancellationID) end
+
+---Stops interval. Return this value from a callback to cancel out an interval.
+---If called with an ID from `setTimeout`, works as well.
+---@param cancellationID integer @Value earlier retuned by `setInterval()`. If a non-numerical value is passed (like a `nil`), call is ignored and returns `false`.
+---@return boolean @True if interval with such ID has been found and stopped.
+function clearInterval(cancellationID) end
+
 --[[ common/io.lua ]]
 
 ---Structure containing various file or directory attributes, including various flags and dates. All values are precomputed and ready to be used (there is
@@ -5730,6 +6398,9 @@ function table.build(iterator, k, v) end
 ---@field isEncrypted boolean @A file or directory that is encrypted. For a file, all data streams in the file are encrypted. For a directory, encryption is the default for newly created files and subdirectories.
 ---@field isCompressed boolean @A file or directory that is compressed. For a file, all of the data in the file is compressed. For a directory, compression is the default for newly created files and subdirectories.
 ---@field isReparsePoint boolean @A file or directory that has an associated reparse point, or a file that is a symbolic link.
+---@field isArchive boolean @A file or directory that is an archive file or directory. Applications typically use this attribute to mark files for backup or removal. Added in CSP 0.3.0.
+---@field isSystem boolean @A file or directory that the operating system uses a part of, or uses exclusively. Added in CSP 0.3.0.
+---@field isTemporary boolean @A file that is being used for temporary storage. File systems avoid writing data back to mass storage if sufficient cache memory is available, because typically, an application deletes a temporary file after the handle is closed. In that scenario, the system can entirely avoid writing the data. Otherwise, the data is written after the handle is closed. Added in CSP 0.3.0.
 local _fileAttributes = {}
 
 --[[ common/io.lua ]]
@@ -5751,7 +6422,7 @@ local _fileAttributes = {}
 ---@param callback fun(fileName: string, fileAttributes: io.FileAttributes, callbackData: TCallbackData): TReturn? @Callback which will be ran for every file in directory fitting mask until it would return a non-nil value.
 ---@param callbackData TCallbackData? @Callback data that will be passed to callback as third argument, to avoid creating a capture.
 ---@return TReturn? @First non-nil value returned by callback.
----@overload fun(directory: string, callback: fun(fileName: string, fileAttributes: io.FileAttributes, callbackData: any), callbackData: any): any
+---@overload fun(directory: string, callback: (fun(fileName: string, fileAttributes: io.FileAttributes, callbackData: any): any), callbackData: any): any
 ---@overload fun(directory: string, mask: string|nil): string[] @This overload just returns the list
 function io.scanDir(directory, mask, callback, callbackData) end
 
@@ -5791,40 +6462,6 @@ function os.saveFileDialog(params, callback) end
 ---@param params {filename: string, arguments: string[], rawArguments: boolean, workingDirectory: string, timeout: integer, environment: table, inheritEnvironment: boolean, stdin: string, separateStderr: boolean, terminateWithScript: boolean|'disposable', assignJob: boolean, dataCallback: fun(err: boolean, data: string)}|`{ filename = '', arguments = {} }` "Table with properties:\n- `filename` (`string`): Application filename.\n- `arguments` (`string[]`): Arguments (quotes will be added automatically unless `rawArguments` is set to true).\n- `rawArguments` (`boolean`): Set to `true` to disable any arguments processing and pass them as they are, simply joining them with a space symbol.\n- `workingDirectory` (`string`): Working directory.\n- `timeout` (`integer`): Timeout in milliseconds. If above zero, process will be killed after given time has passed.\n- `environment` (`table`): If set to a table, values from that table will be used as environment variables instead of inheriting ones from AC process.\n- `inheritEnvironment` (`boolean`): Set to `true` to inherit AC environment variables before adding custom ones.\n- `stdin` (`string`): Optional data to pass to a process in stdin pipe.\n- `separateStderr` (`boolean`): Store stderr data in a separate string.\n- `terminateWithScript` (`boolean|'disposable'`): Terminate process if this Lua script were to terminate (for example, during reload). Since 0.2.10, pass `'disposable'` instead to get `ac.Disposable` back, allowing to terminate the process manually.\n- `assignJob` (`boolean`): Set to `false` to stop CSP from tying the process to AC process (doing so ensures child process would shut down with AC closing).\n- `dataCallback` (`fun(err: boolean, data: string)`): If set to a function, data written in stdout and stderr will be passed to the function instead as it arrives."
 ---@param callback nil|fun(err: string, data: os.ConsoleProcessResult)
 function os.runConsoleProcess(params, callback) end
-
---[[ common/timer.lua ]]
-
----Runs callback after certain time. Returns cancellation ID.
----Note: all callbacks will be ran before `update()` call,
----and they would only ran when script runs. So if your script is executed each frame and AC runs at 60 FPS, smallest interval
----would be 0.016 s, and anything lower that you’d set would still act like 0.016 s. Also, intervals would only be called once
----per frame.
----@param callback fun()
----@param delay number? @Delay time in seconds. Default value: 0.
----@param uniqueKey any? @Unique key: if set, timer wouldn’t be added unless there is no more active timers with such ID.
----@return integer
-function setTimeout(callback, delay, uniqueKey) end
-
----Repeteadly runs callback after certain time. Returns cancellation ID.
----Note: all callbacks will be ran before `update()` call,
----and they would only ran when script runs. So if your script is executed each frame and AC runs at 60 FPS, smallest interval
----would be 0.016 s, and anything lower that you’d set would still act like 0.016 s. Also, intervals would only be called once
----per frame.
----@param callback fun(): function? @Return `clearInterval` (actual function) to clear interval.
----@param period number? @Period time in seconds. Default value: 0.
----@param uniqueKey any? @Unique key: if set, timer wouldn’t be added unless there is no more active timers with such ID.
----@return integer
-function setInterval(callback, period, uniqueKey) end
-
----Stops timeout.
----@param cancellationID integer @Value earlier retuned by `setTimeout()`. If a non-numerical value is passed (like a `nil`), call is ignored and returns `false`.
----@return boolean @True if timeout with such ID has been found and stopped.
-function clearTimeout(cancellationID) end
-
----Stops interval.
----@param cancellationID integer @Value earlier retuned by `setInterval()`.
----@return boolean @True if interval with such ID has been found and stopped.
-function clearInterval(cancellationID) end
 
 --[[ common/ac_enums.lua ]]
 
@@ -6471,17 +7108,13 @@ function ac.evaluateLapTime() end
 
 ---Faster way to deal with driver tags. Any request of unsupported fields will return `false` for further extendability.
 ---Scripts with access to I/O can also alter fields.
----@param driverName string 
----@return ac.DriverTags
-function ac.DriverTags(driverName) end
-
----Faster way to deal with driver tags. Any request of unsupported fields will return `false` for further extendability.
----Scripts with access to I/O can also alter fields.
 ---@class ac.DriverTags
 ---@field color rgbm @User name color. Could be derived from custom color set via `ac.DriverTags` (or `ac.setDriverChatNameColor()`), turns reddish if driver is muted, or uses custom driver tag from CM if any is set, or turns greenish if driver is marked as a friend (in CSP or CM). For the player entry it will always be yellow.
 ---@field friend boolean @Friend tag, uses CSP and CM databases.
 ---@field muted boolean @Muted tag, if set messages in chat will be hidden.
-local _ac_DriverTags = nil
+---Faster way to deal with driver tags. Any request of unsupported fields will return `false` for further extendability.
+---Scripts with access to I/O can also alter fields.
+---@return ac.DriverTags
 function ac.DriverTags(driverName) end
 
 ---Checks if a user is tagged as a friend. Uses CSP and CM databases. Deprecated, use `ac.DriverTags` instead.
@@ -8947,8 +9580,9 @@ function _ac_SceneReference:loadKN5LODAsync(filename, mainFilename, callback) en
 function _ac_SceneReference:setAnimation(filename, position, force) end
 
 ---@param visible boolean|`true`|`false`
+---@param resetMotion boolean? @Default value: `true`. Pass `false` to not reset object motion (if you teleport object somewhere and make it visible all at once without using this option, it’ll appear blurry). Note: you can always use `:clearMotion()` to reset motion manually. Doesn’t have an effect if object has already been visible (in this case, this function doesn’t do anything). 
 ---@return self @Returns self for easy chaining.
-function _ac_SceneReference:setVisible(visible) end
+function _ac_SceneReference:setVisible(visible, resetMotion) end
 
 ---@param shadows boolean|`true`|`false`
 ---@return self @Returns self for easy chaining.
@@ -9110,7 +9744,7 @@ function _ac_SceneReference:contains(childSceneRef) end
 ---@return self @Returns self for easy chaining.
 function _ac_SceneReference:clear() end
 
----Casts a ray prepared by something like `render.createRay(pos, dir, length)` or `render.createMouseRay()`. Accounts for ray length (since 0.2.10).
+---Casts a ray prepared by something like `render.createRay(pos, dir, length)` or `render.createMouseRay()`. Accounts for ray length (since 0.2.10). You can use this method on individual meshes, lists of meshes, or nodes as well (it’ll go over all the child meshes, but the actual expensive raycast would happen only if ray intersects a mesh bounding sphere).
 ---
 ---If you need to access a mesh that was hit, set second argument to true:
 ---```
@@ -9245,6 +9879,12 @@ function _ac_SceneReference:getTextureSlotFilename(index, slot) end
 ---@return string
 function _ac_SceneReference:dumpShaderReplacements() end
 
+---Hint to CSP chunkenizator that this track mesh (or node, in case of “AC_POBJECT” ones, for example) can’t be seen, so it could exclude it from the scene
+---if convinient. Affects Advanced Chunkenization. Might not have an effect.
+---@param hide boolean|`true`|`false` @Pass `true` to mark it as hidden, or `false` to undo.
+---@return self
+function _ac_SceneReference:hintAsObscured(hide) end
+
 ---@param neck ac.SceneReference
 ---@param modelName string
 ---@param carIndex integer
@@ -9283,7 +9923,9 @@ function _ac_SceneReference:boundingSphere(index, outVec) end
 ---  ['metal_details.dds'] = skinDir .. '/metal_details.dds'
 ---})
 ---```
----@param skin table<string, string>
+---
+---Since 0.3.0, this function can also receive a single string pointing to a skin folder.
+---@param skin table<string, string>|string
 ---@return self @Returns self for easy chaining.
 function _ac_SceneReference:applySkin(skin) end
 
@@ -10104,6 +10746,88 @@ function physics.RigidBody(collider, mass, cog, semiDynamic, startsInWorld) end
 ---@return ac.Disposable
 function physics.addTrackSurface(vertices, indices, surfaceName, transform, debugColor) end
 
+---Collect information about available windows.
+---@return {name: string, title: string, position: vec2, size: vec2, visible: boolean, pinned: boolean, collapsed: boolean, layer: integer, layerDuplicate: boolean}[]
+function ac.getAppWindows() end
+
+---Looks for a certain window of either an original AC app, a Python or a Lua app. Use `ac.getAppWindows()` to get a list of available apps.
+---If found, this wrapper can be used to move or hide an app, or switch it to a different render layer.
+---@param windowName string
+---@return ac.AppWindowAccessor?
+function ac.accessAppWindow(windowName) end
+
+---Wrapper for interacting with any AC app. Might not work as intended with some apps not expecting such intrusion though.
+---@class ac.AppWindowAccessor
+local _ac_AppWindowAccessor = nil
+
+---Window reference is valid (some references might become invalid if the window is deleted).
+---@return boolean
+function _ac_AppWindowAccessor:valid() end
+
+---Checks if window is visible.
+---@return boolean
+function _ac_AppWindowAccessor:visible() end
+
+---Changes visible state of the window.
+---@param value boolean? @Default value: `true`.
+---@return ac.AppWindowAccessor
+function _ac_AppWindowAccessor:setVisible(value) end
+
+---Checks if window is pinned.
+---@return boolean
+function _ac_AppWindowAccessor:pinned() end
+
+---Changes pinned state of the window. Works with IMGUI apps with CSP v0.2.3-preview62 or newer.
+---@param value boolean? @Default value: `true`.
+---@return ac.AppWindowAccessor
+function _ac_AppWindowAccessor:setPinned(value) end
+
+---Returns window position.
+---@return vec2
+function _ac_AppWindowAccessor:position() end
+
+---Returns window size (Python apps might draw things to extends exceeding this size).
+---@return vec2
+function _ac_AppWindowAccessor:size() end
+
+---Moves window to a different position. Works with IMGUI apps with CSP v0.2.3-preview62 or newer.
+---@param value vec2
+---@return ac.AppWindowAccessor
+function _ac_AppWindowAccessor:move(value) end
+
+---Resizes a window. Works with IMGUI apps only.
+---@param value vec2
+---@return ac.AppWindowAccessor
+function _ac_AppWindowAccessor:resize(value) end
+
+---Returns redirect layer, or 0 if redirect is disabled. Redirected apps can be accessed via `dynamic::hud::redirected::N` textures.
+---@return integer @0 if redirect is disabled.
+function _ac_AppWindowAccessor:redirectLayer() end
+
+---Moves window to a different render layer, or back to existance with `0` passed as `layer`. Windows in separate layers don’t get mouse
+---commands (but this wrapper can be used to send fake commands instead).
+---@param layer integer? @Default value: `0`.
+---@param duplicate boolean? @Set to `true` to clone a window to a different layer instead of moving it there. Be careful: this might break some Python apps. Default value: `false`.
+---@return ac.AppWindowAccessor
+function _ac_AppWindowAccessor:setRedirectLayer(layer, duplicate) end
+
+---Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
+---@param position vec2
+---@return ac.AppWindowAccessor
+function _ac_AppWindowAccessor:onMouseMove(position) end
+
+---Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
+---@param position vec2
+---@param button ui.MouseButton? @Default value: `ui.MouseButton.Left`.
+---@return ac.AppWindowAccessor
+function _ac_AppWindowAccessor:onMouseDown(position, button) end
+
+---Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
+---@param position vec2
+---@param button ui.MouseButton? @Default value: `ui.MouseButton.Left`.
+---@return ac.AppWindowAccessor
+function _ac_AppWindowAccessor:onMouseUp(position, button) end
+
 ---Writes additional data to replay. Use `ac.readReplayBlob()` to extract data later in replay mode. Data written this way is not tied to frames.
 ---Don’t bother compressing data too much: when writing, data will be compressed automatically.
 ---@param key string @Existing data with the same key will be overwritten.
@@ -10528,6 +11252,16 @@ ui.FocusedFlags = {
 ---| `ui.MouseCursor.ResizeNESW` @When hovering over the bottom-left corner of a window.
 ---| `ui.MouseCursor.ResizeNWSE` @When hovering over the bottom-right corner of a window.
 ---| `ui.MouseCursor.Hand` @Unused by default controls. Use for e.g. hyperlinks.
+---| `ui.MouseCursor.Cross` @Value: 9.
+---| `ui.MouseCursor.UpArrow` @Value: 10.
+---| `ui.MouseCursor.Size` @Value: 11.
+---| `ui.MouseCursor.Icon` @Value: 12.
+---| `ui.MouseCursor.No` @Value: 13.
+---| `ui.MouseCursor.Wait` @Value: 14.
+---| `ui.MouseCursor.AppStarting` @Value: 15.
+---| `ui.MouseCursor.Help` @Value: 16.
+---| `ui.MouseCursor.Pin` @Value: 17.
+---| `ui.MouseCursor.Person` @Value: 18.
 ui.MouseCursor = {
   None = -1, ---@type ui.MouseCursor #No cursor.
   Arrow = 0, ---@type ui.MouseCursor #Default arrow.
@@ -10538,6 +11272,16 @@ ui.MouseCursor = {
   ResizeNESW = 5, ---@type ui.MouseCursor #When hovering over the bottom-left corner of a window.
   ResizeNWSE = 6, ---@type ui.MouseCursor #When hovering over the bottom-right corner of a window.
   Hand = 7, ---@type ui.MouseCursor #Unused by default controls. Use for e.g. hyperlinks.
+  Cross = 9, ---@type ui.MouseCursor #Value: 9.
+  UpArrow = 10, ---@type ui.MouseCursor #Value: 10.
+  Size = 11, ---@type ui.MouseCursor #Value: 11.
+  Icon = 12, ---@type ui.MouseCursor #Value: 12.
+  No = 13, ---@type ui.MouseCursor #Value: 13.
+  Wait = 14, ---@type ui.MouseCursor #Value: 14.
+  AppStarting = 15, ---@type ui.MouseCursor #Value: 15.
+  Help = 16, ---@type ui.MouseCursor #Value: 16.
+  Pin = 17, ---@type ui.MouseCursor #Value: 17.
+  Person = 18, ---@type ui.MouseCursor #Value: 18.
 }
 
 ---@alias ui.MouseButton
@@ -10797,578 +11541,6 @@ ui.StyleColor = {
   TextActive = 49, ---@type ui.StyleColor #Value: 49.
 }
 
----@alias ui.Icons
----| `ui.Icons.LoadingSpinner` @Value: 'fx:loading'.
----| `ui.Icons.Air` @![Icon](https://acstuff.ru/images/icons_24/air.png)
----| `ui.Icons.AppWindow` @![Icon](https://acstuff.ru/images/icons_24/app_window.png)
----| `ui.Icons.Apps` @![Icon](https://acstuff.ru/images/icons_24/apps.png)
----| `ui.Icons.ArrowDown` @![Icon](https://acstuff.ru/images/icons_24/arrow_down.png)
----| `ui.Icons.ArrowLeft` @![Icon](https://acstuff.ru/images/icons_24/arrow_left.png)
----| `ui.Icons.ArrowRight` @![Icon](https://acstuff.ru/images/icons_24/arrow_right.png)
----| `ui.Icons.ArrowUp` @![Icon](https://acstuff.ru/images/icons_24/arrow_up.png)
----| `ui.Icons.Assist` @![Icon](https://acstuff.ru/images/icons_24/assist.png)
----| `ui.Icons.Attention` @![Icon](https://acstuff.ru/images/icons_24/attention.png)
----| `ui.Icons.Avatar` @![Icon](https://acstuff.ru/images/icons_24/avatar.png)
----| `ui.Icons.Back` @![Icon](https://acstuff.ru/images/icons_24/back.png)
----| `ui.Icons.Backspace` @![Icon](https://acstuff.ru/images/icons_24/backspace.png)
----| `ui.Icons.Ballast` @![Icon](https://acstuff.ru/images/icons_24/ballast.png)
----| `ui.Icons.Ban` @![Icon](https://acstuff.ru/images/icons_24/ban.png)
----| `ui.Icons.Barcode` @![Icon](https://acstuff.ru/images/icons_24/barcode.png)
----| `ui.Icons.Bars` @![Icon](https://acstuff.ru/images/icons_24/bars.png)
----| `ui.Icons.BatteryEmpty` @![Icon](https://acstuff.ru/images/icons_24/battery_empty.png)
----| `ui.Icons.BatteryFull` @![Icon](https://acstuff.ru/images/icons_24/battery_full.png)
----| `ui.Icons.Befriend` @![Icon](https://acstuff.ru/images/icons_24/befriend.png)
----| `ui.Icons.Bell` @![Icon](https://acstuff.ru/images/icons_24/bell.png)
----| `ui.Icons.Binocoulars` @![Icon](https://acstuff.ru/images/icons_24/binocoulars.png)
----| `ui.Icons.Blackboard` @![Icon](https://acstuff.ru/images/icons_24/blackboard.png)
----| `ui.Icons.Blanket` @![Icon](https://acstuff.ru/images/icons_24/blanket.png)
----| `ui.Icons.Blast` @![Icon](https://acstuff.ru/images/icons_24/blast.png)
----| `ui.Icons.Bluetooth` @![Icon](https://acstuff.ru/images/icons_24/bluetooth.png)
----| `ui.Icons.Bomb` @![Icon](https://acstuff.ru/images/icons_24/bomb.png)
----| `ui.Icons.Book` @![Icon](https://acstuff.ru/images/icons_24/book.png)
----| `ui.Icons.Bookmark` @![Icon](https://acstuff.ru/images/icons_24/bookmark.png)
----| `ui.Icons.Box` @![Icon](https://acstuff.ru/images/icons_24/box.png)
----| `ui.Icons.Briefcase` @![Icon](https://acstuff.ru/images/icons_24/briefcase.png)
----| `ui.Icons.Bug` @![Icon](https://acstuff.ru/images/icons_24/bug.png)
----| `ui.Icons.Bulb` @![Icon](https://acstuff.ru/images/icons_24/bulb.png)
----| `ui.Icons.Burn` @![Icon](https://acstuff.ru/images/icons_24/burn.png)
----| `ui.Icons.Calculator` @![Icon](https://acstuff.ru/images/icons_24/calculator.png)
----| `ui.Icons.Calendar` @![Icon](https://acstuff.ru/images/icons_24/calendar.png)
----| `ui.Icons.CallBluetooth` @![Icon](https://acstuff.ru/images/icons_24/call_bluetooth.png)
----| `ui.Icons.Call` @![Icon](https://acstuff.ru/images/icons_24/call.png)
----| `ui.Icons.Camera` @![Icon](https://acstuff.ru/images/icons_24/camera.png)
----| `ui.Icons.Cancel` @![Icon](https://acstuff.ru/images/icons_24/cancel.png)
----| `ui.Icons.CarFront` @![Icon](https://acstuff.ru/images/icons_24/car_front.png)
----| `ui.Icons.Cards` @![Icon](https://acstuff.ru/images/icons_24/cards.png)
----| `ui.Icons.Cctv` @![Icon](https://acstuff.ru/images/icons_24/cctv.png)
----| `ui.Icons.Cellphone` @![Icon](https://acstuff.ru/images/icons_24/cellphone.png)
----| `ui.Icons.Chat` @![Icon](https://acstuff.ru/images/icons_24/chat.png)
----| `ui.Icons.Clapperboard` @![Icon](https://acstuff.ru/images/icons_24/clapperboard.png)
----| `ui.Icons.Clip` @![Icon](https://acstuff.ru/images/icons_24/clip.png)
----| `ui.Icons.Clipboard` @![Icon](https://acstuff.ru/images/icons_24/clipboard.png)
----| `ui.Icons.Clock` @![Icon](https://acstuff.ru/images/icons_24/clock.png)
----| `ui.Icons.Cloud` @![Icon](https://acstuff.ru/images/icons_24/cloud.png)
----| `ui.Icons.Code` @![Icon](https://acstuff.ru/images/icons_24/code.png)
----| `ui.Icons.Coffee` @![Icon](https://acstuff.ru/images/icons_24/coffee.png)
----| `ui.Icons.CompassAlt` @![Icon](https://acstuff.ru/images/icons_24/compass_alt.png)
----| `ui.Icons.Compass` @![Icon](https://acstuff.ru/images/icons_24/compass.png)
----| `ui.Icons.Confirm` @![Icon](https://acstuff.ru/images/icons_24/confirm.png)
----| `ui.Icons.Constellation` @![Icon](https://acstuff.ru/images/icons_24/constellation.png)
----| `ui.Icons.Contacts` @![Icon](https://acstuff.ru/images/icons_24/contacts.png)
----| `ui.Icons.Contrast` @![Icon](https://acstuff.ru/images/icons_24/contrast.png)
----| `ui.Icons.Copy` @![Icon](https://acstuff.ru/images/icons_24/copy.png)
----| `ui.Icons.CreditCard` @![Icon](https://acstuff.ru/images/icons_24/credit_card.png)
----| `ui.Icons.Crop` @![Icon](https://acstuff.ru/images/icons_24/crop.png)
----| `ui.Icons.Crosshair` @![Icon](https://acstuff.ru/images/icons_24/crosshair.png)
----| `ui.Icons.Delete` @![Icon](https://acstuff.ru/images/icons_24/delete.png)
----| `ui.Icons.Dice` @![Icon](https://acstuff.ru/images/icons_24/dice.png)
----| `ui.Icons.Directions` @![Icon](https://acstuff.ru/images/icons_24/directions.png)
----| `ui.Icons.Document` @![Icon](https://acstuff.ru/images/icons_24/document.png)
----| `ui.Icons.DollarBill` @![Icon](https://acstuff.ru/images/icons_24/dollar_bill.png)
----| `ui.Icons.DownAlt` @![Icon](https://acstuff.ru/images/icons_24/down_alt.png)
----| `ui.Icons.Down` @![Icon](https://acstuff.ru/images/icons_24/down.png)
----| `ui.Icons.Download` @![Icon](https://acstuff.ru/images/icons_24/download.png)
----| `ui.Icons.Driver` @![Icon](https://acstuff.ru/images/icons_24/driver.png)
----| `ui.Icons.Earth` @![Icon](https://acstuff.ru/images/icons_24/earth.png)
----| `ui.Icons.Edit` @![Icon](https://acstuff.ru/images/icons_24/edit.png)
----| `ui.Icons.Eject` @![Icon](https://acstuff.ru/images/icons_24/eject.png)
----| `ui.Icons.Ellipsis` @![Icon](https://acstuff.ru/images/icons_24/ellipsis.png)
----| `ui.Icons.Enter` @![Icon](https://acstuff.ru/images/icons_24/enter.png)
----| `ui.Icons.Envelope` @![Icon](https://acstuff.ru/images/icons_24/envelope.png)
----| `ui.Icons.Exit` @![Icon](https://acstuff.ru/images/icons_24/exit.png)
----| `ui.Icons.Eye` @![Icon](https://acstuff.ru/images/icons_24/eye.png)
----| `ui.Icons.FastForward` @![Icon](https://acstuff.ru/images/icons_24/fast_forward.png)
----| `ui.Icons.File` @![Icon](https://acstuff.ru/images/icons_24/file.png)
----| `ui.Icons.FilmRoll` @![Icon](https://acstuff.ru/images/icons_24/film_roll.png)
----| `ui.Icons.Film` @![Icon](https://acstuff.ru/images/icons_24/film.png)
----| `ui.Icons.Finish` @![Icon](https://acstuff.ru/images/icons_24/finish.png)
----| `ui.Icons.FireExtinguisher` @![Icon](https://acstuff.ru/images/icons_24/fire_extinguisher.png)
----| `ui.Icons.Fireplace` @![Icon](https://acstuff.ru/images/icons_24/fireplace.png)
----| `ui.Icons.FlagAlt` @![Icon](https://acstuff.ru/images/icons_24/flag_alt.png)
----| `ui.Icons.Flag` @![Icon](https://acstuff.ru/images/icons_24/flag.png)
----| `ui.Icons.FM` @![Icon](https://acstuff.ru/images/icons_24/fm.png)
----| `ui.Icons.Folder` @![Icon](https://acstuff.ru/images/icons_24/folder.png)
----| `ui.Icons.Font` @![Icon](https://acstuff.ru/images/icons_24/font.png)
----| `ui.Icons.Fuel` @![Icon](https://acstuff.ru/images/icons_24/fuel.png)
----| `ui.Icons.Fullscreen` @![Icon](https://acstuff.ru/images/icons_24/fullscreen.png)
----| `ui.Icons.Gamepad` @![Icon](https://acstuff.ru/images/icons_24/gamepad.png)
----| `ui.Icons.Global` @![Icon](https://acstuff.ru/images/icons_24/global.png)
----| `ui.Icons.GlowThick` @![Icon](https://acstuff.ru/images/icons_24/glow_thick.png)
----| `ui.Icons.Glow` @![Icon](https://acstuff.ru/images/icons_24/glow.png)
----| `ui.Icons.GPS` @![Icon](https://acstuff.ru/images/icons_24/gps.png)
----| `ui.Icons.Group` @![Icon](https://acstuff.ru/images/icons_24/group.png)
----| `ui.Icons.HammerAlt` @![Icon](https://acstuff.ru/images/icons_24/hammer_alt.png)
----| `ui.Icons.Hammer` @![Icon](https://acstuff.ru/images/icons_24/hammer.png)
----| `ui.Icons.Hazard` @![Icon](https://acstuff.ru/images/icons_24/hazard.png)
----| `ui.Icons.Headphones` @![Icon](https://acstuff.ru/images/icons_24/headphones.png)
----| `ui.Icons.HeartOutline` @![Icon](https://acstuff.ru/images/icons_24/heart_outline.png)
----| `ui.Icons.Heart` @![Icon](https://acstuff.ru/images/icons_24/heart.png)
----| `ui.Icons.Helmet` @![Icon](https://acstuff.ru/images/icons_24/helmet.png)
----| `ui.Icons.Hide` @![Icon](https://acstuff.ru/images/icons_24/hide.png)
----| `ui.Icons.Home` @![Icon](https://acstuff.ru/images/icons_24/home.png)
----| `ui.Icons.Horizontal` @![Icon](https://acstuff.ru/images/icons_24/horizontal.png)
----| `ui.Icons.Hourglass` @![Icon](https://acstuff.ru/images/icons_24/hourglass.png)
----| `ui.Icons.InboxEmpty` @![Icon](https://acstuff.ru/images/icons_24/inbox_empty.png)
----| `ui.Icons.InboxFull` @![Icon](https://acstuff.ru/images/icons_24/inbox_full.png)
----| `ui.Icons.Info` @![Icon](https://acstuff.ru/images/icons_24/info.png)
----| `ui.Icons.Key` @![Icon](https://acstuff.ru/images/icons_24/key.png)
----| `ui.Icons.Keyboard` @![Icon](https://acstuff.ru/images/icons_24/keyboard.png)
----| `ui.Icons.Kick` @![Icon](https://acstuff.ru/images/icons_24/kick.png)
----| `ui.Icons.Landscape` @![Icon](https://acstuff.ru/images/icons_24/landscape.png)
----| `ui.Icons.Laptop` @![Icon](https://acstuff.ru/images/icons_24/laptop.png)
----| `ui.Icons.Leaderboard` @![Icon](https://acstuff.ru/images/icons_24/leaderboard.png)
----| `ui.Icons.Leave` @![Icon](https://acstuff.ru/images/icons_24/leave.png)
----| `ui.Icons.Lens` @![Icon](https://acstuff.ru/images/icons_24/lens.png)
----| `ui.Icons.Levels` @![Icon](https://acstuff.ru/images/icons_24/levels.png)
----| `ui.Icons.LinkBroken` @![Icon](https://acstuff.ru/images/icons_24/link_broken.png)
----| `ui.Icons.Link` @![Icon](https://acstuff.ru/images/icons_24/link.png)
----| `ui.Icons.ListAlt` @![Icon](https://acstuff.ru/images/icons_24/list_alt.png)
----| `ui.Icons.List` @![Icon](https://acstuff.ru/images/icons_24/list.png)
----| `ui.Icons.Loading` @![Icon](https://acstuff.ru/images/icons_24/loading.png)
----| `ui.Icons.Location` @![Icon](https://acstuff.ru/images/icons_24/location.png)
----| `ui.Icons.Lua` @![Icon](https://acstuff.ru/images/icons_24/lua.png)
----| `ui.Icons.Magnet` @![Icon](https://acstuff.ru/images/icons_24/magnet.png)
----| `ui.Icons.Map` @![Icon](https://acstuff.ru/images/icons_24/map.png)
----| `ui.Icons.Maximize` @![Icon](https://acstuff.ru/images/icons_24/maximize.png)
----| `ui.Icons.Menu` @![Icon](https://acstuff.ru/images/icons_24/menu.png)
----| `ui.Icons.MicrophoneMuted` @![Icon](https://acstuff.ru/images/icons_24/microphone_muted.png)
----| `ui.Icons.Microphone` @![Icon](https://acstuff.ru/images/icons_24/microphone.png)
----| `ui.Icons.Minus` @![Icon](https://acstuff.ru/images/icons_24/minus.png)
----| `ui.Icons.Monitor` @![Icon](https://acstuff.ru/images/icons_24/monitor.png)
----| `ui.Icons.Moon` @![Icon](https://acstuff.ru/images/icons_24/moon.png)
----| `ui.Icons.Mouse` @![Icon](https://acstuff.ru/images/icons_24/mouse.png)
----| `ui.Icons.Music` @![Icon](https://acstuff.ru/images/icons_24/music.png)
----| `ui.Icons.Mute` @![Icon](https://acstuff.ru/images/icons_24/mute.png)
----| `ui.Icons.Navigation` @![Icon](https://acstuff.ru/images/icons_24/navigation.png)
----| `ui.Icons.New` @![Icon](https://acstuff.ru/images/icons_24/new.png)
----| `ui.Icons.Next` @![Icon](https://acstuff.ru/images/icons_24/next.png)
----| `ui.Icons.NotificationsAny` @![Icon](https://acstuff.ru/images/icons_24/notifications_any.png)
----| `ui.Icons.Notifications` @![Icon](https://acstuff.ru/images/icons_24/notifications.png)
----| `ui.Icons.PadlockUnlocked` @![Icon](https://acstuff.ru/images/icons_24/padlock_unlocked.png)
----| `ui.Icons.Padlock` @![Icon](https://acstuff.ru/images/icons_24/padlock.png)
----| `ui.Icons.Palette` @![Icon](https://acstuff.ru/images/icons_24/palette.png)
----| `ui.Icons.Paperclip` @![Icon](https://acstuff.ru/images/icons_24/paperclip.png)
----| `ui.Icons.Paste` @![Icon](https://acstuff.ru/images/icons_24/paste.png)
----| `ui.Icons.Pause` @![Icon](https://acstuff.ru/images/icons_24/pause.png)
----| `ui.Icons.Pedals` @![Icon](https://acstuff.ru/images/icons_24/pedals.png)
----| `ui.Icons.Person` @![Icon](https://acstuff.ru/images/icons_24/person.png)
----| `ui.Icons.Photograph` @![Icon](https://acstuff.ru/images/icons_24/photograph.png)
----| `ui.Icons.Pin` @![Icon](https://acstuff.ru/images/icons_24/pin.png)
----| `ui.Icons.PitStopAlt` @![Icon](https://acstuff.ru/images/icons_24/pit_stop_alt.png)
----| `ui.Icons.PitStop` @![Icon](https://acstuff.ru/images/icons_24/pit_stop.png)
----| `ui.Icons.Pitlane` @![Icon](https://acstuff.ru/images/icons_24/pitlane.png)
----| `ui.Icons.Plane` @![Icon](https://acstuff.ru/images/icons_24/plane.png)
----| `ui.Icons.Play` @![Icon](https://acstuff.ru/images/icons_24/play.png)
----| `ui.Icons.Plug` @![Icon](https://acstuff.ru/images/icons_24/plug.png)
----| `ui.Icons.Plus` @![Icon](https://acstuff.ru/images/icons_24/plus.png)
----| `ui.Icons.Preview` @![Icon](https://acstuff.ru/images/icons_24/preview.png)
----| `ui.Icons.Previous` @![Icon](https://acstuff.ru/images/icons_24/previous.png)
----| `ui.Icons.Print` @![Icon](https://acstuff.ru/images/icons_24/print.png)
----| `ui.Icons.Process` @![Icon](https://acstuff.ru/images/icons_24/process.png)
----| `ui.Icons.Puzzle` @![Icon](https://acstuff.ru/images/icons_24/puzzle.png)
----| `ui.Icons.Python` @![Icon](https://acstuff.ru/images/icons_24/python.png)
----| `ui.Icons.QR` @![Icon](https://acstuff.ru/images/icons_24/qr.png)
----| `ui.Icons.QuestionSign` @![Icon](https://acstuff.ru/images/icons_24/question_sign.png)
----| `ui.Icons.Question` @![Icon](https://acstuff.ru/images/icons_24/question.png)
----| `ui.Icons.Radio` @![Icon](https://acstuff.ru/images/icons_24/radio.png)
----| `ui.Icons.Recognition` @![Icon](https://acstuff.ru/images/icons_24/recognition.png)
----| `ui.Icons.Record` @![Icon](https://acstuff.ru/images/icons_24/record.png)
----| `ui.Icons.Redo` @![Icon](https://acstuff.ru/images/icons_24/redo.png)
----| `ui.Icons.Referee` @![Icon](https://acstuff.ru/images/icons_24/referee.png)
----| `ui.Icons.Repair` @![Icon](https://acstuff.ru/images/icons_24/repair.png)
----| `ui.Icons.Reset` @![Icon](https://acstuff.ru/images/icons_24/reset.png)
----| `ui.Icons.RestartWarning` @![Icon](https://acstuff.ru/images/icons_24/restart_warning.png)
----| `ui.Icons.Restart` @![Icon](https://acstuff.ru/images/icons_24/restart.png)
----| `ui.Icons.Restrictor` @![Icon](https://acstuff.ru/images/icons_24/restrictor.png)
----| `ui.Icons.Resume` @![Icon](https://acstuff.ru/images/icons_24/resume.png)
----| `ui.Icons.Rewind` @![Icon](https://acstuff.ru/images/icons_24/rewind.png)
----| `ui.Icons.Road` @![Icon](https://acstuff.ru/images/icons_24/road.png)
----| `ui.Icons.Rubber` @![Icon](https://acstuff.ru/images/icons_24/rubber.png)
----| `ui.Icons.SatelliteDishLow` @![Icon](https://acstuff.ru/images/icons_24/satellite_dish_low.png)
----| `ui.Icons.SatelliteDishNone` @![Icon](https://acstuff.ru/images/icons_24/satellite_dish_none.png)
----| `ui.Icons.SatelliteDish` @![Icon](https://acstuff.ru/images/icons_24/satellite_dish.png)
----| `ui.Icons.Save` @![Icon](https://acstuff.ru/images/icons_24/save.png)
----| `ui.Icons.Scissors` @![Icon](https://acstuff.ru/images/icons_24/scissors.png)
----| `ui.Icons.Sea` @![Icon](https://acstuff.ru/images/icons_24/sea.png)
----| `ui.Icons.Search` @![Icon](https://acstuff.ru/images/icons_24/search.png)
----| `ui.Icons.Send` @![Icon](https://acstuff.ru/images/icons_24/send.png)
----| `ui.Icons.Service` @![Icon](https://acstuff.ru/images/icons_24/service.png)
----| `ui.Icons.SettingsAlt` @![Icon](https://acstuff.ru/images/icons_24/settings_alt.png)
----| `ui.Icons.Settings` @![Icon](https://acstuff.ru/images/icons_24/settings.png)
----| `ui.Icons.ShieldWithLock` @![Icon](https://acstuff.ru/images/icons_24/shield_with_lock.png)
----| `ui.Icons.Shield` @![Icon](https://acstuff.ru/images/icons_24/shield.png)
----| `ui.Icons.ShiftActive` @![Icon](https://acstuff.ru/images/icons_24/shift_active.png)
----| `ui.Icons.Shift` @![Icon](https://acstuff.ru/images/icons_24/shift.png)
----| `ui.Icons.Shopping` @![Icon](https://acstuff.ru/images/icons_24/shopping.png)
----| `ui.Icons.Shuffle` @![Icon](https://acstuff.ru/images/icons_24/shuffle.png)
----| `ui.Icons.Skip` @![Icon](https://acstuff.ru/images/icons_24/skip.png)
----| `ui.Icons.Sleep` @![Icon](https://acstuff.ru/images/icons_24/sleep.png)
----| `ui.Icons.Sliders` @![Icon](https://acstuff.ru/images/icons_24/sliders.png)
----| `ui.Icons.SlowMotion` @![Icon](https://acstuff.ru/images/icons_24/slow_motion.png)
----| `ui.Icons.Smile` @![Icon](https://acstuff.ru/images/icons_24/smile.png)
----| `ui.Icons.Spaceship` @![Icon](https://acstuff.ru/images/icons_24/spaceship.png)
----| `ui.Icons.Speaker` @![Icon](https://acstuff.ru/images/icons_24/speaker.png)
----| `ui.Icons.Speedometer` @![Icon](https://acstuff.ru/images/icons_24/speedometer.png)
----| `ui.Icons.Spotify` @![Icon](https://acstuff.ru/images/icons_24/spotify.png)
----| `ui.Icons.SquaresHorizontal` @![Icon](https://acstuff.ru/images/icons_24/squares_horizontal.png)
----| `ui.Icons.SquaresVertical` @![Icon](https://acstuff.ru/images/icons_24/squares_vertical.png)
----| `ui.Icons.StarEmpty` @![Icon](https://acstuff.ru/images/icons_24/star_empty.png)
----| `ui.Icons.StarFull` @![Icon](https://acstuff.ru/images/icons_24/star_full.png)
----| `ui.Icons.StarHalf` @![Icon](https://acstuff.ru/images/icons_24/star_half.png)
----| `ui.Icons.Start` @![Icon](https://acstuff.ru/images/icons_24/start.png)
----| `ui.Icons.Stats` @![Icon](https://acstuff.ru/images/icons_24/stats.png)
----| `ui.Icons.Stay` @![Icon](https://acstuff.ru/images/icons_24/stay.png)
----| `ui.Icons.SteeringWheel` @![Icon](https://acstuff.ru/images/icons_24/steering_wheel.png)
----| `ui.Icons.StopAlt` @![Icon](https://acstuff.ru/images/icons_24/stop_alt.png)
----| `ui.Icons.Stop` @![Icon](https://acstuff.ru/images/icons_24/stop.png)
----| `ui.Icons.Stopwatch` @![Icon](https://acstuff.ru/images/icons_24/stopwatch.png)
----| `ui.Icons.Sweeping` @![Icon](https://acstuff.ru/images/icons_24/sweeping.png)
----| `ui.Icons.Tag` @![Icon](https://acstuff.ru/images/icons_24/tag.png)
----| `ui.Icons.Target` @![Icon](https://acstuff.ru/images/icons_24/target.png)
----| `ui.Icons.Team` @![Icon](https://acstuff.ru/images/icons_24/team.png)
----| `ui.Icons.Teleport` @![Icon](https://acstuff.ru/images/icons_24/teleport.png)
----| `ui.Icons.Tent` @![Icon](https://acstuff.ru/images/icons_24/tent.png)
----| `ui.Icons.Thermometer` @![Icon](https://acstuff.ru/images/icons_24/thermometer.png)
----| `ui.Icons.ThumbDown` @![Icon](https://acstuff.ru/images/icons_24/thumb_down.png)
----| `ui.Icons.ThumbUp` @![Icon](https://acstuff.ru/images/icons_24/thumb_up.png)
----| `ui.Icons.TimeRewind` @![Icon](https://acstuff.ru/images/icons_24/time_rewind.png)
----| `ui.Icons.TopHat` @![Icon](https://acstuff.ru/images/icons_24/top_hat.png)
----| `ui.Icons.TrafficLight` @![Icon](https://acstuff.ru/images/icons_24/traffic_light.png)
----| `ui.Icons.Transmission` @![Icon](https://acstuff.ru/images/icons_24/transmission.png)
----| `ui.Icons.Trash` @![Icon](https://acstuff.ru/images/icons_24/trash.png)
----| `ui.Icons.Treat` @![Icon](https://acstuff.ru/images/icons_24/treat.png)
----| `ui.Icons.Trophy` @![Icon](https://acstuff.ru/images/icons_24/trophy.png)
----| `ui.Icons.TurnSignalLeft` @![Icon](https://acstuff.ru/images/icons_24/turn_signal_left.png)
----| `ui.Icons.TurnSignalRight` @![Icon](https://acstuff.ru/images/icons_24/turn_signal_right.png)
----| `ui.Icons.Tv` @![Icon](https://acstuff.ru/images/icons_24/tv.png)
----| `ui.Icons.Umbrella` @![Icon](https://acstuff.ru/images/icons_24/umbrella.png)
----| `ui.Icons.Undo` @![Icon](https://acstuff.ru/images/icons_24/undo.png)
----| `ui.Icons.UpAlt` @![Icon](https://acstuff.ru/images/icons_24/up_alt.png)
----| `ui.Icons.Up` @![Icon](https://acstuff.ru/images/icons_24/up.png)
----| `ui.Icons.User` @![Icon](https://acstuff.ru/images/icons_24/user.png)
----| `ui.Icons.Verified` @![Icon](https://acstuff.ru/images/icons_24/verified.png)
----| `ui.Icons.VideoCameraAlt` @![Icon](https://acstuff.ru/images/icons_24/video_camera_alt.png)
----| `ui.Icons.VideoCamera` @![Icon](https://acstuff.ru/images/icons_24/video_camera.png)
----| `ui.Icons.VIP` @![Icon](https://acstuff.ru/images/icons_24/vip.png)
----| `ui.Icons.VolumeHigh` @![Icon](https://acstuff.ru/images/icons_24/volume_high.png)
----| `ui.Icons.VolumeLow` @![Icon](https://acstuff.ru/images/icons_24/volume_low.png)
----| `ui.Icons.VolumeMedium` @![Icon](https://acstuff.ru/images/icons_24/volume_medium.png)
----| `ui.Icons.Wallet` @![Icon](https://acstuff.ru/images/icons_24/wallet.png)
----| `ui.Icons.Warning` @![Icon](https://acstuff.ru/images/icons_24/warning.png)
----| `ui.Icons.WeatherClear` @![Icon](https://acstuff.ru/images/icons_24/weather_clear.png)
----| `ui.Icons.WeatherCold` @![Icon](https://acstuff.ru/images/icons_24/weather_cold.png)
----| `ui.Icons.WeatherDrizzle` @![Icon](https://acstuff.ru/images/icons_24/weather_drizzle.png)
----| `ui.Icons.WeatherFewClouds` @![Icon](https://acstuff.ru/images/icons_24/weather_few_clouds.png)
----| `ui.Icons.WeatherFog` @![Icon](https://acstuff.ru/images/icons_24/weather_fog.png)
----| `ui.Icons.WeatherHail` @![Icon](https://acstuff.ru/images/icons_24/weather_hail.png)
----| `ui.Icons.WeatherHot` @![Icon](https://acstuff.ru/images/icons_24/weather_hot.png)
----| `ui.Icons.WeatherHurricane` @![Icon](https://acstuff.ru/images/icons_24/weather_hurricane.png)
----| `ui.Icons.WeatherOvercast` @![Icon](https://acstuff.ru/images/icons_24/weather_overcast.png)
----| `ui.Icons.WeatherRainLight` @![Icon](https://acstuff.ru/images/icons_24/weather_rain_light.png)
----| `ui.Icons.WeatherRain` @![Icon](https://acstuff.ru/images/icons_24/weather_rain.png)
----| `ui.Icons.WeatherSleet` @![Icon](https://acstuff.ru/images/icons_24/weather_sleet.png)
----| `ui.Icons.WeatherSnowLight` @![Icon](https://acstuff.ru/images/icons_24/weather_snow_light.png)
----| `ui.Icons.WeatherSnow` @![Icon](https://acstuff.ru/images/icons_24/weather_snow.png)
----| `ui.Icons.WeatherStormLight` @![Icon](https://acstuff.ru/images/icons_24/weather_storm_light.png)
----| `ui.Icons.WeatherStorm` @![Icon](https://acstuff.ru/images/icons_24/weather_storm.png)
----| `ui.Icons.WeatherTornado` @![Icon](https://acstuff.ru/images/icons_24/weather_tornado.png)
----| `ui.Icons.WeatherWarm` @![Icon](https://acstuff.ru/images/icons_24/weather_warm.png)
----| `ui.Icons.WeatherWindySun` @![Icon](https://acstuff.ru/images/icons_24/weather_windy_sun.png)
----| `ui.Icons.WeatherWindy` @![Icon](https://acstuff.ru/images/icons_24/weather_windy.png)
----| `ui.Icons.Webcam` @![Icon](https://acstuff.ru/images/icons_24/webcam.png)
----| `ui.Icons.Wrench` @![Icon](https://acstuff.ru/images/icons_24/wrench.png)
----| `ui.Icons.YandexMusic` @![Icon](https://acstuff.ru/images/icons_24/yandex_music.png)
----| `ui.Icons.YoutubeSolid` @![Icon](https://acstuff.ru/images/icons_24/youtube_solid.png)
----| `ui.Icons.Youtube` @![Icon](https://acstuff.ru/images/icons_24/youtube.png)
----| `ui.Icons.ZoomIn` @![Icon](https://acstuff.ru/images/icons_24/zoom_in.png)
----| `ui.Icons.ZoomOut` @![Icon](https://acstuff.ru/images/icons_24/zoom_out.png)
-ui.Icons = {
-  LoadingSpinner = 'fx:loading', ---@type ui.Icons #Value: 'fx:loading'.
-  Air = 'AIR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/air.png)
-  AppWindow = 'APP_WINDOW', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/app_window.png)
-  Apps = 'APPS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/apps.png)
-  ArrowDown = 'ARROW_DOWN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/arrow_down.png)
-  ArrowLeft = 'ARROW_LEFT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/arrow_left.png)
-  ArrowRight = 'ARROW_RIGHT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/arrow_right.png)
-  ArrowUp = 'ARROW_UP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/arrow_up.png)
-  Assist = 'ASSIST', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/assist.png)
-  Attention = 'ATTENTION', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/attention.png)
-  Avatar = 'AVATAR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/avatar.png)
-  Back = 'BACK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/back.png)
-  Backspace = 'BACKSPACE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/backspace.png)
-  Ballast = 'BALLAST', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/ballast.png)
-  Ban = 'BAN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/ban.png)
-  Barcode = 'BARCODE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/barcode.png)
-  Bars = 'BARS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/bars.png)
-  BatteryEmpty = 'BATTERY_EMPTY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/battery_empty.png)
-  BatteryFull = 'BATTERY_FULL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/battery_full.png)
-  Befriend = 'BEFRIEND', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/befriend.png)
-  Bell = 'BELL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/bell.png)
-  Binocoulars = 'BINOCOULARS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/binocoulars.png)
-  Blackboard = 'BLACKBOARD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/blackboard.png)
-  Blanket = 'BLANKET', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/blanket.png)
-  Blast = 'BLAST', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/blast.png)
-  Bluetooth = 'BLUETOOTH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/bluetooth.png)
-  Bomb = 'BOMB', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/bomb.png)
-  Book = 'BOOK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/book.png)
-  Bookmark = 'BOOKMARK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/bookmark.png)
-  Box = 'BOX', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/box.png)
-  Briefcase = 'BRIEFCASE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/briefcase.png)
-  Bug = 'BUG', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/bug.png)
-  Bulb = 'BULB', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/bulb.png)
-  Burn = 'BURN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/burn.png)
-  Calculator = 'CALCULATOR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/calculator.png)
-  Calendar = 'CALENDAR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/calendar.png)
-  CallBluetooth = 'CALL_BLUETOOTH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/call_bluetooth.png)
-  Call = 'CALL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/call.png)
-  Camera = 'CAMERA', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/camera.png)
-  Cancel = 'CANCEL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/cancel.png)
-  CarFront = 'CAR_FRONT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/car_front.png)
-  Cards = 'CARDS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/cards.png)
-  Cctv = 'CCTV', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/cctv.png)
-  Cellphone = 'CELLPHONE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/cellphone.png)
-  Chat = 'CHAT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/chat.png)
-  Clapperboard = 'CLAPPERBOARD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/clapperboard.png)
-  Clip = 'CLIP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/clip.png)
-  Clipboard = 'CLIPBOARD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/clipboard.png)
-  Clock = 'CLOCK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/clock.png)
-  Cloud = 'CLOUD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/cloud.png)
-  Code = 'CODE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/code.png)
-  Coffee = 'COFFEE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/coffee.png)
-  CompassAlt = 'COMPASS_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/compass_alt.png)
-  Compass = 'COMPASS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/compass.png)
-  Confirm = 'CONFIRM', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/confirm.png)
-  Constellation = 'CONSTELLATION', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/constellation.png)
-  Contacts = 'CONTACTS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/contacts.png)
-  Contrast = 'CONTRAST', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/contrast.png)
-  Copy = 'COPY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/copy.png)
-  CreditCard = 'CREDIT_CARD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/credit_card.png)
-  Crop = 'CROP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/crop.png)
-  Crosshair = 'CROSSHAIR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/crosshair.png)
-  Delete = 'DELETE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/delete.png)
-  Dice = 'DICE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/dice.png)
-  Directions = 'DIRECTIONS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/directions.png)
-  Document = 'DOCUMENT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/document.png)
-  DollarBill = 'DOLLAR_BILL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/dollar_bill.png)
-  DownAlt = 'DOWN_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/down_alt.png)
-  Down = 'DOWN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/down.png)
-  Download = 'DOWNLOAD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/download.png)
-  Driver = 'DRIVER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/driver.png)
-  Earth = 'EARTH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/earth.png)
-  Edit = 'EDIT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/edit.png)
-  Eject = 'EJECT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/eject.png)
-  Ellipsis = 'ELLIPSIS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/ellipsis.png)
-  Enter = 'ENTER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/enter.png)
-  Envelope = 'ENVELOPE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/envelope.png)
-  Exit = 'EXIT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/exit.png)
-  Eye = 'EYE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/eye.png)
-  FastForward = 'FAST_FORWARD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/fast_forward.png)
-  File = 'FILE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/file.png)
-  FilmRoll = 'FILM_ROLL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/film_roll.png)
-  Film = 'FILM', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/film.png)
-  Finish = 'FINISH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/finish.png)
-  FireExtinguisher = 'FIRE_EXTINGUISHER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/fire_extinguisher.png)
-  Fireplace = 'FIREPLACE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/fireplace.png)
-  FlagAlt = 'FLAG_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/flag_alt.png)
-  Flag = 'FLAG', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/flag.png)
-  FM = 'FM', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/fm.png)
-  Folder = 'FOLDER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/folder.png)
-  Font = 'FONT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/font.png)
-  Fuel = 'FUEL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/fuel.png)
-  Fullscreen = 'FULLSCREEN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/fullscreen.png)
-  Gamepad = 'GAMEPAD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/gamepad.png)
-  Global = 'GLOBAL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/global.png)
-  GlowThick = 'GLOW_THICK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/glow_thick.png)
-  Glow = 'GLOW', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/glow.png)
-  GPS = 'GPS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/gps.png)
-  Group = 'GROUP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/group.png)
-  HammerAlt = 'HAMMER_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/hammer_alt.png)
-  Hammer = 'HAMMER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/hammer.png)
-  Hazard = 'HAZARD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/hazard.png)
-  Headphones = 'HEADPHONES', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/headphones.png)
-  HeartOutline = 'HEART_OUTLINE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/heart_outline.png)
-  Heart = 'HEART', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/heart.png)
-  Helmet = 'HELMET', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/helmet.png)
-  Hide = 'HIDE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/hide.png)
-  Home = 'HOME', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/home.png)
-  Horizontal = 'HORIZONTAL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/horizontal.png)
-  Hourglass = 'HOURGLASS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/hourglass.png)
-  InboxEmpty = 'INBOX_EMPTY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/inbox_empty.png)
-  InboxFull = 'INBOX_FULL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/inbox_full.png)
-  Info = 'INFO', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/info.png)
-  Key = 'KEY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/key.png)
-  Keyboard = 'KEYBOARD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/keyboard.png)
-  Kick = 'KICK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/kick.png)
-  Landscape = 'LANDSCAPE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/landscape.png)
-  Laptop = 'LAPTOP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/laptop.png)
-  Leaderboard = 'LEADERBOARD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/leaderboard.png)
-  Leave = 'LEAVE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/leave.png)
-  Lens = 'LENS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/lens.png)
-  Levels = 'LEVELS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/levels.png)
-  LinkBroken = 'LINK_BROKEN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/link_broken.png)
-  Link = 'LINK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/link.png)
-  ListAlt = 'LIST_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/list_alt.png)
-  List = 'LIST', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/list.png)
-  Loading = 'LOADING', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/loading.png)
-  Location = 'LOCATION', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/location.png)
-  Lua = 'LUA', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/lua.png)
-  Magnet = 'MAGNET', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/magnet.png)
-  Map = 'MAP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/map.png)
-  Maximize = 'MAXIMIZE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/maximize.png)
-  Menu = 'MENU', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/menu.png)
-  MicrophoneMuted = 'MICROPHONE_MUTED', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/microphone_muted.png)
-  Microphone = 'MICROPHONE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/microphone.png)
-  Minus = 'MINUS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/minus.png)
-  Monitor = 'MONITOR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/monitor.png)
-  Moon = 'MOON', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/moon.png)
-  Mouse = 'MOUSE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/mouse.png)
-  Music = 'MUSIC', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/music.png)
-  Mute = 'MUTE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/mute.png)
-  Navigation = 'NAVIGATION', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/navigation.png)
-  New = 'NEW', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/new.png)
-  Next = 'NEXT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/next.png)
-  NotificationsAny = 'NOTIFICATIONS_ANY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/notifications_any.png)
-  Notifications = 'NOTIFICATIONS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/notifications.png)
-  PadlockUnlocked = 'PADLOCK_UNLOCKED', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/padlock_unlocked.png)
-  Padlock = 'PADLOCK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/padlock.png)
-  Palette = 'PALETTE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/palette.png)
-  Paperclip = 'PAPERCLIP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/paperclip.png)
-  Paste = 'PASTE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/paste.png)
-  Pause = 'PAUSE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/pause.png)
-  Pedals = 'PEDALS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/pedals.png)
-  Person = 'PERSON', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/person.png)
-  Photograph = 'PHOTOGRAPH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/photograph.png)
-  Pin = 'PIN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/pin.png)
-  PitStopAlt = 'PIT_STOP_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/pit_stop_alt.png)
-  PitStop = 'PIT_STOP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/pit_stop.png)
-  Pitlane = 'PITLANE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/pitlane.png)
-  Plane = 'PLANE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/plane.png)
-  Play = 'PLAY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/play.png)
-  Plug = 'PLUG', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/plug.png)
-  Plus = 'PLUS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/plus.png)
-  Preview = 'PREVIEW', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/preview.png)
-  Previous = 'PREVIOUS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/previous.png)
-  Print = 'PRINT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/print.png)
-  Process = 'PROCESS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/process.png)
-  Puzzle = 'PUZZLE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/puzzle.png)
-  Python = 'PYTHON', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/python.png)
-  QR = 'QR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/qr.png)
-  QuestionSign = 'QUESTION_SIGN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/question_sign.png)
-  Question = 'QUESTION', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/question.png)
-  Radio = 'RADIO', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/radio.png)
-  Recognition = 'RECOGNITION', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/recognition.png)
-  Record = 'RECORD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/record.png)
-  Redo = 'REDO', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/redo.png)
-  Referee = 'REFEREE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/referee.png)
-  Repair = 'REPAIR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/repair.png)
-  Reset = 'RESET', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/reset.png)
-  RestartWarning = 'RESTART_WARNING', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/restart_warning.png)
-  Restart = 'RESTART', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/restart.png)
-  Restrictor = 'RESTRICTOR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/restrictor.png)
-  Resume = 'RESUME', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/resume.png)
-  Rewind = 'REWIND', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/rewind.png)
-  Road = 'ROAD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/road.png)
-  Rubber = 'RUBBER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/rubber.png)
-  SatelliteDishLow = 'SATELLITE_DISH_LOW', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/satellite_dish_low.png)
-  SatelliteDishNone = 'SATELLITE_DISH_NONE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/satellite_dish_none.png)
-  SatelliteDish = 'SATELLITE_DISH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/satellite_dish.png)
-  Save = 'SAVE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/save.png)
-  Scissors = 'SCISSORS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/scissors.png)
-  Sea = 'SEA', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/sea.png)
-  Search = 'SEARCH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/search.png)
-  Send = 'SEND', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/send.png)
-  Service = 'SERVICE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/service.png)
-  SettingsAlt = 'SETTINGS_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/settings_alt.png)
-  Settings = 'SETTINGS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/settings.png)
-  ShieldWithLock = 'SHIELD_WITH_LOCK', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/shield_with_lock.png)
-  Shield = 'SHIELD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/shield.png)
-  ShiftActive = 'SHIFT_ACTIVE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/shift_active.png)
-  Shift = 'SHIFT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/shift.png)
-  Shopping = 'SHOPPING', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/shopping.png)
-  Shuffle = 'SHUFFLE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/shuffle.png)
-  Skip = 'SKIP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/skip.png)
-  Sleep = 'SLEEP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/sleep.png)
-  Sliders = 'SLIDERS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/sliders.png)
-  SlowMotion = 'SLOW_MOTION', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/slow_motion.png)
-  Smile = 'SMILE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/smile.png)
-  Spaceship = 'SPACESHIP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/spaceship.png)
-  Speaker = 'SPEAKER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/speaker.png)
-  Speedometer = 'SPEEDOMETER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/speedometer.png)
-  Spotify = 'SPOTIFY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/spotify.png)
-  SquaresHorizontal = 'SQUARES_HORIZONTAL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/squares_horizontal.png)
-  SquaresVertical = 'SQUARES_VERTICAL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/squares_vertical.png)
-  StarEmpty = 'STAR_EMPTY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/star_empty.png)
-  StarFull = 'STAR_FULL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/star_full.png)
-  StarHalf = 'STAR_HALF', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/star_half.png)
-  Start = 'START', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/start.png)
-  Stats = 'STATS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/stats.png)
-  Stay = 'STAY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/stay.png)
-  SteeringWheel = 'STEERING_WHEEL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/steering_wheel.png)
-  StopAlt = 'STOP_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/stop_alt.png)
-  Stop = 'STOP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/stop.png)
-  Stopwatch = 'STOPWATCH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/stopwatch.png)
-  Sweeping = 'SWEEPING', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/sweeping.png)
-  Tag = 'TAG', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/tag.png)
-  Target = 'TARGET', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/target.png)
-  Team = 'TEAM', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/team.png)
-  Teleport = 'TELEPORT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/teleport.png)
-  Tent = 'TENT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/tent.png)
-  Thermometer = 'THERMOMETER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/thermometer.png)
-  ThumbDown = 'THUMB_DOWN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/thumb_down.png)
-  ThumbUp = 'THUMB_UP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/thumb_up.png)
-  TimeRewind = 'TIME_REWIND', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/time_rewind.png)
-  TopHat = 'TOP_HAT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/top_hat.png)
-  TrafficLight = 'TRAFFIC_LIGHT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/traffic_light.png)
-  Transmission = 'TRANSMISSION', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/transmission.png)
-  Trash = 'TRASH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/trash.png)
-  Treat = 'TREAT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/treat.png)
-  Trophy = 'TROPHY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/trophy.png)
-  TurnSignalLeft = 'TURN_SIGNAL_LEFT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/turn_signal_left.png)
-  TurnSignalRight = 'TURN_SIGNAL_RIGHT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/turn_signal_right.png)
-  Tv = 'TV', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/tv.png)
-  Umbrella = 'UMBRELLA', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/umbrella.png)
-  Undo = 'UNDO', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/undo.png)
-  UpAlt = 'UP_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/up_alt.png)
-  Up = 'UP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/up.png)
-  User = 'USER', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/user.png)
-  Verified = 'VERIFIED', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/verified.png)
-  VideoCameraAlt = 'VIDEO_CAMERA_ALT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/video_camera_alt.png)
-  VideoCamera = 'VIDEO_CAMERA', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/video_camera.png)
-  VIP = 'VIP', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/vip.png)
-  VolumeHigh = 'VOLUME_HIGH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/volume_high.png)
-  VolumeLow = 'VOLUME_LOW', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/volume_low.png)
-  VolumeMedium = 'VOLUME_MEDIUM', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/volume_medium.png)
-  Wallet = 'WALLET', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/wallet.png)
-  Warning = 'WARNING', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/warning.png)
-  WeatherClear = 'WEATHER_CLEAR', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_clear.png)
-  WeatherCold = 'WEATHER_COLD', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_cold.png)
-  WeatherDrizzle = 'WEATHER_DRIZZLE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_drizzle.png)
-  WeatherFewClouds = 'WEATHER_FEW_CLOUDS', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_few_clouds.png)
-  WeatherFog = 'WEATHER_FOG', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_fog.png)
-  WeatherHail = 'WEATHER_HAIL', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_hail.png)
-  WeatherHot = 'WEATHER_HOT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_hot.png)
-  WeatherHurricane = 'WEATHER_HURRICANE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_hurricane.png)
-  WeatherOvercast = 'WEATHER_OVERCAST', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_overcast.png)
-  WeatherRainLight = 'WEATHER_RAIN_LIGHT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_rain_light.png)
-  WeatherRain = 'WEATHER_RAIN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_rain.png)
-  WeatherSleet = 'WEATHER_SLEET', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_sleet.png)
-  WeatherSnowLight = 'WEATHER_SNOW_LIGHT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_snow_light.png)
-  WeatherSnow = 'WEATHER_SNOW', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_snow.png)
-  WeatherStormLight = 'WEATHER_STORM_LIGHT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_storm_light.png)
-  WeatherStorm = 'WEATHER_STORM', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_storm.png)
-  WeatherTornado = 'WEATHER_TORNADO', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_tornado.png)
-  WeatherWarm = 'WEATHER_WARM', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_warm.png)
-  WeatherWindySun = 'WEATHER_WINDY_SUN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_windy_sun.png)
-  WeatherWindy = 'WEATHER_WINDY', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/weather_windy.png)
-  Webcam = 'WEBCAM', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/webcam.png)
-  Wrench = 'WRENCH', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/wrench.png)
-  YandexMusic = 'YANDEX_MUSIC', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/yandex_music.png)
-  YoutubeSolid = 'YOUTUBE_SOLID', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/youtube_solid.png)
-  Youtube = 'YOUTUBE', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/youtube.png)
-  ZoomIn = 'ZOOM_IN', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/zoom_in.png)
-  ZoomOut = 'ZOOM_OUT', ---@type ui.Icons #![Icon](https://acstuff.ru/images/icons_24/zoom_out.png)
-}
-
 ---@alias ui.ButtonFlags
 ---| `ui.ButtonFlags.None` @No special options.
 ---| `ui.ButtonFlags.Repeat` @Hold to repeat.
@@ -11587,6 +11759,20 @@ ui.TabItemFlags = {
   NoCloseWithMiddleMouseButton = 4, ---@type ui.TabItemFlags #Disable behavior of closing tabs (that are submitted with p_open !
 }
 
+---@alias ui.ColumnsFlags
+---| `ui.ColumnsFlags.None` @No special options.
+---| `ui.ColumnsFlags.NoBorder` @Disable column dividers.
+---| `ui.ColumnsFlags.NoResize` @Disable resizing columns when clicking on the dividers.
+---| `ui.ColumnsFlags.NoPreserveWidths` @Disable column width preservation when adjusting columns.
+---| `ui.ColumnsFlags.NoForceWithinWindow` @Disable forcing columns to fit within window.
+ui.ColumnsFlags = {
+  None = 0x0, ---@type ui.ColumnsFlags #No special options.
+  NoBorder = 0x1, ---@type ui.ColumnsFlags #Disable column dividers.
+  NoResize = 0x2, ---@type ui.ColumnsFlags #Disable resizing columns when clicking on the dividers.
+  NoPreserveWidths = 0x4, ---@type ui.ColumnsFlags #Disable column width preservation when adjusting columns.
+  NoForceWithinWindow = 0x8, ---@type ui.ColumnsFlags #Disable forcing columns to fit within window.
+}
+
 ---@alias ui.TreeNodeFlags
 ---| `ui.TreeNodeFlags.None` @No special options.
 ---| `ui.TreeNodeFlags.Selected` @Draw as selected.
@@ -11743,6 +11929,33 @@ ui.DWriteFont.Stretch = {
   UltraExpanded = 'UltraExpanded', ---@type ui.DWriteFont.Stretch #Value: 'UltraExpanded'.
 }
 
+---If any type restriction is set, binding will be shown as empty if there is no device fitting the restriction bound. If no type---restriction is set, any input device can be bound overriding all previously configured boundaries, or multiple bindings can be added---with a popup menu.
+---@alias ui.ControlButtonControlFlags
+---| `ui.ControlButtonControlFlags.None` @Value: 0.
+---| `ui.ControlButtonControlFlags.Keyboard` @Type restriction: keyboard only.
+---| `ui.ControlButtonControlFlags.Gamepad` @Type restriction: gamepad only.
+---| `ui.ControlButtonControlFlags.Controllers` @Type restriction: controllers only.
+---| `ui.ControlButtonControlFlags.NoKeyboard` @Type restriction: gamepad or controllers depending on input mode.
+---| `ui.ControlButtonControlFlags.IgnoreConflicts` @Do not check if anything else in “controls.ini” is already using the input.
+---| `ui.ControlButtonControlFlags.SingleEntry` @Don’t show multiple devices if bound, only a single one, remove other devices on bounding.
+---| `ui.ControlButtonControlFlags.AlterRealConfig` @Copy changes to original presets with car-specific controls or presets-per-mode active (use it if your button is more of a global one, not relating to currently selected car).
+---| `ui.ControlButtonControlFlags.NoDeleteUnbound` @Don’t unbound inputs by hovering button and pressing Delete.
+---| `ui.ControlButtonControlFlags.NoContextMenu` @Use this flag if you want to add your own context menu.
+---| `ui.ControlButtonControlFlags.NoHoldSwitch` @Don’t draw hold switch even if button should have one.
+ui.ControlButtonControlFlags = {
+  None = 0, ---@type ui.ControlButtonControlFlags #Value: 0.
+  Keyboard = 1, ---@type ui.ControlButtonControlFlags #Type restriction: keyboard only.
+  Gamepad = 2, ---@type ui.ControlButtonControlFlags #Type restriction: gamepad only.
+  Controllers = 4, ---@type ui.ControlButtonControlFlags #Type restriction: controllers only.
+  NoKeyboard = 6, ---@type ui.ControlButtonControlFlags #Type restriction: gamepad or controllers depending on input mode.
+  IgnoreConflicts = 16, ---@type ui.ControlButtonControlFlags #Do not check if anything else in “controls.ini” is already using the input.
+  SingleEntry = 32, ---@type ui.ControlButtonControlFlags #Don’t show multiple devices if bound, only a single one, remove other devices on bounding.
+  AlterRealConfig = 64, ---@type ui.ControlButtonControlFlags #Copy changes to original presets with car-specific controls or presets-per-mode active (use it if your button is more of a global one, not relating to currently selected car).
+  NoDeleteUnbound = 128, ---@type ui.ControlButtonControlFlags #Don’t unbound inputs by hovering button and pressing Delete.
+  NoContextMenu = 256, ---@type ui.ControlButtonControlFlags #Use this flag if you want to add your own context menu.
+  NoHoldSwitch = 512, ---@type ui.ControlButtonControlFlags #Don’t draw hold switch even if button should have one.
+}
+
 ---@alias ac.PhysicsDebugLines
 ---| `ac.PhysicsDebugLines.None` @No special options.
 ---| `ac.PhysicsDebugLines.Tyres` @Tyres raycasting.
@@ -11835,33 +12048,6 @@ ac.CarControlsInput.Flag = {
   Skip = -1, ---@type ac.CarControlsInput.Flag #Value: -1.
   Disable = 0, ---@type ac.CarControlsInput.Flag #Value: 0.
   Enable = 1, ---@type ac.CarControlsInput.Flag #Value: 1.
-}
-
----If any type restriction is set, binding will be shown as empty if there is no device fitting the restriction bound. If no type---restriction is set, any input device can be bound overriding all previously configured boundaries, or multiple bindings can be added---with a popup menu.
----@alias ui.ControlButtonControlFlags
----| `ui.ControlButtonControlFlags.None` @Value: 0.
----| `ui.ControlButtonControlFlags.Keyboard` @Type restriction: keyboard only.
----| `ui.ControlButtonControlFlags.Gamepad` @Type restriction: gamepad only.
----| `ui.ControlButtonControlFlags.Controllers` @Type restriction: controllers only.
----| `ui.ControlButtonControlFlags.NoKeyboard` @Type restriction: gamepad or controllers depending on input mode.
----| `ui.ControlButtonControlFlags.IgnoreConflicts` @Do not check if anything else in “controls.ini” is already using the input.
----| `ui.ControlButtonControlFlags.SingleEntry` @Don’t show multiple devices if bound, only a single one, remove other devices on bounding.
----| `ui.ControlButtonControlFlags.AlterRealConfig` @Copy changes to original presets with car-specific controls or presets-per-mode active (use it if your button is more of a global one, not relating to currently selected car).
----| `ui.ControlButtonControlFlags.NoDeleteUnbound` @Don’t unbound inputs by hovering button and pressing Delete.
----| `ui.ControlButtonControlFlags.NoContextMenu` @Use this flag if you want to add your own context menu.
----| `ui.ControlButtonControlFlags.NoHoldSwitch` @Don’t draw hold switch even if button should have one.
-ui.ControlButtonControlFlags = {
-  None = 0, ---@type ui.ControlButtonControlFlags #Value: 0.
-  Keyboard = 1, ---@type ui.ControlButtonControlFlags #Type restriction: keyboard only.
-  Gamepad = 2, ---@type ui.ControlButtonControlFlags #Type restriction: gamepad only.
-  Controllers = 4, ---@type ui.ControlButtonControlFlags #Type restriction: controllers only.
-  NoKeyboard = 6, ---@type ui.ControlButtonControlFlags #Type restriction: gamepad or controllers depending on input mode.
-  IgnoreConflicts = 16, ---@type ui.ControlButtonControlFlags #Do not check if anything else in “controls.ini” is already using the input.
-  SingleEntry = 32, ---@type ui.ControlButtonControlFlags #Don’t show multiple devices if bound, only a single one, remove other devices on bounding.
-  AlterRealConfig = 64, ---@type ui.ControlButtonControlFlags #Copy changes to original presets with car-specific controls or presets-per-mode active (use it if your button is more of a global one, not relating to currently selected car).
-  NoDeleteUnbound = 128, ---@type ui.ControlButtonControlFlags #Don’t unbound inputs by hovering button and pressing Delete.
-  NoContextMenu = 256, ---@type ui.ControlButtonControlFlags #Use this flag if you want to add your own context menu.
-  NoHoldSwitch = 512, ---@type ui.ControlButtonControlFlags #Don’t draw hold switch even if button should have one.
 }
 
 ---FFB (phase 1), FFB (phase 2), damper.
@@ -12045,6 +12231,8 @@ function ui.endToolWindow() end
 function ui.beginTransparentWindow(windowID, pos, size, noPadding, inputs) end
 
 function ui.bringWindowToFront() end
+
+function ui.bringWindowToBack() end
 
 function ui.endTransparentWindow() end
 
@@ -12353,7 +12541,6 @@ function ui.pushClipRect(p1, p2, intersectWithExisting) end
 ---Pretty much fully disables clipping until next `ui.popClipRect()` call.
 function ui.pushClipRectFullScreen() end
 
----@return boolean
 function ui.popClipRect() end
 
 ---@param p1 number|vec2
@@ -12683,7 +12870,6 @@ function ui.beginTransformMatrix() end
 function ui.endTransformMatrix(mat) end
 
 ---@param count integer? @Default value: 1.
----@return boolean
 function ui.popStyleVar(count) end
 
 ---@param varID ui.StyleColor
@@ -12696,13 +12882,11 @@ function ui.styleColor(varID, styleSet) end
 function ui.pushStyleColor(varID, value) end
 
 ---@param count integer? @Default value: 1.
----@return boolean
 function ui.popStyleColor(count) end
 
 ---@param fontType ui.Font
 function ui.pushFont(fontType) end
 
----@return boolean
 function ui.popFont() end
 
 function ui.setNextTextBold() end
@@ -12710,13 +12894,11 @@ function ui.setNextTextBold() end
 ---@param itemWidth number
 function ui.pushItemWidth(itemWidth) end
 
----@return boolean
 function ui.popItemWidth() end
 
 ---@param wrapPos number
 function ui.pushTextWrapPosition(wrapPos) end
 
----@return boolean
 function ui.popTextWrapPosition() end
 
 ---Checks if area is visible (not clipped). Works great if you need to make a list with many elements and don’t want to render elements
@@ -13045,7 +13227,6 @@ function ui.dwriteTextWrapped(text, fontSize, color) end
 ---@param color rgbm? @Default value: `rgbm.colors.white`.
 function ui.dwriteTextAligned(text, fontSize, horizontalAligment, verticalAlignment, size, allowWordWrapping, color) end
 
----@return boolean
 function ui.popID() end
 
 ---@return integer
@@ -13091,11 +13272,6 @@ function ui.storeNumber(id, value) end
 ---@param value boolean? @Default value: `false`.
 function ui.storeBool(id, value) end
 
----@param columns integer? @Default value: 1.
----@param border boolean? @Default value: `true`.
----@param id string|nil @Default value: `nil`.
-function ui.columns(columns, border, id) end
-
 function ui.nextColumn() end
 
 ---@param columnIndex integer
@@ -13109,7 +13285,6 @@ function ui.getColumnWidth(columnIndex) end
 ---Can be used to draw something spanning entire table.
 function ui.pushColumnsBackground() end
 
----@return boolean
 function ui.popColumnsBackground() end
 
 ---Draws a column label with optional ordering arrow and advances to the next column.
@@ -13125,7 +13300,6 @@ function ui.copyable(label) end
 
 function ui.pushDisabled() end
 
----@return boolean
 function ui.popDisabled() end
 
 ---Simple button.
@@ -13500,7 +13674,6 @@ function ui.calcItemWidth() end
 function ui.pushAllowKeyboardFocus(allowKeyboardFocus) end
 
 ---Removes last `ui.pushAllowKeyboardFocus()` modification.
----@return boolean
 function ui.popAllowKeyboardFocus() end
 
 ---In repeat mode, button functions return repeated true in a typematic manner.
@@ -13509,7 +13682,6 @@ function ui.popAllowKeyboardFocus() end
 function ui.pushButtonRepeat(repeatValue) end
 
 ---Removes last `ui.pushButtonRepeat()` modification
----@return boolean
 function ui.popButtonRepeat() end
 
 ---Move content position toward the right.
@@ -13587,7 +13759,8 @@ function ui.setScrollFromPosY(localY, centerYRatio) end
 function ui.windowTitle() end
 
 ---Stop frosted effect of semi-transparent IMGUI surfaces for a single frame.
-function ui.forceSimplifiedComposition() end
+---@param currentWindow boolean? @Set to `true` to make it affect this root window only (if you’re within HUD callback, it’ll affect the entire callback). Any window without frosty effect is drawn first, before anything with frosty effect. Option is added in 0.3.0. Default value: `false`.
+function ui.forceSimplifiedComposition(currentWindow) end
 
 ---Allow AC to see mouse events for a frame, even if IMGUI is handling them.
 function ui.passthroughIMGUI() end
@@ -13709,11 +13882,13 @@ function ui.onChat(callback, settingsCallback) end
 ---Not available to car and track scripts.
 ---
 ---Since 0.2.8, return `'finalize'` to allow `ui.popup()` and `ui.onUIFinale()`.
----@param callback fun(mode: 'menu'|'pause'|'results'|'replay'|'game'): 'debug'|'apps'|boolean?
+---@param callback fun(mode: 'menu'|'pause'|'results'|'replay'|'game'): 'debug'|'debug-nonexclusive'|'apps'|'apps-nonexclusive'|boolean?
+---@param noPadding boolean? @Default value: `false`.
 ---@return ac.Disposable
-function ui.onExclusiveHUD(callback) end
+function ui.onExclusiveHUD(callback, noPadding) end
 
----Open modal popup message with OK and Cancel buttons, return user choice via callback.
+---Open modal popup message with OK and Cancel buttons, return user choice via callback. Since 0.3.0, you can pass `'-'` as `cancelText` to have a dialog
+---with a single button only.
 ---@overload fun(title: string, msg: string, callback: function)
 ---@param title string
 ---@param msg string
@@ -13730,7 +13905,7 @@ function ui.modalPopup(title, msg, okText, cancelText, okIconID, cancelIconID, c
 --- `ui.modernButton()` with the height of 40 pixels and the gap of 8 pixels.
 ---@param title string
 ---@param callback fun(): boolean
----@param autoclose boolean? @Automatically close if clicked outside of dialog. Default value: `false`.
+---@param autoclose boolean? @Automatically close if clicked outside of dialog, or if Escape button is pressed. Default value: `false`.
 ---@param closeCallback fun()? @Default value: `nil`.
 function ui.modalDialog(title, callback, autoclose, closeCallback) end
 
@@ -13778,7 +13953,7 @@ function ui.setDriverPopup(id, carIndex) end
 ---@param autofocus boolean? @Default value: `true`.
 function ui.mentionDriverInChat(carIndex, autofocus) end
 
----Returns state of an image (might act strage with special textures, like the ones loaded from DLLs; new return values might be added later).
+---Returns state of an image (might act strangely with special textures, like the ones loaded from DLLs; new return values might be added later).
 ---@param imageSource string @Path to the image, absolute or relative to script folder or AC root. URLs are also accepted.
 ---@return 'ready'|'loading'|'missing'
 function ui.imageState(imageSource) end
@@ -14143,6 +14318,7 @@ function physics.setAINoInput(carIndex, active, stall) end
 ---@param carIndex integer @0-based car index.
 ---@param name string @First and last name separated by a space.
 ---@param nationCode ac.NationCode|nil @3 characters long nation code. If not set, current value is used. Default value: `nil`.
+---@return boolean @Returns `false` if no changes have been made.
 function physics.setAIDriverName(carIndex, name, nationCode) end
 
 ---Sets name of an AI’s team, announces new name online to other clients. Could be used for some hot driver swapping.
@@ -14239,11 +14415,12 @@ function physics.setAISplineOffset(carIndex, offset, overrideAiAwareness) end
 ---@param overrideAiAwareness boolean? @Default value: `false`.
 function physics.setAISplineAbsoluteOffset(carIndex, offset, overrideAiAwareness) end
 
----If not loaded yet, loads new AI spline in background and uses it instead of main API spline. Experimental.
+---If not loaded yet, loads new AI spline in background and uses it instead of main API spline.
 ---@param carIndex integer @0-based car index.
----@param filename string @Full path to a spline file.
+---@param filename string|nil @Path to a spline file. Pass `nil` to reset the spline. Default value: `nil`.
+---@param aiHintsFilename string|nil @Path to “ai_hints.ini” file. Added in 0.3.0. Each new value creates a new spline, so please don’t use it excessively. If you need to limit speed dynamically, consider using dedicated functinos. Default value: `nil`.
 ---@return boolean
-function physics.setAISpline(carIndex, filename) end
+function physics.setAISpline(carIndex, filename, aiHintsFilename) end
 
 ---Changes extra AI grip (120% by default).
 ---@param carIndex integer @0-based car index.
@@ -14319,6 +14496,20 @@ function ac.disableCarRecovery(disable) end
 ---@param disable boolean? @Default value: `true`.
 function ac.disableQuickMenuPitstop(disable) end
 
+---Disables drawing of virtual mirror entirely.
+---@param disable boolean? @Default value: `true`.
+function ac.disableVirtualMirror(disable) end
+
+---Disables other HUD elements.
+---Not available to scripts without I/O access.
+---@param idsMask 'sessionTime'|'fuel'|'proximity'|'virtualMirror'|'quickPitsMenu'|'leaderboard'|'startingLights'|'wrongWay'|'ping'|'damage'|string[]. @ID or list of IDs.
+---@param disable boolean? @Default value: `true`.
+function ac.disableExtraHUDElements(idsMask, disable) end
+
+---Disables Neck FX altering driver model.
+---@param disable boolean? @Default value: `true`.
+function ac.disableNeckFXDriverModelMovement(disable) end
+
 ---Sets current camera mode.
 ---@param mode ac.CameraMode
 function ac.setCurrentCamera(mode) end
@@ -14337,6 +14528,7 @@ function ac.setCurrentTrackCamera(set) end
 
 function ac.forceSnow() end
 
+---@return boolean
 function ac.recenterVR() end
 
 ---Focus on a certain car.
@@ -14370,9 +14562,17 @@ function ac.sendChatMessage(command) end
 ---and stop it from showing in chat apps.
 ---
 ---Second argument in callback stores car ID of a car that sent the message, or -1 if message comes from server.
----@param callback fun(message: string, senderCarIndex: integer, senderSessionID: integer): boolean
+---Not available to scripts without I/O access.
+---@param callback fun(message: string, senderCarIndex: integer, senderSessionID: integer): boolean @Callback which will be called each time new message arrives.
 ---@return ac.Disposable
 function ac.onChatMessage(callback) end
+
+---Sets a callback which will be called when user tries to send a message. Return `true` from callback to handle chat message
+---and stop it from actually being sent (it’ll disappear from the chat as if sent).
+---Not available to scripts without I/O access.
+---@param callback fun(message: string, senderCarIndex: integer, senderSessionID: integer): boolean @Callback which will be called each time new message is being sent.
+---@return ac.Disposable
+function ac.onOutgoingChatMessage(callback) end
 
 ---@param reverbValue number
 function ac.setReverbValue(reverbValue) end
@@ -14403,6 +14603,21 @@ function ac.setCameraExposure(exposure) end
 ---@param distance number @Value in meters, or 0 to disable DOF.
 function ac.setCameraDOF(distance) end
 
+---Hide mouse for a very short period of time. Call each frame if you want for it to stay hidden. Works similar to `ui.setMouseCursor(ui.MouseCursor.None)`,
+---but this one can be called from `script.update()` and has an option to restore cursor position.
+---@param restorePosition boolean? @Set to `true` if you want for mouse to restore position when reappearing. Default value: `false`.
+function ac.hideMouseCursor(restorePosition) end
+
+---Returns mouse delta since the last call in pixels, but also, hides mouse and fixes it in place, allowing to drag things around endlessly. Good for
+---implementing first person cameras, or something like custom mouse steering, so that mouse is no longer bound by window or screen size. Mouse will be
+---released and reappear shortly after this function has stopped being called. If delta is not available (for example, if `force` is not set to `true`,
+---and mouse currently is hovering some UI element), returns `vec2(0, 0)`.
+---@param rawInput nil|boolean|'camera' @Set to `true` to use raw input, or to `'camera'` to use raw input only if that’s user’s preference for cameras.
+---@param restorePosition boolean? @Set to `true` to restore mouse position when mouse is released. Default value: `true`.
+---@param force boolean? @Set to `true` to force access even if mouse is currently busy interacting with UI or something like that. Default value: `false`.
+---@return vec2
+function ac.accessMouseDelta(rawInput, restorePosition, force) end
+
 ---Sets a callback which will be called when drawing driver context menu. Within, `ui.` functions can be used to add additional information.
 ---@param callback fun(carIndex: integer)
 ---@return ac.Disposable
@@ -14413,6 +14628,7 @@ function ui.onDriverContextMenu(callback) end
 function ac.isCarResetAllowed() end
 
 ---Resets car back to the track. Available in few basic modes in offline only (such as practice with a single car), invalidates lap.
+---@return boolean @Return value added in 0.3.0.
 function ac.resetCar() end
 
 ---Resets car back to the track and moves it a bit back. Available in few basic modes in offline only (such as practice with a single car), invalidates lap.
@@ -14501,8 +14717,12 @@ function ac.blockEscapeButton() end
 ---Not available to scripts without I/O access.
 ---@param targetIndex integer @Set to -1 to apply track config, or to car index to apply a car config.
 ---@param data string @INI config data.
----@param flags integer? @Bit flags. 1: restore the state of track conditions, set by default. 2: partial mode (do not discard existing config loaded from INI file on a disk), set by default. 4: reload 3D-trees as well, set by default. 8: apply shader replacements from the config to the entire model, not just to meshes loaded from KN5. Use `bit.bor()` to combine flags. Default value: `uint(data_ac_ext_track_adjustments::load_adjustments_flags::default_value)`.
+---@param flags integer? @Bit flags. 1: restore the state of track conditions, set by default. 2: partial mode (do not discard existing config loaded from INI file on a disk), set by default. 4: reload 3D-trees as well, set by default. 8: apply shader replacements from the config to the entire model, not just to meshes loaded from KN5. Use `bit.bor()` to combine flags. Default value: 7.
 function ac.applyContentConfig(targetIndex, data, flags) end
+
+---Collect information about available windows.
+---@return {name: string, title: string, position: vec2, size: vec2, visible: boolean, pinned: boolean, collapsed: boolean, layer: integer, layerDuplicate: boolean}[]
+function ac.getAppWindows() end
 
 ---Pauses or un-pauses file system monitoring used for live reloading. Might be useful to pause it if you’re about to update a lot of configs, for example. Make sure
 ---to always re-enable watching afterwards though, or it’ll be re-enabled in a few seconds automatically.
@@ -14552,7 +14772,7 @@ function ac.isPythonAppActive(appName) end
 ---@return boolean @Returns `false` if app with this name was not found.
 function ac.reloadPythonApp(appName, withoutDisposing) end
 
----Alter `FFMULT` and `STEER_ASSIST` from car.ini. Original values are available in car state.
+---Alter `FFMULT` and `STEER_ASSIST` from car.ini. Original values are available in car state. Since 0.3.0, pass `0` to restore original values.
 ---@param carIndex integer
 ---@param ffbBase number
 ---@param ffbSteerAssist number? @Kunos use 1 for all of their cars. Default value: 1.
@@ -14646,6 +14866,11 @@ function ac.replaceDriverModel(carIndex, data) end
 ---@return boolean
 function ac.setHShifterActive(active) end
 
+---Toggle fullscreen state. Currently, doesn’t work with exclusive fullscreen. Returns `false` if no change has been made.
+---@param fullscreen boolean? @Pass `nil` to toggle.
+---@return boolean
+function ac.toggleFullscreen(fullscreen) end
+
 ---Override camera clip planes. Pass distances in meters, or `nil` to disable the override.
 ---@param nearPlane number?
 ---@param farPlane number?
@@ -14693,6 +14918,8 @@ function ac.overrideCarControls(carIndex) end
 ---@param frames integer? @Number of frames to keep pressing button for. Default value: 3.
 function ac.simulateCustomHotkeyPress(key, frames) end
 
+---Use `ac.recenterVR()`.
+---@deprecated
 ---@return boolean
 function ac.resetVRPose() end
 
@@ -14740,7 +14967,7 @@ function ac.areOnboardCameraParamsNeedSaving() end
 
 ---Applies an edit to AC config, such as “video.ini”, live without actually altering file on a disk. Only a very few values are
 ---currently supported.
----@param config 'controls.ini'|'video.ini'|'gameplay.ini'|'assetto_corsa.ini'|'proximity_indicator.ini'|'graphics.ini'|'graphics_adjustments.ini'|'custom_rendering_modes.ini'|'general.ini'|'walking_out.ini'
+---@param config 'controls.ini'|'video.ini'|'gameplay.ini'|'assetto_corsa.ini'|'mouse_hider.ini'|'proximity_indicator.ini'|'graphics.ini'|'graphics_adjustments.ini'|'custom_rendering_modes.ini'|'general.ini'|'walking_out.ini'
 ---@param data string @Serialized INI data.
 function ac.applyLiveConfigEdit(config, data) end
 
@@ -15116,8 +15343,9 @@ function ac.loadSetup(setupFilename) end
 function ac.resetSetupToDefault() end
 
 ---Exports current setup into a string.
+---@param includeMetadata boolean? @Default value: `true`.
 ---@return string
-function ac.stringifyCurrentSetup() end
+function ac.stringifyCurrentSetup(includeMetadata) end
 
 ---Returns information about the current vote, or `nil` if there is not any. Time is in seconds.
 ---@return {type: 'restart'|'skip'|'kick'|'unknown', voted: boolean, ownVote: boolean, votesTotal: integer, votesYes: integer, votesQuorum: integer, timeTotal: number, timeLeft: number, targetIndex: integer?}?
@@ -15188,7 +15416,7 @@ function ac.setMouseWheel(scroll) end
 ---@overload fun(script: string, callback: function)
 ---@param script string @File name (without extension) relative to script directory, or script code.
 ---@param data serializable|nil @Data to pass to the script (will be available as `worker.input` value). Default value: `nil`.
----@param callback fun(err: string, data: string|number|boolean)? @Default value: `nil`.
+---@param callback fun(err: string, data: string|number|boolean|table, ...)? @Default value: `nil`.
 function ac.startBackgroundWorker(script, data, callback) end
 
 ---Draw virtual mirror. If Real Mirrors module is active and has its virtual mirrors option enabled, mirror might be drawn in two pieces 
@@ -15822,6 +16050,14 @@ function ui.toolWindow(id, pos, size, noPadding, inputs, content) end
 ---@overload fun(content: fun())
 function ui.tooltip(padding, content) end
 
+---Set `columns` above 1 to start a column layout. Set it back to 1 to stop the layout. Since 0.3.0, there is a new override
+---taking flags. When layouting columns, use `ui.nextColumn()` to switch to the next column, or row if current column is the last one.
+---@param columns integer? @Default value: 1.
+---@param border boolean? @Default value: `true`.
+---@param id string|nil @Default value: `nil`.
+---@overload fun(columns: integer, flags: ui.ColumnsFlags, id: string?)
+function ui.columns(columns, border, id) end
+
 ---Draw a child window: perfect for clipping content, for scrolling lists, etc. Think of it more like
 ---a HTML div with overflow set to either scrolling or hidden, for example.
 ---@generic T
@@ -15977,10 +16213,11 @@ function ui.drawRaceFlag(color) end
 ---@param hint string? @Optional hint appearing if mouse is hovering the icon.
 function ui.drawCarIcon(iconID, color, hint) end
 
----Generates ID to use with `ui.icon()` to draw an icon from an atlas.
+---Generates ID to use with `ui.icon()` to draw an icon from an atlas. Might be faster to safe the result
+---of the call and reuse that, although it’s not that expensive if you only need to render a couple of icons.
 ---@param filename string @Texture filename.
----@param uv1 vec2 @UV coordinates of the upper left corner.
----@param uv2 vec2 @UV coordinates of the bottom right corner.
+---@param uv1 number|vec2 @UV coordinates of the upper left corner in 0…1 range, 0 for the top left corner.
+---@param uv2 number|vec2 @UV coordinates of the bottom right corner in 0…1 range, 0 for the top left corner.
 ---@return ui.Icons @Returns an ID to be used as an argument for `ui.icon()` function.
 function ui.atlasIconID(filename, uv1, uv2) end
 
@@ -16680,6 +16917,16 @@ function ac.collectKN5TextureNames(kn5Filename, filter) end
 ---@return string[]? @Returns `nil` if there is no such file, no access to it or the file is damaged.
 function ac.collectKN5MaterialProperties(kn5Filename, filter) end
 
+---Adjusts LOD sliders from Graphics Adjustments live (adjustments remain in-place for as long as the script is alive).
+---Pass `nil` to cancel a certain adjustment. Pass 1 for a regular LOD multiplier, or a value above 1 to increase details
+---at distance. Pass `math.huge` to disable LODs.
+---
+---For scripts with Gameplay API access, there is also `ac.setExtraTrackLODMultiplier()` which would be applied on top of
+---this multiplier.
+---@param trackMultiplier number?
+---@param carsMultiplier number?
+function ac.overrideLODMultiplier(trackMultiplier, carsMultiplier) end
+
 --[[ common/ac_display.lua ]]
 
 ---Display namespace with helper functions for creating dynamic textures.
@@ -16799,6 +17046,193 @@ function ac.Particles.Detractor(params) end
 ---@field forceMultiplier number @Force multiplier of the effect. Default value: 1.
 local _ac_Particles_Detractor = nil
 
+--[[ common/ac_extras_binaryinput.lua ]]
+
+---@param id string @Name of a section in “controls.ini”. If you are adding a new input, use something like “your.namespace/Nice Name” (without square brackets or colons) to ensure there won’t be collisions and it would integrate nicely.
+---@param defaults {keyboard: nil|{key: ui.KeyIndex?, ctrl: boolean?, shift: boolean?, alt: boolean?}, gamepad: nil|ac.GamepadButton, period: nil|number, hold: nil|boolean}? @Default settings if user has not configured input yet. Parameter `period` can be used to create buttons which would keep reporting as pressed (or call `:onDown()`) while held, can be configured in “controls.ini” as “REPEAT_PERIOD”; by default repeating is disable. Set parameter `hold` to a boolean value and control widget will get a “hold” switch. Buttons configured in “hold” mode return `true` on `:pressed()` when both pressed and released, as well as trigger `:onPressed()` when released too. Note: if `ac.ControlButton()` is called multiple times within a race session, only defaults from the first run will be taken into account (but if subsequent calls will have a “hold” value, button editing widget will still get a “hold” switch).
+---@return ac.ControlButton
+function ac.ControlButton(id, defaults) end
+
+--[[ common/ac_extras_binaryinput.lua ]]
+
+---A good way to listen to user pressing buttons configured in AC control settings. Handles everything for you automatically, and if you’re working
+---on a Lua app has a `:control()` method drawing a button showing current binding and allowing to change it in-game.
+---
+---Could be used for original AC button bindings, new bindings added by CSP, or even for creating custom bindings. For that, make sure to pass a
+---reliably unique ID when creating a control button, maybe even prefixed by your app name.
+---
+---Note: inputs for car scripts (both display and physics ones) would work only if the car is currently controlled by the user and not in a replay.
+---When possible, consider binding to car state instead. If your script runs at lower rate than graphics thread (skipping frames), either use `:down()`
+---or, better yet, sign to events, `:pressed()` call might return `false`.
+---@class ac.ControlButton
+local _ac_ControlButton = nil
+
+---Button is configured.
+---@return boolean
+function _ac_ControlButton:configured() end
+
+---Button is disabled.
+---@return boolean
+function _ac_ControlButton:disabled() end
+
+---Button is using hold mode.
+---@return boolean
+function _ac_ControlButton:holdMode() end
+
+---Button was just pressed. For buttons in hold mode returns `true` on both press and release.
+---@return boolean
+function _ac_ControlButton:pressed() end
+
+---Button was just released. For buttons in hold mode returns `true` on both press and release.
+---@return boolean
+function _ac_ControlButton:released() end
+
+---Button is held down. For buttons in hold mode works similar to `:pressed()`.
+---@return boolean
+function _ac_ControlButton:down() end
+
+---Sets a callback to be called when the button is pressed. For buttons in hold mode calls callback on both presses and releases. If button is held down
+---when this method is called, callback will be called the next frame.
+---@param callback fun()
+---@return ac.Disposable
+function _ac_ControlButton:onPressed(callback) end
+
+---Sets a callback to be called when the button is released. For buttons in hold mode calls callback shortly after both presses and releases.
+---@param callback fun()
+---@return ac.Disposable
+function _ac_ControlButton:onReleased(callback) end
+
+---Always active buttons work even if AC is paused or in, for example, pits menu.
+---@param value boolean? @Default value: `true`.
+---@return ac.ControlButton
+function _ac_ControlButton:setAlwaysActive(value) end
+
+---Disabled buttons ignore presses but remember their settings.
+---@param value boolean? @Default value: `true`.
+---@return ac.ControlButton
+function _ac_ControlButton:setDisabled(value) end
+
+---Use within UI function to draw an editing button. Not available for scripts without UI access.
+---To change color of pressed button indicator, override `PlotLinesHovered` color.
+---@param size vec2? @If not set, or width is 0, uses next item width and regular button height.
+---@param flags ui.ControlButtonControlFlags? @Default value: `ac.ControlButtonControlFlags.None`.
+---@param emptyLabel string? @Default value: `'Click to assign'`.
+---@return boolean
+function _ac_ControlButton:control(size, flags, emptyLabel) end
+
+---Returns text for displaying current binding, or `nil` if the button isn’t bound to anything.
+---@return string?
+function _ac_ControlButton:boundTo() end
+
+--[[ common/ac_extras_yebiscolorcorrection.lua ]]
+
+---Helper entity to set color corrections. Holds up to 200 corrections at once. Call `:reset()` if you want to start over, or just use `ac.setColorCorrection()` the way it’s meant to be used.
+---@class ac.ColorCorrection
+local _ac_ColorCorrection = nil
+
+---Reset alterations.
+---@return self
+function _ac_ColorCorrection:reset() end
+
+---Completely desaturate the image.
+---@return self
+function _ac_ColorCorrection:grayscale() end
+
+---Invert image colors.
+---@return self
+function _ac_ColorCorrection:negative() end
+
+---Change image saturation.
+---@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
+---@return self
+function _ac_ColorCorrection:saturation(v) end
+
+---Change image brightness (multiplies color by the parameter).
+---@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
+---@return self
+function _ac_ColorCorrection:brightness(v) end
+
+---Change image contrast.
+---@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
+---@return self
+function _ac_ColorCorrection:contrast(v) end
+
+---Change image bias (adds the parameter to color).
+---@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
+---@return self
+function _ac_ColorCorrection:bias(v) end
+
+---Add a fadeout transformation.
+---@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
+---@return self
+function _ac_ColorCorrection:fade(v, effectRatio) end
+
+---Turn image monotone.
+---@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
+---@param saturation number? @Saturation factor. Default value: 0.
+---@param brightness number? @Brightness factor. Default value: 1.
+---@return self
+function _ac_ColorCorrection:monotone(v, saturation, brightness) end
+
+---Alter hue, saturation and brightness.
+---@param hueDegrees number? @Degrees for hue shift. Default value: 0.
+---@param saturation number? @Saturation adjustment. Default value: 1.
+---@param brightness number? @Brightness adjustment. Default value: 1.
+---@param keepLuminance boolean? @Keep image luminance. Default value: `false`.
+---@return self
+function _ac_ColorCorrection:HSB(hueDegrees, saturation, brightness, keepLuminance) end
+
+---Alter image white balance.
+---@param temperatureK number? @Temperature in K. Default value: 6500.
+---@param luminance number? @Luminance. Default value: 1.
+---@return self
+function _ac_ColorCorrection:whiteBalance(temperatureK, luminance) end
+
+---Alter image temperature.
+---@param temperatureK number? @Temperature in K. Default value: 6500.
+---@param luminance number? @Luminance. Default value: 1.
+---@return self
+function _ac_ColorCorrection:temperature(temperatureK, luminance) end
+
+---Shift tone to sepia.
+---@param v number? @Sepia amount. Default value: 1.
+---@return self
+function _ac_ColorCorrection:sepia(v) end
+
+---Shift image hue.
+---@param hueDegrees number? @Degrees for hue shift. Default value: 0.
+---@param keepLuminance boolean? @Keep image luminance. Default value: `false`.
+---@return self
+function _ac_ColorCorrection:hue(hueDegrees, keepLuminance) end
+
+---YEBIS uses color matrices to quickly adjust HDR (input 0…∞ range) and LDR (output 0…1 range) color. Tweaks such as saturation, brightness and
+---contrast configured in YEBIS PP filter, or in video settings, all control those matrices.
+---
+---This function allows to easily tweak those matrices. Call it, optionally specifying target matrix and priority, and then use methods of returned
+---entity to easily tweak the color. Chain methods together to achieve the desired effect:
+---```
+---ac.setColorCorrection():brightness(3):saturation(2)
+---```
+---
+---Won’t have any effect if YEBIS is disabled, or if WeatherFX style script replaces YEBIS post-processing and doesn’t read
+---HDR matrix correctly. For compatibility reasons, if WeatherFX style script doesn’t read LDR color matrix, it will be applied
+---afterwards (in CSPs before 0.2.5, there wasn’t a method for WeatherFX style scripts to even access LDR color matrix, and
+---Assetto Corsa didn’t alter it at all).
+---
+---Each time the function is called with the same target and priority parameters, its state will reset. Feel free to call this function every frame
+---if you want for adjustments to transition smoothly, or just once if you just want to tweak the colors and forget about it.
+---
+---Note: you can keep a reference to returned value and tweak it instead, but then you’ll have to call `:reset()` manually. One tweak entity can
+---hold up to 40 adjustments, mostly to make sure it’s used correctly. Actual adjustments are very cheap.
+---
+---Note: some scripts, such as online scripts, can access old API for color corrections, such as `ac.ColorCorrectionBrightness()`.
+---Those things are obsolete now, please use this thing instead (with only exception being WeatherFX styles, those could still
+---old API since it could be a tiny bit faster overall).
+---@param targetLDR boolean? @Set to `true` to alter final LDR image instead of original HDR image. Note: original AC never tweaked LDR color matrix at all. Default value: `false`.
+---@param priority integer? @Specifies order of execution. Higher numbers mean corrections will apply first. Can be an integer in -100…100 range. Default value: `0`.
+---@return ac.ColorCorrection
+function ac.setColorCorrection(targetLDR, priority) end
+
 --[[ common/ac_physics.lua ]]
 
 ---State of car controls.
@@ -16907,90 +17341,6 @@ function ui.onDriverTooltip(overrideOriginal, callback) end
 ---@param tweaks {mainSize: number?, mirrorSize: number?, distanceMultiplier: number?, tagSize: vec2?}? @Optional setting tweaks overriding user settings (use only if necessary). Tag size is in pixels, by default it’s 512×64.
 ---@return ac.Disposable
 function ui.onDriverNameTag(overrideOriginal, bgColor, callback, tweaks) end
-
---[[ common/ac_gameplay_apps.lua ]]
-
----Collect information about available windows.
----@return {name: string, title: string, position: vec2, size: vec2, visible: boolean, pinned: boolean, collapsed: boolean, layer: integer, layerDuplicate: boolean}[]
-function ac.getAppWindows() end
-
----Looks for a certain window of either an original AC app, a Python or a Lua app. Use `ac.getAppWindows()` to get a list of available apps.
----If found, this wrapper can be used to move or hide an app, or switch it to a different render layer.
----@param windowName string
----@return ac.AppWindowAccessor?
-function ac.accessAppWindow(windowName) end
-
----Wrapper for interacting with any AC app. Might not work as intended with some apps not expecting such intrusion though.
----@class ac.AppWindowAccessor
-local _ac_AppWindowAccessor = nil
-
----Window reference is valid (some references might become invalid if the window is deleted).
----@return boolean
-function _ac_AppWindowAccessor:valid() end
-
----Checks if window is visible.
----@return boolean
-function _ac_AppWindowAccessor:visible() end
-
----Changes visible state of the window.
----@param value boolean? @Default value: `true`.
----@return ac.AppWindowAccessor
-function _ac_AppWindowAccessor:setVisible(value) end
-
----Checks if window is pinned.
----@return boolean
-function _ac_AppWindowAccessor:pinned() end
-
----Changes pinned state of the window. Works with IMGUI apps with CSP v0.2.3-preview62 or newer.
----@param value boolean? @Default value: `true`.
----@return ac.AppWindowAccessor
-function _ac_AppWindowAccessor:setPinned(value) end
-
----Returns window position.
----@return vec2
-function _ac_AppWindowAccessor:position() end
-
----Returns window size (Python apps might draw things to extends exceeding this size).
----@return vec2
-function _ac_AppWindowAccessor:size() end
-
----Moves window to a different position. Works with IMGUI apps with CSP v0.2.3-preview62 or newer.
----@param value vec2
----@return ac.AppWindowAccessor
-function _ac_AppWindowAccessor:move(value) end
-
----Resizes a window. Works with IMGUI apps only.
----@param value vec2
----@return ac.AppWindowAccessor
-function _ac_AppWindowAccessor:resize(value) end
-
----Returns redirect layer, or 0 if redirect is disabled. Redirected apps can be accessed via `dynamic::hud::redirected::N` textures.
----@return integer @0 if redirect is disabled.
-function _ac_AppWindowAccessor:redirectLayer() end
-
----Moves window to a different render layer, or back to existance with `0` passed as `layer`. Windows in separate layers don’t get mouse
----commands (but this wrapper can be used to send fake commands instead).
----@param layer integer? @Default value: `0`.
----@param duplicate boolean? @Set to `true` to clone a window to a different layer instead of moving it there. Be careful: this might break some Python apps. Default value: `false`.
----@return ac.AppWindowAccessor
-function _ac_AppWindowAccessor:setRedirectLayer(layer, duplicate) end
-
----Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
----@param position vec2
----@return ac.AppWindowAccessor
-function _ac_AppWindowAccessor:onMouseMove(position) end
-
----Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
----@param position vec2
----@param button ui.MouseButton? @Default value: `ui.MouseButton.Left`.
----@return ac.AppWindowAccessor
-function _ac_AppWindowAccessor:onMouseDown(position, button) end
-
----Sends a fake mouse event to a window. Does not work with IMGUI apps or from online scripts.
----@param position vec2
----@param button ui.MouseButton? @Default value: `ui.MouseButton.Left`.
----@return ac.AppWindowAccessor
-function _ac_AppWindowAccessor:onMouseUp(position, button) end
 
 --[[ common/ac_game.lua ]]
 
@@ -17286,190 +17636,3 @@ local _ac_CarExtraSwitchParams = nil
 ---@param index integer @0-based switch index.
 ---@return ac.CarExtraSwitchParams? @Returns `nil` if there is no switch with such index.
 function ac.accessExtraSwitchParams(index) end
-
---[[ common/ac_extras_binaryinput.lua ]]
-
----@param id string @Name of a section in “controls.ini”. If you are adding a new input, use something like “your.namespace/Nice Name” (without square brackets or colons) to ensure there won’t be collisions and it would integrate nicely.
----@param defaults {keyboard: nil|{key: ui.KeyIndex?, ctrl: boolean?, shift: boolean?, alt: boolean?}, gamepad: nil|ac.GamepadButton, period: nil|number, hold: nil|boolean}? @Default settings if user has not configured input yet. Parameter `period` can be used to create buttons which would keep reporting as pressed (or call `:onDown()`) while held, can be configured in “controls.ini” as “REPEAT_PERIOD”; by default repeating is disable. Set parameter `hold` to a boolean value and control widget will get a “hold” switch. Buttons configured in “hold” mode return `true` on `:pressed()` when both pressed and released, as well as trigger `:onPressed()` when released too. Note: if `ac.ControlButton()` is called multiple times within a race session, only defaults from the first run will be taken into account (but if subsequent calls will have a “hold” value, button editing widget will still get a “hold” switch).
----@return ac.ControlButton
-function ac.ControlButton(id, defaults) end
-
---[[ common/ac_extras_binaryinput.lua ]]
-
----A good way to listen to user pressing buttons configured in AC control settings. Handles everything for you automatically, and if you’re working
----on a Lua app has a `:control()` method drawing a button showing current binding and allowing to change it in-game.
----
----Could be used for original AC button bindings, new bindings added by CSP, or even for creating custom bindings. For that, make sure to pass a
----reliably unique ID when creating a control button, maybe even prefixed by your app name.
----
----Note: inputs for car scripts (both display and physics ones) would work only if the car is currently controlled by the user and not in a replay.
----When possible, consider binding to car state instead. If your script runs at lower rate than graphics thread (skipping frames), either use `:down()`
----or, better yet, sign to events, `:pressed()` call might return `false`.
----@class ac.ControlButton
-local _ac_ControlButton = nil
-
----Button is configured.
----@return boolean
-function _ac_ControlButton:configured() end
-
----Button is disabled.
----@return boolean
-function _ac_ControlButton:disabled() end
-
----Button is using hold mode.
----@return boolean
-function _ac_ControlButton:holdMode() end
-
----Button was just pressed. For buttons in hold mode returns `true` on both press and release.
----@return boolean
-function _ac_ControlButton:pressed() end
-
----Button was just released. For buttons in hold mode returns `true` on both press and release.
----@return boolean
-function _ac_ControlButton:released() end
-
----Button is held down. For buttons in hold mode works similar to `:pressed()`.
----@return boolean
-function _ac_ControlButton:down() end
-
----Sets a callback to be called when the button is pressed. For buttons in hold mode calls callback on both presses and releases. If button is held down
----when this method is called, callback will be called the next frame.
----@param callback fun()
----@return ac.Disposable
-function _ac_ControlButton:onPressed(callback) end
-
----Sets a callback to be called when the button is released. For buttons in hold mode calls callback shortly after both presses and releases.
----@param callback fun()
----@return ac.Disposable
-function _ac_ControlButton:onReleased(callback) end
-
----Always active buttons work even if AC is paused or in, for example, pits menu.
----@param value boolean? @Default value: `true`.
----@return ac.ControlButton
-function _ac_ControlButton:setAlwaysActive(value) end
-
----Disabled buttons ignore presses but remember their settings.
----@param value boolean? @Default value: `true`.
----@return ac.ControlButton
-function _ac_ControlButton:setDisabled(value) end
-
----Use within UI function to draw an editing button. Not available for scripts without UI access.
----To change color of pressed button indicator, override `PlotLinesHovered` color.
----@param size vec2? @If not set, or width is 0, uses next item width and regular button height.
----@param flags ui.ControlButtonControlFlags? @Default value: `ac.ControlButtonControlFlags.None`.
----@param emptyLabel string? @Default value: `'Click to assign'`.
----@return boolean
-function _ac_ControlButton:control(size, flags, emptyLabel) end
-
----Returns text for displaying current binding, or `nil` if the button isn’t bound to anything.
----@return string?
-function _ac_ControlButton:boundTo() end
-
---[[ common/ac_extras_yebiscolorcorrection.lua ]]
-
----Helper entity to set color corrections. Holds up to 200 corrections at once. Call `:reset()` if you want to start over, or just use `ac.setColorCorrection()` the way it’s meant to be used.
----@class ac.ColorCorrection
-local _ac_ColorCorrection = nil
-
----Reset alterations.
----@return self
-function _ac_ColorCorrection:reset() end
-
----Completely desaturate the image.
----@return self
-function _ac_ColorCorrection:grayscale() end
-
----Invert image colors.
----@return self
-function _ac_ColorCorrection:negative() end
-
----Change image saturation.
----@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
----@return self
-function _ac_ColorCorrection:saturation(v) end
-
----Change image brightness (multiplies color by the parameter).
----@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
----@return self
-function _ac_ColorCorrection:brightness(v) end
-
----Change image contrast.
----@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 1.
----@return self
-function _ac_ColorCorrection:contrast(v) end
-
----Change image bias (adds the parameter to color).
----@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
----@return self
-function _ac_ColorCorrection:bias(v) end
-
----Add a fadeout transformation.
----@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
----@return self
-function _ac_ColorCorrection:fade(v, effectRatio) end
-
----Turn image monotone.
----@param v number|rgb|rgbm? @Fourth component of rgbm acts as an intensity adjustment. Default value: 0.
----@param saturation number? @Saturation factor. Default value: 0.
----@param brightness number? @Brightness factor. Default value: 1.
----@return self
-function _ac_ColorCorrection:monotone(v, saturation, brightness) end
-
----Alter hue, saturation and brightness.
----@param hueDegrees number? @Degrees for hue shift. Default value: 0.
----@param saturation number? @Saturation adjustment. Default value: 1.
----@param brightness number? @Brightness adjustment. Default value: 1.
----@param keepLuminance boolean? @Keep image luminance. Default value: `false`.
----@return self
-function _ac_ColorCorrection:HSB(hueDegrees, saturation, brightness, keepLuminance) end
-
----Alter image white balance.
----@param temperatureK number? @Temperature in K. Default value: 6500.
----@param luminance number? @Luminance. Default value: 1.
----@return self
-function _ac_ColorCorrection:whiteBalance(temperatureK, luminance) end
-
----Alter image temperature.
----@param temperatureK number? @Temperature in K. Default value: 6500.
----@param luminance number? @Luminance. Default value: 1.
----@return self
-function _ac_ColorCorrection:temperature(temperatureK, luminance) end
-
----Shift tone to sepia.
----@param v number? @Sepia amount. Default value: 1.
----@return self
-function _ac_ColorCorrection:sepia(v) end
-
----Shift image hue.
----@param hueDegrees number? @Degrees for hue shift. Default value: 0.
----@param keepLuminance boolean? @Keep image luminance. Default value: `false`.
----@return self
-function _ac_ColorCorrection:hue(hueDegrees, keepLuminance) end
-
----YEBIS uses color matrices to quickly adjust HDR (input 0…∞ range) and LDR (output 0…1 range) color. Tweaks such as saturation, brightness and
----contrast configured in YEBIS PP filter, or in video settings, all control those matrices.
----
----This function allows to easily tweak those matrices. Call it, optionally specifying target matrix and priority, and then use methods of returned
----entity to easily tweak the color. Chain methods together to achieve the desired effect:
----```
----ac.setColorCorrection():brightness(3):saturation(2)
----```
----
----Won’t have any effect if YEBIS is disabled, or if WeatherFX style script replaces YEBIS post-processing and doesn’t read
----HDR matrix correctly. For compatibility reasons, if WeatherFX style script doesn’t read LDR color matrix, it will be applied
----afterwards (in CSPs before 0.2.5, there wasn’t a method for WeatherFX style scripts to even access LDR color matrix, and
----Assetto Corsa didn’t alter it at all).
----
----Each time the function is called with the same target and priority parameters, its state will reset. Feel free to call this function every frame
----if you want for adjustments to transition smoothly, or just once if you just want to tweak the colors and forget about it.
----
----Note: you can keep a reference to returned value and tweak it instead, but then you’ll have to call `:reset()` manually. One tweak entity can
----hold up to 40 adjustments, mostly to make sure it’s used correctly. Actual adjustments are very cheap.
----
----Note: some scripts, such as online scripts, can access old API for color corrections, such as `ac.ColorCorrectionBrightness()`.
----Those things are obsolete now, please use this thing instead (with only exception being WeatherFX styles, those could still
----old API since it could be a tiny bit faster overall).
----@param targetLDR boolean? @Set to `true` to alter final LDR image instead of original HDR image. Note: original AC never tweaked LDR color matrix at all. Default value: `false`.
----@param priority integer? @Specifies order of execution. Higher numbers mean corrections will apply first. Can be an integer in -100…100 range. Default value: `0`.
----@return ac.ColorCorrection
-function ac.setColorCorrection(targetLDR, priority) end
