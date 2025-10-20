@@ -72,6 +72,13 @@ RaceTrackManager.getOvertakingSide = function()
     return overtakingSide
 end
 
+---Returns the side of the track based on the lateral offset
+---@param lateralOffset number
+---@return RaceTrackManager.TrackSide
+RaceTrackManager.getSideFromLateralOffset = function(lateralOffset)
+    return lateralOffset < 0 and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
+end
+
 ---Creates a new yellow flag zone ending at the given spline position and extending backwards by the configured distance
 ---@param yellowZoneEndSplinePosition number
 ---@return number yellowFlagZoneIndex
