@@ -65,7 +65,6 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         -- limit the yielding car throttle while driving on the yielding lane
         CarOperations.setAIThrottleLimit(carIndex, 0.5)
 
-        local car = sortedCarsList[sortedCarsListIndex]
         local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
         topSpeed = math.max(topSpeed, 60) -- don't let the top speed drop too much
         CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
