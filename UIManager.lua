@@ -485,6 +485,10 @@ function UIManager.renderUIOptionsControls()
     if ui.checkbox('Log fast AI state changes', storage.debugLogFastStateChanges) then storage.debugLogFastStateChanges = not storage.debugLogFastStateChanges end
     if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car changes from one state to another very quickly') end
 
+    if ui.button('Simulate accident', ui.ButtonFlags.None) then
+        AccidentManager.simulateAccident()
+    end
+
 --[===[
     ui.separator()
 

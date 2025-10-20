@@ -82,17 +82,17 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         -- return
     -- end
 
-    local targetOffset = 0
 
-    local carToNavigateAround = closestAccidentClosestCar
     -- CarManager.cars_navigatingAroundCarIndex[carIndex] = carToNavigateAround.index
 
     -- local accidentWorldPosition = AccidentManager.accidents_worldPosition[accidentIndex]
     -- local distanceToAccident = car.position:distance(accidentWorldPosition)
 
-    local carToNavigateAroundLateralOffset = CarManager.getActualTrackLateralOffset(carToNavigateAround.position)
 
     --[=====[
+    local targetOffset = 0
+    local carToNavigateAround = closestAccidentClosestCar
+    local carToNavigateAroundLateralOffset = CarManager.getActualTrackLateralOffset(carToNavigateAround.position)
     -- local signOfLateralOffset = carToNavigateAroundLateralOffset < 0 and -1 or 1
     -- now we need to calculate our own offset to use to go around the car to navigating around
     if (math.abs(carToNavigateAroundLateralOffset) < 0.1) then
@@ -105,9 +105,32 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     end
     --]=====]
 
+
+
+    --[=====[
+    local carToNavigateAround = closestAccidentClosestCar
+    local carToNavigateAroundLateralOffset = CarManager.getActualTrackLateralOffset(carToNavigateAround.position)
     local carToNavigateAroundSide = RaceTrackManager.getSideFromLateralOffset(carToNavigateAroundLateralOffset)
     local carToNavigateAroundOppositeSide = RaceTrackManager.getOppositeSide(carToNavigateAroundSide)
-    targetOffset = carToNavigateAroundOppositeSide == RaceTrackManager.TrackSide.LEFT and -2 or 2
+    local targetOffset = carToNavigateAroundOppositeSide == RaceTrackManager.TrackSide.LEFT and -2 or 2
+    local sideToDriveTo = carToNavigateAroundOppositeSide
+    --]=====]
+
+    local carsInAccident = {AccidentManager.accidents_carIndex[accidentIndex], AccidentManager.accidents_collidedWithCarIndex[accidentIndex]}
+    local targetOffset = CollisionAvoidanceManager.computeDesiredLateralOffset(carIndex, carsInAccident, dt
+    -- ,{
+            -- horizon_meters = 30,
+            -- steps = 5,
+            -- d_samples = {targetOffset - 1.5, targetOffset, targetOffset + 1.5},
+            -- track_half = 10,
+            -- edge_margin = 0.5,
+            -- max_d_rate = 10,
+            -- bias_from_obs = 0.6,
+    -- }
+    )
+    local sideToDriveTo = RaceTrackManager.getSideFromLateralOffset(targetOffset)
+
+
 
     ----------------------
     ----------------------
@@ -120,7 +143,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local sideToDriveTo = targetOffset < 0 and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
     CarOperations.driveSafelyToSide(carIndex, dt, car, sideToDriveTo, math.abs(targetOffset), 5, true)
     --]=====]
-    CarOperations.driveSafelyToSide(carIndex, dt, car, carToNavigateAroundOppositeSide, math.abs(targetOffset), 5, true)
+    CarOperations.driveSafelyToSide(carIndex, dt, car, sideToDriveTo, math.abs(targetOffset), 5, true)
+
+    -- Prevent the car from retiring while navigating around an accident because otherwise when the ai cars are moving very slow, the game tends to teleports them back to the pits
+    CarOperations.preventAIFromRetiring(carIndex)
 
     CarOperations.toggleCarCollisions(carIndex, false)
 end

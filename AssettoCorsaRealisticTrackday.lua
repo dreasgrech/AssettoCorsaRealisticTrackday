@@ -40,6 +40,7 @@ RaceFlagManager = require("RaceFlagManager")
 UIManager = require("UIManager")
 -- CarSpeedLimiter = require("CarSpeedLimiter")
 CustomAIFloodManager = require("CustomAIFloodManager")
+CollisionAvoidanceManager = require("CollisionAvoidanceManager")
 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
@@ -68,12 +69,21 @@ OnCarEventManager.OnCarEventExecutions[OnCarEventManager.OnCarEventType.Collisio
   local storage = StorageManager.getStorage()
   if storage.handleAccidents then
       -- Register an accident for the car collision
-      local accidentIndex = AccidentManager.registerCollision(carIndex)
+      local car = ac.getCar(carIndex)
+      if not car then
+          Logger.error(string.format('OnCarEventManager: OnCarEventType.Collision called for invalid car index %d', carIndex))
+          return
+      end
+
+      --[====[
+      local accidentIndex = AccidentManager.registerCollision(carIndex, car.collisionPosition, car.collidedWith)
       if not accidentIndex then
           return
       end
 
       CarStateMachine.informAboutAccident(accidentIndex)
+      --]====]
+      AccidentManager.registerCollision(carIndex, car.collisionPosition, car.collidedWith)
   end
 end
 

@@ -8,8 +8,8 @@ local yellowZones_resolved = {}
 
 
 ---@alias RaceTrackManager.TrackSide
----| `RaceTrackManager.TrackSide.LEFT` @Value: 1.
----| `RaceTrackManager.TrackSide.RIGHT` @Value: 2.
+---| "RaceTrackManager.TrackSide.LEFT" @Value: 1.
+---| "RaceTrackManager.TrackSide.RIGHT" @Value: 2.
 RaceTrackManager.TrackSide = {
     LEFT = 1,
     RIGHT = 2,

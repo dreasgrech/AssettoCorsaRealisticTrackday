@@ -76,8 +76,11 @@ end
 
 ---Registers a collision accident for the given culprit car index
 ---@param culpritCarIndex integer
+---@param collisionLocalPosition vec3 @position of the collision in local car space
+---@param collidedWith integer @0 = track, 1+ = car collider index
 ---@return integer? accidentIndex
-AccidentManager.registerCollision = function(culpritCarIndex)
+-- AccidentManager.registerCollision = function(culpritCarIndex)
+AccidentManager.registerCollision = function(culpritCarIndex, collisionLocalPosition, collidedWith)
 
     -- TODO: need to handle what happens when a player car is the culprit car
     -- TODO: need to handle what happens when a player car is the culprit car
@@ -100,9 +103,18 @@ AccidentManager.registerCollision = function(culpritCarIndex)
         return
     end
 
+    -- Ignore the accident if the culprit car is already navigating around an accident
+    -- Andreas: The physics.disableCarCollisions doesn't seem to always work for cars in AI flood as of the current csp so 
+    -- Andreas: here I'm ignoring new collisions for cars that are already navigating around an accident to prevent a pile up
+    local culpritCarState = CarStateMachine.getCurrentState(culpritCarIndex)
+    if culpritCarState == CarStateMachine.CarStateType.NAVIGATING_AROUND_ACCIDENT then
+        Logger.log(string.format("#%d is already navigating around an accident, ignoring new collision", culpritCarIndex))
+        return
+    end
+
     -- car.collisionDepth
-    local collisionLocalPosition = culpritCar.collisionPosition
-    local collidedWith = culpritCar.collidedWith
+    -- local collisionLocalPosition = culpritCar.collisionPosition
+    -- local collidedWith = culpritCar.collidedWith
     local collidedWithTrack = collidedWith == 0
 
     -- CURRENTLY IGNORING TRACK COLLISIONS WHILE WORKING ON CAR-TO-CAR COLLISIONS
@@ -170,6 +182,9 @@ AccidentManager.registerCollision = function(culpritCarIndex)
     -----------------------------
 
     Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", culpritCarIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), accidentIndex, #AccidentManager.accidents_carIndex))
+
+    -- Inform the Car State Machine about the new accident so that it puts the cars in their new states
+    CarStateMachine.informAboutAccident(accidentIndex)
 
     return accidentIndex
 end
@@ -280,6 +295,26 @@ AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident
     end
 
     return currentClosestAccidentIndex, currentClosestAccidentClosestCarIndex
+end
+
+function AccidentManager.simulateAccident()
+
+    -- CameraManager.getFocusedCarIndex()
+
+    local currentSortedCarsList = CarManager.currentSortedCarsList
+    local culpritCarIndex = currentSortedCarsList[2].index
+    local victimCarIndex = currentSortedCarsList[3].index
+
+    local culpritCar = ac.getCar(culpritCarIndex)
+    if not culpritCar then
+        Logger.error("AccidentManager.simulateAccident: culprit car not found")
+        return
+    end
+
+    local collidedWith = victimCarIndex + 1 -- +1 because 0 is track
+    local collisionLocalPosition = culpritCar.position
+
+    AccidentManager.registerCollision(culpritCarIndex, collisionLocalPosition, collidedWith)
 end
 
 return AccidentManager
