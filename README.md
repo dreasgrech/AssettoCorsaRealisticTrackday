@@ -86,7 +86,8 @@ There are also a number of settings that help with understanding what the app is
 
 This table shows you a lot of information about each other including the current state the car is in, if it's yielding or overtaking and who's the other car involved, and also reasons why they can't yield or overtake at the time beind.  It's invaluable for understanding the behaviour of the cars.
 
-**Keep the car list table and all other Debugging options disabled during regular usage of the app so that you don't incur the performance hit they entail.**
+> [!CAUTION]
+> Keep the car list table and all other Debugging options disabled during regular usage of the app so that you don't incur the performance hit they entail.
 
 ## How It Works
 ### Car States
