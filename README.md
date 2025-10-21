@@ -7,6 +7,12 @@
 Using this app, AI cars will yield to faster cars by driving to the side and only yielding to one pre-defined side (left or right) as is the way during trackdays, particularly on the Nordschliefe.  AI cars will also overtake other cars on the other side and return back to the racing line once it's safe to do so.
 
 This provides the user a smooth single-player driving experience with AI cars where the vehicles respect each other while driving and act like real drivers do.
+<br><br>
+> [!NOTE]
+> If you enjoy the app, it would be immensely appreciated if you give it a rating at the Overtake page: https://www.overtake.gg/downloads/assetto-corsa-realistic-trackday.80212/
+<p align="center">
+    <img width="500" alt="image" src="https://github.com/user-attachments/assets/de1613b2-3801-41e8-afdc-48cf7bb2176c" />
+</p>
 
 <br><br>
 My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm410?si=A4LDo-DjJOClf2i4&t=312" target="_blank">Nordschleife Touristenfahrten</a> experience where by law you are required to overtake only on the left and thus yielding cars always need yield to the right.
