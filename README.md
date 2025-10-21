@@ -11,7 +11,7 @@ This provides the user a smooth single-player driving experience with AI cars wh
 > [!NOTE]
 > If you enjoy the app, it would be immensely appreciated if you could give it a rating at the Overtake.gg page: https://www.overtake.gg/downloads/assetto-corsa-realistic-trackday.80212/
 <p align="center">
-    <img width="500" alt="image" src="https://github.com/user-attachments/assets/de1613b2-3801-41e8-afdc-48cf7bb2176c" />
+    <a href="https://www.overtake.gg/downloads/assetto-corsa-realistic-trackday.80212/"><img width="500" alt="image" src="https://github.com/user-attachments/assets/de1613b2-3801-41e8-afdc-48cf7bb2176c" /></a>
 </p>
 
 <br><br>
