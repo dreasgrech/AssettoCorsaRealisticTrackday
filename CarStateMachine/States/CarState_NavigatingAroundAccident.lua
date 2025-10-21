@@ -24,8 +24,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         return
     end
 
-    CarOperations.setAICaution(carIndex, 1)
     --CarOperations.setAICaution(carIndex, 6)
+    --CarOperations.setAICaution(carIndex, 1)
+    CarOperations.setAICaution(carIndex, 0)
+
     CarOperations.setAITopSpeed(carIndex, 10)
     -- CarOperations.limitTopSpeed(carIndex, 10)
     -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.3)
@@ -116,8 +118,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local sideToDriveTo = carToNavigateAroundOppositeSide
     --]=====]
 
+    ----------------------------------
     local carsInAccident = {AccidentManager.accidents_carIndex[accidentIndex], AccidentManager.accidents_collidedWithCarIndex[accidentIndex]}
-    local targetOffset = CollisionAvoidanceManager.computeDesiredLateralOffset(carIndex, carsInAccident, dt
+    local targetOffset, influencingCarIndex = CollisionAvoidanceManager.computeDesiredLateralOffset(carIndex, carsInAccident, dt
     -- ,{
             -- horizon_meters = 30,
             -- steps = 5,
@@ -129,6 +132,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- }
     )
     local sideToDriveTo = RaceTrackManager.getSideFromLateralOffset(targetOffset)
+    -- TODO: THE CLOSESTACCIDENTINDEX HERE IS NOT CORRECT BECAUSE IT MAY BE DIFFERENT THAT FROM FROM COMPUTEDESIREDLATERALOFFSET GIVES US
+    AccidentManager.setCarNavigatingAroundAccident(carIndex, closestAccidentIndex, influencingCarIndex)
+    ----------------------------------
 
 
 
@@ -143,7 +149,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local sideToDriveTo = targetOffset < 0 and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
     CarOperations.driveSafelyToSide(carIndex, dt, car, sideToDriveTo, math.abs(targetOffset), 5, true)
     --]=====]
-    CarOperations.driveSafelyToSide(carIndex, dt, car, sideToDriveTo, math.abs(targetOffset), 5, true)
+    CarOperations.driveSafelyToSide(carIndex, dt, car, sideToDriveTo, math.abs(targetOffset), 5, true, false)
 
     -- Prevent the car from retiring while navigating around an accident because otherwise when the ai cars are moving very slow, the game tends to teleports them back to the pits
     CarOperations.preventAIFromRetiring(carIndex)

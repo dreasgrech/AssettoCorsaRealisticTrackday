@@ -363,34 +363,37 @@ end
 --]======]
 
 --- Drives the car to the specified side while making sure there are no cars blocking the side we're trying to drive to.
----@param carIndex number
----@param dt number
----@param car ac.StateCar
----@param side RaceTrackManager.TrackSide
----@param driveToSideMaxOffset number
----@param rampSpeed_mps number
----@param overrideAiAwareness boolean
+---@param carIndex number @0-based car index.
+---@param dt number @Delta time in seconds.
+---@param car ac.StateCar @The ac.StateCar table of the car.
+---@param side RaceTrackManager.TrackSide @The side to drive to.
+---@param driveToSideMaxOffset number @The maximum lateral offset to drive to on the specified side.
+---@param rampSpeed_mps number @The speed at which to ramp up the lateral offset.
+---@param overrideAiAwareness boolean @Whether to override AI awareness.
+---@param sideCheck boolean @Whether to check if the side is safe to drive to.
 ---@return boolean
-function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMaxOffset,rampSpeed_mps, overrideAiAwareness)
+function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMaxOffset,rampSpeed_mps, overrideAiAwareness, sideCheck)
     -- make sure there isn't any car on the side we're trying to drive to so we don't crash into it
-    local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
-    local isCarOffTrack = CarManager.isCarOffTrack(car, side)
-    local sideNotSafe = not isSideSafeToDrive
-    -- if not isSideSafeToDrive then
-    if sideNotSafe or isCarOffTrack then
-        -- return false since we can't drive to the side safely
-        -- return false
-        -- drive to the other side to avoid colliding with the car on this side
-        side = RaceTrackManager.getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
-        driveToSideMaxOffset = driveToSideMaxOffset * 0.5 -- drive to the other side but not fully
-        rampSpeed_mps = rampSpeed_mps-- * 0.5 -- drive more slowly to the other side
+    if sideCheck then
+      local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
+      local isCarOffTrack = CarManager.isCarOffTrack(car, side)
+      local sideNotSafe = not isSideSafeToDrive
+      -- if not isSideSafeToDrive then
+      if sideNotSafe or isCarOffTrack then
+          -- return false since we can't drive to the side safely
+          -- return false
+          -- drive to the other side to avoid colliding with the car on this side
+          side = RaceTrackManager.getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
+          driveToSideMaxOffset = driveToSideMaxOffset * 0.5 -- drive to the other side but not fully
+          rampSpeed_mps = rampSpeed_mps-- * 0.5 -- drive more slowly to the other side
 
-        -- do another side check on the other side since we're driving to the other side now
-        local isOtherSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
-        if not isOtherSideSafeToDrive then
-          -- both sides are blocked, so we can't drive to either side safely
-          return false
-        end
+          -- do another side check on the other side since we're driving to the other side now
+          local isOtherSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
+          if not isOtherSideSafeToDrive then
+            -- both sides are blocked, so we can't drive to either side safely
+            return false
+          end
+      end
     end
 
       -- todo: should these operations be here?
@@ -444,7 +447,7 @@ function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
     local rampSpeed_mps = storage.overtakeRampSpeed_mps
     local overrideAiAwareness = storage.overrideAiAwareness
 
-    return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness)
+    return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
 end
 
 --- Drives the car to the yielding lane while making sure there are no cars blocking the side.
@@ -459,7 +462,7 @@ function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
       local rampSpeed_mps = storage.rampSpeed_mps
       local overrideAiAwareness = storage.overrideAiAwareness
 
-      return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness)
+      return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
 end
 
 local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level

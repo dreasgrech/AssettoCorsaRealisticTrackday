@@ -7,6 +7,7 @@ local __perCarState = {}   -- [carIndex] = { last_d = number }
 local __sNodes = {}        -- horizon s-samples
 local __dp     = {}        -- dp[k][i] costs
 local __parent = {}        -- backpointers
+local __domObs = {}        -- __domObs[k] is an array: for each i, index of dominant obstacle (in obs arrays) at that (k,i)
 
 ---@param carIndex integer
 ---@return table state
@@ -20,7 +21,7 @@ local function __getState(carIndex)
 end
 
 local function __clamp(x, a, b)
-  if x < a then return a elseif x > b then return b else return x end
+  if x < a then return a elseif x > b then return x and b or b end -- tiny JIT trick to keep branch predictable
 end
 
 -- Wrap a delta in [ -0.5, +0.5 ] for normalized progress differences
@@ -29,16 +30,17 @@ local function __wrap01Signed(ds)
 end
 
 --------------------------------------------------------------------------------
---- Compute the **desired lateral offset** (meters) for a given AI car using a
---- short-horizon **Frenet corridor** lattice. The track centerline defines
---- progress `s` (0..1), and we choose among a few lateral offsets `d` at each
---- lookahead slice, minimizing a cost = clearance + smoothness + track-bounds
---- (plus a light centerline bias). Only the **first step’s** `d` is used each
---- frame (receding horizon), then rate-limited for stability.
+--- Compute the **desired lateral offset** for a given AI car using a short-horizon
+--- **Frenet corridor** lattice (road-aligned `s`, lateral offset `d` in meters).
+--- We discretize a corridor ahead along the centerline (K slices), sample a few
+--- lateral offsets per slice, score them for obstacle clearance, smoothness, and
+--- track bounds, then pick the best sequence via a tiny DP. We apply only the
+--- **first step** (receding horizon), and rate-limit `d` for stability. Finally,
+--- we **normalize** to [-1, 1] using `trackHalf` so it can be fed to
+--- `physics.setAISplineOffset`.
 ---
---- The planner is **per-car**: state (last commanded `d`) is saved by car index.
---- It’s designed for **multiple cars per frame**: flat numeric arrays, table
---- reuse, and tiny fixed loops keep GC + CPU low.
+--- The function is **per-car**: it saves the last commanded `d` (in meters) by ego
+--- car index. Buffers are reused to keep GC low.
 ---
 --- @param egoCarIndex        integer     AI car index being controlled.
 --- @param stoppedCarIndices  integer[]   Indices of cars considered “stopped” hazards.
@@ -46,23 +48,24 @@ end
 --- @param cfg                table|nil   Optional tuning:
 ---        cfg.horizon_meters (number)  default 45.0
 ---        cfg.steps          (integer) default 6
----        cfg.d_samples      (number[]) default {-3,-1.5,0,1.5,3}
+---        cfg.d_samples      (number[]) default {-3,-1.5,0,1.5,3}   -- meters
 ---        cfg.obstacle_sigma (number)  default 1.2
 ---        cfg.weight_clear   (number)  default 1.5
 ---        cfg.weight_smooth  (number)  default 2.0
 ---        cfg.weight_track   (number)  default 1.0
 ---        cfg.center_bias    (number)  default 0.2
----        cfg.track_half     (number)  default 7.0    -- fallback half-width (m)
+---        cfg.track_half     (number)  default 7.0    -- half-width in meters
 ---        cfg.edge_margin    (number)  default 0.7
 ---        cfg.max_d_rate     (number)  default 6.0    -- m/s slew limit
 ---        cfg.bias_from_obs  (number)  default 0.4    -- pushes away from obstacle side
 ---
---- @return number desired_lateral_offset  Signed meters from centerline (+left, −right)
+--- @return number offset_normalized  Lateral offset in [-1, 1] (−1 left, +1 right) for physics.setAISplineOffset
+--- @return integer|nil influencing_car_index  The stopped car index most influencing the chosen avoidance at first slice (or nil)
 --------------------------------------------------------------------------------
 function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stoppedCarIndices, dtSeconds, cfg)
   -- Fast path: ego car
   local ego = ac.getCar(egoCarIndex)
-  if not ego then return 0.0 end
+  if not ego then return 0.0, nil end
 
   -- Resolve config (locals for JIT friendliness)
   cfg = cfg or {}
@@ -89,14 +92,15 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
     local s = s0 + (horizonMeters * (k / steps)) * invL
     if s >= 1.0 then s = s - 1.0 end
     __sNodes[k] = s
+    local dom = __domObs[k]; if not dom then dom = {}; __domObs[k] = dom else for i = 1, #dSamples do dom[i] = 0 end end
   end
 
-  -- Per-car state (previous commanded d)
+  -- Per-car state (previous commanded d, meters)
   local state  = __getState(egoCarIndex)
   local last_d = state.last_d
 
-  -- Preprocess obstacles into (s,d) in numeric flat arrays (no vec3 allocs)
-  local obsS, obsD = {}, {}
+  -- Preprocess obstacles into (s,d) with mapping to car indices
+  local obsS, obsD, obsIdx = {}, {}, {}
   local obsCount = 0
   local sWindowN = (horizonMeters * invL) * 1.1   -- consider obstacles within ±this in s
 
@@ -107,11 +111,12 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
       if c then
         obsCount = obsCount + 1
         local so = ac.worldCoordinateToTrackProgress(c.position) or 0.0
-        obsS[obsCount] = so
+        obsS[obsCount]   = so
+        obsIdx[obsCount] = idx
 
         -- Lateral offset sign via track side vector (fallback: ego.side).
         local wPoint = ac.trackProgressToWorldCoordinate(so)
-        local sideV  = ego.side  -- If you have side_at(so), plug it here.
+        local sideV  = ego.side  -- Replace with side_at(so) if you have it.
         local dx = c.position.x - wPoint.x
         local dy = c.position.y - wPoint.y
         local dz = c.position.z - wPoint.z
@@ -135,6 +140,7 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
     local sK = __sNodes[k]
     local rowK, parK = __dp[k], __parent[k]
     local prevRow = (k > 1) and __dp[k-1] or nil
+    local domK = __domObs[k]
 
     for i = 1, dCount do
       local d = dSamples[i]
@@ -151,15 +157,23 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
 
       -- Obstacle clearance: Gaussian-like repulsion if close in s
       local clearPen = 0.0
+      local dominantObs = 0
+      local dominantTerm = 0.0
       for o = 1, obsCount do
         local ds = __wrap01Signed(obsS[o] - sK)
         if ds >= -sWindowN and ds <= sWindowN then
           local lateral = d - obsD[o]
-          clearPen = clearPen + wClear * math.exp(-(lateral * lateral) * invTwoSigma2)
-          -- Small directional bias: push away from obstacle side
-          clearPen = clearPen - (biasFromObs * (lateral / trackHalf))
+          local term = wClear * math.exp(-(lateral * lateral) * invTwoSigma2) - (biasFromObs * (lateral / trackHalf))
+          clearPen = clearPen + term
+          -- Track the obstacle contributing the largest magnitude cost component
+          local absTerm = (term >= 0 and term) or -term
+          if absTerm > dominantTerm then
+            dominantTerm = absTerm
+            dominantObs  = o
+          end
         end
       end
+      domK[i] = dominantObs  -- store dominant obstacle index (in obs arrays) for this (k,i)
 
       -- Centerline bias (weak regularizer)
       local centerPen = centerBias * (d * d)
@@ -198,16 +212,26 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
   end
   local dStar = dSamples[idx]
 
-  -- Rate-limit for stability
+  -- Determine which obstacle most influenced the first-step choice
+  local domFirst = __domObs[1][idx] or 0
+  local influencingCarIndex = (domFirst ~= 0) and obsIdx[domFirst] or nil
+
+  -- Rate-limit for stability (meters)
   local dt = (dtSeconds and dtSeconds > 0) and dtSeconds or 1/120
   local maxStep = maxDRate * dt
   local delta = dStar - last_d
   if delta >  maxStep then delta =  maxStep
   elseif delta < -maxStep then delta = -maxStep end
 
-  local desired_d = last_d + delta
-  state.last_d = desired_d
-  return desired_d
+  local desired_d_meters = last_d + delta
+  state.last_d = desired_d_meters
+
+  -- Convert to normalized [-1, 1] for physics.setAISplineOffset
+  local offset_normalized = desired_d_meters / trackHalf
+  if offset_normalized < -1.0 then offset_normalized = -1.0
+  elseif offset_normalized >  1.0 then offset_normalized =  1.0 end
+
+  return offset_normalized, influencingCarIndex
 end
 
 return CollisionAvoidanceManager

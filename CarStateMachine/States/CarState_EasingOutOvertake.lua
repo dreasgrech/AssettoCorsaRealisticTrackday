@@ -46,7 +46,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local driveToSide = RaceTrackManager.getYieldingSide()
     local targetOffset = 0
     local rampSpeed_mps = storage.overtakeRampRelease_mps
-    CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
+    CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
 end
 
 -- TRANSITION FUNCTION

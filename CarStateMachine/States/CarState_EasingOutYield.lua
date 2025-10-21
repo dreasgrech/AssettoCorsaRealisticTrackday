@@ -49,7 +49,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local easeOutYieldSide = RaceTrackManager.getOvertakingSide() -- always ease out yield to the overtaking side
       local targetOffset = 0
       local rampSpeed_mps = storage.rampRelease_mps
-      CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
+      CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
 end
 
 -- TRANSITION FUNCTION

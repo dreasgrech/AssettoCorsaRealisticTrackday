@@ -145,7 +145,7 @@ UIManager.drawMainWindowContent = function()
       -- local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[carIndex]
       local state = CarStateMachine.getCurrentState(carIndex)
       local throttleLimitString = (not (CarManager.cars_throttleLimit[carIndex] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[carIndex]) or 'no limit'
-      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[carIndex] == math.huge)) and string.format('%d', CarManager.cars_aiTopSpeed[carIndex]) or 'no limit'
+      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[carIndex] == math.huge)) and string.format('%d km/h', CarManager.cars_aiTopSpeed[carIndex]) or 'no limit'
       -- local cantYieldReason = CarManager.cars_reasonWhyCantYield[carIndex] or ''
       -- local cantYieldReason = Strings.StringValues[Strings.StringCategories.ReasonWhyCantYield][CarManager.cars_reasonWhyCantYield_NAME[carIndex]] or ''
       -- local cantOvertakeReason = CarManager.cars_reasonWhyCantOvertake[carIndex] or ''
