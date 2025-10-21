@@ -9,7 +9,7 @@ Using this app, AI cars will yield to faster cars by driving to the side and onl
 This provides the user a smooth single-player driving experience with AI cars where the vehicles respect each other while driving and act like real drivers do.
 <br><br>
 > [!NOTE]
-> If you enjoy the app, it would be immensely appreciated if you give it a rating at the Overtake page: https://www.overtake.gg/downloads/assetto-corsa-realistic-trackday.80212/
+> If you enjoy the app, it would be immensely appreciated if you could give it a rating at the Overtake.gg page: https://www.overtake.gg/downloads/assetto-corsa-realistic-trackday.80212/
 <p align="center">
     <img width="500" alt="image" src="https://github.com/user-attachments/assets/de1613b2-3801-41e8-afdc-48cf7bb2176c" />
 </p>
