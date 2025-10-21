@@ -46,8 +46,10 @@ Copy the `AssettoCorsaRealisticTrackday` directory to `\steamapps\common\assetto
 ### Cutting Edge
 If you want to install the app directly using the latest source code, you can download the entire repository and put all files in: `\steamapps\common\assettocorsa\apps\lua\AssettoCorsaRealisticTrackday\`
 
-*There's no guarantee everything will work as expected when using the cutting edge "nightly" code here since I am constantly commiting in untested code when I'm working on the app.*
-<br><br><br><br>
+> [!WARNING]
+> *There's no guarantee everything will work as expected when using the cutting edge "nightly" code here since I am constantly committing in untested code when I'm working on the app.*
+
+<br><br><br>
 You should end up with this file structure once the files are copied:
 
 <img width="768" height="789" alt="image" src="https://github.com/user-attachments/assets/1a4a5f7b-5445-458b-a599-de0d2eadcd6b" />
