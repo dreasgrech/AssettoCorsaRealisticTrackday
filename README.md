@@ -7,6 +7,12 @@
 Using this app, AI cars will yield to faster cars by driving to the side and only yielding to one pre-defined side (left or right) as is the way during trackdays, particularly on the Nordschliefe.  AI cars will also overtake other cars on the other side and return back to the racing line once it's safe to do so.
 
 This provides the user a smooth single-player driving experience with AI cars where the vehicles respect each other while driving and act like real drivers do.
+<br><br>
+> [!NOTE]
+> If you enjoy the app, it would be immensely appreciated if you could give it a rating at the Overtake.gg page: https://www.overtake.gg/downloads/assetto-corsa-realistic-trackday.80212/
+<p align="center">
+    <a href="https://www.overtake.gg/downloads/assetto-corsa-realistic-trackday.80212/"><img width="500" alt="image" src="https://github.com/user-attachments/assets/de1613b2-3801-41e8-afdc-48cf7bb2176c" /></a>
+</p>
 
 <br><br>
 My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm410?si=A4LDo-DjJOClf2i4&t=312" target="_blank">Nordschleife Touristenfahrten</a> experience where by law you are required to overtake only on the left and thus yielding cars always need yield to the right.
@@ -40,8 +46,10 @@ Copy the `AssettoCorsaRealisticTrackday` directory to `\steamapps\common\assetto
 ### Cutting Edge
 If you want to install the app directly using the latest source code, you can download the entire repository and put all files in: `\steamapps\common\assettocorsa\apps\lua\AssettoCorsaRealisticTrackday\`
 
-*There's no guarantee everything will work as expected when using the cutting edge "nightly" code here since I am constantly commiting in untested code when I'm working on the app.*
-<br><br><br><br>
+> [!WARNING]
+> *There's no guarantee everything will work as expected when using the cutting edge "nightly" code here since I am constantly committing in untested code when I'm working on the app.*
+
+<br><br><br>
 You should end up with this file structure once the files are copied:
 
 <img width="768" height="789" alt="image" src="https://github.com/user-attachments/assets/1a4a5f7b-5445-458b-a599-de0d2eadcd6b" />
@@ -80,7 +88,8 @@ There are also a number of settings that help with understanding what the app is
 
 This table shows you a lot of information about each other including the current state the car is in, if it's yielding or overtaking and who's the other car involved, and also reasons why they can't yield or overtake at the time beind.  It's invaluable for understanding the behaviour of the cars.
 
-**Keep the car list table and all other Debugging options disabled during regular usage of the app so that you don't incur the performance hit they entail.**
+> [!CAUTION]
+> Keep the car list table and all other Debugging options disabled during regular usage of the app so that you don't incur the performance hit they entail.
 
 ## How It Works
 ### Car States
