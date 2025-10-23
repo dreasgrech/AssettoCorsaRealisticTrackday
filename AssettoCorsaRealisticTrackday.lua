@@ -224,8 +224,11 @@ function script.MANIFEST__UPDATE(dt)
     end
   end
 
+  -- custom ai flood handling
   local localPlayerSortedCarListIndex = CarManager.sortedCarList_carIndexToSortedIndex[0]
   CustomAIFloodManager.handleFlood(sortedCars, localPlayerSortedCarListIndex)
+
+  RaceTrackManager.updateYellowFlagZones()
 end
 
 --[====[

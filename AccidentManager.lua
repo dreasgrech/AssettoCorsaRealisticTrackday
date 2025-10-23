@@ -61,6 +61,13 @@ local setAccidentAsResolved = function(accidentIndex)
         CompletableIndexCollectionManager.updateFirstNonResolvedIndex(accidentCompletableIndex, AccidentManager.accidents_resolved)
 end
 
+---Returns a boolean value indicating whether the accident has been resolved
+---@param carIndex integer @0-based car index
+---@return boolean @true if the accident is resolved
+AccidentManager.isAccidentResolved = function(carIndex)
+    return AccidentManager.accidents_resolved[carIndex]
+end
+
 ---Resolve any accident the given car is a culprit in
 ---@param carIndex number
 AccidentManager.informAboutCarReset = function(carIndex)
@@ -170,7 +177,7 @@ AccidentManager.registerCollision = function(culpritCarIndex, collisionLocalPosi
     end
 
     -- create a yellow flag zone for this accident
-    local yellowFlagZoneIndex = RaceTrackManager.declareYellowFlagZone(carSplinePosition)
+    local yellowFlagZoneIndex = RaceTrackManager.declareYellowFlagZone(accidentIndex)
     AccidentManager.accidents_yellowFlagZoneIndex[accidentIndex] = yellowFlagZoneIndex
 
     -----------------------------

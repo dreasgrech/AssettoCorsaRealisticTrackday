@@ -173,7 +173,9 @@ UIManager.drawMainWindowContent = function()
       -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
       local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
 
-      local involvedInAccidentIndex = AccidentManager.cars_culpritInAccidentIndex[carIndex] or AccidentManager.cars_victimInAccidentIndex[carIndex]
+      local culpritInAccidentIndex = AccidentManager.cars_culpritInAccidentIndex[carIndex]
+      local victimInAccidentIndex = AccidentManager.cars_victimInAccidentIndex[carIndex]
+      local involvedInAccidentIndex = culpritInAccidentIndex or victimInAccidentIndex
       local currentlyNavigatingAroundAccidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
 
       -- local previousCarState = CarStateMachine.cars_previousState[carIndex]
@@ -273,7 +275,8 @@ UIManager.drawMainWindowContent = function()
       ui.nextColumn()
       
       if involvedInAccidentIndex then
-        ui.textColored(string.format("yes #%d", involvedInAccidentIndex), uiColor)
+        local culpritOrVictim = culpritInAccidentIndex and "Culprit" or "Victim"
+        ui.textColored(string.format("Accident:#%d %s", involvedInAccidentIndex, culpritOrVictim), uiColor)
       else
         ui.textColored("no", uiColor)
       end

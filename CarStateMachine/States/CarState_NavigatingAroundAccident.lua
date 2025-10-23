@@ -155,6 +155,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     CarOperations.preventAIFromRetiring(carIndex)
 
     CarOperations.toggleCarCollisions(carIndex, false)
+
+    --------------------------------------
+    CollisionAvoidanceManager.debugDraw(carIndex)
+    --------------------------------------
 end
 
 -- TRANSITION FUNCTION
@@ -164,12 +168,22 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+    -- If we don't have an accident index to navigate around, return to normal driving
     local accidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
-    if accidentIndex == 0 then
+    if not accidentIndex or accidentIndex == 0 then
         -- Logger.error(string.format("accidentIndex is 0! in car #%d", carIndex))
         -- CarStateMachine.changeCarState(carIndex, CarStateMachine.CarStateType.DRIVING_NORMALLY)
         AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
         CarStateMachine.setStateExitReason(carIndex, StateExitReason.NoAccidentIndexToNavigateAround)
+        return CarStateMachine.CarStateType.DRIVING_NORMALLY
+    end
+
+    -- If the accident has been resolved, return to normal driving
+    local accidentResolved = AccidentManager.isAccidentResolved(accidentIndex)
+    if accidentResolved then
+        Logger.log(string.format("[CarState_NavigatingAroundAccident] Car %d accident #%d has been resolved, returning to normal driving", carIndex, accidentIndex))
+        AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
+        CarStateMachine.setStateExitReason(carIndex, StateExitReason.AccidentResolved)
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
     end
 
@@ -199,6 +213,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- end
     -- end
 
+    -- If the car we're navigating around is no longer valid, return to normal driving
     local carToNavigateAroundIndex = CarManager.cars_navigatingAroundCarIndex[carIndex]
     local carToNavigateAround = ac.getCar(carToNavigateAroundIndex)
     if not carToNavigateAround then
@@ -225,7 +240,6 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
             return CarStateMachine.CarStateType.DRIVING_NORMALLY
         end
     end
-
 
     --[=====[
     local accidentWorldPosition = AccidentManager.accidents_worldPosition[accidentIndex]

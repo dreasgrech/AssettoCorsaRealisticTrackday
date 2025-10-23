@@ -4,6 +4,7 @@ local yellowZonesCompletableIndex = CompletableIndexCollectionManager.createNewI
 
 local yellowZones_startSplinePosition = {}
 local yellowZones_endSplinePosition = {}
+local yellowZones_accidentIndex = {}
 local yellowZones_resolved = {}
 
 
@@ -21,7 +22,7 @@ RaceTrackManager.TrackSideStrings = {
 }
 
 local sim = ac.getSim()
-local trackLength_meters = sim.trackLengthM
+local trackLength_meters = sim.trackLengthM -- todo: rename as CONSTANT
 
 --- Returns the total track length in meters
 ---@return number trackLength_meters
@@ -79,23 +80,78 @@ RaceTrackManager.getSideFromLateralOffset = function(lateralOffset)
     return lateralOffset < 0 and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
 end
 
----Creates a new yellow flag zone ending at the given spline position and extending backwards by the configured distance
----@param yellowZoneEndSplinePosition number
----@return number yellowFlagZoneIndex
-RaceTrackManager.declareYellowFlagZone = function(yellowZoneEndSplinePosition)
-    local yellowFlagZoneIndex = CompletableIndexCollectionManager.incrementLastIndexCreated(yellowZonesCompletableIndex)
+-- local calculateYellowFlagZoneStartSplinePosition = function(yellowZoneEndSplinePosition)
+    -- -- todo : this function is not good
+    -- local storage = StorageManager.getStorage()
+    -- local yellowZoneSizeMeters = storage.distanceFromAccidentToSeeYellowFlag_meters
+    -- local yellowZoneSizeNormalized = yellowZoneSizeMeters / trackLength_meters
 
+    -- local yellowZoneStartSplinePosition = yellowZoneEndSplinePosition - yellowZoneSizeNormalized
+    -- if yellowZoneStartSplinePosition < 0 then
+        -- yellowZoneStartSplinePosition = yellowZoneStartSplinePosition + 1.0
+    -- end
+
+    -- return yellowZoneStartSplinePosition
+-- end
+
+local getYellowZoneSizeNormalized = function()
     local storage = StorageManager.getStorage()
     local yellowZoneSizeMeters = storage.distanceFromAccidentToSeeYellowFlag_meters
     local yellowZoneSizeNormalized = yellowZoneSizeMeters / trackLength_meters
+    return yellowZoneSizeNormalized
+end
 
-    local yellowZoneStartSplinePosition = yellowZoneEndSplinePosition - yellowZoneSizeNormalized
+local calculateYellowFlagZoneStartEndPositions = function(accidentIndex, yellowZoneSizeNormalized)
+    local closestSplinePosition
+    local furthestSplinePosition
+
+    -- start by using the culprit car's spline position
+    local culpritCarIndex = AccidentManager.accidents_carIndex[accidentIndex]
+    local culpritCar = ac.getCar(culpritCarIndex)
+    if culpritCar then
+        local culpritCarSplinePosition = culpritCar.splinePosition
+        closestSplinePosition = culpritCarSplinePosition
+        furthestSplinePosition = culpritCarSplinePosition
+    end
+
+    -- if there's a collided-with car, check its spline position too and use the furthest one of the two
+    local collidedWithCarIndex = AccidentManager.accidents_collidedWithCarIndex[accidentIndex]
+    if collidedWithCarIndex then
+        local collidedWithCar = ac.getCar(collidedWithCarIndex)
+        if collidedWithCar then
+            local collidedWithCarSplinePosition = collidedWithCar.splinePosition
+            if collidedWithCarSplinePosition > furthestSplinePosition then
+                furthestSplinePosition = collidedWithCarSplinePosition
+            else 
+                closestSplinePosition = collidedWithCarSplinePosition
+            end
+        end
+    end
+
+    local yellowZoneStartSplinePosition = closestSplinePosition - yellowZoneSizeNormalized
+    local yellowZoneEndSplinePosition = furthestSplinePosition
+
     if yellowZoneStartSplinePosition < 0 then
         yellowZoneStartSplinePosition = yellowZoneStartSplinePosition + 1.0
     end
 
+    return yellowZoneStartSplinePosition, yellowZoneEndSplinePosition
+end
+
+---Creates a new yellow flag zone ending at the given spline position and extending backwards by the configured distance
+---@param accidentIndex number
+---@return number yellowFlagZoneIndex
+-- RaceTrackManager.declareYellowFlagZone = function(yellowZoneEndSplinePosition, accidentIndex)
+RaceTrackManager.declareYellowFlagZone = function(accidentIndex)
+
+    -- Calculate the start and end spline positions based on the accident's cars' positions
+    local yellowZoneSizeNormalized = getYellowZoneSizeNormalized()
+    local yellowZoneStartSplinePosition, yellowZoneEndSplinePosition = calculateYellowFlagZoneStartEndPositions(accidentIndex, yellowZoneSizeNormalized)
+
+    local yellowFlagZoneIndex = CompletableIndexCollectionManager.incrementLastIndexCreated(yellowZonesCompletableIndex)
     yellowZones_startSplinePosition[yellowFlagZoneIndex] = yellowZoneStartSplinePosition
     yellowZones_endSplinePosition[yellowFlagZoneIndex] = yellowZoneEndSplinePosition
+    yellowZones_accidentIndex[yellowFlagZoneIndex] = accidentIndex
     yellowZones_resolved[yellowFlagZoneIndex] = false
 
     Logger.log(string.format("[RaceTrackManager] Declared yellow flag zone #%d: start %.3f end %.3f", yellowFlagZoneIndex, yellowZoneStartSplinePosition, yellowZoneEndSplinePosition))
@@ -103,11 +159,47 @@ RaceTrackManager.declareYellowFlagZone = function(yellowZoneEndSplinePosition)
     return yellowFlagZoneIndex
 end
 
+-- TODO: THIS METHOD STILL NEEDS TO BE TESTED AND THEN USED, for example in updateYellowFlagZones()
+RaceTrackManager.isSplinePosition1FurtherThanSplinePosition2 = function(splinePosition1, splinePosition2)
+    -- splinePositions are normalized 0.0-1.0 values
+    -- this function also needs to handle the case where the spline positions wrap around the 0.0/1.0 point
+
+    if splinePosition1 >= splinePosition2 then
+        return (splinePosition1 - splinePosition2) < 0.5
+    else
+        return (splinePosition2 - splinePosition1) > 0.5
+    end
+end
+
+RaceTrackManager.updateYellowFlagZones = function()
+    local lastYellowZoneIndexCreated = CompletableIndexCollectionManager.getLastIndexCreated(yellowZonesCompletableIndex)
+    if lastYellowZoneIndexCreated == 0 then
+        return false
+    end
+
+    local yellowZoneSizeNormalized = getYellowZoneSizeNormalized()
+
+    -- go through all non-resolved yellow zones and update their end spline position based on the furthest spline position of the accident cars
+    local firstNonResolvedYellowZoneIndex = CompletableIndexCollectionManager.getFirstNonResolvedIndex(yellowZonesCompletableIndex)
+    for yellowZoneIndex = firstNonResolvedYellowZoneIndex, lastYellowZoneIndexCreated do
+        local yellowZoneResolved = yellowZones_resolved[yellowZoneIndex]
+        if yellowZoneResolved == false then
+            local accidentIndex = yellowZones_accidentIndex[yellowZoneIndex]
+
+            -- recalculate start and end spline positions
+            local yellowZoneStartSplinePosition, yellowZoneEndSplinePosition = calculateYellowFlagZoneStartEndPositions(accidentIndex, yellowZoneSizeNormalized)
+
+            yellowZones_startSplinePosition[yellowZoneIndex] = yellowZoneStartSplinePosition
+            yellowZones_endSplinePosition[yellowZoneIndex] = yellowZoneEndSplinePosition
+        end
+    end
+end
 --- Removes a yellow flag zone
 ---@param yellowFlagZoneIndex number
 RaceTrackManager.removeYellowFlagZone = function(yellowFlagZoneIndex)
     yellowZones_startSplinePosition[yellowFlagZoneIndex] = nil
     yellowZones_endSplinePosition[yellowFlagZoneIndex] = nil
+    yellowZones_accidentIndex[yellowFlagZoneIndex] = nil
 
     yellowZones_resolved[yellowFlagZoneIndex] = true
     CompletableIndexCollectionManager.updateFirstNonResolvedIndex(yellowZonesCompletableIndex, yellowZones_resolved)
@@ -125,7 +217,8 @@ RaceTrackManager.isSplinePositionInYellowZone = function(splinePosition)
 
     local firstNonResolvedYellowZoneIndex = CompletableIndexCollectionManager.getFirstNonResolvedIndex(yellowZonesCompletableIndex)
     for yellowZoneIndex = firstNonResolvedYellowZoneIndex, lastYellowZoneIndexCreated do
-        if yellowZones_resolved[yellowZoneIndex] == false then
+        local yellowZoneResolved = yellowZones_resolved[yellowZoneIndex]
+        if yellowZoneResolved == false then
             local yellowZoneStartSplinePosition = yellowZones_startSplinePosition[yellowZoneIndex]
             local yellowZoneEndSplinePosition = yellowZones_endSplinePosition[yellowZoneIndex]
 

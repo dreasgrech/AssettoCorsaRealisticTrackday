@@ -5,18 +5,18 @@ local CollisionAvoidanceManager = {}
 -- Per-car persistent state (no allocations in hot path)
 local _stateByCar = {}  -- [carIndex] = { last_d = 0, last_norm = 0, lastAvoidCarIndex = -1 }
 
--- Reused scratch (no GC): DP buffers and horizon samples
+-- Reused scratch (low-GC): DP buffers and horizon samples
 local _sNodes = {}          -- progress samples (0..1) along centerline
 local _dp     = {}          -- dynamic programming cost rows
 local _parent = {}          -- backpointers
 local _costAtK1 = {}        -- cost per lateral bin at first step (for debug bars)
 
 -- Debug toggles & per-car last frame snapshot (for drawing outside hot path)
-local _debugEnabled = false
+local _debugEnabled = true
 local _dbg = {}             -- [carIndex] = { sNodes, dSamples, pathIdxByK, obstacles = { {s,d,idx}... }, chosenK1D, costsK1, trackHalf, edgeMargin }
 
 -- Utils
-local function clamp(x, a, b) if x < a then return a elseif x > b then return b else return x end end
+local function clamp(x, a, b) if x < a then return a elseif x > b then return x and b or b end end
 local function wrap01Signed(ds) if ds > 0.5 then return ds - 1.0 elseif ds < -0.5 then return ds + 1.0 else return ds end end
 
 ---@param carIndex integer
@@ -29,7 +29,7 @@ end
 
 -- ============================== Public API =================================
 
---- Enable/disable gizmo drawing. When disabled, no extra work is done in hot path.
+--- Enable/disable gizmo drawing (when disabled, hot path does zero extra work).
 --- @param enabled boolean
 function CollisionAvoidanceManager.setDebugEnabled(enabled)
   _debugEnabled = not not enabled
@@ -44,15 +44,15 @@ end
 
 --------------------------------------------------------------------------------
 --- Compute normalized AISpline offset using a **Frenet corridor** lattice.
---- The corridor samples several lateral offsets `d` at a few lookahead `s`-slices
---- ahead of the ego car, then runs dynamic programming to minimize:
+--- We discretize forward progress `s` along the track centerline (K slices) and
+--- sample a few lateral offsets `d` (in meters) per slice. A tiny dynamic
+--- program minimizes:
 ---   cost = obstacle_clearance + smoothness + track_bounds + small_center_bias.
+--- We apply only the first step (receding horizon) and rate-limit `d` per frame.
 ---
---- Notes:
---- • Output is **normalized** in [-1,1] (ready for physics.setAISplineOffset()).
---- • Per-car state (last_d) is stored by index, and a slew limit smooths output.
---- • Also returns `avoidCarIndex`: the stopped car that most influenced the
----   first-step choice this frame (-1 if none).
+--- Lateral positions of stopped cars are obtained via `ac.worldCoordinateToTrack`,
+--- using `.x` (normalized in [-1, 1]) then scaled by `trackHalf` to meters —
+--- this is CSP’s canonical track-space mapping for lateral position and progress. :contentReference[oaicite:0]{index=0}
 ---
 --- @param egoCarIndex        integer     -- AI car index (0-based).
 --- @param stoppedCarIndices  integer[]   -- Indices of cars considered stopped/hazards.
@@ -60,7 +60,7 @@ end
 --- @param cfg                table|nil   -- Optional tuning:
 ---        .horizon_meters (number)  default 45.0
 ---        .steps          (integer) default 6
----        .d_samples      (number[]) default {-3,-1.5,0,1.5,3}  -- in meters
+---        .d_samples      (number[]) default {-3,-1.5,0,1.5,3}  -- meters
 ---        .obstacle_sigma (number)  default 1.2
 ---        .weight_clear   (number)  default 1.6
 ---        .weight_smooth  (number)  default 2.0
@@ -71,8 +71,8 @@ end
 ---        .max_d_rate     (number)  default 6.0      -- m/s slew limit
 ---        .bias_from_obs  (number)  default 0.4
 ---
---- @return number normOffset       -- [-1, 1] offset for physics.setAISplineOffset()
---- @return integer avoidCarIndex   -- stopped car index most affecting decision, or -1
+--- @return number normOffset       -- [-1, 1] value for physics.setAISplineOffset()
+--- @return integer avoidCarIndex   -- stopped car index most affecting first-step choice, or -1
 --------------------------------------------------------------------------------
 function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stoppedCarIndices, dtSeconds, cfg)
   local ego = ac.getCar(egoCarIndex)
@@ -108,27 +108,21 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
   local S = getState(egoCarIndex)
   local last_d = S.last_d
 
-  -- Preprocess obstacles to Frenet (s, d)
+  -- Preprocess obstacles to Frenet (s, d in meters) using CSP’s track coords
   local obsS, obsD, obsIdx = {}, {}, {}
   local obsCount = 0
   local sWindowN = (horizonMeters * invL) * 1.1
-  local egoSide = ego.side  -- used to compute signed lateral at given s
 
   for i = 1, (stoppedCarIndices and #stoppedCarIndices or 0) do
     local idx = stoppedCarIndices[i]
     if idx ~= egoCarIndex then
       local c = ac.getCar(idx)
       if c then
+        local tc = ac.worldCoordinateToTrack(c.position)       -- .x in [-1,1], .z progress
         obsCount = obsCount + 1
-        local so = ac.worldCoordinateToTrackProgress(c.position) or 0.0
-        obsS[obsCount] = so
+        obsS[obsCount]   = tc.z
         obsIdx[obsCount] = idx
-        -- project hazard position to lateral w.r.t. track at so
-        local wPoint = ac.trackProgressToWorldCoordinate(so)
-        local dx = c.position.x - wPoint.x
-        local dy = c.position.y - wPoint.y
-        local dz = c.position.z - wPoint.z
-        obsD[obsCount] = dx * egoSide.x + dy * egoSide.y + dz * egoSide.z  -- signed meters
+        obsD[obsCount]   = tc.x * trackHalf                     -- convert to meters
       end
     end
   end
@@ -144,11 +138,11 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
 
   local invTwoSigma2 = 1.0 / (2.0 * obstacleSigma * obstacleSigma)
 
-  -- Keep track of which obstacle pulls the first step most
+  -- Track which obstacle pulls the first step most for each i
   local k1BestObsIdxPerI = {}   -- [i] -> carIndex or -1
   for i=1,dCount do k1BestObsIdxPerI[i] = -1 end
 
-  -- DP over lattice
+  -- DP over the Frenet corridor lattice
   for k = 1, steps do
     local sK = _sNodes[k]
     local rowK, parK = _dp[k], _parent[k]
@@ -181,11 +175,9 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
           clearPen = clearPen + pen
           clearPen = clearPen - (biasFromObs * (lateral / trackHalf))
 
-          -- Remember which obstacle contributed most (for k==1 only)
           if k == 1 then
-            local pullMag = pen
-            if pullMag > strongestPullMag then
-              strongestPullMag = pullMag
+            if pen > strongestPullMag then
+              strongestPullMag = pen
               strongestPull = obsIdx[o]
             end
           end
@@ -217,21 +209,18 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
     end
   end
 
-  -- Backtrack global best and extract first-step decision
+  -- Backtrack best path and take first-step decision
   local lastRow = _dp[steps]
   local bestI, bestCost = 1, lastRow[1]
-  for i = 2, dCount do
-    local cst = lastRow[i]; if cst < bestCost then bestCost = cst; bestI = i end
-  end
+  for i = 2, dCount do local cst = lastRow[i]; if cst < bestCost then bestCost = cst; bestI = i end end
   local idx = bestI
   for k = steps, 2, -1 do idx = _parent[k][idx] end
   local dStar = dSamples[idx]
 
-  -- Identify which obstacle influenced K=1 choice most for that bin
   local avoidCarIndex = k1BestObsIdxPerI[idx] or -1
   if not avoidCarIndex then avoidCarIndex = -1 end
 
-  -- Rate-limit in meters, then normalize to [-1, 1] by track half-width
+  -- Rate-limit in meters, then normalize to [-1, 1]
   local dt = (dtSeconds and dtSeconds > 0) and dtSeconds or 1/120
   local maxStep = maxDRate * dt
   local delta = dStar - last_d
@@ -239,7 +228,8 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
   elseif delta < -maxStep then delta = -maxStep end
   local desired_d = last_d + delta
 
-  local norm = clamp(desired_d / trackHalf, -1.0, 1.0)
+  local norm = desired_d / trackHalf
+  if norm < -1.0 then norm = -1.0 elseif norm > 1.0 then norm = 1.0 end
 
   -- Persist
   S.last_d = desired_d
@@ -248,12 +238,10 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
 
   -- Store snapshot for debug draw (cheap; reuses tables)
   if _debugEnabled then
-    local snap = _dbg[egoCarIndex]
-    if not snap then snap = {} _dbg[egoCarIndex] = snap end
+    local snap = _dbg[egoCarIndex]; if not snap then snap = {} _dbg[egoCarIndex] = snap end
     snap.sNodes, snap.dSamples = {}, {}
     for k=1,steps do snap.sNodes[k] = _sNodes[k] end
     for i=1,dCount do snap.dSamples[i] = dSamples[i] end
-    -- backtrack full path to visualize
     local pathIdxByK = {}
     local ii = bestI
     for k = steps, 1, -1 do
@@ -261,7 +249,6 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
       ii = (k > 1) and _parent[k][ii] or ii
     end
     snap.pathIdxByK = pathIdxByK
-    -- obstacles
     local obs = {}
     for o=1,obsCount do obs[o] = { s = obsS[o], d = obsD[o], idx = obsIdx[o] } end
     snap.obstacles = obs
@@ -277,15 +264,12 @@ end
 
 --------------------------------------------------------------------------------
 --- Draw debug gizmos for a given car:
---- • Green corridor lines for each d-sample (first few s-slices).
---- • Blue polyline for the chosen path; small arrows show forward s.
---- • Red boxes at stopped cars; text shows their lateral `d` and AC index.
---- • On ground: cost bars at first slice (low=good).
+--- • Green rails = each lateral sample d across the s-slices (corridor lattice).
+--- • Blue polyline with arrows = chosen path (first step is applied this frame).
+--- • Red posts = stopped cars projected into Frenet (s,d).
+--- • Yellow bars at first slice = per-d costs (blue-topped is the chosen bin).
 ---
---- This uses CSP helpers: render.debugArrow (3D arrows) and TrackPaint to
---- stamp persistent world-space lines/text on the asphalt for readability.
---- See render.debugArrow & ac.TrackPaint docs in lib.lua. 
---- (render.debugArrow, ac.TrackPaint:line, :text) :contentReference[oaicite:5]{index=5} :contentReference[oaicite:6]{index=6}.
+--- Uses CSP helpers (debug arrows, TrackPaint) to draw in world-space. :contentReference[oaicite:1]{index=1}
 ---
 --- @param carIndex integer
 function CollisionAvoidanceManager.debugDraw(carIndex)
@@ -293,7 +277,6 @@ function CollisionAvoidanceManager.debugDraw(carIndex)
   local snap = _dbg[carIndex]
   if not snap then return end
 
-  -- World-space painters (reuse one per call to avoid leaks)
   if not CollisionAvoidanceManager._paint then
     CollisionAvoidanceManager._paint = ac.TrackPaint()
     CollisionAvoidanceManager._paint.paddingSize = 0.02
@@ -306,25 +289,21 @@ function CollisionAvoidanceManager.debugDraw(carIndex)
   local dSamples = snap.dSamples
   local steps = #sNodes
   local dCount = #dSamples
-  local trackHalf = snap.trackHalf
 
-  -- Draw all corridor rails (green)
+  -- Corridors (green)
   for i=1,dCount do
     local prevW = nil
     for k=1,steps do
       local s = sNodes[k]
       local w = ac.trackProgressToWorldCoordinate(s)
-      -- shift laterally by d sample
       local side = ac.getCar(carIndex).side
       local p = vec3(w.x + side.x * dSamples[i], w.y + side.y * dSamples[i], w.z + side.z * dSamples[i])
-      if prevW then
-        paint:line(prevW, p, rgbm(0,1,0,1), 0.04)
-      end
+      if prevW then paint:line(prevW, p, rgbm(0,1,0,1), 0.04) end
       prevW = p
     end
   end
 
-  -- Draw chosen path (blue thick)
+  -- Chosen path (blue + arrows)
   local prevP = nil
   for k=1,steps do
     local s = sNodes[k]
@@ -334,33 +313,32 @@ function CollisionAvoidanceManager.debugDraw(carIndex)
     local p = vec3(w.x + side.x * d, w.y + side.y * d, w.z + side.z * d)
     if prevP then
       paint:line(prevP, p, rgbm(0.2,0.4,1,1), 0.08)
-      render.debugArrow(prevP, p, 0.4, rgbm(0.2,0.4,1,1))  -- arrow tip for direction :contentReference[oaicite:7]{index=7}
+      render.debugArrow(prevP, p, 0.4, rgbm(0.2,0.4,1,1))
     end
     prevP = p
   end
 
-  -- Draw obstacles (red) with index & d-value
+  -- Obstacles (red posts)
   for _,o in ipairs(snap.obstacles) do
     local w = ac.trackProgressToWorldCoordinate(o.s)
     local side = ac.getCar(carIndex).side
     local p = vec3(w.x + side.x * o.d, w.y + side.y * o.d, w.z + side.z * o.d)
     paint:line(p + vec3(0,0.01,0), p + vec3(0,0.6,0), rgbm(1,0,0,1), 0.06)
-    paint:text("Consolas", string.format("#%d  d=%.2f", o.idx, o.d), p + vec3(0,0.65,0), 0.5, 0, rgbm(1,0.4,0.2,1))  -- :contentReference[oaicite:8]{index=8}
+    paint:text("Consolas", string.format("#%d  d=%.2f", o.idx, o.d), p + vec3(0,0.65,0), 0.5, 0, rgbm(1,0.4,0.2,1))
   end
 
-  -- Cost bars at first slice (lower is better)
+  -- First-slice cost bars (yellow; blue-topped is chosen)
   do
     local s = sNodes[1]
     local w = ac.trackProgressToWorldCoordinate(s)
     local side = ac.getCar(carIndex).side
-    -- find scale
     local maxC = 1e-6
     for i=1,dCount do if snap.costsK1[i] > maxC then maxC = snap.costsK1[i] end end
     for i=1,dCount do
       local d = dSamples[i]
       local base = vec3(w.x + side.x * d, w.y + side.y * d, w.z + side.z * d)
       local h = 0.5 * (snap.costsK1[i] / maxC)
-      paint:line(base, base + vec3(0,h,0), i==1 and rgbm(1,1,0,1) or rgbm(0.9,0.9,0.2,1), 0.04)
+      paint:line(base, base + vec3(0,h,0), rgbm(0.95,0.9,0.2,1), 0.04)
       if math.abs(d - snap.chosenK1D) < 1e-3 then
         paint:line(base, base + vec3(0,h+0.15,0), rgbm(0.2,0.6,1,1), 0.06)
       end
