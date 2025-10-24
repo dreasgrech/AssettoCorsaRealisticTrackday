@@ -7,10 +7,7 @@ local yellowZones_endSplinePosition = {}
 local yellowZones_accidentIndex = {}
 local yellowZones_resolved = {}
 
-
----@alias RaceTrackManager.TrackSide
----| "RaceTrackManager.TrackSide.LEFT" @Value: 1.
----| "RaceTrackManager.TrackSide.RIGHT" @Value: 2.
+---@enum RaceTrackManager.TrackSide 
 RaceTrackManager.TrackSide = {
     LEFT = 1,
     RIGHT = 2,
