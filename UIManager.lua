@@ -390,6 +390,7 @@ function UIManager.drawCarStateOverheadText()
   -- render.setDepthMode(depthModeBeforeModification)
 end
 
+-- TODO: Extract to SettingsWindow.draw() or something
 function UIManager.renderUIOptionsControls()
     local storage = StorageManager.getStorage()
 
@@ -423,6 +424,9 @@ function UIManager.renderUIOptionsControls()
 
     storage.defaultAICaution =  ui.slider('Default AI Caution', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution]) -- do not drop the minimum below 2 because 1 is used while overtaking
     if ui.itemHovered() then ui.setTooltip('Base AI caution level (higher = more cautious, slower but less accident prone).') end
+
+    storage.defaultLateralOffset =  ui.slider('Default Lateral Offset', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset])
+    if ui.itemHovered() then ui.setTooltip('The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.') end
 
     storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, StorageManager.options_min[StorageManager.Options.MaxLateralOffset_normalized], StorageManager.options_max[StorageManager.Options.MaxLateralOffset_normalized])
     if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end

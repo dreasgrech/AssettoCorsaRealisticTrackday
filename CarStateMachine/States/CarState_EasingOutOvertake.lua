@@ -43,10 +43,11 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
     -- the drive to side is now the same side as the yielding side since we're easing out of the overtake
     -- local driveToSide = storage.yieldSide
-    local driveToSide = RaceTrackManager.getYieldingSide()
+    -- local driveToSide = RaceTrackManager.getYieldingSide()
     local targetOffset = 0
     local rampSpeed_mps = storage.overtakeRampRelease_mps
-    CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
+    -- CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
+    CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
 end
 
 -- TRANSITION FUNCTION

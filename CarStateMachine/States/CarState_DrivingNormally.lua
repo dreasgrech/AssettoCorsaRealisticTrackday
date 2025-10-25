@@ -37,7 +37,20 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
 end
 
 -- UPDATE FUNCTION
-CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, car, carBehind, storage)
+---@param carIndex integer
+---@param dt number
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
+---@param storage StorageTable
+CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      -- TODO: set the correct ramp speed here
+      local rampSpeed_mps = storage.rampSpeed_mps
+      local targetOffset = storage.defaultLateralOffset
+
+      local car = sortedCarsList[sortedCarsListIndex]
+
+      -- Keep driving towards the default lateral offset to try and keep the lane as much as possible
+      CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
 end
 
 -- TRANSITION FUNCTION
