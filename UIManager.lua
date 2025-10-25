@@ -391,6 +391,9 @@ function UIManager.drawCarStateOverheadText()
   -- render.setDepthMode(depthModeBeforeModification)
 end
 
+--local UI_NORMAL_TEXT_FONT_SIZE = 16
+local UI_HEADER_TEXT_FONT_SIZE = 15
+
 -- TODO: Extract to SettingsWindow.draw() or something
 function UIManager.renderUIOptionsControls()
     local storage = StorageManager.getStorage()
@@ -401,6 +404,8 @@ function UIManager.renderUIOptionsControls()
     settingsWindowIconPositionBottomLeft.x = settingsWindowIconPosition.x + APP_ICON_SIZE.x
     settingsWindowIconPositionBottomLeft.y = settingsWindowIconPosition.y + APP_ICON_SIZE.y
     ui.drawImage(APP_ICON_PATH, settingsWindowIconPosition, settingsWindowIconPositionBottomLeft, ui.ImageFit.Fit)
+
+    ui.pushDWriteFont('Segoe UI')
 
     -- Draw the Enabled checkbox
     local appEnabled = storage.enabled
@@ -428,7 +433,10 @@ function UIManager.renderUIOptionsControls()
 
     ui.separator()
 
-    ui.text('Driving Lanes')
+    -- ui.text('Driving Lanes')
+    ui.newLine(1)
+    ui.dwriteText('Driving Lanes', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
 
     storage.defaultLateralOffset =  ui.slider('Default Lateral Offset', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset])
     if ui.itemHovered() then ui.setTooltip('The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.') end
@@ -456,7 +464,10 @@ function UIManager.renderUIOptionsControls()
 -- ui.dwriteText('Yielding', 12)       -- 24 px size here
 -- ui.popDWriteFont()
 
-    ui.text('Yielding')
+    -- ui.text('Yielding')
+    ui.newLine(1)
+    ui.dwriteText('Yielding', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
 
     storage.detectCarBehind_meters =  ui.slider('Detect car behind (m)', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters])
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
@@ -469,7 +480,10 @@ function UIManager.renderUIOptionsControls()
 
     ui.separator()
 
-    ui.text('Overtaking')
+    -- ui.text('Overtaking')
+    ui.newLine(1)
+    ui.dwriteText('Overtaking', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
 
     if ui.checkbox('Handle overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
@@ -485,7 +499,10 @@ function UIManager.renderUIOptionsControls()
 
     ui.separator()
 
-    ui.text('Accidents')
+    -- ui.text('Accidents')
+    ui.newLine(1)
+    ui.dwriteText('Accidents', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
 
     if ui.checkbox('Handle accidents (WORK IN PROGRESS - BEST NOT USED FOR NOW)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
@@ -498,14 +515,20 @@ function UIManager.renderUIOptionsControls()
 
     ui.separator()
 
-    ui.text('Other')
+    -- ui.text('Other')
+    ui.newLine(1)
+    ui.dwriteText('Other', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
 
     storage.clearAhead_meters = ui.slider('The distance (m) which determines whether a car is far enough ahead of another car', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters])
     if ui.itemHovered() then ui.setTooltip('When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.'); end
 
     ui.separator()
 
-    ui.text('Debugging')
+    -- ui.text('Debugging')
+    ui.newLine(1)
+    ui.dwriteText('Debugging', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
 
     if ui.checkbox('Show car state overhead text', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
     if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
@@ -540,6 +563,7 @@ function UIManager.renderUIOptionsControls()
     -- storage.distanceToFrontCarToOvertake =  ui.slider('Min distance to front car to overtake (m)', storage.distanceToFrontCarToOvertake, 1.0, 20.0)
     -- if ui.itemHovered() then ui.setTooltip('Minimum distance to the car in front before an AI car will consider overtaking it.') end
 --]===]
+  ui.popDWriteFont()
 end
 
 return UIManager
