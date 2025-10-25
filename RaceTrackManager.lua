@@ -74,8 +74,11 @@ end
 ---Returns the overtaking side as configured in the settings
 ---@return RaceTrackManager.TrackSide overtakingSide
 RaceTrackManager.getOvertakingSide = function()
-    local yieldSide = RaceTrackManager.getYieldingSide()
-    local overtakingSide = RaceTrackManager.getOppositeSide(yieldSide)
+    -- local yieldSide = RaceTrackManager.getYieldingSide()
+    -- local overtakingSide = RaceTrackManager.getOppositeSide(yieldSide)
+    local storage = StorageManager.getStorage()
+    local overtakingLateralOffset = storage.overtakingLateralOffset
+    local overtakingSide = RaceTrackManager.getSideFromLateralOffset(overtakingLateralOffset)
     return overtakingSide
 end
 
