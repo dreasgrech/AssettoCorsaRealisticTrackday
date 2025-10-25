@@ -83,7 +83,8 @@ local settingsWindowIconPositionBottomLeft = vec2(0,0) -- this is needed for the
 
 UIManager.drawMainWindowContent = function()
   local storage = StorageManager.getStorage()
-  ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
+  -- ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
+  ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[RaceTrackManager.getYieldingSide()]))
 
   --[====[
   if ui.button('Teleport', ui.ButtonFlags.None) then
@@ -412,9 +413,9 @@ function UIManager.renderUIOptionsControls()
     -- if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
     -- if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
 
-    local comboValueChanged
-    storage.yieldSide, comboValueChanged = ui.combo('Yielding Side', storage.yieldSide, ui.ComboFlags.NoPreview, RaceTrackManager.TrackSideStrings)
-    if ui.itemHovered() then ui.setTooltip('The track side which AI will yield to when you approach from the rear.') end
+    -- local comboValueChanged
+    -- storage.yieldSide, comboValueChanged = ui.combo('Yielding Side', storage.yieldSide, ui.ComboFlags.NoPreview, RaceTrackManager.TrackSideStrings)
+    -- if ui.itemHovered() then ui.setTooltip('The track side which AI will yield to when you approach from the rear.') end
 
     if ui.checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily. (EXPERIMENTAL)') end

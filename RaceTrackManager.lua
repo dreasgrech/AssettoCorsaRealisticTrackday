@@ -65,7 +65,9 @@ end
 ---@return RaceTrackManager.TrackSide yieldSide
 RaceTrackManager.getYieldingSide = function()
     local storage = StorageManager.getStorage()
-    local yieldSide = storage.yieldSide
+    -- local yieldSide = storage.yieldSide
+    local yieldingLateralOffset = storage.yieldingLateralOffset
+    local yieldSide = RaceTrackManager.getSideFromLateralOffset(yieldingLateralOffset)
     return yieldSide
 end
 

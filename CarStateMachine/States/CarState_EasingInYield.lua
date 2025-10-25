@@ -32,7 +32,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   CarManager.cars_currentSplineOffset[carIndex] = CarManager.getActualTrackLateralOffset(car.position)
 
   -- turn on turning lights
-  local turningLights = storage.yieldSide == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
+  local turningLights = RaceTrackManager.getYieldingSide()  == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
   CarOperations.toggleTurningLights(carIndex, turningLights)
 end
 

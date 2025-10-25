@@ -31,7 +31,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   CarOperations.removeAICaution(carIndex)
 
   -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
-  local turningLights = (not storage.yieldSide == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
+  local turningLights = (not RaceTrackManager.getYieldingSide() == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
   -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
   CarOperations.toggleTurningLights(carIndex, turningLights)
 end

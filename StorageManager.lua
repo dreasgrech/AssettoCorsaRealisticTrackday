@@ -4,45 +4,45 @@ local StorageManager = {}
 StorageManager.Options ={
     Enabled = 1,
     HandleSideChecking = 2,
-    YieldSide = 3,
-    OverrideAiAwareness = 4,
-    DefaultAICaution = 5,
+    -- YieldSide = 3,
+    OverrideAiAwareness = 3,
+    DefaultAICaution = 4,
 
-    DefaultLateralOffset = 6,
-    YieldingLateralOffset = 7,
-    OvertakingLateralOffset = 8,
+    DefaultLateralOffset = 5,
+    YieldingLateralOffset = 6,
+    OvertakingLateralOffset = 7,
     -- MaxLateralOffset_normalized = 9,
 
-    ClearAhead_meters = 9,
+    ClearAhead_meters = 8,
 
-    DetectCarBehind_meters = 10,
-    RampSpeed_mps = 11,
-    RampRelease_mps = 12,
+    DetectCarBehind_meters = 9,
+    RampSpeed_mps = 10,
+    RampRelease_mps = 11,
 
-    HandleOvertaking = 13,
-    DetectCarAhead_meters = 14,
-    OvertakeRampSpeed_mps = 15,
-    OvertakeRampRelease_mps = 16,
+    HandleOvertaking = 12,
+    DetectCarAhead_meters = 13,
+    OvertakeRampSpeed_mps = 14,
+    OvertakeRampRelease_mps = 15,
 
-    CustomAIFlood_enabled = 17,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 18,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 19,
+    CustomAIFlood_enabled = 16,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 17,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 18,
 
-    HandleAccidents = 20,
-    DistanceFromAccidentToSeeYellowFlag_meters = 21,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 22,
+    HandleAccidents = 19,
+    DistanceFromAccidentToSeeYellowFlag_meters = 20,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 21,
 
-    DebugDraw = 23,
-    DebugDrawSideOfftrack = 24,
-    DrawCarList = 25,
-    DebugLogFastStateChanges = 26,
+    DebugDraw = 22,
+    DebugDrawSideOfftrack = 23,
+    DrawCarList = 24,
+    DebugLogFastStateChanges = 25,
 }
 
 -- only used to build the actual tables that hold the runtime values
 local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.Enabled, default=true, min=nil, max=nil },
     { name = StorageManager.Options.HandleSideChecking, default=true, min=nil, max=nil },
-    { name = StorageManager.Options.YieldSide, default=RaceTrackManager.TrackSide.RIGHT, min=nil, max=nil },
+    -- { name = StorageManager.Options.YieldSide, default=RaceTrackManager.TrackSide.RIGHT, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
 
@@ -92,7 +92,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@class StorageTable
 ---@field enabled boolean
 ---@field handleSideChecking boolean
----@field yieldSide RaceTrackManager.TrackSide
+-- ---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
 ---@field defaultAICaution integer
 ---@field defaultLateralOffset number
@@ -122,7 +122,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 local storageTable = {
     enabled = StorageManager.options_default[StorageManager.Options.Enabled],
     handleSideChecking = StorageManager.options_default[StorageManager.Options.HandleSideChecking],
-    yieldSide = StorageManager.options_default[StorageManager.Options.YieldSide],
+    -- yieldSide = StorageManager.options_default[StorageManager.Options.YieldSide],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
 
