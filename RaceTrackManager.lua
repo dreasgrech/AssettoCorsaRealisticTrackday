@@ -18,6 +18,13 @@ RaceTrackManager.TrackSideStrings = {
     [RaceTrackManager.TrackSide.RIGHT] = "Right",
 }
 
+--- Mapping of TrackSide to lateral offset sign
+--- Used in RaceTrackManager.getLateralOffsetSign 
+local lateralOffsetSigns = {
+    [RaceTrackManager.TrackSide.LEFT] = -1,
+    [RaceTrackManager.TrackSide.RIGHT] = 1,
+}
+
 local sim = ac.getSim()
 local trackLength_meters = sim.trackLengthM -- todo: rename as CONSTANT
 
@@ -75,6 +82,12 @@ end
 ---@return RaceTrackManager.TrackSide
 RaceTrackManager.getSideFromLateralOffset = function(lateralOffset)
     return lateralOffset < 0 and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
+end
+
+---@param side RaceTrackManager.TrackSide
+---@return integer
+RaceTrackManager.getLateralOffsetSign = function(side)
+    return lateralOffsetSigns[side]
 end
 
 -- local calculateYellowFlagZoneStartSplinePosition = function(yellowZoneEndSplinePosition)
