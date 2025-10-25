@@ -426,22 +426,35 @@ function UIManager.renderUIOptionsControls()
     storage.defaultAICaution =  ui.slider('Default AI Caution', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution]) -- do not drop the minimum below 2 because 1 is used while overtaking
     if ui.itemHovered() then ui.setTooltip('Base AI caution level (higher = more cautious, slower but less accident prone).') end
 
+    ui.separator()
+
+    ui.text('Driving Lanes')
+
     storage.defaultLateralOffset =  ui.slider('Default Lateral Offset', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset])
     if ui.itemHovered() then ui.setTooltip('The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.') end
 
     storage.yieldingLateralOffset =  ui.slider('Yielding Lateral Offset', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset])
     if ui.itemHovered() then ui.setTooltip('The lateral offset from the centerline that AI cars will drive to when yielding.') end
+    local yieldingSide = RaceTrackManager.getYieldingSide()
+    ui.text(string.format('Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]))
 
     storage.overtakingLateralOffset =  ui.slider('Overtaking Lateral Offset', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset])
     if ui.itemHovered() then ui.setTooltip('The lateral offset from the centerline that AI cars will drive to when overtaking another car.') end
+    local overtakingSide = RaceTrackManager.getOvertakingSide()
+    ui.text(string.format('Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]))
+
+    if yieldingSide == overtakingSide then
+      ui.textColored('Warning: Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
+    end
 
     -- storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, StorageManager.options_min[StorageManager.Options.MaxLateralOffset_normalized], StorageManager.options_max[StorageManager.Options.MaxLateralOffset_normalized])
     -- if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
 
-    storage.clearAhead_meters = ui.slider('The distance (m) which determines whether a car is far enough ahead of another car', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters])
-    if ui.itemHovered() then ui.setTooltip('When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.'); end
-
     ui.separator()
+
+-- ui.pushDWriteFont('Segoe UI')     -- or a custom TTF; see docs comment
+-- ui.dwriteText('Yielding', 12)       -- 24 px size here
+-- ui.popDWriteFont()
 
     ui.text('Yielding')
 
@@ -482,6 +495,13 @@ function UIManager.renderUIOptionsControls()
 
     storage.distanceToStartNavigatingAroundCarInAccident_meters =  ui.slider('Distance to start navigating around car in accident (m)', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100)
     if ui.itemHovered() then ui.setTooltip('Distance from accident at which AI will start navigating around the car in accident.') end
+
+    ui.separator()
+
+    ui.text('Other')
+
+    storage.clearAhead_meters = ui.slider('The distance (m) which determines whether a car is far enough ahead of another car', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters])
+    if ui.itemHovered() then ui.setTooltip('When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.'); end
 
     ui.separator()
 
