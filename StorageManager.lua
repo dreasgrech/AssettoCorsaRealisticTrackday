@@ -7,31 +7,35 @@ StorageManager.Options ={
     YieldSide = 3,
     OverrideAiAwareness = 4,
     DefaultAICaution = 5,
+
     DefaultLateralOffset = 6,
-    MaxLateralOffset_normalized = 7,
-    ClearAhead_meters = 8,
+    YieldingLateralOffset = 7,
+    OvertakingLateralOffset = 8,
+    -- MaxLateralOffset_normalized = 9,
 
-    DetectCarBehind_meters = 9,
-    RampSpeed_mps = 10,
-    RampRelease_mps = 11,
+    ClearAhead_meters = 9,
 
-    HandleOvertaking = 12,
-    DetectCarAhead_meters = 13,
-    OvertakeRampSpeed_mps = 14,
-    OvertakeRampRelease_mps = 15,
+    DetectCarBehind_meters = 10,
+    RampSpeed_mps = 11,
+    RampRelease_mps = 12,
 
-    CustomAIFlood_enabled = 16,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 17,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 18,
+    HandleOvertaking = 13,
+    DetectCarAhead_meters = 14,
+    OvertakeRampSpeed_mps = 15,
+    OvertakeRampRelease_mps = 16,
 
-    HandleAccidents = 19,
-    DistanceFromAccidentToSeeYellowFlag_meters = 20,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 21,
+    CustomAIFlood_enabled = 17,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 18,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 19,
 
-    DebugDraw = 22,
-    DebugDrawSideOfftrack = 23,
-    DrawCarList = 24,
-    DebugLogFastStateChanges = 25,
+    HandleAccidents = 20,
+    DistanceFromAccidentToSeeYellowFlag_meters = 21,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 22,
+
+    DebugDraw = 23,
+    DebugDrawSideOfftrack = 24,
+    DrawCarList = 25,
+    DebugLogFastStateChanges = 26,
 }
 
 -- only used to build the actual tables that hold the runtime values
@@ -41,8 +45,12 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.YieldSide, default=RaceTrackManager.TrackSide.RIGHT, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
+
     { name = StorageManager.Options.DefaultLateralOffset, default=0, min=-1, max=1 },
-    { name = StorageManager.Options.MaxLateralOffset_normalized, default=0.8, min=0.1, max=1.0 },
+    { name = StorageManager.Options.YieldingLateralOffset, default=0.5, min=-1, max=1 },
+    { name = StorageManager.Options.OvertakingLateralOffset, default=-0.5, min=-1, max=1 },
+    -- { name = StorageManager.Options.MaxLateralOffset_normalized, default=0.8, min=0.1, max=1.0 },
+
     { name = StorageManager.Options.ClearAhead_meters, default=10.0, min=4.0, max=20.0 },
 
     { name = StorageManager.Options.DetectCarBehind_meters, default=90, min=10, max=90 },
@@ -88,7 +96,9 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field overrideAiAwareness boolean
 ---@field defaultAICaution integer
 ---@field defaultLateralOffset number
----@field maxLateralOffset_normalized number
+---@field yieldingLateralOffset number
+---@field overtakingLateralOffset number
+-- ---@field maxLateralOffset_normalized number
 ---@field detectCarBehind_meters number
 ---@field rampSpeed_mps number
 ---@field rampRelease_mps number
@@ -115,8 +125,11 @@ local storageTable = {
     yieldSide = StorageManager.options_default[StorageManager.Options.YieldSide],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
+
     defaultLateralOffset = StorageManager.options_default[StorageManager.Options.DefaultLateralOffset],
-    maxLateralOffset_normalized = StorageManager.options_default[StorageManager.Options.MaxLateralOffset_normalized],
+    yieldingLateralOffset = StorageManager.options_default[StorageManager.Options.YieldingLateralOffset],
+    overtakingLateralOffset = StorageManager.options_default[StorageManager.Options.OvertakingLateralOffset],
+    -- maxLateralOffset_normalized = StorageManager.options_default[StorageManager.Options.MaxLateralOffset_normalized],
 
     detectCarBehind_meters = StorageManager.options_default[StorageManager.Options.DetectCarBehind_meters],
     rampSpeed_mps = StorageManager.options_default[StorageManager.Options.RampSpeed_mps],

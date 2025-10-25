@@ -428,8 +428,14 @@ function UIManager.renderUIOptionsControls()
     storage.defaultLateralOffset =  ui.slider('Default Lateral Offset', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset])
     if ui.itemHovered() then ui.setTooltip('The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.') end
 
-    storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, StorageManager.options_min[StorageManager.Options.MaxLateralOffset_normalized], StorageManager.options_max[StorageManager.Options.MaxLateralOffset_normalized])
-    if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
+    storage.yieldingLateralOffset =  ui.slider('Yielding Lateral Offset', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset])
+    if ui.itemHovered() then ui.setTooltip('The lateral offset from the centerline that AI cars will drive to when yielding.') end
+
+    storage.overtakingLateralOffset =  ui.slider('Overtaking Lateral Offset', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset])
+    if ui.itemHovered() then ui.setTooltip('The lateral offset from the centerline that AI cars will drive to when overtaking another car.') end
+
+    -- storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, StorageManager.options_min[StorageManager.Options.MaxLateralOffset_normalized], StorageManager.options_max[StorageManager.Options.MaxLateralOffset_normalized])
+    -- if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
 
     storage.clearAhead_meters = ui.slider('The distance (m) which determines whether a car is far enough ahead of another car', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters])
     if ui.itemHovered() then ui.setTooltip('When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.'); end

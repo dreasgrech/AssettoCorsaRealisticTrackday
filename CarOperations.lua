@@ -460,7 +460,8 @@ end
 function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
     local driveToSide = RaceTrackManager.getOvertakingSide()
     -- local targetOffset = storage.maxLateralOffset_normalized
-    local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
+    -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
+    local targetOffset = storage.overtakingLateralOffset
     local rampSpeed_mps = storage.overtakeRampSpeed_mps
     local overrideAiAwareness = storage.overrideAiAwareness
 
@@ -477,7 +478,8 @@ end
 function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
       local driveToSide = RaceTrackManager.getYieldingSide()
       -- local targetOffset = storage.maxLateralOffset_normalized
-      local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
+      -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
+      local targetOffset = storage.yieldingLateralOffset
       local rampSpeed_mps = storage.rampSpeed_mps
       local overrideAiAwareness = storage.overrideAiAwareness
 
