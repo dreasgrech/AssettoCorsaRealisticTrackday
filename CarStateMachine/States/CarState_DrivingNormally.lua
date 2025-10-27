@@ -43,8 +43,7 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-      -- TODO: set the correct ramp speed here
-      local rampSpeed_mps = storage.rampSpeed_mps
+      local rampSpeed_mps = 1000 -- high value so they keep on the lane as much as possible?
       local targetOffset = storage.defaultLateralOffset
 
       local car = sortedCarsList[sortedCarsListIndex]
