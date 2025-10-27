@@ -43,6 +43,8 @@ CustomAIFloodManager = require("CustomAIFloodManager")
 CollisionAvoidanceManager = require("CollisionAvoidanceManager")
 -- FrenetAvoid = require("FrenetAvoid")
 
+SettingsWindow = require("SettingsWindow")
+
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
 ---
@@ -374,7 +376,7 @@ end
 function script.MANIFEST__FUNCTION_SETTINGS()
   if (not Constants.CAN_APP_RUN) then return end
 
-  UIManager.renderUIOptionsControls()
+  SettingsWindow.draw()
 end
 
 --[=====[ 
