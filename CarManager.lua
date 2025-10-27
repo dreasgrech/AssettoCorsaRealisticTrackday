@@ -379,14 +379,15 @@ end
 ---@param car ac.StateCar
 ---@param carFront ac.StateCar
 ---@return number closingSpeed_ms
----@return number TTC
+---@return number timeToCollision
+---@return number distanceBetweenCars
 CarManager.getClosingSpeed = function(car, carFront)
-  if not car or not carFront then return -1,-1 end
+  if not car or not carFront then return -1,-1,-1 end
 
   -- positions
   local deltaPositions = carFront.position - car.position
   local distanceBetweenPositions = deltaPositions:length()
-  if distanceBetweenPositions < 1e-3 then return -1, -1 end
+  if distanceBetweenPositions < 1e-3 then return -1, -1, -1 end
   local rhat = deltaPositions / distanceBetweenPositions
 
   -- closing speed in m/s (positive = closing, negative = opening)
@@ -403,9 +404,9 @@ CarManager.getClosingSpeed = function(car, carFront)
 
   -- local carBehindIndex = car.index
   -- CarManager.cars_closingSpeed[carBehindIndex] = closing_ms
-  -- CarManager.cars_timeToCollision[carBehindIndex] = TTC
+  -- CarManager.cars_timeToCollision[carBehindIndex] = timeToCollision
 
-  return closingSpeed_ms, timeToCollision
+  return closingSpeed_ms, timeToCollision, distanceBetweenPositions
 end
 
 -- -- Utility: compute world right-vector at a given progress on the AI spline
