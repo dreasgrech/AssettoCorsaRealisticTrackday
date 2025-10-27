@@ -41,6 +41,7 @@ UIManager = require("UIManager")
 -- CarSpeedLimiter = require("CarSpeedLimiter")
 CustomAIFloodManager = require("CustomAIFloodManager")
 CollisionAvoidanceManager = require("CollisionAvoidanceManager")
+-- FrenetAvoid = require("FrenetAvoid")
 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
@@ -53,6 +54,9 @@ local function awake()
 
   -- Logger.log('Initializing')
   CarManager.ensureDefaults(0) -- ensure defaults on local player car
+
+  -- Logger.log(ac.getTrackFullID())
+  -- Logger.log(ac.getSim().raceSessionType)
 end
 awake()
 
@@ -229,6 +233,9 @@ function script.MANIFEST__UPDATE(dt)
   CustomAIFloodManager.handleFlood(sortedCars, localPlayerSortedCarListIndex)
 
   RaceTrackManager.updateYellowFlagZones()
+
+  -- local offset = FrenetAvoid.computeOffset(sortedCars, ac.getCar(0), dt)
+  -- physics.setAISplineOffset(0, offset, true)
 end
 
 --[====[
@@ -348,12 +355,15 @@ function script.MANIFEST__TRANSPARENT(dt)
   -- ----------------------------------------------------------------
   
 
-  if storage.debugDraw then
+  if storage.debugShowRaycastsWhileDrivingLaterally then
     for i, car in ac.iterateCars() do
       local carIndex = car.index
         CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
     end
   end
+
+  -- FrenetAvoid.debugDraw(0)
+
 
   -- render.setDepthMode(render.DepthMode.Normal)
 end

@@ -33,9 +33,10 @@ StorageManager.Options ={
     DistanceToStartNavigatingAroundCarInAccident_meters = 21,
 
     DebugDraw = 22,
-    DebugDrawSideOfftrack = 23,
-    DrawCarList = 24,
-    DebugLogFastStateChanges = 25,
+    DebugShowRaycastsWhileDrivingLaterally = 23,
+    DebugDrawSideOfftrack = 24,
+    DrawCarList = 25,
+    DebugLogFastStateChanges = 26,
 }
 
 -- only used to build the actual tables that hold the runtime values
@@ -71,6 +72,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters, default=30.0, min=10.0, max=100.0 },
 
     { name = StorageManager.Options.DebugDraw, default=false, min=nil, max=nil },
+    { name = StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DrawCarList, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DebugLogFastStateChanges, default=false, min=nil, max=nil },
@@ -114,6 +116,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field distanceFromAccidentToSeeYellowFlag_meters number
 ---@field distanceToStartNavigatingAroundCarInAccident_meters number
 ---@field debugDraw boolean
+---@field debugShowRaycastsWhileDrivingLaterally boolean
 ---@field debugDrawSideOfftrack boolean
 ---@field drawCarList boolean
 ---@field debugLogFastStateChanges boolean
@@ -150,6 +153,7 @@ local storageTable = {
     distanceToStartNavigatingAroundCarInAccident_meters = StorageManager.options_default[StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters],
 
     debugDraw = StorageManager.options_default[StorageManager.Options.DebugDraw],
+    debugShowRaycastsWhileDrivingLaterally = StorageManager.options_default[StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally],
     debugDrawSideOfftrack = StorageManager.options_default[StorageManager.Options.DebugDrawSideOfftrack],
     drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],
     debugLogFastStateChanges = StorageManager.options_default[StorageManager.Options.DebugLogFastStateChanges],
