@@ -51,8 +51,8 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
 
     { name = StorageManager.Options.DefaultLateralOffset, default=0, min=-1, max=1 },
-    { name = StorageManager.Options.YieldingLateralOffset, default=0.5, min=-1, max=1 },
-    { name = StorageManager.Options.OvertakingLateralOffset, default=-0.5, min=-1, max=1 },
+    { name = StorageManager.Options.YieldingLateralOffset, default=0.8, min=-1, max=1 },
+    { name = StorageManager.Options.OvertakingLateralOffset, default=-0.8, min=-1, max=1 },
     -- { name = StorageManager.Options.MaxLateralOffset_normalized, default=0.8, min=0.1, max=1.0 },
 
     { name = StorageManager.Options.ClearAhead_meters, default=10.0, min=4.0, max=20.0 },
