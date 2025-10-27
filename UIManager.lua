@@ -332,7 +332,7 @@ local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 
 function UIManager.drawCarStateOverheadText()
   local storage = StorageManager.getStorage()
-  if not storage.debugDraw then return end
+  if not storage.debugShowCarStateOverheadText then return end
   local sim = ac.getSim()
   -- local depthModeBeforeModification = render.DepthMode
   -- if storage.drawOnTop then
@@ -530,7 +530,7 @@ function UIManager.renderUIOptionsControls()
     ui.dwriteText('Debugging', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    if ui.checkbox('Show car state overhead text', storage.debugDraw) then storage.debugDraw = not storage.debugDraw end
+    if ui.checkbox('Show car state overhead text', storage.debugShowCarStateOverheadText) then storage.debugShowCarStateOverheadText = not storage.debugShowCarStateOverheadText end
     if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
 
     if ui.checkbox('Show raycasts when driving laterally', storage.debugShowRaycastsWhileDrivingLaterally) then storage.debugShowRaycastsWhileDrivingLaterally = not storage.debugShowRaycastsWhileDrivingLaterally end
