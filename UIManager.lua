@@ -471,6 +471,9 @@ function UIManager.renderUIOptionsControls()
     ui.dwriteText('Yielding', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
+    if ui.checkbox('Handle yielding', storage.handleYielding) then storage.handleYielding = not storage.handleYielding end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to yield on the correct lane') end
+
     storage.detectCarBehind_meters =  ui.slider('Detect car behind (m)', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters])
     if ui.itemHovered() then ui.setTooltip('Start yielding if the player is behind and within this distance') end
 

@@ -545,6 +545,11 @@ end
 ---@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
 CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sortedCarsListIndex, storage)
+  local handleYielding = storage.handleYielding
+  if not handleYielding then
+    return
+  end
+
     local car = sortedCarsList[sortedCarsListIndex]
 
     --Check all the cars behind us within our detection radius to see if we need to yield to any of them

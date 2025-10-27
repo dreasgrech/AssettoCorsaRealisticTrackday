@@ -15,28 +15,29 @@ StorageManager.Options ={
 
     ClearAhead_meters = 8,
 
-    DetectCarBehind_meters = 9,
-    RampSpeed_mps = 10,
-    RampRelease_mps = 11,
+    HandleYielding = 9,
+    DetectCarBehind_meters = 10,
+    RampSpeed_mps = 11,
+    RampRelease_mps = 12,
 
-    HandleOvertaking = 12,
-    DetectCarAhead_meters = 13,
-    OvertakeRampSpeed_mps = 14,
-    OvertakeRampRelease_mps = 15,
+    HandleOvertaking = 13,
+    DetectCarAhead_meters = 14,
+    OvertakeRampSpeed_mps = 15,
+    OvertakeRampRelease_mps = 16,
 
-    CustomAIFlood_enabled = 16,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 17,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 18,
+    CustomAIFlood_enabled = 17,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 18,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 19,
 
-    HandleAccidents = 19,
-    DistanceFromAccidentToSeeYellowFlag_meters = 20,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 21,
+    HandleAccidents = 20,
+    DistanceFromAccidentToSeeYellowFlag_meters = 21,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 22,
 
-    DebugShowCarStateOverheadText = 22,
-    DebugShowRaycastsWhileDrivingLaterally = 23,
-    DebugDrawSideOfftrack = 24,
-    DrawCarList = 25,
-    DebugLogFastStateChanges = 26,
+    DebugShowCarStateOverheadText = 23,
+    DebugShowRaycastsWhileDrivingLaterally = 24,
+    DebugDrawSideOfftrack = 25,
+    DrawCarList = 26,
+    DebugLogFastStateChanges = 27,
 }
 
 -- local RAMP_SPEEDS_MAX = 10
@@ -56,6 +57,7 @@ local optionsCollection_beforeDoD = {
 
     { name = StorageManager.Options.ClearAhead_meters, default=10.0, min=4.0, max=20.0 },
 
+    { name = StorageManager.Options.HandleYielding, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DetectCarBehind_meters, default=90, min=10, max=90 },
     { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=2.0 },
     { name = StorageManager.Options.RampRelease_mps, default=0.1, min=0.1, max=2.0 },
@@ -107,6 +109,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field yieldingLateralOffset number
 ---@field overtakingLateralOffset number
 -- ---@field maxLateralOffset_normalized number
+---@field handleYielding boolean
 ---@field detectCarBehind_meters number
 ---@field rampSpeed_mps number
 ---@field rampRelease_mps number
@@ -140,6 +143,7 @@ local storageTable = {
     overtakingLateralOffset = StorageManager.options_default[StorageManager.Options.OvertakingLateralOffset],
     -- maxLateralOffset_normalized = StorageManager.options_default[StorageManager.Options.MaxLateralOffset_normalized],
 
+    handleYielding = StorageManager.options_default[StorageManager.Options.HandleYielding],
     detectCarBehind_meters = StorageManager.options_default[StorageManager.Options.DetectCarBehind_meters],
     rampSpeed_mps = StorageManager.options_default[StorageManager.Options.RampSpeed_mps],
     rampRelease_mps = StorageManager.options_default[StorageManager.Options.RampRelease_mps],
