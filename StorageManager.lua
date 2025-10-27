@@ -39,6 +39,8 @@ StorageManager.Options ={
     DebugLogFastStateChanges = 26,
 }
 
+-- local RAMP_SPEEDS_MAX = 10
+
 -- only used to build the actual tables that hold the runtime values
 local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.Enabled, default=true, min=nil, max=nil },
@@ -57,11 +59,15 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DetectCarBehind_meters, default=90, min=10, max=90 },
     { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=2.0 },
     { name = StorageManager.Options.RampRelease_mps, default=0.1, min=0.1, max=2.0 },
+    -- { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=RAMP_SPEEDS_MAX },
+    -- { name = StorageManager.Options.RampRelease_mps, default=0.1, min=0.1, max=RAMP_SPEEDS_MAX },
 
     { name = StorageManager.Options.HandleOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DetectCarAhead_meters, default=100, min=50, max=500 },
     { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=2.0 },
     { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.5, min=0.1, max=2.0 },
+    -- { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=RAMP_SPEEDS_MAX },
+    -- { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.5, min=0.1, max=RAMP_SPEEDS_MAX },
 
     { name = StorageManager.Options.CustomAIFlood_enabled, default=false, min=nil, max=nil },
     { name = StorageManager.Options.CustomAIFlood_distanceBehindPlayerToCycle_meters, default=200, min=50, max=500 },

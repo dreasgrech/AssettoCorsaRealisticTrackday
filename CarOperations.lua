@@ -396,8 +396,9 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
           -- drive to the other side to avoid colliding with the car on this side
           side = RaceTrackManager.getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
           -- driveToSideMaxOffset = driveToSideMaxOffset * 0.5 -- drive to the other side but not fully
-          targetLateralOffset = targetLateralOffset * 0.5 -- drive to the other side but not fully
-          rampSpeed_mps = rampSpeed_mps-- * 0.5 -- drive more slowly to the other side
+          -- targetLateralOffset = targetLateralOffset * 0.5 -- drive to the other side but not fully
+          targetLateralOffset = -targetLateralOffset * 0.5 -- drive to the other side but not fully
+          rampSpeed_mps = rampSpeed_mps * 0.5 -- drive more slowly to the other side
 
           -- do another side check on the other side since we're driving to the other side now
           local isOtherSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
@@ -412,19 +413,19 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
       -- todo: should these operations be here?
       -- todo: should these operations be here?
       -- todo: should these operations be here?
-      CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
-      CarOperations.resetAIThrottleLimit(carIndex) -- remove any speed limit we may have applied while waiting for a gap
+      -- CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+      -- CarOperations.resetAIThrottleLimit(carIndex) -- remove any speed limit we may have applied while waiting for a gap
       CarOperations.setGrip(carIndex, CarManager.GripValues.DRIVING_TO_THE_SIDE) -- increase grip while driving to the side
 
       -- if we are driving at high speed, we need to decrease the ramp speed so that our car doesn't jolt out of control
       -- local splineOffsetTransitionSpeed = CarOperations.limitSplitOffsetRampUpSpeed(car.speedKmh, storage.rampSpeed_mps)
       local splineOffsetTransitionSpeed = CarOperations.limitSplineOffsetRampUpSpeed(car.speedKmh, rampSpeed_mps)
 
-      local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
       -- local sideSign = drivingToTheLeft and -1 or 1
+
       -- TODO: Are you sure we shouldn't be using the actual track lateral offset here?
       local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
-      -- local currentSplineOffset = CarManager.getActualTrackLateralOffset(car.position)
+      -- local currentSplineOffset = currentActualTrackLateralOffset -- the problem with this one is that if the increase in offset is too low, the ai can override it and still go the other direction
 
       -- local targetSplineOffset = storage.maxLateralOffset_normalized * sideSign
       -- TODO: limit the target offset when we are approaching a corner or in mid corner!
@@ -441,6 +442,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
       -- keep the turning lights on while driving to the side
+      local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
       local turningLights = drivingToTheLeft and ac.TurningLights.Left or ac.TurningLights.Right
       -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
       CarOperations.toggleTurningLights(carIndex, turningLights)
@@ -690,7 +692,7 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(car
     local p = CarOperations.getSideAnchorPoints(carPosition, carForward, carLeftDirection, carUp, halfAABBSize)  -- returns left/right dirs too
     -- local pLeftDirection = p.leftDirection
     -- local pRightDirection = p.rightDirection
-    local sideGap = 2.0
+    local sideGap = 1.5
 
     --[====[
     CarManager.cars_totalSideBlockRaysData[carIndex] = 2
