@@ -44,10 +44,10 @@ StorageManager.Options ={
 
 -- only used to build the actual tables that hold the runtime values
 local optionsCollection_beforeDoD = {
-    { name = StorageManager.Options.Enabled, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.Enabled, default=false, min=nil, max=nil },
     { name = StorageManager.Options.HandleSideChecking, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options.YieldSide, default=RaceTrackManager.TrackSide.RIGHT, min=nil, max=nil },
-    { name = StorageManager.Options.OverrideAiAwareness, default=false, min=nil, max=nil },
+    { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
 
     { name = StorageManager.Options.DefaultLateralOffset, default=0, min=-1, max=1 },
@@ -169,12 +169,22 @@ local storageTable = {
     debugLogFastStateChanges = StorageManager.options_default[StorageManager.Options.DebugLogFastStateChanges],
 }
 
-local storage = ac.storage(storageTable)
+local sim = ac.getSim()
+local raceSessionType = sim.raceSessionType
+
+local fullTrackID = ac.getTrackFullID("_")
+
+local storageKey = string.format("%s_%s", fullTrackID, raceSessionType)
+local storage = ac.storage(storageTable, storageKey)
 
 ---comment
 ---@return StorageTable storage
 function StorageManager.getStorage()
     return storage
+end
+
+function StorageManager.getStorageKey()
+    return storageKey
 end
 
 return StorageManager

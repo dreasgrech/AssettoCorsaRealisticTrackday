@@ -20,6 +20,9 @@ SettingsWindow.draw = function()
 
     ui.pushDWriteFont('Segoe UI')
 
+    ui.text(string.format('Settings loaded for %s', StorageManager.getStorageKey()))
+    ui.newLine(1)
+
     -- Draw the Enabled checkbox
     local appEnabled = storage.enabled
     local enabledCheckBoxColor = appEnabled and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
