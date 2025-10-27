@@ -51,13 +51,14 @@ local carTableColumns_dataBeforeDoD = {
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'ClosingSpeed', orderDirection = 0, width = 95, tooltip='Closing speed to car in front' },
   { name = 'TimeToCollide', orderDirection = 0, width = 95, tooltip='Time to collision to car in front' },
+  { name = 'FrontCarDistance', orderDirection = 0, width = 95, tooltip='The distance to the car in front (m)' },
   { name = 'PreviousState', orderDirection = 0, width = 170, tooltip='Previous state' },
   { name = 'CurrentState', orderDirection = 0, width = 170, tooltip='Current state' },
   { name = 'TimeInState', orderDirection = 0, width = 90, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
-  { name = 'InvolvedInAccident', orderDirection = 0, width = 120, tooltip='Involved in accident status' },
-  { name = 'NavigatingAccident', orderDirection = 0, width = 120, tooltip='Navigating accident status' },
+  { name = 'InvolvedInAccident', orderDirection = 0, width = 40, tooltip='Involved in accident status' },
+  { name = 'NavigatingAccident', orderDirection = 0, width = 40, tooltip='Navigating accident status' },
   { name = 'PreviousStateExitReason', orderDirection = 0, width = 250, tooltip='Reason for last state exit' },
   { name = "CantYieldReason", orderDirection = 0, width = 260, tooltip="Reason why the car can't yield" },
   { name = "CantOvertakeReason", orderDirection = 0, width = 260, tooltip="Reason why the car can't overtake" },
@@ -190,7 +191,8 @@ UIManager.drawMainWindowContent = function()
       local trackAISplineSides = ac.getTrackAISplineSides(carSplinePosition)
 
       local carFront = sortedCarsList[n-1]
-      local closingSpeed, timeToCollision = CarManager.getClosingSpeed(car, carFront)
+      local closingSpeed, timeToCollision, distanceToFrontCar = CarManager.getClosingSpeed(car, carFront)
+
 
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
@@ -253,6 +255,7 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("%.2f", CarManager.cars_grip[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.2f km/h", closingSpeed), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.2fs", timeToCollision), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.2f m", distanceToFrontCar), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
       ui.textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui.nextColumn()
@@ -441,15 +444,14 @@ function UIManager.renderUIOptionsControls()
     storage.defaultLateralOffset =  ui.slider('Default Lateral Offset', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset])
     if ui.itemHovered() then ui.setTooltip('The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.') end
 
-    storage.yieldingLateralOffset =  ui.slider('Yielding Lateral Offset', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset])
-    if ui.itemHovered() then ui.setTooltip('The lateral offset from the centerline that AI cars will drive to when yielding.') end
-    local yieldingSide = RaceTrackManager.getYieldingSide()
-    ui.text(string.format('Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]))
 
-    storage.overtakingLateralOffset =  ui.slider('Overtaking Lateral Offset', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset])
-    if ui.itemHovered() then ui.setTooltip('The lateral offset from the centerline that AI cars will drive to when overtaking another car.') end
+    local yieldingSide = RaceTrackManager.getYieldingSide()
+    storage.yieldingLateralOffset =  ui.slider(string.format('Yielding Lateral Offset.  Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset])
+    if ui.itemHovered() then ui.setTooltip('The lateral offset from the centerline that AI cars will drive to when yielding.') end
+
     local overtakingSide = RaceTrackManager.getOvertakingSide()
-    ui.text(string.format('Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]))
+    storage.overtakingLateralOffset =  ui.slider(string.format('Overtaking Lateral Offset.  Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset])
+    if ui.itemHovered() then ui.setTooltip('The lateral offset from the centerline that AI cars will drive to when overtaking another car.') end
 
     if yieldingSide == overtakingSide then
       ui.textColored('Warning: Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
