@@ -140,9 +140,9 @@ SettingsWindow.draw = function()
 
     storage.detectCarBehind_meters =  renderSlider('Detect car behind (m)', 'Start yielding if the player is behind and within this distance', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH)
 
-    storage.rampSpeed_mps =  renderSlider('Yield offset ramp (m/s)', 'How quickly the side offset ramps up when yielding.', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps], DEFAULT_SLIDER_WIDTH)
+    storage.rampSpeed_mps =  renderSlider('Yield offset ramp (m/s)', 'How quickly the lateral offset ramps up when yielding.', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps], DEFAULT_SLIDER_WIDTH)
 
-    storage.rampRelease_mps =  renderSlider('Yield offset release (m/s)', 'How quickly the side offset returns to normal once an overtaking car has fully driven past the yielding car.', storage.rampRelease_mps, StorageManager.options_min[StorageManager.Options.RampRelease_mps], StorageManager.options_max[StorageManager.Options.RampRelease_mps], DEFAULT_SLIDER_WIDTH)
+    storage.rampRelease_mps =  renderSlider('Yield offset release (m/s)', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the yielding car.', storage.rampRelease_mps, StorageManager.options_min[StorageManager.Options.RampRelease_mps], StorageManager.options_max[StorageManager.Options.RampRelease_mps], DEFAULT_SLIDER_WIDTH)
 
     --ui.separator()
 
@@ -157,9 +157,9 @@ SettingsWindow.draw = function()
 
     storage.detectCarAhead_meters =  renderSlider('Detect car ahead (m)', 'Start overtaking if the car in front is within this distance', storage.detectCarAhead_meters, StorageManager.options_min[StorageManager.Options.DetectCarAhead_meters], StorageManager.options_max[StorageManager.Options.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH)
 
-    storage.overtakeRampSpeed_mps =  renderSlider('Overtake offset ramp (m/s)', 'How quickly the side offset ramps up when overtaking another car.', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH)
+    storage.overtakeRampSpeed_mps =  renderSlider('Overtake offset ramp (m/s)', 'How quickly the lateral offset ramps up when overtaking another car.', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH)
 
-    storage.overtakeRampRelease_mps =  renderSlider('Overtake offset release (m/s)', 'How quickly the side offset returns to normal once an overtaking car has fully driven past the overtaken car.', storage.overtakeRampRelease_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampRelease_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampRelease_mps], DEFAULT_SLIDER_WIDTH)
+    storage.overtakeRampRelease_mps =  renderSlider('Overtake offset release (m/s)', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the overtaken car.', storage.overtakeRampRelease_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampRelease_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampRelease_mps], DEFAULT_SLIDER_WIDTH)
 
     -- finish two columns
     ui.columns(1, false)
