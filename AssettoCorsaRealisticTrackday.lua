@@ -59,6 +59,16 @@ local function awake()
 
   -- Logger.log(ac.getTrackFullID())
   -- Logger.log(ac.getSim().raceSessionType)
+
+  local globalStorage = StorageManager.getGlobalStorage()
+  if not globalStorage.appRanFirstTime then
+    Logger.log('First time app run detected.  Showing app windows')
+    UIManager.openMainWindow()
+    UIManager.openSettingsWindow()
+
+    globalStorage.appRanFirstTime = true
+  end
+
 end
 awake()
 

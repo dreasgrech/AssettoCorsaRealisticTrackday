@@ -174,17 +174,32 @@ local raceSessionType = sim.raceSessionType
 
 local fullTrackID = ac.getTrackFullID("_")
 
-local storageKey = string.format("%s_%s", fullTrackID, raceSessionType)
-local storage = ac.storage(storageTable, storageKey)
+local perTrackPerModeStorageKey = string.format("%s_%s", fullTrackID, raceSessionType)
+local perTrackPerModeStorage = ac.storage(storageTable, perTrackPerModeStorageKey)
 
----comment
+---@class GlobalStorageTable
+---@field appRanFirstTime boolean
+
+---@type GlobalStorageTable
+
+local globalStorageTable = {
+    appRanFirstTime = false,
+}
+
+local globalStorage = ac.storage(globalStorageTable, "global")
+
 ---@return StorageTable storage
 function StorageManager.getStorage()
-    return storage
+    return perTrackPerModeStorage
+end
+
+---@return GlobalStorageTable globalStorage
+function StorageManager.getGlobalStorage()
+    return globalStorage
 end
 
 function StorageManager.getStorageKey()
-    return storageKey
+    return perTrackPerModeStorageKey
 end
 
 return StorageManager
