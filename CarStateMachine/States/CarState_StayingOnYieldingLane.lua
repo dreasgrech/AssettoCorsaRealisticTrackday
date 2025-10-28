@@ -123,6 +123,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
       --]====]
 
+      -- Check again if we should yield to a new car behind us
       local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
       if newStateDueToCarBehind then
         -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
