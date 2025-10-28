@@ -24,7 +24,7 @@ local renderDebuggingSection = function(storage)
     ui.dwriteText('Debugging', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    ui.columns(2, false, "debuggingSection")
+    ui.columns(3, false, "debuggingSection")
 
     if ui.checkbox('Show car state overhead text', storage.debugShowCarStateOverheadText) then storage.debugShowCarStateOverheadText = not storage.debugShowCarStateOverheadText end
     if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
@@ -37,6 +37,8 @@ local renderDebuggingSection = function(storage)
 
     if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
     if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
+
+    ui.nextColumn()
 
     if ui.checkbox('Log fast AI state changes', storage.debugLogFastStateChanges) then storage.debugLogFastStateChanges = not storage.debugLogFastStateChanges end
     if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car changes from one state to another very quickly') end
