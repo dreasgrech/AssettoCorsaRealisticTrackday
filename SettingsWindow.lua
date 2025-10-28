@@ -18,6 +18,39 @@ local renderSlider = function(label, tooltip, value, min, max, sliderWidth)
     return newValue
 end
 
+local renderDebuggingSection = function(storage)
+    -- ui.text('Debugging')
+    ui.newLine(1)
+    ui.dwriteText('Debugging', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
+
+    ui.columns(2, false, "debuggingSection")
+
+    if ui.checkbox('Show car state overhead text', storage.debugShowCarStateOverheadText) then storage.debugShowCarStateOverheadText = not storage.debugShowCarStateOverheadText end
+    if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
+
+    if ui.checkbox('Show raycasts when driving laterally', storage.debugShowRaycastsWhileDrivingLaterally) then storage.debugShowRaycastsWhileDrivingLaterally = not storage.debugShowRaycastsWhileDrivingLaterally end
+    if ui.itemHovered() then ui.setTooltip('Shows the raycasts used to check for side clearance when driving checking for cars on the side') end
+
+    if ui.checkbox('Draw tyres side offtrack gizmos', storage.debugDrawSideOfftrack) then storage.debugDrawSideOfftrack = not storage.debugDrawSideOfftrack end
+    if ui.itemHovered() then ui.setTooltip('Shows gizmos for the car\'s tyres when offtrack') end
+
+    if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
+    if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
+
+    if ui.checkbox('Log fast AI state changes', storage.debugLogFastStateChanges) then storage.debugLogFastStateChanges = not storage.debugLogFastStateChanges end
+    if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car changes from one state to another very quickly') end
+
+    ui.nextColumn()
+
+    if ui.button('Simulate accident', ui.ButtonFlags.None) then
+        AccidentManager.simulateAccident()
+    end
+
+    -- reset the column layout
+    ui.columns(1, false)
+end
+
 SettingsWindow.draw = function()
     local storage = StorageManager.getStorage()
 
@@ -56,9 +89,9 @@ SettingsWindow.draw = function()
 
     storage.defaultAICaution =  renderSlider('Default AI Caution', 'Base AI caution level (higher = more cautious, slower but less accident prone).', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH) -- do not drop the minimum below 2 because 1 is used while overtaking
 
+    ui.newLine(1)
     ui.separator()
 
-    -- ui.text('Driving Lanes')
     ui.newLine(1)
     ui.dwriteText('Driving Lanes', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
@@ -80,6 +113,7 @@ SettingsWindow.draw = function()
     -- storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, StorageManager.options_min[StorageManager.Options.MaxLateralOffset_normalized], StorageManager.options_max[StorageManager.Options.MaxLateralOffset_normalized])
     -- if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
 
+    ui.newLine(1)
     ui.separator()
 
 -- ui.pushDWriteFont('Segoe UI')     -- or a custom TTF; see docs comment
@@ -91,7 +125,6 @@ SettingsWindow.draw = function()
     --ui.setColumnWidth(1, 260)
 
 
-    -- ui.text('Yielding')
     ui.newLine(1)
     ui.dwriteText('Yielding', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
@@ -109,7 +142,6 @@ SettingsWindow.draw = function()
 
     ui.nextColumn()
 
-    -- ui.text('Overtaking')
     ui.newLine(1)
     ui.dwriteText('Overtaking', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
@@ -126,10 +158,9 @@ SettingsWindow.draw = function()
     -- finish two columns
     ui.columns(1, false)
 
-
+    ui.newLine(1)
     ui.separator()
 
-    -- ui.text('Accidents')
     ui.newLine(1)
     ui.dwriteText('Accidents', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
@@ -141,9 +172,9 @@ SettingsWindow.draw = function()
 
     storage.distanceToStartNavigatingAroundCarInAccident_meters =  renderSlider('Distance to start navigating around car in accident (m)', 'Distance from accident at which AI will start navigating around the car in accident.', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100, DEFAULT_SLIDER_WIDTH)
 
+    ui.newLine(1)
     ui.separator()
 
-    -- ui.text('Other')
     ui.newLine(1)
     ui.dwriteText('Other', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
@@ -152,29 +183,7 @@ SettingsWindow.draw = function()
 
     ui.separator()
 
-    -- ui.text('Debugging')
-    ui.newLine(1)
-    ui.dwriteText('Debugging', UI_HEADER_TEXT_FONT_SIZE)
-    ui.newLine(1)
-
-    if ui.checkbox('Show car state overhead text', storage.debugShowCarStateOverheadText) then storage.debugShowCarStateOverheadText = not storage.debugShowCarStateOverheadText end
-    if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
-
-    if ui.checkbox('Show raycasts when driving laterally', storage.debugShowRaycastsWhileDrivingLaterally) then storage.debugShowRaycastsWhileDrivingLaterally = not storage.debugShowRaycastsWhileDrivingLaterally end
-    if ui.itemHovered() then ui.setTooltip('Shows the raycasts used to check for side clearance when driving checking for cars on the side') end
-
-    if ui.checkbox('Draw tyres side offtrack gizmos', storage.debugDrawSideOfftrack) then storage.debugDrawSideOfftrack = not storage.debugDrawSideOfftrack end
-    if ui.itemHovered() then ui.setTooltip('Shows gizmos for the car\'s tyres when offtrack') end
-
-    if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
-    if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
-
-    if ui.checkbox('Log fast AI state changes', storage.debugLogFastStateChanges) then storage.debugLogFastStateChanges = not storage.debugLogFastStateChanges end
-    if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car changes from one state to another very quickly') end
-
-    if ui.button('Simulate accident', ui.ButtonFlags.None) then
-        AccidentManager.simulateAccident()
-    end
+    renderDebuggingSection(storage)
 
 --[===[
     ui.separator()
