@@ -55,17 +55,17 @@ local carTableColumns_dataBeforeDoD = {
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'ClosingSpeed', orderDirection = 0, width = 95, tooltip='Closing speed to car in front' },
-  { name = 'TimeToCollide', orderDirection = 0, width = 95, tooltip='Time to collision to car in front' },
-  { name = 'FrontCarDistance', orderDirection = 0, width = 95, tooltip='The distance to the car in front (m)' },
-  { name = 'PreviousState', orderDirection = 0, width = 170, tooltip='Previous state' },
-  { name = 'CurrentState', orderDirection = 0, width = 170, tooltip='Current state' },
+  { name = 'TimeToCollide', orderDirection = 0, width = 75, tooltip='Time to collision to car in front' },
+  { name = 'FrontCarDistance', orderDirection = 0, width = 75, tooltip='The distance to the car in front (m)' },
+  { name = 'PreviousState', orderDirection = 0, width = 160, tooltip='Previous state' },
+  { name = 'CurrentState', orderDirection = 0, width = 160, tooltip='Current state' },
   { name = 'TimeInState', orderDirection = 0, width = 90, tooltip='Time spent in current state' },
   { name = 'Yielding', orderDirection = 0, width = 70, tooltip='Yielding status' },
   { name = 'Overtaking', orderDirection = 0, width = 80, tooltip='Overtaking status' },
-  { name = 'InvolvedInAccident', orderDirection = 0, width = 40, tooltip='Involved in accident status' },
-  { name = 'NavigatingAccident', orderDirection = 0, width = 40, tooltip='Navigating accident status' },
+  -- { name = 'InvolvedInAccident', orderDirection = 0, width = 40, tooltip='Involved in accident status' },
+  -- { name = 'NavigatingAccident', orderDirection = 0, width = 40, tooltip='Navigating accident status' },
   { name = 'PreviousStateExitReason', orderDirection = 0, width = 250, tooltip='Reason for last state exit' },
-  { name = "CantYieldReason", orderDirection = 0, width = 260, tooltip="Reason why the car can't yield" },
+  { name = "CantYieldReason", orderDirection = 0, width = 220, tooltip="Reason why the car can't yield" },
   { name = "CantOvertakeReason", orderDirection = 0, width = 260, tooltip="Reason why the car can't overtake" },
 }
 
@@ -289,20 +289,20 @@ UIManager.drawMainWindowContent = function()
       end
       ui.nextColumn()
       
-      if involvedInAccidentIndex then
-        local culpritOrVictim = culpritInAccidentIndex and "Culprit" or "Victim"
-        ui.textColored(string.format("Accident:#%d %s", involvedInAccidentIndex, culpritOrVictim), uiColor)
-      else
-        ui.textColored("no", uiColor)
-      end
-      ui.nextColumn()
+      -- if involvedInAccidentIndex then
+        -- local culpritOrVictim = culpritInAccidentIndex and "Culprit" or "Victim"
+        -- ui.textColored(string.format("Accident:#%d %s", involvedInAccidentIndex, culpritOrVictim), uiColor)
+      -- else
+        -- ui.textColored("no", uiColor)
+      -- end
+      -- ui.nextColumn()
 
-      if currentlyNavigatingAroundAccidentIndex and currentlyNavigatingAroundAccidentIndex > 0 then
-        ui.textColored(string.format("yes #%d (car: #%d)", currentlyNavigatingAroundAccidentIndex, CarManager.cars_navigatingAroundCarIndex[carIndex]), uiColor)
-      else
-        ui.textColored("no", uiColor)
-      end
-      ui.nextColumn()
+      -- if currentlyNavigatingAroundAccidentIndex and currentlyNavigatingAroundAccidentIndex > 0 then
+        -- ui.textColored(string.format("yes #%d (car: #%d)", currentlyNavigatingAroundAccidentIndex, CarManager.cars_navigatingAroundCarIndex[carIndex]), uiColor)
+      -- else
+        -- ui.textColored("no", uiColor)
+      -- end
+      -- ui.nextColumn()
 
       ui.textColored(lastStateExitReason, uiColor); ui.nextColumn()
       ui.textColored(cantYieldReason, uiColor); ui.nextColumn()
