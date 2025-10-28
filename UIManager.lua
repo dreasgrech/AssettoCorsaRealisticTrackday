@@ -80,7 +80,14 @@ local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 
 UIManager.drawMainWindowContent = function()
   local storage = StorageManager.getStorage()
-  -- ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[storage.yieldSide]))
+
+  if ui.button('Open Settings') then
+    local settingsWindowOpened = ac.isWindowOpen('settingsWindow')
+    ac.setWindowOpen('settingsWindow', not settingsWindowOpened)
+  end
+
+  ui.newLine(1)
+
   ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[RaceTrackManager.getYieldingSide()]))
 
   --[====[
