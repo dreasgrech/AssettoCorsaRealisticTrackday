@@ -256,7 +256,7 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
             -- local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
             local stateExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousState]) or ''
             Logger.warn(string.format(
-            "CarStateMachine: #%d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
+            "[CarStateMachine] #%d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
             carIndex,
             timeInStateBeforeChange,
             CarStateMachine.CarStateTypeStrings[currentStateBeforeChange],
