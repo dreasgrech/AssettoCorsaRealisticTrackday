@@ -39,12 +39,13 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     local currentlyYieldingToCar = ac.getCar(currentlyYieldingToCarIndex)
     if currentlyYieldingToCar then
       local carBehindPosition = currentlyYieldingToCar.position
-      Logger.log(string.format("[EasingInYield] #%d yielding to #%d. OvertakingSide: %s, CarBehindPosition: %s, CarBehindLateralOffset: %.3f",
+      Logger.log(string.format("[EasingInYield] #%d yielding to #%d. CarAvgSpeed: %.3f, CarBehindAvgSpeed: %.3f, CarBehindLateralOffset: %.3f",
       carIndex,
       currentlyYieldingToCarIndex,
-      RaceTrackManager.TrackSideStrings[RaceTrackManager.getOvertakingSide()],
-      tostring(carBehindPosition),
-      CarManager.getActualTrackLateralOffset(carBehindPosition)))
+      CarManager.cars_averageSpeedKmh[carIndex],
+      CarManager.cars_averageSpeedKmh[currentlyYieldingToCarIndex],
+      CarManager.getActualTrackLateralOffset(carBehindPosition)
+      ))
     end
   end
 end
