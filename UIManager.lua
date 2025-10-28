@@ -1,5 +1,9 @@
 ﻿local UIManager = {}
 
+-- These are the window IDs as defined in the manifest.ini
+local MAIN_WINDOW_ID = 'mainWindow'
+local SETTINGS_WINDOW_ID = 'settingsWindow'
+
 -- UI Car list table colors
 local CARLIST_ROW_BACKGROUND_COLOR_SELECTED = rgbm(1, 0, 0, 0.3)
 local CARLIST_ROW_BACKGROUND_COLOR_CLICKED = rgbm(1, 0, 0, 0.3)
@@ -81,9 +85,8 @@ local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 UIManager.drawMainWindowContent = function()
   local storage = StorageManager.getStorage()
 
-  if ui.button('Open Settings') then
-    local settingsWindowOpened = ac.isWindowOpen('settingsWindow')
-    ac.setWindowOpen('settingsWindow', not settingsWindowOpened)
+  if ui.button('Modify Settings') then
+    UIManager.toggleSettingsWindow()
   end
 
   ui.newLine(1)
@@ -393,6 +396,32 @@ function UIManager.drawCarStateOverheadText()
   -- render.setDepthMode(prevDepth)
 
   -- render.setDepthMode(depthModeBeforeModification)
+end
+
+---Opens or closes the specified window.
+---@param windowID string
+---@param open boolean @true to open, false to close
+local openWindow = function(windowID, open)
+  ac.setWindowOpen(windowID, open)
+end
+
+---Opens the specified window if closed, or closes it if opened.
+---@param windowID string
+local toggleWindow = function(windowID)
+  local windowOpen = ac.isWindowOpen(windowID)
+  openWindow(windowID, not windowOpen)
+end
+
+UIManager.openMainWindow = function()
+  openWindow(MAIN_WINDOW_ID, true)
+end
+
+UIManager.openSettingsWindow = function()
+  openWindow(SETTINGS_WINDOW_ID, true)
+end
+
+UIManager.toggleSettingsWindow = function()
+  toggleWindow(SETTINGS_WINDOW_ID)
 end
 
 return UIManager
