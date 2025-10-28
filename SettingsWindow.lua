@@ -41,6 +41,9 @@ local renderDebuggingSection = function(storage)
     if ui.checkbox('Log fast AI state changes', storage.debugLogFastStateChanges) then storage.debugLogFastStateChanges = not storage.debugLogFastStateChanges end
     if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car changes from one state to another very quickly') end
 
+    if ui.checkbox('Log car yielding', storage.debugLogCarYielding) then storage.debugLogCarYielding = not storage.debugLogCarYielding end
+    if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car is yielding to another car') end
+
     ui.nextColumn()
 
     if ui.button('Simulate accident', ui.ButtonFlags.None) then
@@ -88,6 +91,7 @@ SettingsWindow.draw = function()
     if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding/overtaking.') end
 
     storage.defaultAICaution =  renderSlider('Default AI Caution', 'Base AI caution level (higher = more cautious, slower but less accident prone).', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH) -- do not drop the minimum below 2 because 1 is used while overtaking
+    storage.defaultAIAggression =  renderSlider('Default AI Aggression', 'Base AI aggression level (higher = more aggressive, faster but more accident prone).', storage.defaultAIAggression, StorageManager.options_min[StorageManager.Options.DefaultAIAggression], StorageManager.options_max[StorageManager.Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
 
     ui.newLine(1)
     ui.separator()
@@ -101,7 +105,7 @@ SettingsWindow.draw = function()
     -- currentValue = ui.slider('##someSliderID', currentValue, 0, 100, 'Quantity: %.0f')
 
     local yieldingSide = RaceTrackManager.getYieldingSide()
-    storage.yieldingLateralOffset =  renderSlider(string.format('Yielding Lateral Offset.  Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), 'The lateral offset from the centerline that AI cars will drive to when yielding.', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset], DEFAULT_SLIDER_WIDTH)
+    storage.yieldingLateralOffset =  renderSlider(string.format('Yielding Lateral Offset.  Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), 'The lateral offset from the centerline that AI cars will drive to when yielding (giving way to faster cars).', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset], DEFAULT_SLIDER_WIDTH)
 
     local overtakingSide = RaceTrackManager.getOvertakingSide()
     storage.overtakingLateralOffset =  renderSlider(string.format('Overtaking Lateral Offset.  Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH)
@@ -204,5 +208,26 @@ SettingsWindow.draw = function()
 --]===]
   ui.popDWriteFont()
 end
+
+--[===[
+local settingsWindow = ui.addSettings({
+  icon = ui.Icons.Settings,
+  name = 'Realistic Trackday Settings',
+  id = 'rt_settings',                                    -- your stable ID
+  size = {
+    default = vec2(800, 620),                            -- initial size
+    min     = vec2(600, 420),                            -- smallest allowed
+    max     = vec2(2000, 1400),                          -- largest allowed
+    automatic = false                                    -- don’t autosize content
+  },
+  category = 'settings'
+}, function()
+  SettingsWindow.draw()
+end)
+settingsWindow('open') 
+-- ]===]
+
+-- ac.setWindowOpen('mainWindow', true) 
+-- ac.setWindowOpen('settingsWindow', true)
 
 return SettingsWindow

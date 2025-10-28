@@ -42,6 +42,8 @@ CarManager.cars_sideBlockRaysData = {} -- Example: one ray=> {pos,dir,len}. two 
 CarManager.cars_throttleLimit = {}
 ---@type table<integer,integer>
 CarManager.cars_aiCaution = {}
+---@type table<integer,integer>
+CarManager.cars_aiAggression = {}
 ---@type table<integer,number>
 CarManager.cars_aiTopSpeed = {}
 ---@type table<integer,number>
@@ -111,6 +113,16 @@ CarManager.AICautionValues = {
   AFTER_ACCIDENT = 16
 }
 
+---@enum CarManager.AIAggressionValues
+---Holds the different AI Aggression levels used in different situations
+CarManager.AIAggressionValues = {
+  OVERTAKING_WITH_NO_OBSTACLE_INFRONT = 1,
+  OVERTAKING_WITH_OBSTACLE_INFRONT = .95,
+  OVERTAKING_WHILE_INCORNER = .95,
+  YIELDING = .5,
+  AFTER_ACCIDENT = .1
+}
+
 ---@enum CarManager.GripValues
 CarManager.GripValues = {
   NORMAL = 1, -- todo: physics.setExtraAIGrip says that the default value is 1 but also says that AI cars have 120% grip
@@ -163,6 +175,7 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarOperations.setAIStopCounter(carIndex, 0)
   CarOperations.setGentleStop(carIndex, false)
   CarOperations.removeAICaution(carIndex)
+  CarOperations.removeAIAggression(carIndex)
   CarOperations.setDefaultAIGrip(carIndex)
 
   -- reset any pedal positions we may have set
@@ -216,7 +229,7 @@ end
 
 --- returns a boolean value indicating whether the car is on the overtaking lane
 ---@param carIndex number
----@param trackSide any
+---@param trackSide RaceTrackManager.TrackSide
 ---@return boolean
 function CarManager.isCarDrivingOnSide(carIndex, trackSide)
   local car = ac.getCar(carIndex)
@@ -225,13 +238,15 @@ function CarManager.isCarDrivingOnSide(carIndex, trackSide)
   end
 
   local carPosition = car.position
-  local carTrackCoordinatesX = CarManager.getActualTrackLateralOffset(carPosition)
+  local actualLateralOffset = CarManager.getActualTrackLateralOffset(carPosition)
 
   if trackSide == RaceTrackManager.TrackSide.LEFT then
-    return carTrackCoordinatesX <= -0.1
+    return actualLateralOffset <= -0.1
   end
 
-  return carTrackCoordinatesX >= 0.1
+  return actualLateralOffset >= 0.1
+
+  -- return (trackSide == RaceTrackManager.TrackSide.LEFT and carTrackCoordinatesX <= -0.1) and true or false
 end
 
 ---used in sorting

@@ -171,6 +171,21 @@ CarOperations.removeAICaution = function(carIndex)
   CarOperations.setAICaution(carIndex, storage.defaultAICaution)
 end
 
+---Changes AI aggression.
+---@param carIndex integer @0-based car index.
+---@param aggression number @AI aggression from 0 to 1. Note: aggression level set in a launcher will be multiplied by 0.95, so to set 100% aggression here, pass 0.95.
+CarOperations.setAIAggression = function(carIndex, aggression)
+    physics.setAIAggression(carIndex, aggression)
+    CarManager.cars_aiAggression[carIndex] = aggression
+end
+
+---Removes any AI aggression and sets it back to the default value.
+---@param carIndex integer @0-based car index.
+CarOperations.removeAIAggression = function(carIndex)
+  local storage = StorageManager.getStorage()
+  CarOperations.setAIAggression(carIndex, storage.defaultAIAggression)
+end
+
 ---Forces AI to brake for a specified amount of time. Originally, this mechanism is used to get AIs to brake after an incident.
 ---Subsequent calls overwrite current waiting, pass 0 to get cars to move.
 ---@param carIndex integer @0-based car index.
@@ -492,12 +507,14 @@ end
 ---Calculated the overtaking car's ai caution value while overtaking another car.
 ---@param overtakingCar ac.StateCar
 ---@param yieldingCar ac.StateCar?
----@return integer
-CarOperations.calculateAICautionWhileOvertaking = function(overtakingCar, yieldingCar)
+---@return number aiCaution
+---@return number aiAggression 
+CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtakingCar, yieldingCar)
     local overtakingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(overtakingCar.position)
 
     -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
     local aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
+    local aiAggression = CarManager.AIAggressionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
 
     -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
     if yieldingCar then
@@ -507,6 +524,7 @@ CarOperations.calculateAICautionWhileOvertaking = function(overtakingCar, yieldi
         if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
             -- aiCaution = AICAUTION_WHILE_OVERTAKING_AND_NO_OBSTACLE_INFRONT
             aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
+            aiAggression = CarManager.AIAggressionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
         end
     end
 
@@ -515,9 +533,10 @@ CarOperations.calculateAICautionWhileOvertaking = function(overtakingCar, yieldi
     local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(overtakingCarIndex)
     if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION then
         aiCaution = CarManager.AICautionValues.OVERTAKING_WHILE_INCORNER
+        aiAggression = CarManager.AIAggressionValues.OVERTAKING_WHILE_INCORNER
     end
 
-    return aiCaution
+    return aiCaution, aiAggression
 end
 
 -- Returns the six lateral anchor points plus some helpers
@@ -692,7 +711,7 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(car
     local p = CarOperations.getSideAnchorPoints(carPosition, carForward, carLeftDirection, carUp, halfAABBSize)  -- returns left/right dirs too
     -- local pLeftDirection = p.leftDirection
     -- local pRightDirection = p.rightDirection
-    local sideGap = 1.5
+    local sideGap = 1
 
     --[====[
     CarManager.cars_totalSideBlockRaysData[carIndex] = 2

@@ -40,7 +40,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'SplineSides', orderDirection = 0, width = 85, tooltip='Spline Sides' },
   -- { name = 'MaxSpeed', orderDirection = 0, width = 70, tooltip='Max Speed' },
   { name = 'Speed', orderDirection = 0, width = 70, tooltip='Current velocity' },
-  { name = 'AverageSpeed', orderDirection = 0, width = 100, tooltip='Average speed' },
+  { name = 'AvgSpeed', orderDirection = 0, width = 75, tooltip='Average speed' },
   { name = 'ActualOffset', orderDirection = 0, width = 88, tooltip='Actual Lateral offset from centerline' },
   { name = 'CalculatedOffset', orderDirection = 0, width = 110, tooltip='Lateral offset from centerline' },
   { name = 'TargetOffset', orderDirection = 0, width = 90, tooltip='Desired lateral offset' },
@@ -50,6 +50,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'ThrottleLimit', orderDirection = 0, width = 90, tooltip='Max throttle limit' },
   { name = 'AITopSpeed', orderDirection = 0, width = 90, tooltip='AI top speed' },
   { name = 'AICaution', orderDirection = 0, width = 75, tooltip='AI caution level' },
+  { name = 'AIAggression', orderDirection = 0, width = 75, tooltip='AI aggression level' },
   { name = 'Grip', orderDirection = 0, width = 40, tooltip='AI grip level' },
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
@@ -199,6 +200,9 @@ UIManager.drawMainWindowContent = function()
       local carFront = sortedCarsList[n-1]
       local closingSpeed, timeToCollision, distanceToFrontCar = CarManager.getClosingSpeed(car, carFront)
 
+      local aiCaution = CarManager.cars_aiCaution[carIndex]
+      -- local aiAggression = CarManager.cars_aiAggression[carIndex]
+      local aiAggression = car.aiAggression
 
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
@@ -257,7 +261,8 @@ UIManager.drawMainWindowContent = function()
       ui.textColored(string.format("%.1f|%.1f|%.1f", carInputClutch, carInputBrake, carInputGas), uiColor); ui.nextColumn()
       ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
       ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
-      ui.textColored(tostring(CarManager.cars_aiCaution[carIndex] or 0), uiColor); ui.nextColumn()
+      ui.textColored(tostring(aiCaution), uiColor); ui.nextColumn()
+      ui.textColored(string.format("%.2f", aiAggression), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.2f", CarManager.cars_grip[carIndex] or 0), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.2f km/h", closingSpeed), uiColor); ui.nextColumn()
       ui.textColored(string.format("%.2fs", timeToCollision), uiColor); ui.nextColumn()

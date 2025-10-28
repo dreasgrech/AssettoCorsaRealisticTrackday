@@ -256,10 +256,10 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
             -- local cars_statesExitReason = CarManager.cars_statesExitReason[carIndex][currentStateBeforeChange] or ""
             local stateExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousState]) or ''
             Logger.warn(string.format(
-            "CarStateMachine: Car %d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
+            "CarStateMachine: #%d changing state too quickly: %.3fs in state %s (previous: %s) before changing to %s (%s)",
             carIndex,
             timeInStateBeforeChange,
-            CarStateMachine.CarStateTypeStrings[CarStateMachine.getCurrentState(carIndex)],
+            CarStateMachine.CarStateTypeStrings[currentStateBeforeChange],
             CarStateMachine.CarStateTypeStrings[previousState],
             CarStateMachine.CarStateTypeStrings[newStateToTransitionIntoThisFrame],
             stateExitReason))
@@ -480,7 +480,9 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
     local carBehindIndex = carBehind.index
 
     -- If this car is not close to the overtaking car, do nothing
-    local distanceFromOvertakingCarToYieldingCar = MathHelpers.distanceBetweenVec3s(carBehind.position, car.position)
+    local carPosition = car.position
+    local carBehindPosition = carBehind.position
+    local distanceFromOvertakingCarToYieldingCar = MathHelpers.distanceBetweenVec3s(carBehindPosition, carPosition)
     --TODO: here we should use the full detection radius if the carBehind is directly behind us,
     --TODO: but if the car behind is in in between other cars behind us, then use a small radius since we can't see the car coming that much because there are other cars in the way
     local radius = storage.detectCarBehind_meters
@@ -524,6 +526,15 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
     -- TODO: also check if our car is a lot more powerful than the overtaking car, think twice before yielding
 
     -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
+
+
+    -- Logger.log(string.format("[%s] #%d yielding to #%d. OvertakingSide: %s, CarBehindPosition: %s, CarBehindLateralOffset: %.3f",
+    -- ac.getSim().timestamp, 
+    -- carIndex, 
+    -- carBehindIndex,
+    -- RaceTrackManager.TrackSideStrings[overtakingSide], 
+    -- tostring(carBehindPosition),
+    -- CarManager.getActualTrackLateralOffset(carBehindPosition)))
 
     -- Since all the checks have passed, the yielding car can now start to yield
     CarManager.cars_currentlyYieldingCarToIndex[carIndex] = carBehindIndex

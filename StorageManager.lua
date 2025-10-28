@@ -7,37 +7,39 @@ StorageManager.Options ={
     -- YieldSide = 3,
     OverrideAiAwareness = 3,
     DefaultAICaution = 4,
+    DefaultAIAggression = 5,
 
-    DefaultLateralOffset = 5,
-    YieldingLateralOffset = 6,
-    OvertakingLateralOffset = 7,
+    DefaultLateralOffset = 6,
+    YieldingLateralOffset = 7,
+    OvertakingLateralOffset = 8,
     -- MaxLateralOffset_normalized = 9,
 
-    ClearAhead_meters = 8,
+    ClearAhead_meters = 9,
 
-    HandleYielding = 9,
-    DetectCarBehind_meters = 10,
-    RampSpeed_mps = 11,
-    RampRelease_mps = 12,
+    HandleYielding = 10,
+    DetectCarBehind_meters = 11,
+    RampSpeed_mps = 12,
+    RampRelease_mps = 13,
 
-    HandleOvertaking = 13,
-    DetectCarAhead_meters = 14,
-    OvertakeRampSpeed_mps = 15,
-    OvertakeRampRelease_mps = 16,
+    HandleOvertaking = 14,
+    DetectCarAhead_meters = 15,
+    OvertakeRampSpeed_mps = 16,
+    OvertakeRampRelease_mps = 17,
 
-    CustomAIFlood_enabled = 17,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 18,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 19,
+    CustomAIFlood_enabled = 18,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 19,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 20,
 
-    HandleAccidents = 20,
-    DistanceFromAccidentToSeeYellowFlag_meters = 21,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 22,
+    HandleAccidents = 21,
+    DistanceFromAccidentToSeeYellowFlag_meters = 22,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 23,
 
-    DebugShowCarStateOverheadText = 23,
-    DebugShowRaycastsWhileDrivingLaterally = 24,
-    DebugDrawSideOfftrack = 25,
-    DrawCarList = 26,
-    DebugLogFastStateChanges = 27,
+    DebugShowCarStateOverheadText = 24,
+    DebugShowRaycastsWhileDrivingLaterally = 25,
+    DebugDrawSideOfftrack = 26,
+    DrawCarList = 27,
+    DebugLogFastStateChanges = 28,
+    DebugLogCarYielding = 29,
 }
 
 -- local RAMP_SPEEDS_MAX = 10
@@ -49,6 +51,7 @@ local optionsCollection_beforeDoD = {
     -- { name = StorageManager.Options.YieldSide, default=RaceTrackManager.TrackSide.RIGHT, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
+    { name = StorageManager.Options.DefaultAIAggression, default=.5, min=0, max=0.95 }, -- The max is .95 because it's mentioned in the docs for physics.setAIAggression that the value from the launcher is multiplied by .95 so that's the max
 
     { name = StorageManager.Options.DefaultLateralOffset, default=0, min=-1, max=1 },
     { name = StorageManager.Options.YieldingLateralOffset, default=0.8, min=-1, max=1 },
@@ -59,15 +62,15 @@ local optionsCollection_beforeDoD = {
 
     { name = StorageManager.Options.HandleYielding, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DetectCarBehind_meters, default=90, min=10, max=90 },
-    { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=2.0 },
-    { name = StorageManager.Options.RampRelease_mps, default=0.1, min=0.1, max=2.0 },
+    { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=1.0 },
+    { name = StorageManager.Options.RampRelease_mps, default=0.25, min=0.1, max=1.0 },
     -- { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=RAMP_SPEEDS_MAX },
     -- { name = StorageManager.Options.RampRelease_mps, default=0.1, min=0.1, max=RAMP_SPEEDS_MAX },
 
     { name = StorageManager.Options.HandleOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DetectCarAhead_meters, default=100, min=50, max=500 },
-    { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=2.0 },
-    { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.5, min=0.1, max=2.0 },
+    { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=1.0 },
+    { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.5, min=0.1, max=1.0 },
     -- { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=RAMP_SPEEDS_MAX },
     -- { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.5, min=0.1, max=RAMP_SPEEDS_MAX },
 
@@ -84,6 +87,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DrawCarList, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DebugLogFastStateChanges, default=false, min=nil, max=nil },
+    { name = StorageManager.Options.DebugLogCarYielding, default=false, min=nil, max=nil },
 }
 
 StorageManager.options_default = {}
@@ -105,6 +109,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 -- ---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
 ---@field defaultAICaution integer
+---@field defaultAIAggression integer
 ---@field defaultLateralOffset number
 ---@field yieldingLateralOffset number
 ---@field overtakingLateralOffset number
@@ -129,6 +134,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field debugDrawSideOfftrack boolean
 ---@field drawCarList boolean
 ---@field debugLogFastStateChanges boolean
+---@field debugLogCarYielding boolean
 
 ---@type StorageTable
 local storageTable = {
@@ -137,6 +143,7 @@ local storageTable = {
     -- yieldSide = StorageManager.options_default[StorageManager.Options.YieldSide],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
+    defaultAIAggression = StorageManager.options_default[StorageManager.Options.DefaultAIAggression],
 
     defaultLateralOffset = StorageManager.options_default[StorageManager.Options.DefaultLateralOffset],
     yieldingLateralOffset = StorageManager.options_default[StorageManager.Options.YieldingLateralOffset],
@@ -167,6 +174,7 @@ local storageTable = {
     debugDrawSideOfftrack = StorageManager.options_default[StorageManager.Options.DebugDrawSideOfftrack],
     drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],
     debugLogFastStateChanges = StorageManager.options_default[StorageManager.Options.DebugLogFastStateChanges],
+    debugLogCarYielding = StorageManager.options_default[StorageManager.Options.DebugLogCarYielding],
 }
 
 local sim = ac.getSim()
