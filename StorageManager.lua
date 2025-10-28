@@ -40,6 +40,7 @@ StorageManager.Options ={
     DrawCarList = 27,
     DebugLogFastStateChanges = 28,
     DebugLogCarYielding = 29,
+    DebugLogCarOvertaking = 30,
 }
 
 -- local RAMP_SPEEDS_MAX = 10
@@ -88,6 +89,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DrawCarList, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DebugLogFastStateChanges, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DebugLogCarYielding, default=false, min=nil, max=nil },
+    { name = StorageManager.Options.DebugLogCarOvertaking, default=false, min=nil, max=nil },
 }
 
 StorageManager.options_default = {}
@@ -135,6 +137,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field drawCarList boolean
 ---@field debugLogFastStateChanges boolean
 ---@field debugLogCarYielding boolean
+---@field debugLogCarOvertaking boolean
 
 ---@type StorageTable
 local storageTable = {
@@ -175,6 +178,7 @@ local storageTable = {
     drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],
     debugLogFastStateChanges = StorageManager.options_default[StorageManager.Options.DebugLogFastStateChanges],
     debugLogCarYielding = StorageManager.options_default[StorageManager.Options.DebugLogCarYielding],
+    debugLogCarOvertaking = StorageManager.options_default[StorageManager.Options.DebugLogCarOvertaking],
 }
 
 local sim = ac.getSim()

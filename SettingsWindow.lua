@@ -46,6 +46,9 @@ local renderDebuggingSection = function(storage)
     if ui.checkbox('Log car yielding', storage.debugLogCarYielding) then storage.debugLogCarYielding = not storage.debugLogCarYielding end
     if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car is yielding to another car') end
 
+    if ui.checkbox('Log car overtaking', storage.debugLogCarOvertaking) then storage.debugLogCarOvertaking = not storage.debugLogCarOvertaking end
+    if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car is overtaking another car') end
+
     ui.nextColumn()
 
     if ui.button('Simulate accident', ui.ButtonFlags.None) then

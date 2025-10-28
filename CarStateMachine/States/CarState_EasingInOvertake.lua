@@ -28,6 +28,20 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   local car = sortedCarsList[sortedCarsListIndex]
   -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
   CarManager.cars_currentSplineOffset[carIndex] = CarManager.getActualTrackLateralOffset(car.position)
+
+  if storage.debugLogCarOvertaking then
+    local currentlyOvertakingCar = ac.getCar(currentlyOvertakingCarIndex)
+    if currentlyOvertakingCar then
+      local carFrontPosition = currentlyOvertakingCar.position
+      Logger.log(string.format("[EasingInOvertake] #%d overtaking #%d. YieldingSide: %s, CarFrontPosition: %s, CarFrontLateralOffset: %.3f",
+      carIndex,
+      currentlyOvertakingCarIndex,
+      RaceTrackManager.getYieldingSide(),
+      carFrontPosition,
+      CarManager.getActualTrackLateralOffset(carFrontPosition)
+      ))
+    end
+  end
 end
 
 -- UPDATE FUNCTION
