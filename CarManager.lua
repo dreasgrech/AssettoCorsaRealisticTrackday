@@ -227,6 +227,9 @@ function CarManager.getActualTrackLateralOffset(carPosition)
   return carTrackCoordinates.x
 end
 
+-- local SIDE_DETERMINATION_THRESHOLD = 0.1
+local SIDE_DETERMINATION_THRESHOLD = 0.3
+
 --- returns a boolean value indicating whether the car is on the overtaking lane
 ---@param carIndex number
 ---@param trackSide RaceTrackManager.TrackSide
@@ -241,10 +244,10 @@ function CarManager.isCarDrivingOnSide(carIndex, trackSide)
   local actualLateralOffset = CarManager.getActualTrackLateralOffset(carPosition)
 
   if trackSide == RaceTrackManager.TrackSide.LEFT then
-    return actualLateralOffset <= -0.1
+    return actualLateralOffset <= -SIDE_DETERMINATION_THRESHOLD
   end
 
-  return actualLateralOffset >= 0.1
+  return actualLateralOffset >= SIDE_DETERMINATION_THRESHOLD
 
   -- return (trackSide == RaceTrackManager.TrackSide.LEFT and carTrackCoordinatesX <= -0.1) and true or false
 end
