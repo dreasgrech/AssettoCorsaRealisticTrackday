@@ -138,6 +138,12 @@ end)
 -- wiki: function to be called each frame to draw window content
 ---
 function script.MANIFEST__FUNCTION_MAIN(dt)
+
+  if ui.button('Modify Settings') then
+    UIManager.toggleSettingsWindow()
+  end
+
+  ui.newLine(1)
   if (not shouldAppRun()) then
     local storage = StorageManager.getStorage()
     ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(storage.enabled), tostring(Constants.IS_ONLINE)))
