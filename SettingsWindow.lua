@@ -189,10 +189,14 @@ SettingsWindow.draw = function()
     ui.dwriteText('Yielding', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    if ui.checkbox('Handle yielding', storage.handleYielding) then storage.handleYielding = not storage.handleYielding end
+    local handleYielding = storage.handleYielding
+
+    local handleYieldingCheckboxColor = handleYielding and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
+    ui.pushStyleColor(ui.StyleColor.Text, handleYieldingCheckboxColor)
+    if ui.checkbox('Handle Yielding', storage.handleYielding) then storage.handleYielding = not storage.handleYielding end
+    ui.popStyleColor(1)
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to yield on the correct lane') end
 
-    local handleYielding = storage.handleYielding
     createDisabledSection(not handleYielding, function()
         storage.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the player is behind and within this distance', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
@@ -219,10 +223,14 @@ SettingsWindow.draw = function()
     ui.dwriteText('Overtaking', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    if ui.checkbox('Handle overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
+    local handleOvertaking = storage.handleOvertaking
+
+    local handleOvertakingCheckboxColor = handleOvertaking and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
+    ui.pushStyleColor(ui.StyleColor.Text, handleOvertakingCheckboxColor)
+    if ui.checkbox('Handle Overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
+    ui.popStyleColor(1)
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
     
-    local handleOvertaking = storage.handleOvertaking
     createDisabledSection(not handleOvertaking, function()
         storage.detectCarAhead_meters =  renderSlider('Detect car ahead distance', 'Start overtaking if the car in front is within this distance', storage.detectCarAhead_meters, StorageManager.options_min[StorageManager.Options.DetectCarAhead_meters], StorageManager.options_max[StorageManager.Options.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
