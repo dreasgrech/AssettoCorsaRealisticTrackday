@@ -62,13 +62,18 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       
       -- if the overtaking car is very close behind us, limit our speed to let it pass more easily
       -- local limitSpeedToLetOvertakingCarPass = distanceBetweenCars < 10
-      local limitSpeedToLetOvertakingCarPass = distanceBetweenCarsSqr < 10*10
+      local distanceToOvertakingCarToLimitSpeed = storage.distanceToOvertakingCarToLimitSpeed
+      local distanceToOvertakingCarToLimitSpeedSqr = distanceToOvertakingCarToLimitSpeed * distanceToOvertakingCarToLimitSpeed
+      local limitSpeedToLetOvertakingCarPass = distanceBetweenCarsSqr < distanceToOvertakingCarToLimitSpeedSqr
       if limitSpeedToLetOvertakingCarPass then
         -- limit the yielding car throttle while driving on the yielding lane
         CarOperations.setAIThrottleLimit(carIndex, 0.5)
 
-        local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
-        topSpeed = math.max(topSpeed, 60) -- don't let the top speed drop too much
+        local speedLimitValueToOvertakingCar = storage.speedLimitValueToOvertakingCar
+        -- local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
+        local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*speedLimitValueToOvertakingCar)
+        -- topSpeed = math.max(topSpeed, 60) -- don't let the top speed drop too much
+        topSpeed = math.max(topSpeed, storage.minimumSpeedLimitKmhToLimitToOvertakingCar) -- don't let the top speed drop too much
         CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
         
         -- press some brake to help slow down the car a bit because the top speed limit is broken in csp atm in trackday ai flood mode

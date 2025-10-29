@@ -179,7 +179,7 @@ SettingsWindow.draw = function()
 -- ui.popDWriteFont()
 
     ui.columns(2, true, "yieldingOvertakingSection")
-    ui.setColumnWidth(0, 380)
+    ui.setColumnWidth(0, 540)
     --ui.setColumnWidth(1, 260)
 
 
@@ -195,6 +195,16 @@ SettingsWindow.draw = function()
     storage.rampSpeed_mps =  renderSlider('Yield offset ramp (m/s)', 'How quickly the lateral offset ramps up when yielding.', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps], DEFAULT_SLIDER_WIDTH)
 
     storage.rampRelease_mps =  renderSlider('Yield offset release (m/s)', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the yielding car.', storage.rampRelease_mps, StorageManager.options_min[StorageManager.Options.RampRelease_mps], StorageManager.options_max[StorageManager.Options.RampRelease_mps], DEFAULT_SLIDER_WIDTH)
+
+    ui.newLine(1)
+
+    storage.speedLimitValueToOvertakingCar = renderSlider('Speed limit value to overtaking car', 'When yielding, the yielding car speed will be limited to this fraction of the overtaking car speed to let it pass more easily. 1.0 = same speed as overtaking car, 0.5 = half the speed of the overtaking car.', storage.speedLimitValueToOvertakingCar, StorageManager.options_min[StorageManager.Options.SpeedLimitValueToOvertakingCar], StorageManager.options_max[StorageManager.Options.SpeedLimitValueToOvertakingCar], DEFAULT_SLIDER_WIDTH)
+    local speedLimitValueToOvertakingCar  = storage.speedLimitValueToOvertakingCar
+    createDisabledSection(speedLimitValueToOvertakingCar >= 1.0, function()
+        storage.distanceToOvertakingCarToLimitSpeed = renderSlider('Distance to overtaking car to limit speed (m)', 'When yielding, if an overtaking car is within this distance behind us, we will limit our speed to let it pass more easily.', storage.distanceToOvertakingCarToLimitSpeed, StorageManager.options_min[StorageManager.Options.DistanceToOvertakingCarToLimitSpeed], StorageManager.options_max[StorageManager.Options.DistanceToOvertakingCarToLimitSpeed], DEFAULT_SLIDER_WIDTH)
+
+        storage.minimumSpeedLimitKmhToLimitToOvertakingCar = renderSlider('Minimum speed limit (km/h) to limit to overtaking car', 'When yielding, the yielding car speed will not be limited below this speed even if the overtaking car is very slow.', storage.minimumSpeedLimitKmhToLimitToOvertakingCar, StorageManager.options_min[StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar], StorageManager.options_max[StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar], DEFAULT_SLIDER_WIDTH)
+    end)
 
     --ui.separator()
 

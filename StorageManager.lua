@@ -22,28 +22,31 @@ StorageManager.Options ={
     DetectCarBehind_meters = 13,
     RampSpeed_mps = 14,
     RampRelease_mps = 15,
+    DistanceToOvertakingCarToLimitSpeed = 16,
+    SpeedLimitValueToOvertakingCar = 17,
+    MinimumSpeedLimitKmhToLimitToOvertakingCar = 18,
 
-    HandleOvertaking = 16,
-    DetectCarAhead_meters = 17,
-    OvertakeRampSpeed_mps = 18,
-    OvertakeRampRelease_mps = 19,
+    HandleOvertaking = 19,
+    DetectCarAhead_meters = 20,
+    OvertakeRampSpeed_mps = 21,
+    OvertakeRampRelease_mps = 22,
 
-    CustomAIFlood_enabled = 20,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 21,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 22,
+    CustomAIFlood_enabled = 23,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 24,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 25,
 
-    HandleAccidents = 23,
-    DistanceFromAccidentToSeeYellowFlag_meters = 24,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 25,
+    HandleAccidents = 26,
+    DistanceFromAccidentToSeeYellowFlag_meters = 27,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 28,
 
-    DebugShowCarStateOverheadText = 26,
-    DebugCarStateOverheadShowDistance = 27,
-    DebugShowRaycastsWhileDrivingLaterally = 28,
-    DebugDrawSideOfftrack = 29,
-    DrawCarList = 30,
-    DebugLogFastStateChanges = 31,
-    DebugLogCarYielding = 32,
-    DebugLogCarOvertaking = 33,
+    DebugShowCarStateOverheadText = 29,
+    DebugCarStateOverheadShowDistance = 30,
+    DebugShowRaycastsWhileDrivingLaterally = 31,
+    DebugDrawSideOfftrack = 32,
+    DrawCarList = 33,
+    DebugLogFastStateChanges = 34,
+    DebugLogCarYielding = 35,
+    DebugLogCarOvertaking = 36,
 }
 
 -- local RAMP_SPEEDS_MAX = 10
@@ -70,6 +73,9 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DetectCarBehind_meters, default=90, min=10, max=90 },
     { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=1.0 },
     { name = StorageManager.Options.RampRelease_mps, default=0.25, min=0.1, max=1.0 },
+    { name = StorageManager.Options.DistanceToOvertakingCarToLimitSpeed, default=10.0, min=1.0, max=100.0 },
+    { name = StorageManager.Options.SpeedLimitValueToOvertakingCar, default=0.7, min=0.0, max=1.0 },
+    { name = StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar, default=60.0, min=0.0, max=300.0 },
     -- { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=RAMP_SPEEDS_MAX },
     -- { name = StorageManager.Options.RampRelease_mps, default=0.1, min=0.1, max=RAMP_SPEEDS_MAX },
 
@@ -128,6 +134,9 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field detectCarBehind_meters number
 ---@field rampSpeed_mps number
 ---@field rampRelease_mps number
+---@field distanceToOvertakingCarToLimitSpeed number
+---@field speedLimitValueToOvertakingCar number
+---@field minimumSpeedLimitKmhToLimitToOvertakingCar number
 ---@field handleOvertaking boolean
 ---@field detectCarAhead_meters number
 ---@field clearAhead_meters number
@@ -168,6 +177,9 @@ local storageTable = {
     detectCarBehind_meters = StorageManager.options_default[StorageManager.Options.DetectCarBehind_meters],
     rampSpeed_mps = StorageManager.options_default[StorageManager.Options.RampSpeed_mps],
     rampRelease_mps = StorageManager.options_default[StorageManager.Options.RampRelease_mps],
+    distanceToOvertakingCarToLimitSpeed = StorageManager.options_default[StorageManager.Options.DistanceToOvertakingCarToLimitSpeed],
+    speedLimitValueToOvertakingCar = StorageManager.options_default[StorageManager.Options.SpeedLimitValueToOvertakingCar],
+    minimumSpeedLimitKmhToLimitToOvertakingCar = StorageManager.options_default[StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar],
 
     handleOvertaking = StorageManager.options_default[StorageManager.Options.HandleOvertaking],
     detectCarAhead_meters = StorageManager.options_default[StorageManager.Options.DetectCarAhead_meters],
