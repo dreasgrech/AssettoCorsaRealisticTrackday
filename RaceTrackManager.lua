@@ -34,6 +34,12 @@ RaceTrackManager.getTrackLengthMeters = function()
     return trackLength_meters
 end
 
+local trackName = ac.getTrackName()
+
+RaceTrackManager.getTrackName = function()
+    return trackName
+end
+
 --- Converts a spline span value representing a fraction of the track length (0..1) to meters
 --- Example: 0.5 = half the track length, 0.25 = quarter of the track length
 ---@param splineValue number
