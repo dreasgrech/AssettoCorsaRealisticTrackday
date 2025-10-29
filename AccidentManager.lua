@@ -235,6 +235,8 @@ AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident
     local currentClosestAccidentClosestCarIndex = -1
     local currentClosestAccidentClosestCarSplinePosition = nil
 
+    local distanceToDetectAccidentSqr = distanceToDetectAccident * distanceToDetectAccident
+
      -- for i = 1, lastAccidentIndexCreated do
     local firstNonResolvedAccidentIndex = CompletableIndexCollectionManager.getFirstNonResolvedIndex(accidentCompletableIndex)
     for accidentIndex = firstNonResolvedAccidentIndex, lastAccidentIndexCreated do
@@ -255,8 +257,10 @@ AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident
                     -- make sure the culprit car is within the distance to detect an accident
                     local culpritCarWorldPosition = culpritCar.position
                     -- local distanceFromOurCarToCulpritCar = (culpritCarWorldPosition - carWorldPosition):length()
-                    local distanceFromOurCarToCulpritCar = MathHelpers.distanceBetweenVec3s(carWorldPosition, culpritCarWorldPosition)
-                    if distanceFromOurCarToCulpritCar < distanceToDetectAccident then
+                    -- local distanceFromOurCarToCulpritCar = MathHelpers.distanceBetweenVec3s(carWorldPosition, culpritCarWorldPosition)
+                    local distanceFromOurCarToCulpritCarSqr = MathHelpers.distanceBetweenVec3sSqr(carWorldPosition, culpritCarWorldPosition)
+                    -- if distanceFromOurCarToCulpritCar < distanceToDetectAccident then
+                    if distanceFromOurCarToCulpritCarSqr < distanceToDetectAccidentSqr then
                         closestCarSplineDistance = math.abs(carSplinePosition - culpritCarSplinePosition)
                         closestCar = culpritCar
                     end
@@ -270,8 +274,10 @@ AccidentManager.isCarComingUpToAccident = function(car, distanceToDetectAccident
                 if victimCarAheadOfUs then
                     -- make sure the victim car is within the distance to detect an accident
                     local victimCarWorldPosition = victimCar.position
-                    local distanceFromOurCarToVictimCar = MathHelpers.distanceBetweenVec3s(carWorldPosition, victimCarWorldPosition)
-                    if distanceFromOurCarToVictimCar < distanceToDetectAccident then
+                    -- local distanceFromOurCarToVictimCar = MathHelpers.distanceBetweenVec3s(carWorldPosition, victimCarWorldPosition)
+                    local distanceFromOurCarToVictimCarSqr = MathHelpers.distanceBetweenVec3sSqr(carWorldPosition, victimCarWorldPosition)
+                    -- if distanceFromOurCarToVictimCar < distanceToDetectAccident then
+                    if distanceFromOurCarToVictimCarSqr < distanceToDetectAccidentSqr then
                         -- if the victim car is closer than the culprit car, use the victim car as the closest car
                         local victimCarSplineDistance = math.abs(carSplinePosition - victimCarSplinePosition)
                         if victimCarSplineDistance < closestCarSplineDistance then

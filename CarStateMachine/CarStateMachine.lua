@@ -420,9 +420,13 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   local carPosition = car.position
   local carFrontPosition = carFront.position
   -- local distanceToFrontCar = MathHelpers.vlen(MathHelpers.vsub(carFrontPosition, carPosition))
-  local distanceToFrontCar = MathHelpers.distanceBetweenVec3s(carFrontPosition, carPosition)
   -- if distanceToFrontCar > storage.distanceToFrontCarToOvertake then
-  if distanceToFrontCar > storage.detectCarAhead_meters then
+  local detectCarAhead_meters = storage.detectCarAhead_meters 
+  local detectCarAhead_metersSqr = detectCarAhead_meters * detectCarAhead_meters
+  -- local distanceToFrontCar = MathHelpers.distanceBetweenVec3s(carFrontPosition, carPosition)
+  local distanceToFrontCarSqr = MathHelpers.distanceBetweenVec3sSqr(carFrontPosition, carPosition)
+  -- if distanceToFrontCar > storage.detectCarAhead_meters then
+  if distanceToFrontCarSqr > detectCarAhead_metersSqr then
     -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Too far from front car to consider overtaking: ' .. string.format('%.2f', distanceToFrontCar) .. 'm'
     CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.YieldingCarTooFarAhead)
     return
@@ -451,8 +455,10 @@ CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, 
   if carBehind then
   -- if there's a car behind us, make sure it's not too close before we start overtaking
     -- local distanceFromCarBehindToUs = MathHelpers.vlen(MathHelpers.vsub(carBehind.position, carPosition))
-    local distanceFromCarBehindToUs = MathHelpers.distanceBetweenVec3s(carBehind.position, carPosition)
-    if distanceFromCarBehindToUs < 5.0 then
+    -- local distanceFromCarBehindToUs = MathHelpers.distanceBetweenVec3s(carBehind.position, carPosition)
+    local distanceFromCarBehindToUsSqr = MathHelpers.distanceBetweenVec3sSqr(carBehind.position, carPosition)
+    -- if distanceFromCarBehindToUs < 5.0 then
+    if distanceFromCarBehindToUsSqr < 5*5 then
       -- CarManager.cars_reasonWhyCantOvertake[carIndex] = 'Car behind too close so not overtaking'
       CarStateMachine.setReasonWhyCantOvertake(carIndex, ReasonWhyCantOvertakeStringNames.AnotherCarBehindTooClose)
       return
@@ -482,11 +488,15 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
     -- If this car is not close to the overtaking car, do nothing
     local carPosition = car.position
     local carBehindPosition = carBehind.position
-    local distanceFromOvertakingCarToYieldingCar = MathHelpers.distanceBetweenVec3s(carBehindPosition, carPosition)
+    local detectCarBehind_meters = storage.detectCarBehind_meters
+    local detectCarBehind_metersSqr = detectCarBehind_meters * detectCarBehind_meters
+    -- local distanceFromOvertakingCarToYieldingCar = MathHelpers.distanceBetweenVec3s(carBehindPosition, carPosition)
+    local distanceFromOvertakingCarToYieldingCarSqr = MathHelpers.distanceBetweenVec3sSqr(carBehindPosition, carPosition)
     --TODO: here we should use the full detection radius if the carBehind is directly behind us,
     --TODO: but if the car behind is in in between other cars behind us, then use a small radius since we can't see the car coming that much because there are other cars in the way
-    local radius = storage.detectCarBehind_meters
-    local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCar <= radius
+    -- local radius = storage.detectCarBehind_meters
+    -- local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCar <= radius
+    local isYieldingCarCloseToOvertakingCar = distanceFromOvertakingCarToYieldingCarSqr <= detectCarBehind_metersSqr
     if not isYieldingCarCloseToOvertakingCar then
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarTooFarBehind)
       return
@@ -565,13 +575,16 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sorted
 
     --Check all the cars behind us within our detection radius to see if we need to yield to any of them
     local detectedCarBehind_meters = storage.detectCarBehind_meters
+    local detectedCarBehind_metersSqr = detectedCarBehind_meters * detectedCarBehind_meters
     -- for loop through all the cars behind us within our detection radius
     local totalCarsBehindUs = #sortedCarsList - sortedCarsListIndex
     for i = 1, totalCarsBehindUs do
       local carBehind = sortedCarsList[sortedCarsListIndex + i]
       -- todo: there must be a better way of checking the distance between the cars
-      local distanceFromCarBehindToUs = MathHelpers.distanceBetweenVec3s(carBehind.position, car.position)
-      local isCarBehindWithinRadius = distanceFromCarBehindToUs <= detectedCarBehind_meters
+      -- local distanceFromCarBehindToUs = MathHelpers.distanceBetweenVec3s(carBehind.position, car.position)
+      -- local isCarBehindWithinRadius = distanceFromCarBehindToUs <= detectedCarBehind_meters
+      local distanceFromCarBehindToUsSqr = MathHelpers.distanceBetweenVec3sSqr(carBehind.position, car.position)
+      local isCarBehindWithinRadius = distanceFromCarBehindToUsSqr <= detectedCarBehind_metersSqr
       if isCarBehindWithinRadius then
         local stateDueToYield = handleShouldWeYieldToBehindCar_singleCar(car, carBehind, storage)
         if stateDueToYield then

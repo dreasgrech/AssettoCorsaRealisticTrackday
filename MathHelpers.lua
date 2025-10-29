@@ -51,7 +51,7 @@ end
 ---@param vec3a vec3
 ---@param vec3b vec3
 ---@return number
-function MathHelpers.distanceBetweenVec3sSq(vec3a, vec3b)
+function MathHelpers.distanceBetweenVec3sSqr(vec3a, vec3b)
     local dx = vec3a.x - vec3b.x
     local dy = vec3a.y - vec3b.y
     local dz = vec3a.z - vec3b.z

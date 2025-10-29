@@ -1,5 +1,13 @@
 ﻿local UIManager = {}
 
+--bindings
+local ac = ac
+local ui = ui
+local CarStateMachine = CarStateMachine
+local CarManager = CarManager
+local CameraManager = CameraManager
+local MathHelpers = MathHelpers
+
 -- These are the window IDs as defined in the manifest.ini
 local MAIN_WINDOW_ID = 'mainWindow'
 local SETTINGS_WINDOW_ID = 'settingsWindow'
@@ -361,6 +369,9 @@ function UIManager.drawCarStateOverheadText()
   --render.setBlendMode(render.BlendMode.BlendPremultiplied)        -- act like opaque even in transparent pass  (SDK: OpaqueForced)
 
   -- for i = 1, sim.carsCount - 1 do
+
+  local debugCarStateOverheadShowDistance = storage.debugCarStateOverheadShowDistance
+  local debugCarStateOverheadShowDistanceSqr = debugCarStateOverheadShowDistance * debugCarStateOverheadShowDistance
   local carsCount = sim.carsCount
   local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()
   local cameraFocusedCar = ac.getCar(cameraFocusedCarIndex)
@@ -374,8 +385,8 @@ function UIManager.drawCarStateOverheadText()
       if showText then
         local car = ac.getCar(i)
         if car then
-          local distanceFromCameraFocusedCarToThisCar = MathHelpers.distanceBetweenVec3s(car.position, cameraFocusedCar.position)
-          local isThisCarCloseToCameraFocusedCar = distanceFromCameraFocusedCarToThisCar < storage.debugCarStateOverheadShowDistance
+          local distanceFromCameraFocusedCarToThisCarSqr = MathHelpers.distanceBetweenVec3sSqr(car.position, cameraFocusedCar.position)
+          local isThisCarCloseToCameraFocusedCar = distanceFromCameraFocusedCarToThisCarSqr < debugCarStateOverheadShowDistanceSqr
           if isThisCarCloseToCameraFocusedCar then
             local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
             render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState], 1, render.FontAlign.Center)--, render.FontAlign.Center)

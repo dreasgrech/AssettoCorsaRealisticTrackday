@@ -57,10 +57,12 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarsList[sortedCarsListIndex]
       local carPosition = car.position
       local carWeAreCurrentlyYieldingToPosition = carWeAreCurrentlyYieldingTo.position
-      local distanceBetweenCars = MathHelpers.distanceBetweenVec3s(carPosition, carWeAreCurrentlyYieldingToPosition)
+      -- local distanceBetweenCars = MathHelpers.distanceBetweenVec3s(carPosition, carWeAreCurrentlyYieldingToPosition)
+      local distanceBetweenCarsSqr = MathHelpers.distanceBetweenVec3sSqr(carPosition, carWeAreCurrentlyYieldingToPosition)
       
       -- if the overtaking car is very close behind us, limit our speed to let it pass more easily
-      local limitSpeedToLetOvertakingCarPass = distanceBetweenCars < 10
+      -- local limitSpeedToLetOvertakingCarPass = distanceBetweenCars < 10
+      local limitSpeedToLetOvertakingCarPass = distanceBetweenCarsSqr < 10*10
       if limitSpeedToLetOvertakingCarPass then
         -- limit the yielding car throttle while driving on the yielding lane
         CarOperations.setAIThrottleLimit(carIndex, 0.5)

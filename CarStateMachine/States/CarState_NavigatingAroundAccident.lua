@@ -233,8 +233,10 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- make sure we're some distance away from the car we're navigating around
         local carToNavigateAroundWorldPosition = carToNavigateAround.position
         local ourCarWorldPosition = car.position
-        local distanceToCarToNavigateAround = MathHelpers.distanceBetweenVec3s(ourCarWorldPosition, carToNavigateAroundWorldPosition)
-        if distanceToCarToNavigateAround > 10 then
+        -- local distanceToCarToNavigateAround = MathHelpers.distanceBetweenVec3s(ourCarWorldPosition, carToNavigateAroundWorldPosition)
+        local distanceToCarToNavigateAroundSqr = MathHelpers.distanceBetweenVec3sSqr(ourCarWorldPosition, carToNavigateAroundWorldPosition)
+        -- jif distanceToCarToNavigateAround > 10 then
+        if distanceToCarToNavigateAroundSqr > 10*10 then
             -- we're more than some meters away from the car we were navigating around, so return to normal driving
             AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
             CarStateMachine.setStateExitReason(carIndex, StateExitReason.AccidentIsFarBehindUs)
