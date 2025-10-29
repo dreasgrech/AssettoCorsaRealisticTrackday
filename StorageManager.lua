@@ -70,7 +70,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.ClearAhead_meters, default=10.0, min=4.0, max=20.0 },
 
     { name = StorageManager.Options.HandleYielding, default=true, min=nil, max=nil },
-    { name = StorageManager.Options.DetectCarBehind_meters, default=90, min=10, max=90 },
+    { name = StorageManager.Options.DetectCarBehind_meters, default=90, min=10, max=500 },
     { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=1.0 },
     { name = StorageManager.Options.RampRelease_mps, default=0.25, min=0.1, max=1.0 },
     { name = StorageManager.Options.DistanceToOvertakingCarToLimitSpeed, default=10.0, min=1.0, max=100.0 },
