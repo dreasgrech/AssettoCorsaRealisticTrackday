@@ -1,5 +1,3 @@
--- UILateralOffsetsImageWidget.lua
-
 local UILateralOffsetsImageWidget = {}
 
 -- ========== CONFIGURABLE CONSTANTS ==========
@@ -12,14 +10,24 @@ local TRACK_ROUNDING             = 4
 local TRACK_HALF_HEIGHT          = 14
 local TICK_HEIGHT                = 10
 local TICK_HEIGHT_CENTER         = 20
-local CAPTION_OFFSET_Y           = 6
 
 -- Marker (car) shape
 local CAR_WIDTH                  = 26
 local CAR_HEIGHT                 = 18
 local CAR_ROUNDING               = 4
 local CAR_NOSE_SIZE              = 6
-local CAR_ROW_SPACING            = 18          -- vertical spacing between rows if you decide to stack markers
+
+-- If STACK_MARKERS = true, each marker is drawn on a separate "row" around track midline.
+-- Row index is an integer offset from midline: -1 = above, 0 = center, +1 = below (you can use any integers).
+local STACK_MARKERS              = true
+local ROW_SPACING                = 18            -- pixels between rows
+local DEFAULT_ROW_INDEX          = 0             -- e.g., 0   (center)
+local YIELDING_ROW_INDEX         = 1             -- e.g., +1  (below)
+local OVERTAKE_ROW_INDEX         = -1            -- e.g., -1  (above)
+
+-- If STACK_MARKERS = false, all markers share the same baseline (track midline).
+-- You can still nudge captions using CAPTION_OFFSET_Y below.
+local CAPTION_OFFSET_Y           = 6             -- pixels below marker to place caption text
 
 -- Colors
 local COLOR_CARD_BG              = rgbm(0.08, 0.08, 0.08, 0.90)
@@ -42,7 +50,6 @@ local TICK_THICKNESS             = 1
 local MARKER_NOSE_THICKNESS      = 2
 
 -- Fonts
-local HEADER_FONT_SIZE           = 13
 local CAPTION_FONT_SIZE          = 11
 local LABEL_FONT_SIZE            = 11
 
@@ -56,12 +63,6 @@ local CAPTION_DEFAULT_TEXT       = "Default"
 local CAPTION_YIELDING_TEXT      = "Yielding"
 local CAPTION_OVERTAKE_TEXT      = "Overtake"
 
--- Storage field names (rename here if your table uses different keys)
-local FIELD_DEFAULT_OFFSET       = "defaultLateralOffset"
-local FIELD_YIELDING_OFFSET      = "yieldingLateralOffset"
-local FIELD_OVERTAKING_OFFSET    = "overtakingLateralOffset"
-
--- ========== INTERNAL HELPERS ==========
 local function clampNorm(x)
   if x < -1 then return -1 end
   if x >  1 then return  1 end
@@ -90,8 +91,16 @@ local function drawCarMarker(xCenter, midY, color)
   ui.drawLine(vec2(xCenter + CAR_NOSE_SIZE, p1.y), vec2(xCenter, noseY), color, MARKER_NOSE_THICKNESS)
 end
 
--- ========== PUBLIC DRAW FUNCTION ==========
----@param storage table
+-- Compute baseline Y for a marker based on row index and STACK_MARKERS toggle.
+local function rowY(trackMidY, rowIndex)
+  if STACK_MARKERS then
+    return trackMidY + (rowIndex * ROW_SPACING)
+  else
+    return trackMidY
+  end
+end
+
+---@param storage StorageTable
 function UILateralOffsetsImageWidget.draw(storage)
   -- Reserve block area from current cursor
   local cursor = ui.getCursor()
@@ -139,30 +148,32 @@ function UILateralOffsetsImageWidget.draw(storage)
   end
 
   -- Read offsets from storage
-  local offDefault   = storage[FIELD_DEFAULT_OFFSET]    or 0.0
-  local offYielding  = storage[FIELD_YIELDING_OFFSET]   or -0.5
-  local offOvertake  = storage[FIELD_OVERTAKING_OFFSET] or 0.5
+  local offDefault   = storage.defaultLateralOffset
+  local offYielding  = storage.yieldingLateralOffset
+  local offOvertake  = storage.overtakingLateralOffset
 
-  -- Marker positions
+  -- Marker positions (X)
   local xDefault  = mapOffsetToX(offDefault,  trackTL.x, trackW)
   local xYielding = mapOffsetToX(offYielding, trackTL.x, trackW)
   local xOvertake = mapOffsetToX(offOvertake, trackTL.x, trackW)
 
-  -- Draw markers (stacked in three rows for readability)
-  drawCarMarker(xDefault,  trackMidY - CAR_ROW_SPACING, COLOR_DEFAULT_MARKER)
-  drawCarMarker(xYielding, trackMidY,                    COLOR_YIELDING_MARKER)
-  drawCarMarker(xOvertake, trackMidY + CAR_ROW_SPACING,  COLOR_OVERTAKE_MARKER)
+  -- Marker positions (Y) — controlled by the new row index constants
+  local yDefault  = rowY(trackMidY, DEFAULT_ROW_INDEX)
+  local yYielding = rowY(trackMidY, YIELDING_ROW_INDEX)
+  local yOvertake = rowY(trackMidY, OVERTAKE_ROW_INDEX)
 
-  -- Captions
+  -- Draw markers
+  drawCarMarker(xDefault,  yDefault,  COLOR_DEFAULT_MARKER)
+  drawCarMarker(xYielding, yYielding, COLOR_YIELDING_MARKER)
+  drawCarMarker(xOvertake, yOvertake, COLOR_OVERTAKE_MARKER)
+
+  -- Captions under each marker
   if SHOW_CAPTIONS then
-    ui.dwriteDrawText(CAPTION_DEFAULT_TEXT,  CAPTION_FONT_SIZE,
-      vec2(xDefault  - 20, (trackMidY - CAR_ROW_SPACING) + CAR_HEIGHT * 0.5 + CAPTION_OFFSET_Y), COLOR_TEXT)
+    ui.dwriteDrawText(CAPTION_DEFAULT_TEXT,  CAPTION_FONT_SIZE, vec2(xDefault  - 20, yDefault  + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
 
-    ui.dwriteDrawText(CAPTION_YIELDING_TEXT, CAPTION_FONT_SIZE,
-      vec2(xYielding - 20, (trackMidY)                     + CAR_HEIGHT * 0.5 + CAPTION_OFFSET_Y), COLOR_TEXT)
+    ui.dwriteDrawText(CAPTION_YIELDING_TEXT, CAPTION_FONT_SIZE, vec2(xYielding - 20, yYielding + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
 
-    ui.dwriteDrawText(CAPTION_OVERTAKE_TEXT, CAPTION_FONT_SIZE,
-      vec2(xOvertake - 20, (trackMidY + CAR_ROW_SPACING)   + CAR_HEIGHT * 0.5 + CAPTION_OFFSET_Y), COLOR_TEXT)
+    ui.dwriteDrawText(CAPTION_OVERTAKE_TEXT, CAPTION_FONT_SIZE, vec2(xOvertake - 20, yOvertake + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
   end
 
   -- Reserve layout space so following UI doesn’t overlap the drawing
