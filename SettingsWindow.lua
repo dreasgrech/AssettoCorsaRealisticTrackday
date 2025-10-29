@@ -124,6 +124,11 @@ SettingsWindow.draw = function()
 
     ui.newLine(1)
 
+    -- start the global app-enabled disabled section if the app is disabled
+    if not appEnabled then
+        ui.pushDisabled()
+    end
+
     -- if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
     -- if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
 
@@ -296,6 +301,11 @@ SettingsWindow.draw = function()
     -- if ui.itemHovered() then ui.setTooltip('Minimum distance to the car in front before an AI car will consider overtaking it.') end
 --]===]
   ui.popDWriteFont()
+
+-- Close the global app-enabled disabled section if the app is disabled
+if not appEnabled then
+    ui.popDisabled()
+end
 end
 
 --[===[
