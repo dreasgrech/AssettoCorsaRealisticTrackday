@@ -181,6 +181,10 @@ SettingsWindow.draw = function()
         storage.overtakingLateralOffset =  renderSlider(string.format('Overtaking Lateral Offset [-1..1] -> Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
     end)
 
+    ui.newLine(1)
+
+    UILateralOffsetsImageWidget.draw(storage)
+
     if yieldingSide == overtakingSide then
       ui.textColored('Warning: Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
     end
