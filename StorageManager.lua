@@ -35,12 +35,13 @@ StorageManager.Options ={
     DistanceToStartNavigatingAroundCarInAccident_meters = 23,
 
     DebugShowCarStateOverheadText = 24,
-    DebugShowRaycastsWhileDrivingLaterally = 25,
-    DebugDrawSideOfftrack = 26,
-    DrawCarList = 27,
-    DebugLogFastStateChanges = 28,
-    DebugLogCarYielding = 29,
-    DebugLogCarOvertaking = 30,
+    DebugCarStateOverheadShowDistance = 25,
+    DebugShowRaycastsWhileDrivingLaterally = 26,
+    DebugDrawSideOfftrack = 27,
+    DrawCarList = 28,
+    DebugLogFastStateChanges = 29,
+    DebugLogCarYielding = 30,
+    DebugLogCarOvertaking = 31,
 }
 
 -- local RAMP_SPEEDS_MAX = 10
@@ -84,6 +85,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters, default=30.0, min=10.0, max=100.0 },
 
     { name = StorageManager.Options.DebugShowCarStateOverheadText, default=false, min=nil, max=nil },
+    { name = StorageManager.Options.DebugCarStateOverheadShowDistance, default=125.0, min=10.0, max=500.0 },
     { name = StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
     { name = StorageManager.Options.DrawCarList, default=true, min=nil, max=nil },
@@ -132,6 +134,7 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field distanceFromAccidentToSeeYellowFlag_meters number
 ---@field distanceToStartNavigatingAroundCarInAccident_meters number
 ---@field debugShowCarStateOverheadText boolean
+---@field debugCarStateOverheadShowDistance number
 ---@field debugShowRaycastsWhileDrivingLaterally boolean
 ---@field debugDrawSideOfftrack boolean
 ---@field drawCarList boolean
@@ -173,6 +176,7 @@ local storageTable = {
     distanceToStartNavigatingAroundCarInAccident_meters = StorageManager.options_default[StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters],
 
     debugShowCarStateOverheadText = StorageManager.options_default[StorageManager.Options.DebugShowCarStateOverheadText],
+    debugCarStateOverheadShowDistance = StorageManager.options_default[StorageManager.Options.DebugCarStateOverheadShowDistance],
     debugShowRaycastsWhileDrivingLaterally = StorageManager.options_default[StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally],
     debugDrawSideOfftrack = StorageManager.options_default[StorageManager.Options.DebugDrawSideOfftrack],
     drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],

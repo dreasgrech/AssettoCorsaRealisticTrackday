@@ -1,4 +1,8 @@
 local CameraManager = {}
+
+--bindings
+local ac = ac
+
 -- carIndex is 0-based
 CameraManager.followCarWithChaseCamera = function(carIndex)
   ac.focusCar(carIndex)                                 -- make that car the target

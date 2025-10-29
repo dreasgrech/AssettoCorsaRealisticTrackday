@@ -10,9 +10,25 @@ local settingsWindowIconPositionBottomLeft = vec2(0,0) -- this is needed for the
 
 local DEFAULT_SLIDER_WIDTH = 200
 
+---Renders a slider with a tooltip
+---@param label string @Slider label.
+---@param tooltip string
+---@param value refnumber|number @Current slider value.
+---@param min number? @Default value: 0.
+---@param max number? @Default value: 1.
+---@param sliderWidth number
+---@return number @Possibly updated slider value.
 local renderSlider = function(label, tooltip, value, min, max, sliderWidth)
     ui.pushItemWidth(sliderWidth)
     local newValue = ui.slider(label, value, min, max)
+    ui.popItemWidth()
+    if ui.itemHovered() then ui.setTooltip(tooltip) end
+    return newValue
+end
+
+local renderSliderWithInnerText = function(sliderID, labelFormat, tooltip, value, min, max, sliderWidth)
+    ui.pushItemWidth(sliderWidth)
+    local newValue = ui.slider(sliderID, value, min, max, labelFormat)
     ui.popItemWidth()
     if ui.itemHovered() then ui.setTooltip(tooltip) end
     return newValue
@@ -28,6 +44,9 @@ local renderDebuggingSection = function(storage)
 
     if ui.checkbox('Show car state overhead text', storage.debugShowCarStateOverheadText) then storage.debugShowCarStateOverheadText = not storage.debugShowCarStateOverheadText end
     if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
+
+    -- storage.debugCarStateOverheadShowDistance = renderSlider('Car state overhead show distance (m)', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage.debugCarStateOverheadShowDistance, StorageManager.options_min[StorageManager.Options.DebugCarStateOverheadShowDistance], StorageManager.options_max[StorageManager.Options.DebugCarStateOverheadShowDistance], DEFAULT_SLIDER_WIDTH)
+    storage.debugCarStateOverheadShowDistance = renderSliderWithInnerText('##debugCarStateOverheadShowDistance', 'Overhead text distance: %.0fm', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage.debugCarStateOverheadShowDistance, StorageManager.options_min[StorageManager.Options.DebugCarStateOverheadShowDistance], StorageManager.options_max[StorageManager.Options.DebugCarStateOverheadShowDistance], DEFAULT_SLIDER_WIDTH)
 
     if ui.checkbox('Show raycasts when driving laterally', storage.debugShowRaycastsWhileDrivingLaterally) then storage.debugShowRaycastsWhileDrivingLaterally = not storage.debugShowRaycastsWhileDrivingLaterally end
     if ui.itemHovered() then ui.setTooltip('Shows the raycasts used to check for side clearance when driving checking for cars on the side') end

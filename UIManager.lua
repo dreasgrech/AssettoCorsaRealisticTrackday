@@ -362,31 +362,39 @@ function UIManager.drawCarStateOverheadText()
 
   -- for i = 1, sim.carsCount - 1 do
   local carsCount = sim.carsCount
-  for i = 0, carsCount do
-  -- for i, car in ac.iterateCars() do
-    -- CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
-    -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
-    local carState = CarStateMachine.getCurrentState(i)
-    if CarManager.cars_initialized[i] and carState ~= CarStateMachine.CarStateType.DRIVING_NORMALLY then
-      local car = ac.getCar(i)
-      if car then
-        -- local txt = string.format(
-          -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
-          -- i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh),
-          -- CarManager.cars_currentSplineOffset[i],
-          -- CarManager.cars_targetSplineOffset[i],
-          -- carState
-        -- )
-        -- -- do
-        -- --   local indicatorStatusText = UIManager.indicatorStatusText(i)
-        -- --   txt = txt .. string.format("  ind=%s", indicatorStatusText)
-        -- -- end
+  local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()
+  local cameraFocusedCar = ac.getCar(cameraFocusedCarIndex)
+  if cameraFocusedCar then
+    for i = 0, carsCount do
+    -- for i, car in ac.iterateCars() do
+      -- CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
+      -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
+      local carState = CarStateMachine.getCurrentState(i)
+      local showText = CarManager.cars_initialized[i] and carState ~= CarStateMachine.CarStateType.DRIVING_NORMALLY
+      if showText then
+        local car = ac.getCar(i)
+        if car then
+          local distanceFromCameraFocusedCarToThisCar = MathHelpers.distanceBetweenVec3s(car.position, cameraFocusedCar.position)
+          local isThisCarCloseToCameraFocusedCar = distanceFromCameraFocusedCarToThisCar < storage.debugCarStateOverheadShowDistance
+          if isThisCarCloseToCameraFocusedCar then
+            local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
+            render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState], 1, render.FontAlign.Center)--, render.FontAlign.Center)
+          end
+          -- local txt = string.format(
+            -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
+            -- i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh),
+            -- CarManager.cars_currentSplineOffset[i],
+            -- CarManager.cars_targetSplineOffset[i],
+            -- carState
+          -- )
+          -- -- do
+          -- --   local indicatorStatusText = UIManager.indicatorStatusText(i)
+          -- --   txt = txt .. string.format("  ind=%s", indicatorStatusText)
+          -- -- end
 
-        -- -- render the text slightly above the car
-        -- render.debugText(car.position + vec3(0, 2.0, 0), txt)
-
-        local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
-        render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState], 1, render.FontAlign.Center)--, render.FontAlign.Center)
+          -- -- render the text slightly above the car
+          -- render.debugText(car.position + vec3(0, 2.0, 0), txt)
+        end
       end
     end
   end
