@@ -164,6 +164,9 @@ SettingsWindow.draw = function()
     ui.dwriteText('Driving Lanes', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
+    ui.columns(2, false, "lateralsSection")
+    ui.setColumnWidth(0, 560)
+
     storage.defaultLateralOffset =  renderSlider('Default Lateral Offset [-1..1]', 'The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.\n-1 = fully to the left\n0 = center of the track (racing line)\n1 = fully to the right', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
 
     -- currentValue = ui.slider('##someSliderID', currentValue, 0, 100, 'Quantity: %.0f')
@@ -181,13 +184,17 @@ SettingsWindow.draw = function()
         storage.overtakingLateralOffset =  renderSlider(string.format('Overtaking Lateral Offset [-1..1] -> Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
     end)
 
-    ui.newLine(1)
-
-    UILateralOffsetsImageWidget.draw(storage)
+    -- ui.newLine(1)
 
     if yieldingSide == overtakingSide then
       ui.textColored('Warning: Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
     end
+
+    ui.nextColumn()
+
+    UILateralOffsetsImageWidget.draw(storage)
+
+    ui.columns(1, false)
 
     -- storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, StorageManager.options_min[StorageManager.Options.MaxLateralOffset_normalized], StorageManager.options_max[StorageManager.Options.MaxLateralOffset_normalized])
     -- if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
