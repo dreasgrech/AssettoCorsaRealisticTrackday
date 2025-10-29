@@ -40,9 +40,9 @@ local COLOR_TEXT_MINOR           = rgbm(0.80, 0.80, 0.80, 1.00)
 local COLOR_CAR_OUTLINE          = rgbm(0.00, 0.00, 0.00, 0.55)
 
 -- Marker colors
-local COLOR_DEFAULT_MARKER       = rgbm(0.20, 0.65, 1.00, 1.00)
+local COLOR_DEFAULT_MARKER       = rgbm(0.40, 1.00, 0.40, 1.00)
 local COLOR_YIELDING_MARKER      = rgbm(1.00, 0.70, 0.20, 1.00)
-local COLOR_OVERTAKE_MARKER      = rgbm(0.40, 1.00, 0.40, 1.00)
+local COLOR_OVERTAKE_MARKER      = rgbm(0.20, 0.65, 1.00, 1.00)
 
 -- Lines/weights
 local CENTERLINE_THICKNESS       = 2
