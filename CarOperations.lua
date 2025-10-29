@@ -1,5 +1,14 @@
 ﻿local CarOperations = {}
 
+-- bindings
+local ac = ac
+local physics = physics
+local vec3 = vec3
+local rgbm = rgbm
+local approach = MathHelpers.approach
+local vsub = MathHelpers.vsub
+local dot = MathHelpers.dot
+
 --[====[
 ---@alias CarOperations.CarDirections 
 ---| `CarOperations.CarDirections.None` @Value: 0.
@@ -268,8 +277,8 @@ function CarOperations.isSecondCarClearlyAhead(firstCar, secondCar, meters)
     end
 
     local fwd = firstCar.look
-    local rel = MathHelpers.vsub(secondCar.position, firstCar.position)
-    return MathHelpers.dot(fwd, rel) > meters
+    local rel = vsub(secondCar.position, firstCar.position)
+    return dot(fwd, rel) > meters
 end
 
 ---Returns a boolean value indicating whether the second car is clearly behind the first car.
@@ -279,8 +288,8 @@ end
 ---@return boolean
 function CarOperations.isSecondCarClearlyBehindFirstCar(firstCar, secondCar, meters)
     local fwd = firstCar.look
-    local rel = MathHelpers.vsub(secondCar.position, firstCar.position)
-    return MathHelpers.dot(fwd, rel) < -meters
+    local rel = vsub(secondCar.position, firstCar.position)
+    return dot(fwd, rel) < -meters
 end
 
 ---limits the ramp up speed of the spline offset when the car is driving at high speed
@@ -450,7 +459,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
       local targetSplineOffset = targetLateralOffset
 
       local step = splineOffsetTransitionSpeed * dt
-      currentSplineOffset = MathHelpers.approach(currentSplineOffset, targetSplineOffset, step)
+      currentSplineOffset = approach(currentSplineOffset, targetSplineOffset, step)
 
       -- set the spline offset on the ai car
       -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
