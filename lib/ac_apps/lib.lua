@@ -4001,6 +4001,7 @@ function ac.setSystemMessage(title, description) end
 function ac.getUnreadChatMessages() end
 
 ---Return distances to the nearest left and right cars in meters within 20 meters, or `nil` if there are no cars nearby or blind spot detection is not available for this car.
+---Meant to be used for things like blind spot warnings on side mirrors, it’s fast but inaccurate and only computes results for the nearest cars.
 ---@param carIndex integer @0-based car index.
 ---@return number?, number?
 function ac.getCarBlindSpot(carIndex) end
@@ -5724,7 +5725,7 @@ function math.isinf(x) end
 function math.isfinite(x) end
 
 ---@type number
-math.nan = 0/0
+math.nan = math.sqrt(-1)
 
 ---@type number
 math.tau = math.pi * 2
@@ -6503,6 +6504,14 @@ function physics.Collider.Capsule(length, radius, offset, look, debug) end
 ---@param debug boolean? @Set to `true` to see an outline. Default value: `false`.
 ---@return physics.ColliderType
 function physics.Collider.Cylinder(length, radius, offset, look, debug) end
+
+---Ray collider. Added in 0.3.0-preview121.
+---@param length number
+---@param origin vec3? @Default value: `vec3(0, 0, 0)`.
+---@param dir vec3? @Default value: `vec3(0, 0, 1)`.
+---@param debug boolean? @Set to `true` to see an outline. Default value: `false`.
+---@return physics.ColliderType
+function physics.Collider.Ray(length, origin, dir, debug) end
 
 --[[ common/ac_extras_ini.lua ]]
 
@@ -9871,9 +9880,16 @@ function _ac_SceneReference:getMaterialPropertyIndex(index, propertyName) end
 ---Get texture filename of a certain texture slot of an element.
 ---@param index integer|nil @1-based index of an element to get a texture filename of. Default value: 1.
 ---@param slot string|integer|nil|"'txDiffuse'"|"'txNormal'"|"'txEmissive'"|"'txMaps'" @Texture slot name or a 1-based index of a texture slot. Default value: 1.
----@return string|nil @Texture filename or `nil` if there is no such slot or element.
----@overload fun(s: ac.SceneReference, slot: string): string
+---@return string? @Texture filename or `nil` if there is no such slot or element.
+---@overload fun(s: ac.SceneReference, slot: string): string?
 function _ac_SceneReference:getTextureSlotFilename(index, slot) end
+
+---Get texture details of a certain texture slot of an element. Slower, but has a lot of details.
+---@param index integer|nil @1-based index of an element to get a texture filename of. Default value: 1.
+---@param slot string|integer|nil|"'txDiffuse'"|"'txNormal'"|"'txEmissive'"|"'txMaps'" @Texture slot name or a 1-based index of a texture slot. Default value: 1.
+---@return {index: integer, slot: string, filename: string, size: vec2}? @Texture filename or `nil` if there is no such slot or element.
+---@overload fun(s: ac.SceneReference, slot: string): {index: integer, slot: string, filename: string, size: vec2}?
+function _ac_SceneReference:getTextureSlotDetails(index, slot) end
 
 ---Dump shader replacements configs for materials in current selection. Resulting string might be pretty huge. Not all properties are dumped, but more properties might be added later. Some textures are stored as temporary IDs only valid within a session.
 ---@return string
@@ -13984,7 +14000,7 @@ function physics.teleportCarTo(carIndex, spawnSet) end
 ---Sets car position and orientation and invalidates current lap time. Car will be aligned on track surface.
 ---@param carIndex integer
 ---@param pos vec3
----@param dir vec3
+---@param dir vec3|nil @Since 0.3.0-preview124, pass `nil` to align car along AI spline. Default value: `nil`.
 function physics.setCarPosition(carIndex, pos, dir) end
 
 ---Sets car velocity and invalidates current lap time.
@@ -14329,8 +14345,13 @@ function physics.setAIDriverTeam(carIndex, team) end
 ---Changes position of an AI car.
 ---@param carIndex integer @0-based car index.
 ---@param pos vec3
----@param dir vec3
+---@param dir vec3|nil @Since 0.3.0-preview124, pass `nil` to align car along AI spline. Default value: `nil`.
 function physics.setAICarPosition(carIndex, pos, dir) end
+
+---Changes position of an AI car.
+---@param carIndex integer @0-based car index.
+---@param time number? @Delay before starting to drive, in seconds. Default value: 0.
+function physics.setAITimeToStart(carIndex, time) end
 
 ---Changes AI aggression. Use `ac.getCar(carIndex).aiAggression` to get current value.
 ---@param carIndex integer @0-based car index.
@@ -14908,7 +14929,7 @@ function ac.reloadControlSettings() end
 ---@return ac.OverlayLeaderboardParams?
 function ac.accessOverlayLeaderboardParams() end
 
----Access car controls overwriting. Easier than simulating inputs with fake gamepads and keypresses.
+---Overwrite car controls entirely. Easier than simulating inputs with fake gamepads and keypresses.
 ---@param carIndex integer? @0-based car index (only controls for AIs and user cars can be overriden). Default value: 0.
 ---@return ac.CarControlsInput?
 function ac.overrideCarControls(carIndex) end
@@ -15788,7 +15809,8 @@ function ray:track(culling) end
 ---@nodiscard
 function ray:scene(culling) end
 
----Ray/cars intersection. Accounts for ray length (since 0.2.10).
+---Ray/cars intersection. Accounts for ray length (since 0.2.10). Casts a ray against actual cars visual 3D geometry,
+---so it’s likely you don’t need it and would be happier with `:carCollider()`.
 ---@param culling integer? @Set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
 ---@return number @Intersection distance, or -1 if there was no intersection.
 ---@nodiscard
@@ -15959,6 +15981,13 @@ function _uiDWriteFont:allowRealSizes(allow) end
 ---@param allow boolean? @Default value: `true`.
 ---@return self
 function _uiDWriteFont:allowEmoji(allow) end
+
+---Added in 0.3.0-preview121. Allows to tune spacing between characters. Not available before Windows 8.
+---@param leading number @The spacing before each character, in reading order.
+---@param trailing number @The spacing after each character, in reading order.
+---@param minimumAdvanceWidth number @The minimum advance of each character, to prevent characters from becoming too thin or zero-width. This must be zero or greater.
+---@return self
+function _uiDWriteFont:spacing(leading, trailing, minimumAdvanceWidth) end
 
 --[[ common/ac_ui.lua ]]
 
@@ -17394,6 +17423,7 @@ function ac.DriverWeightShift(carIndex) end
 
 ---A helper structure to simulate some inputs for controlling the car.
 ---@class ac.CarControlsInput
+---@field combineAxes boolean @Added in 0.3.0-preview125. Set to `false` to entirely override original pedal and handbrake values instead of combining. Default value: `true`.
 ---@field gearUp boolean @Set to `true` to activate a flag for the next physics step.
 ---@field gearDown boolean @Set to `true` to activate a flag for the next physics step.
 ---@field brakeBalanceUp boolean @Set to `true` to activate a flag for the next physics step.

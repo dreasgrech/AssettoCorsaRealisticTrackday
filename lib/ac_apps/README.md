@@ -2203,6 +2203,7 @@ Return the number of unread chat messages, or 0 in an offline race.
   - `integer`
 ## Function ac.getCarBlindSpot(carIndex)
 Return distances to the nearest left and right cars in meters within 20 meters, or `nil` if there are no cars nearby or blind spot detection is not available for this car.
+Meant to be used for things like blind spot warnings on side mirrors, it’s fast but inaccurate and only computes results for the nearest cars.
 
   Parameters:
 
@@ -5192,6 +5193,22 @@ Cylinder collider (slower than capsule, consider using capsule where appropriate
   4. `look`: `vec3?` Default value: `vec3(0, 0, 1)`.
 
   5. `debug`: `boolean?` Set to `true` to see an outline. Default value: `false`.
+
+  Returns:
+
+  - `physics.ColliderType`
+## Function physics.Collider.Ray(length, origin, dir, debug)
+Ray collider. Added in 0.3.0-preview121.
+
+  Parameters:
+
+  1. `length`: `number`
+
+  2. `origin`: `vec3?` Default value: `vec3(0, 0, 0)`.
+
+  3. `dir`: `vec3?` Default value: `vec3(0, 0, 1)`.
+
+  4. `debug`: `boolean?` Set to `true` to see an outline. Default value: `false`.
 
   Returns:
 
@@ -11354,7 +11371,17 @@ end
 
   Returns:
 
-    - `string|nil` Texture filename or `nil` if there is no such slot or element.
+    - `string`
+
+- `ac.SceneReference:getTextureSlotDetails(index, slot)`
+
+  Get texture details of a certain texture slot of an element. Slower, but has a lot of details.
+
+  Parameters:
+
+    1. `index`: `integer|nil` 1-based index of an element to get a texture filename of. Default value: 1.
+
+    2. `slot`: `string|integer|nil|"'txDiffuse'"|"'txNormal'"|"'txEmissive'"|"'txMaps'"` Texture slot name or a 1-based index of a texture slot. Default value: 1.
 
 - `ac.SceneReference:dumpShaderReplacements()`
 
@@ -16275,7 +16302,7 @@ Sets car position and orientation and invalidates current lap time. Car will be 
 
   2. `pos`: `vec3`
 
-  3. `dir`: `vec3`
+  3. `dir`: `vec3|nil` Since 0.3.0-preview124, pass `nil` to align car along AI spline. Default value: `nil`.
 ## Function physics.setCarVelocity(carIndex, velocity)
 Sets car velocity and invalidates current lap time.
 
@@ -16813,7 +16840,15 @@ Changes position of an AI car.
 
   2. `pos`: `vec3`
 
-  3. `dir`: `vec3`
+  3. `dir`: `vec3|nil` Since 0.3.0-preview124, pass `nil` to align car along AI spline. Default value: `nil`.
+## Function physics.setAITimeToStart(carIndex, time)
+Changes position of an AI car.
+
+  Parameters:
+
+  1. `carIndex`: `integer` 0-based car index.
+
+  2. `time`: `number?` Delay before starting to drive, in seconds. Default value: 0.
 ## Function physics.setAIAggression(carIndex, aggression)
 Changes AI aggression. Use `ac.getCar(carIndex).aiAggression` to get current value.
 
@@ -17726,7 +17761,7 @@ function ac.reloadControlSettings() end
 
   - `ac.OverlayLeaderboardParams`
 ## Function ac.overrideCarControls(carIndex)
-Access car controls overwriting. Easier than simulating inputs with fake gamepads and keypresses.
+Overwrite car controls entirely. Easier than simulating inputs with fake gamepads and keypresses.
 
   Parameters:
 
@@ -19005,7 +19040,8 @@ for faster and more accurate raycasting.
 
 - `ray:cars(culling)`
 
-  Ray/cars intersection. Accounts for ray length (since 0.2.10).
+  Ray/cars intersection. Accounts for ray length (since 0.2.10). Casts a ray against actual cars visual 3D geometry,
+so it’s likely you don’t need it and would be happier with `:carCollider()`.
 
   Parameters:
 
@@ -19251,6 +19287,22 @@ Emoji are enabled by default.
   Parameters:
 
     1. `allow`: `boolean?` Default value: `true`.
+
+  Returns:
+
+    - `self`
+
+- `ui.DWriteFont:spacing(leading, trailing, minimumAdvanceWidth)`
+
+  Added in 0.3.0-preview121. Allows to tune spacing between characters. Not available before Windows 8.
+
+  Parameters:
+
+    1. `leading`: `number` The spacing before each character, in reading order.
+
+    2. `trailing`: `number` The spacing after each character, in reading order.
+
+    3. `minimumAdvanceWidth`: `number` The minimum advance of each character, to prevent characters from becoming too thin or zero-width. This must be zero or greater.
 
   Returns:
 
