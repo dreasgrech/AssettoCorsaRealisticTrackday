@@ -117,9 +117,12 @@ SettingsWindow.draw = function()
     local appEnabled = storage.enabled
     local enabledCheckBoxColor = appEnabled and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
     ui.pushStyleColor(ui.StyleColor.Text, enabledCheckBoxColor)
-    if ui.checkbox('Enabled', appEnabled) then storage.enabled = not storage.enabled end
+    local enabledDisabledText = appEnabled and 'Enabled' or 'Disabled'
+    if ui.checkbox('Realistic Trackday ' .. enabledDisabledText, appEnabled) then storage.enabled = not storage.enabled end
     ui.popStyleColor(1)
     if ui.itemHovered() then ui.setTooltip('Master switch for this app.') end
+
+    ui.newLine(1)
 
     -- if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
     -- if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
@@ -156,15 +159,22 @@ SettingsWindow.draw = function()
     ui.dwriteText('Driving Lanes', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    storage.defaultLateralOffset =  renderSlider('Default Lateral Offset [-1..1]', 'The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
+    storage.defaultLateralOffset =  renderSlider('Default Lateral Offset [-1..1]', 'The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.\n-1 = fully to the left\n0 = center of the track (racing line)\n1 = fully to the right', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
 
     -- currentValue = ui.slider('##someSliderID', currentValue, 0, 100, 'Quantity: %.0f')
 
+    local handleYielding = storage.handleYielding
+    local handleOvertaking = storage.handleOvertaking
+
     local yieldingSide = RaceTrackManager.getYieldingSide()
-    storage.yieldingLateralOffset =  renderSlider(string.format('Yielding Lateral Offset [-1..1] -> Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), 'The lateral offset from the centerline that AI cars will drive to when yielding (giving way to faster cars).\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
+    createDisabledSection(not handleYielding, function()
+        storage.yieldingLateralOffset =  renderSlider(string.format('Yielding Lateral Offset [-1..1] -> Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), 'The lateral offset from the centerline that AI cars will drive to when yielding (giving way to faster cars).\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
+    end)
 
     local overtakingSide = RaceTrackManager.getOvertakingSide()
-    storage.overtakingLateralOffset =  renderSlider(string.format('Overtaking Lateral Offset [-1..1] -> Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
+    createDisabledSection(not handleOvertaking, function()
+        storage.overtakingLateralOffset =  renderSlider(string.format('Overtaking Lateral Offset [-1..1] -> Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
+    end)
 
     if yieldingSide == overtakingSide then
       ui.textColored('Warning: Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
@@ -188,8 +198,6 @@ SettingsWindow.draw = function()
     ui.newLine(1)
     ui.dwriteText('Yielding', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
-
-    local handleYielding = storage.handleYielding
 
     local handleYieldingCheckboxColor = handleYielding and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
     ui.pushStyleColor(ui.StyleColor.Text, handleYieldingCheckboxColor)
@@ -222,8 +230,6 @@ SettingsWindow.draw = function()
     ui.newLine(1)
     ui.dwriteText('Overtaking', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
-
-    local handleOvertaking = storage.handleOvertaking
 
     local handleOvertakingCheckboxColor = handleOvertaking and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
     ui.pushStyleColor(ui.StyleColor.Text, handleOvertakingCheckboxColor)
