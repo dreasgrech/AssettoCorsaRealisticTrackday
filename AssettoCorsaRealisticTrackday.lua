@@ -69,6 +69,13 @@ local function awake()
     globalStorage.appRanFirstTime = true
   end
 
+  -- Collect some initial data about all the cars
+  for i, car in ac.iterateCars() do
+    local carIndex = car.index
+    local originalCarAIAggression = car.aiAggression
+    CarManager.cars_ORIGINAL_AI_AGGRESSION[carIndex] = originalCarAIAggression
+    Logger.log(string.format('Car %d AI Aggression: %.3f', i, car.aiAggression))
+  end
 end
 awake()
 

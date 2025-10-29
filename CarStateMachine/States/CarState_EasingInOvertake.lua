@@ -73,7 +73,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
     local aiCaution, aiAggression = CarOperations.calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
     CarOperations.setAICaution(carIndex, aiCaution)
-    CarOperations.setAIAggression(carIndex, aiAggression)
+    
+    if storage.overrideOriginalAIAggression_overtaking then
+      CarOperations.setAIAggression(carIndex, aiAggression)
+    end
 
     -- -- the drive to side is to be opposite side to the the yielding side
     -- local driveToSide = RaceTrackManager.getOvertakingSide()
@@ -189,5 +192,5 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     -- reset the overtaking car caution back to normal
     CarOperations.removeAICaution(carIndex)
-    CarOperations.removeAIAggression(carIndex)
+    CarOperations.setDefaultAIAggression(carIndex)
 end

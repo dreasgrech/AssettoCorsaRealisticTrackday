@@ -9,6 +9,8 @@ local CAR_SPEEDS_BUFFER_SIZE = 600
 CarManager.cars_initialized = {}
 ---@type table<integer,number>
 CarManager.cars_MAXTOPSPEED = {} -- do not reset this
+---@type table<integer,integer>
+CarManager.cars_ORIGINAL_AI_AGGRESSION = {} -- do not reset this
 
 ---@type table<integer,number>
 CarManager.cars_currentSplineOffset = {}
@@ -175,7 +177,7 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarOperations.setAIStopCounter(carIndex, 0)
   CarOperations.setGentleStop(carIndex, false)
   CarOperations.removeAICaution(carIndex)
-  CarOperations.removeAIAggression(carIndex)
+  CarOperations.setDefaultAIAggression(carIndex)
   CarOperations.setDefaultAIGrip(carIndex)
 
   -- reset any pedal positions we may have set
@@ -226,6 +228,15 @@ function CarManager.getActualTrackLateralOffset(carPosition)
   local carTrackCoordinates = ac.worldCoordinateToTrack(carPosition)
   return carTrackCoordinates.x
 end
+
+CarManager.getDefaultAIAggression = function(carIndex)
+  local storage = StorageManager.getStorage()
+  return 
+    -- if we're not overriding the original aggression, restore revert back to the original aggression
+    storage.overrideOriginalAIAggression_drivingNormally and storage.defaultAIAggression
+    or CarManager.cars_ORIGINAL_AI_AGGRESSION[carIndex]
+end
+
 
 -- local SIDE_DETERMINATION_THRESHOLD = 0.1
 local SIDE_DETERMINATION_THRESHOLD = 0.3

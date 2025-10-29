@@ -7,41 +7,43 @@ StorageManager.Options ={
     -- YieldSide = 3,
     OverrideAiAwareness = 3,
     DefaultAICaution = 4,
-    DefaultAIAggression = 5,
+    OverrideOriginalAIAggression_DrivingNormally = 5,
+    OverrideOriginalAIAggression_Overtaking = 6,
+    DefaultAIAggression = 7,
 
-    DefaultLateralOffset = 6,
-    YieldingLateralOffset = 7,
-    OvertakingLateralOffset = 8,
-    -- MaxLateralOffset_normalized = 9,
+    DefaultLateralOffset = 8,
+    YieldingLateralOffset = 9,
+    OvertakingLateralOffset = 10,
+    -- MaxLateralOffset_normalized = 10,
 
-    ClearAhead_meters = 9,
+    ClearAhead_meters = 11,
 
-    HandleYielding = 10,
-    DetectCarBehind_meters = 11,
-    RampSpeed_mps = 12,
-    RampRelease_mps = 13,
+    HandleYielding = 12,
+    DetectCarBehind_meters = 13,
+    RampSpeed_mps = 14,
+    RampRelease_mps = 15,
 
-    HandleOvertaking = 14,
-    DetectCarAhead_meters = 15,
-    OvertakeRampSpeed_mps = 16,
-    OvertakeRampRelease_mps = 17,
+    HandleOvertaking = 16,
+    DetectCarAhead_meters = 17,
+    OvertakeRampSpeed_mps = 18,
+    OvertakeRampRelease_mps = 19,
 
-    CustomAIFlood_enabled = 18,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 19,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 20,
+    CustomAIFlood_enabled = 20,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 21,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 22,
 
-    HandleAccidents = 21,
-    DistanceFromAccidentToSeeYellowFlag_meters = 22,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 23,
+    HandleAccidents = 23,
+    DistanceFromAccidentToSeeYellowFlag_meters = 24,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 25,
 
-    DebugShowCarStateOverheadText = 24,
-    DebugCarStateOverheadShowDistance = 25,
-    DebugShowRaycastsWhileDrivingLaterally = 26,
-    DebugDrawSideOfftrack = 27,
-    DrawCarList = 28,
-    DebugLogFastStateChanges = 29,
-    DebugLogCarYielding = 30,
-    DebugLogCarOvertaking = 31,
+    DebugShowCarStateOverheadText = 26,
+    DebugCarStateOverheadShowDistance = 27,
+    DebugShowRaycastsWhileDrivingLaterally = 28,
+    DebugDrawSideOfftrack = 29,
+    DrawCarList = 30,
+    DebugLogFastStateChanges = 31,
+    DebugLogCarYielding = 32,
+    DebugLogCarOvertaking = 33,
 }
 
 -- local RAMP_SPEEDS_MAX = 10
@@ -53,6 +55,8 @@ local optionsCollection_beforeDoD = {
     -- { name = StorageManager.Options.YieldSide, default=RaceTrackManager.TrackSide.RIGHT, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
+    { name = StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally, default=true, min=nil, max=false },
+    { name = StorageManager.Options.OverrideOriginalAIAggression_Overtaking, default=true, min=nil, max=false },
     { name = StorageManager.Options.DefaultAIAggression, default=.5, min=0, max=0.95 }, -- The max is .95 because it's mentioned in the docs for physics.setAIAggression that the value from the launcher is multiplied by .95 so that's the max
 
     { name = StorageManager.Options.DefaultLateralOffset, default=0, min=-1, max=1 },
@@ -113,6 +117,8 @@ optionsCollection_beforeDoD = nil  -- free memory
 -- ---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
 ---@field defaultAICaution integer
+---@field overrideOriginalAIAggression_drivingNormally boolean
+---@field overrideOriginalAIAggression_overtaking boolean
 ---@field defaultAIAggression integer
 ---@field defaultLateralOffset number
 ---@field yieldingLateralOffset number
@@ -149,6 +155,8 @@ local storageTable = {
     -- yieldSide = StorageManager.options_default[StorageManager.Options.YieldSide],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
+    overrideOriginalAIAggression_drivingNormally = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally],
+    overrideOriginalAIAggression_overtaking = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_Overtaking],
     defaultAIAggression = StorageManager.options_default[StorageManager.Options.DefaultAIAggression],
 
     defaultLateralOffset = StorageManager.options_default[StorageManager.Options.DefaultLateralOffset],

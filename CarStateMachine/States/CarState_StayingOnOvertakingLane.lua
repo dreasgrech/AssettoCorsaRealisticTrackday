@@ -28,7 +28,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local yieldingCar = ac.getCar(yieldingCarIndex)
     local aiCaution, aiAggression = CarOperations.calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
     CarOperations.setAICaution(carIndex, aiCaution)
-    CarOperations.setAIAggression(carIndex, aiAggression)
+
+    if storage.overrideOriginalAIAggression_overtaking then
+        CarOperations.setAIAggression(carIndex, aiAggression)
+    end
 
     -- keep driving to the overtaking side even while staying on the overtaking lane since sometimes the cars still end up drifting back to the normal lanes mostly because of high speed corners
     local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
@@ -124,5 +127,5 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     -- reset the overtaking car caution back to normal
     CarOperations.removeAICaution(carIndex)
-    CarOperations.removeAIAggression(carIndex)
+    CarOperations.setDefaultAIAggression(carIndex)
 end

@@ -181,9 +181,9 @@ end
 
 ---Removes any AI aggression and sets it back to the default value.
 ---@param carIndex integer @0-based car index.
-CarOperations.removeAIAggression = function(carIndex)
-  local storage = StorageManager.getStorage()
-  CarOperations.setAIAggression(carIndex, storage.defaultAIAggression)
+CarOperations.setDefaultAIAggression = function(carIndex)
+  local aiAggression = CarManager.getDefaultAIAggression(carIndex)
+  CarOperations.setAIAggression(carIndex, aiAggression)
 end
 
 ---Forces AI to brake for a specified amount of time. Originally, this mechanism is used to get AIs to brake after an incident.

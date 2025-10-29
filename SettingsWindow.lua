@@ -1,5 +1,8 @@
 local SettingsWindow = {}
 
+-- bindings
+local ui = ui
+
 local UI_HEADER_TEXT_FONT_SIZE = 15
 
 -- Values for drawing the app icon in the settings window
@@ -78,6 +81,21 @@ local renderDebuggingSection = function(storage)
     ui.columns(1, false)
 end
 
+--- Creates a disabled section in the UI.
+---@param createSection boolean @If true, will create a disabled section.
+---@param callback function @Function to call to render the contents of the section.
+local createDisabledSection = function(createSection, callback)
+    if createSection then
+        ui.pushDisabled()
+    end
+
+    callback()
+
+    if createSection then
+        ui.popDisabled()
+    end
+end
+
 SettingsWindow.draw = function()
     local storage = StorageManager.getStorage()
 
@@ -115,7 +133,19 @@ SettingsWindow.draw = function()
     if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding/overtaking.') end
 
     storage.defaultAICaution =  renderSlider('Default AI Caution', 'Base AI caution level (higher = more cautious, slower but less accident prone).', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH) -- do not drop the minimum below 2 because 1 is used while overtaking
-    storage.defaultAIAggression =  renderSlider('Default AI Aggression', 'Base AI aggression level (higher = more aggressive, faster but more accident prone).', storage.defaultAIAggression, StorageManager.options_min[StorageManager.Options.DefaultAIAggression], StorageManager.options_max[StorageManager.Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
+
+
+    if ui.checkbox('Override original AI aggression when driving normally', storage.overrideOriginalAIAggression_drivingNormally) then storage.overrideOriginalAIAggression_drivingNormally = not storage.overrideOriginalAIAggression_drivingNormally end
+    if ui.itemHovered() then ui.setTooltip('If enabled, will override the original AI aggression value thats is set from the game launcher when the car is driving normally.') end
+
+    local overrideOriginalAIAggression_drivingNormally = storage.overrideOriginalAIAggression_drivingNormally
+
+    createDisabledSection(not overrideOriginalAIAggression_drivingNormally, function()
+        storage.defaultAIAggression =  renderSlider('Overridden AI Aggression when driving normally', 'Base AI aggression level (higher = more aggressive, faster but more accident prone).', storage.defaultAIAggression, StorageManager.options_min[StorageManager.Options.DefaultAIAggression], StorageManager.options_max[StorageManager.Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
+    end)
+
+    if ui.checkbox('Override original AI aggression when overtaking', storage.overrideOriginalAIAggression_overtaking) then storage.overrideOriginalAIAggression_overtaking = not storage.overrideOriginalAIAggression_overtaking end
+    if ui.itemHovered() then ui.setTooltip('If enabled, will override the original AI aggression value thats is set from the game launcher when the car is overtaking another car.') end
 
     ui.newLine(1)
     ui.separator()

@@ -30,6 +30,8 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
       -- reset the yielding car caution back to normal
       CarOperations.removeAICaution(carIndex)
 
+      CarOperations.setDefaultAIAggression(carIndex)
+
       -- remove the yielding car throttle limit since we will now be driving normally
       CarOperations.resetAIThrottleLimit(carIndex)
       
@@ -43,6 +45,9 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+      -- Keep setting this per tick because the default ai aggression can be changed from the settings
+      CarOperations.setDefaultAIAggression(carIndex)
+
       local rampSpeed_mps = 1000 -- high value so they keep on the lane as much as possible?
       local targetOffset = storage.defaultLateralOffset
 
