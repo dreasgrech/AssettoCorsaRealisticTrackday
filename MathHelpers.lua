@@ -32,6 +32,7 @@ end
 ---@param vec3b vec3
 ---@return number
 function MathHelpers.distanceBetweenVec3s(vec3a, vec3b)
+    -- TODO: this can definitely be optimized
     return MathHelpers.vlen(MathHelpers.vsub(vec3a, vec3b))
 end
 
