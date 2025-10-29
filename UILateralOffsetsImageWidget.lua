@@ -9,7 +9,7 @@ local CAR_H           = 18
 local CAR_ROUNDING    = 4
 
 -- Map normalized lateral offset [-1..1] to an X pixel within the inner track bar
-local function __mapOffsetToX(offsetNormalized, trackLeftX, trackWidth)
+local function mapOffsetToX(offsetNormalized, trackLeftX, trackWidth)
   if offsetNormalized < -1 then offsetNormalized = -1 end
   if offsetNormalized >  1 then offsetNormalized =  1 end
   -- -1 => left edge, 0 => center, +1 => right edge
@@ -18,7 +18,7 @@ local function __mapOffsetToX(offsetNormalized, trackLeftX, trackWidth)
 end
 
 -- Draw a simple rounded rectangle “car” with a small “nose” triangle
-local function __drawCarMarker(xCenter, midY, color)
+local function drawCarMarker(xCenter, midY, color)
   local p1 = vec2(xCenter - CAR_W * 0.5, midY - CAR_H * 0.5)
   local p2 = vec2(xCenter + CAR_W * 0.5, midY + CAR_H * 0.5)
 
@@ -56,15 +56,15 @@ function UILateralOffsetsImageWidget.draw(storage)
   -- Centerline & tick marks at -1, -0.5, 0, 0.5, 1
   local ticks = { -1.0, -0.5, 0.0, 0.5, 1.0 }
   for i = 1, #ticks do
-    local x = __mapOffsetToX(ticks[i], trackTL.x, trackW)
+    local x = mapOffsetToX(ticks[i], trackTL.x, trackW)
     local h = (math.abs(ticks[i]) < 1e-4) and (TICK_H * 2) or TICK_H
     ui.drawLine(vec2(x, trackMidY - h), vec2(x, trackMidY + h), rgbm(0.55, 0.55, 0.55, 1), (i == 3) and 2 or 1)
   end
 
   -- Labels "L | 0 | R" using positioned text calls that actually exist
   ui.drawTextClipped("L", vec2(trackTL.x - 10, trackMidY - 8), vec2(trackTL.x -  2, trackMidY + 8), rgbm(0.8, 0.8, 0.8, 1), nil, false)
-  ui.drawTextClipped("0", vec2(__mapOffsetToX(0, trackTL.x, trackW) - 5, trackMidY - 8),
-                         vec2(__mapOffsetToX(0, trackTL.x, trackW) + 5, trackMidY + 8), rgbm(0.8, 0.8, 0.8, 1), nil, false)
+  ui.drawTextClipped("0", vec2(mapOffsetToX(0, trackTL.x, trackW) - 5, trackMidY - 8),
+                         vec2(mapOffsetToX(0, trackTL.x, trackW) + 5, trackMidY + 8), rgbm(0.8, 0.8, 0.8, 1), nil, false)
   ui.drawTextClipped("R", vec2(trackBR.x +  2, trackMidY - 8), vec2(trackBR.x + 12, trackMidY + 8), rgbm(0.8, 0.8, 0.8, 1), nil, false)
 
   -- Pull offsets from storage (rename these fields if yours differ)
@@ -73,13 +73,13 @@ function UILateralOffsetsImageWidget.draw(storage)
   local offOvertake  = storage.overtakingLateralOffset  or 0.5
 
   -- Place markers
-  local xDefault  = __mapOffsetToX(offDefault,  trackTL.x, trackW)
-  local xYielding = __mapOffsetToX(offYielding, trackTL.x, trackW)
-  local xOvertake = __mapOffsetToX(offOvertake, trackTL.x, trackW)
+  local xDefault  = mapOffsetToX(offDefault,  trackTL.x, trackW)
+  local xYielding = mapOffsetToX(offYielding, trackTL.x, trackW)
+  local xOvertake = mapOffsetToX(offOvertake, trackTL.x, trackW)
 
-  __drawCarMarker(xDefault,  trackMidY, rgbm(0.20, 0.65, 1.00, 1.0))
-  __drawCarMarker(xYielding, trackMidY, rgbm(1.00, 0.70, 0.20, 1.0))
-  __drawCarMarker(xOvertake, trackMidY, rgbm(0.40, 1.00, 0.40, 1.0))
+  drawCarMarker(xDefault,  trackMidY, rgbm(0.20, 0.65, 1.00, 1.0))
+  drawCarMarker(xYielding, trackMidY, rgbm(1.00, 0.70, 0.20, 1.0))
+  drawCarMarker(xOvertake, trackMidY, rgbm(0.40, 1.00, 0.40, 1.0))
 
   -- Marker captions using positioned DWrite text that exists
   ui.dwriteDrawText("Default",   11, vec2(xDefault  - 20, trackMidY + CAR_H * 0.5 + 6), rgbm(0.85, 0.85, 0.85, 1))
