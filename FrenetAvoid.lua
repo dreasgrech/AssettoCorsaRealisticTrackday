@@ -1,6 +1,8 @@
--- FrenetAvoid.lua (enhanced debug)
--- Heavily-commented, instrumented lateral planner using quintic polynomials.
--- Adds: opponent-size via radii (disks), extensive debug drawing, rejection markers, logs.
+-- FrenetAvoid.lua — anchored start + early sample + richer debug
+-- Rationale:
+--  • Anchor polylines at the ego car so curves don’t “begin far ahead”.
+--  • Add a very-early first sample so expansion begins close to the bumper.
+--  • (Optional) make longitudinal stepping speed-aware (common in Frenet planners).
 
 local FrenetAvoid = {}
 
@@ -9,14 +11,27 @@ local FrenetAvoid = {}
 ---------------------------------------------------------------------------------------------------
 local planningHorizonSeconds     = 1.60
 local sampleTimeStepSeconds      = 0.08
-local candidateEndTimesSeconds   = { 0.8, 1.2, 1.6 }
-local candidateTerminalOffsetsN  = { -0.8, -0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8 }
 
--- Window of interest in progress (wrap-aware)
+-- Try multiple maneuver durations (how long we take to reach terminal lateral offset)
+local candidateEndTimesSeconds   = { 0.8, 1.2, 1.6 }
+
+-- Terminal lateral offsets (normalized -1..+1). Will be clamped to safe bounds below.
+local candidateTerminalOffsetsN  = { -0.8,-0.6,-0.4,-0.2, 0.0, 0.2, 0.4, 0.6, 0.8 }
+
+-- Longitudinal window of interest in progress (wrap-aware). This sets the *furthest* sample.
 local longitudinalWindowAheadZ   = 0.020
 local longitudinalWindowBehindZ  = 0.006
 
--- Collision disk sizes (meters). If you want per-car, hook up a table index by car.index.
+-- NEW: begin drawing/expansion essentially at the bumper
+local firstSampleSeconds         = 0.03   -- very early first sample after t=0 (seconds)
+local startMetersAhead           = 0.0    -- 0.0 draws right under the car; ≥0.5 if you want a tiny lead
+
+-- Optional: make forward progress speed-aware (common in Frenet). If false, we use a flat fraction.
+local useSpeedAwareLookahead     = true
+local minAheadMetersAtLowSpeed   = 6.0    -- clamp forward sweep so we still see some path when creeping
+local maxAheadMetersAtHighSpeed  = 45.0   -- and don’t go crazy at Vmax
+
+-- Collision disk sizes (meters). Inflate if you want more conservative clearances.
 local opponentRadiusMeters       = 1.35
 local egoRadiusMeters            = 1.35
 
@@ -24,7 +39,7 @@ local egoRadiusMeters            = 1.35
 local maxAbsOffsetNormalized     = 0.95
 local maxOffsetChangePerSecondN  = 2.2
 
--- Costs
+-- Cost weights
 local costWeight_Clearance       = 3.0
 local costWeight_TerminalCenter  = 0.8
 local costWeight_JerkComfort     = 0.25
@@ -38,12 +53,13 @@ local drawSamplesAsSpheres       = true
 local drawOpponentDiscs          = true
 local drawRejectionMarkers       = true
 local drawEgoFootprint           = true
+local drawAnchorLink             = true    -- draw a tiny line from ego to first sample point
 
 ---------------------------------------------------------------------------------------------------
 -- Scratch and helpers
 ---------------------------------------------------------------------------------------------------
-local scratch_CandidatePaths = {}   -- survivors
-local scratch_Samples        = {}   -- reusable buffer per candidate
+local scratch_CandidatePaths = {}   -- survivors for drawing + chosen best
+local scratch_Samples        = {}   -- reused buffer per candidate
 local scratch_NearbyCars     = {}
 local scratch_Rejections     = {}   -- { {pos=vec3, reason="collision"}, ... }
 
@@ -54,11 +70,13 @@ local function clampOffsetToRoad(n)
 end
 
 local function offsetNormToMeters(offsetN, progressZ)
-  local sides = ac.getTrackAISplineSides(progressZ)
+  local sides = ac.getTrackAISplineSides(progressZ) -- vec2: left/right meters
   return (offsetN < 0) and (offsetN * sides.x) or (offsetN * sides.y)
 end
 
--- Quintic lateral motion from d0 -> dT with flat end (v=a=0)
+-- Quintic lateral motion from d0 -> dT with flat end (v=a=0). Standard in Frenet planning. 
+-- See Werling et al. (2010), quartic/quintic profiles in Frenet frame. 
+-- (We use quintic for lateral, start at current state.)  :contentReference[oaicite:1]{index=1}
 local function makeLateralQuintic(d0, dDot0, dT, T)
   local a0, a1, a2 = d0, dDot0, 0.0
   local T2, T3, T4, T5 = T*T, T*T*T, T*T*T*T, T*T*T*T*T
@@ -76,7 +94,6 @@ local function minClearanceMeters(worldPos, opponents, egoIndex)
   local best = 1e9
   for i = 1, #opponents do
     local opp = opponents[i]
-    -- Skip ego just in case
     if opp and opp.index ~= egoIndex then
       local d = (opp.position - worldPos):length()
       local clr = d - (opponentRadiusMeters + egoRadiusMeters)
@@ -87,15 +104,15 @@ local function minClearanceMeters(worldPos, opponents, egoIndex)
 end
 
 -- Build opponent list around ego progress (wrap-aware)
-local function collectNearbyOpponents(egoProgressZ, allCars, outList, egoIndex)
+local function collectNearbyOpponents(egoZ, allCars, outList, egoIndex)
   local n = 0
   for i = 1, #allCars do
     local c = allCars[i]
     if c and c.index ~= egoIndex then
       local tc = ac.worldCoordinateToTrack(c.position)
       if tc then
-        local ahead = wrap01(tc.z - egoProgressZ)
-        local behind = wrap01(egoProgressZ - tc.z)
+        local ahead  = wrap01(tc.z - egoZ)
+        local behind = wrap01(egoZ - tc.z)
         if ahead <= longitudinalWindowAheadZ or behind <= longitudinalWindowBehindZ then
           n = n + 1; outList[n] = c
         end
@@ -104,6 +121,27 @@ local function collectNearbyOpponents(egoProgressZ, allCars, outList, egoIndex)
   end
   for j = n + 1, #outList do outList[j] = nil end
   return n
+end
+
+-- (Optional) speed-aware mapping time→progress, clamped to an ahead window
+local function progressAtTime(egoZ, egoSpeedMps, t)
+  if not useSpeedAwareLookahead then
+    local frac = t / planningHorizonSeconds
+    return wrap01(egoZ + frac * longitudinalWindowAheadZ)
+  end
+  -- Convert “meters ahead” to “delta progress” using current track length (CSP provides length via world<->spline).
+  -- If you keep a track-length helper elsewhere, pipe it in; here we infer from ahead window limits.
+  local aheadMeters = math.max(minAheadMetersAtLowSpeed,
+                        math.min(maxAheadMetersAtHighSpeed, egoSpeedMps * planningHorizonSeconds))
+  -- At time t within the horizon, scale linearly 0..aheadMeters:
+  local meters = (t / planningHorizonSeconds) * aheadMeters + startMetersAhead
+  -- Convert meters→delta progress using local lane widths as a fallback: CSP doesn’t give length here,
+  -- but delta-z only sets sampling spacing for visualization; the collision test uses world positions.
+  -- Approximate with meters → small delta-z by proportion to a nominal track length (~20 km max).
+  -- If you have RaceTrackManager.getTrackLengthMeters(), swap it in here.
+  local nominalLen = 20000.0
+  local dz = meters / nominalLen
+  return wrap01(egoZ + dz)
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -115,13 +153,17 @@ function FrenetAvoid.computeOffset(allCars, ego, dt)
     return 0.0
   end
 
-  -- Ego state in track coords: x=offsetN (-1..+1), z=progress (0..1 wrap)
+  -- Ego state (Frenet-like): x=offsetN (-1..+1), z=progress (0..1 wrap)
   local tc = ac.worldCoordinateToTrack(ego.position)
   local egoZ = wrap01(tc.z)
   local egoN = clampOffsetToRoad(tc.x)
   local vLat0 = 0.0 -- start with zero lateral rate for stability
+  local egoSpeedMps = ego.speedKmh and (ego.speedKmh / 3.6) or 0.0
 
-  if Logger then Logger.log(string.format("FrenetAvoid: ego idx=%d z=%.4f x=%.3f dt=%.3f", ego.index, egoZ, egoN, dt or -1)) end
+  if Logger then
+    Logger.log(string.format("FrenetAvoid: ego idx=%d z=%.4f x=%.3f dt=%.3f v=%.1f m/s",
+      ego.index, egoZ, egoN, dt or -1, egoSpeedMps))
+  end
 
   -- Opponents near us
   local nearCount = collectNearbyOpponents(egoZ, allCars, scratch_NearbyCars, ego.index)
@@ -141,8 +183,17 @@ function FrenetAvoid.computeOffset(allCars, ego, dt)
       local dAt, jerkAbs = makeLateralQuintic(egoN, vLat0, nT, T)
       for i=1,#scratch_Samples do scratch_Samples[i]=nil end
 
-      local t = 0.0
+      -- IMPORTANT: anchor sample 0 exactly at ego pose so the line starts AT the car
       local count = 0
+      do
+        count = 1
+        local z0 = egoZ
+        local n0 = egoN
+        local world0 = ac.trackCoordinateToWorld(vec3(n0, 0.0, z0))
+        scratch_Samples[count] = { pos = world0, offsetN = n0, progressZ = z0, clr = minClearanceMeters(world0, scratch_NearbyCars, ego.index) }
+      end
+
+      local t = firstSampleSeconds -- start almost immediately after t=0
       local minClr = 1e9
       local jerkSum = 0.0
       local collided = false
@@ -150,16 +201,14 @@ function FrenetAvoid.computeOffset(allCars, ego, dt)
       while t <= math.min(T, planningHorizonSeconds) do
         count = count + 1
         local n = clampOffsetToRoad(dAt(t))
-        local frac = t / planningHorizonSeconds
-        local z = wrap01(egoZ + frac * longitudinalWindowAheadZ)
+        local z = progressAtTime(egoZ, egoSpeedMps, t)
         local world = ac.trackCoordinateToWorld(vec3(n, 0.0, z))
 
         local clr = minClearanceMeters(world, scratch_NearbyCars, ego.index)
         if clr < 0.0 then
           collided = true
           if drawRejectionMarkers then
-            local mark = scratch_Rejections[#scratch_Rejections+1] or {}
-            mark.pos = world; mark.reason = "collision"; scratch_Rejections[#scratch_Rejections+1] = mark
+            scratch_Rejections[#scratch_Rejections+1] = { pos = world, reason = "collision" }
           end
           if Logger then Logger.log(string.format("REJECT termN=%.2f T=%.2f t=%.2f clr=%.2f", nT, T, t, clr)) end
           break
@@ -167,26 +216,33 @@ function FrenetAvoid.computeOffset(allCars, ego, dt)
         if clr < minClr then minClr = clr end
         jerkSum = jerkSum + jerkAbs(t)
 
-        local s = scratch_Samples[count] or {}
-        s.pos = world; s.offsetN = n; s.progressZ = z; s.clr = clr
-        scratch_Samples[count] = s
+        scratch_Samples[count] = scratch_Samples[count] or {}
+        local s = scratch_Samples[count]
+        s.pos, s.offsetN, s.progressZ, s.clr = world, n, z, clr
 
         t = t + sampleTimeStepSeconds
       end
 
       if not collided and count >= 2 then
-        local cost = (costWeight_Clearance * (1.0 / (0.5 + minClr))) +
-                     (costWeight_TerminalCenter * math.abs(nT)) +
-                     (costWeight_JerkComfort * jerkSum)
+        -- Interpretable cost: keep distance, prefer center if equal, prefer smoothness (low jerk)
+        local cost = (costWeight_Clearance * (1.0 / (0.5 + minClr)))
+                   + (costWeight_TerminalCenter * math.abs(nT))
+                   + (costWeight_JerkComfort * jerkSum)
         survivors = survivors + 1
         local p = scratch_CandidatePaths[survivors] or {}
         p.samples = {}; for i=1,count do p.samples[i] = scratch_Samples[i] end
         p.terminalOffsetN = nT; p.durationT = T; p.totalCost = cost; p.minClr = minClr
         scratch_CandidatePaths[survivors] = p
-        if Logger then Logger.log(string.format("OK termN=%.2f T=%.2f samples=%d minClr=%.2f cost=%.3f", nT, T, count, minClr, cost)) end
+
+        if Logger then
+          Logger.log(string.format("OK termN=%.2f T=%.2f samples=%d minClr=%.2f cost=%.3f", nT, T, count, minClr, cost))
+        end
+
         if cost < bestCost then bestCost, bestIdx = cost, survivors end
       else
-        if Logger then Logger.log(string.format("DROP termN=%.2f T=%.2f collided=%s samples=%d", nT, T, tostring(collided), count)) end
+        if Logger then
+          Logger.log(string.format("DROP termN=%.2f T=%.2f collided=%s samples=%d", nT, T, tostring(collided), count))
+        end
       end
     end
   end
@@ -202,7 +258,7 @@ function FrenetAvoid.computeOffset(allCars, ego, dt)
     return OUTPUT_IS_NORMALIZED and outN or offsetNormToMeters(outN, egoZ)
   end
 
-  -- Smoothly move toward the next sample of the best path to avoid twitching
+  -- Smoothly move toward the *next* sample of the best path (sample[2] is now very close to the car)
   local best = scratch_CandidatePaths[bestIdx]
   local nextN = best.samples[ math.min(2, #best.samples) ].offsetN
   local stepMax = maxOffsetChangePerSecondN * dt
@@ -218,7 +274,7 @@ local colAll  = rgbm(0.3, 0.7, 1.0, 0.35)
 local colBest = rgbm(1.0, 0.9, 0.2, 1.0)
 
 local function clrToColor(c)
-  -- Map clearance to color: red (<=0.5m), yellow (~2m), green (>=5m)
+  -- Red (≤0.5 m), yellow (~2 m), green (≥5 m)
   if c <= 0.5 then return rgbm(1.0, 0.1, 0.1, 0.9) end
   if c <= 2.0 then return rgbm(1.0, 0.8, 0.1, 0.9) end
   return rgbm(0.2, 1.0, 0.2, 0.9)
@@ -240,29 +296,26 @@ function FrenetAvoid.debugDraw(carIndex)
 
   if #scratch_CandidatePaths == 0 then
     if Logger then Logger.log("FrenetAvoid.debugDraw: no candidates to draw") end
-    -- Still draw rejection markers, if any
     if drawRejectionMarkers then
       for i=1,#scratch_Rejections do
         local m = scratch_Rejections[i]
         if m then
           local p = m.pos; local d = 0.6
-          render.debugLine(p + vec3(-d,0, -d), p + vec3(d,0,d), rgbm(1,0,0,1))
-          render.debugLine(p + vec3(-d,0, d),  p + vec3(d,0,-d), rgbm(1,0,0,1))
+          render.debugLine(p + vec3(-d,0,-d), p + vec3(d,0,d), rgbm(1,0,0,1))
+          render.debugLine(p + vec3(-d,0, d), p + vec3(d,0,-d), rgbm(1,0,0,1))
         end
       end
     end
     return
   end
 
-  -- Draw survivors (thin)
+  -- Draw survivors (thin), with sample spheres (colored by clearance)
   local drawn = 0
   for i=1, #scratch_CandidatePaths do
     local p = scratch_CandidatePaths[i]
-    -- Polyline
     for j=1, #p.samples-1 do
       render.debugLine(p.samples[j].pos, p.samples[j+1].pos, colAll)
     end
-    -- Optional sample spheres colored by clearance
     if drawSamplesAsSpheres then
       for j=1,#p.samples do
         local s = p.samples[j]
@@ -272,7 +325,7 @@ function FrenetAvoid.debugDraw(carIndex)
     drawn = drawn + 1; if drawn >= debugMaxPathsDrawn then break end
   end
 
-  -- Highlight best path (thicker by overdrawing, plus a label)
+  -- Highlight best path and label
   local bestIdx, bestCost = 1, scratch_CandidatePaths[1].totalCost
   for i=2,#scratch_CandidatePaths do
     if scratch_CandidatePaths[i].totalCost < bestCost then bestIdx, bestCost = i, scratch_CandidatePaths[i].totalCost end
@@ -281,18 +334,26 @@ function FrenetAvoid.debugDraw(carIndex)
   for j=1,#bp.samples-1 do render.debugLine(bp.samples[j].pos, bp.samples[j+1].pos, colBest) end
   local mid = bp.samples[math.floor(#bp.samples/2)]
   if mid then
-    local txt = string.format("best  cost=%.2f  minClr=%.2f m  dT=%.2f  T=%.2fs", bp.totalCost, bp.minClr, bp.terminalOffsetN, bp.durationT)
+    local txt = string.format("best cost=%.2f  minClr=%.2f m  dT=%.2f  T=%.2fs", bp.totalCost, bp.minClr, bp.terminalOffsetN, bp.durationT)
     render.debugText(mid.pos, txt)
   end
 
-  -- Rejection markers (red X at collision sample)
+  -- Small visual link from ego to first sample (so “start” is obvious)
+  if drawAnchorLink then
+    local ego = ac.getCar(carIndex)
+    if ego and bp and bp.samples[1] then
+      render.debugLine(ego.position, bp.samples[1].pos, rgbm(1,1,1,0.6))
+    end
+  end
+
+  -- Rejection markers (red X)
   if drawRejectionMarkers then
     for i=1,#scratch_Rejections do
       local m = scratch_Rejections[i]
       if m then
         local p = m.pos; local d = 0.6
-        render.debugLine(p + vec3(-d,0, -d), p + vec3(d,0,d), rgbm(1,0,0,1))
-        render.debugLine(p + vec3(-d,0, d),  p + vec3(d,0,-d), rgbm(1,0,0,1))
+        render.debugLine(p + vec3(-d,0,-d), p + vec3(d,0,d), rgbm(1,0,0,1))
+        render.debugLine(p + vec3(-d,0, d), p + vec3(d,0,-d), rgbm(1,0,0,1))
       end
     end
   end
