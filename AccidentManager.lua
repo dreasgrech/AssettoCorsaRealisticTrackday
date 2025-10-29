@@ -315,8 +315,8 @@ function AccidentManager.simulateAccident()
     -- CameraManager.getFocusedCarIndex()
 
     local currentSortedCarsList = CarManager.currentSortedCarsList
-    local culpritCarIndex = currentSortedCarsList[2].index
-    local victimCarIndex = currentSortedCarsList[3].index
+    local culpritCarIndex = currentSortedCarsList[1].index
+    local victimCarIndex = currentSortedCarsList[2].index
 
     local culpritCar = ac.getCar(culpritCarIndex)
     if not culpritCar then
