@@ -12,6 +12,7 @@ local settingsWindowIconPosition = vec2(0,10) -- the x value is updated dynamica
 local settingsWindowIconPositionBottomLeft = vec2(0,0) -- this is needed for the ui.drawImage function and is also calculated dynamically
 
 local DEFAULT_SLIDER_WIDTH = 200
+local DEFAULT_SLIDER_FORMAT = '%.2f'
 
 ---Renders a slider with a tooltip
 ---@param label string @Slider label.
@@ -20,10 +21,11 @@ local DEFAULT_SLIDER_WIDTH = 200
 ---@param min number? @Default value: 0.
 ---@param max number? @Default value: 1.
 ---@param sliderWidth number
+---@param labelFormat string|'%.3f'|nil @C-style format string. Default value: `'%.3f'`.
 ---@return number @Possibly updated slider value.
-local renderSlider = function(label, tooltip, value, min, max, sliderWidth)
+local renderSlider = function(label, tooltip, value, min, max, sliderWidth, labelFormat)
     ui.pushItemWidth(sliderWidth)
-    local newValue = ui.slider(label, value, min, max)
+    local newValue = ui.slider(label, value, min, max, labelFormat)
     ui.popItemWidth()
     if ui.itemHovered() then ui.setTooltip(tooltip) end
     return newValue
@@ -132,7 +134,7 @@ SettingsWindow.draw = function()
     if ui.checkbox('Handle side checking while yielding/overtaking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
     if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding/overtaking.') end
 
-    storage.defaultAICaution =  renderSlider('Default AI Caution', 'Base AI caution level (higher = more cautious, slower but less accident prone).', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH) -- do not drop the minimum below 2 because 1 is used while overtaking
+    storage.defaultAICaution =  renderSlider('Default AI Caution', 'Base AI caution level (higher = more cautious, slower but less accident prone).', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT) -- do not drop the minimum below 2 because 1 is used while overtaking
 
 
     if ui.checkbox('Override original AI aggression when driving normally', storage.overrideOriginalAIAggression_drivingNormally) then storage.overrideOriginalAIAggression_drivingNormally = not storage.overrideOriginalAIAggression_drivingNormally end
@@ -141,7 +143,7 @@ SettingsWindow.draw = function()
     local overrideOriginalAIAggression_drivingNormally = storage.overrideOriginalAIAggression_drivingNormally
 
     createDisabledSection(not overrideOriginalAIAggression_drivingNormally, function()
-        storage.defaultAIAggression =  renderSlider('Overridden AI Aggression when driving normally', 'Base AI aggression level (higher = more aggressive, faster but more accident prone).', storage.defaultAIAggression, StorageManager.options_min[StorageManager.Options.DefaultAIAggression], StorageManager.options_max[StorageManager.Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
+        storage.defaultAIAggression =  renderSlider('Overridden AI Aggression when driving normally', 'Base AI aggression level (higher = more aggressive, faster but more accident prone).', storage.defaultAIAggression, StorageManager.options_min[StorageManager.Options.DefaultAIAggression], StorageManager.options_max[StorageManager.Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
     end)
 
     if ui.checkbox('Override original AI aggression when overtaking', storage.overrideOriginalAIAggression_overtaking) then storage.overrideOriginalAIAggression_overtaking = not storage.overrideOriginalAIAggression_overtaking end
@@ -154,15 +156,15 @@ SettingsWindow.draw = function()
     ui.dwriteText('Driving Lanes', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    storage.defaultLateralOffset =  renderSlider('Default Lateral Offset', 'The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset], DEFAULT_SLIDER_WIDTH)
+    storage.defaultLateralOffset =  renderSlider('Default Lateral Offset', 'The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.', storage.defaultLateralOffset, StorageManager.options_min[StorageManager.Options.DefaultLateralOffset], StorageManager.options_max[StorageManager.Options.DefaultLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
 
     -- currentValue = ui.slider('##someSliderID', currentValue, 0, 100, 'Quantity: %.0f')
 
     local yieldingSide = RaceTrackManager.getYieldingSide()
-    storage.yieldingLateralOffset =  renderSlider(string.format('Yielding Lateral Offset.  Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), 'The lateral offset from the centerline that AI cars will drive to when yielding (giving way to faster cars).', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset], DEFAULT_SLIDER_WIDTH)
+    storage.yieldingLateralOffset =  renderSlider(string.format('Yielding Lateral Offset.  Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), 'The lateral offset from the centerline that AI cars will drive to when yielding (giving way to faster cars).', storage.yieldingLateralOffset, StorageManager.options_min[StorageManager.Options.YieldingLateralOffset], StorageManager.options_max[StorageManager.Options.YieldingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
 
     local overtakingSide = RaceTrackManager.getOvertakingSide()
-    storage.overtakingLateralOffset =  renderSlider(string.format('Overtaking Lateral Offset.  Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH)
+    storage.overtakingLateralOffset =  renderSlider(string.format('Overtaking Lateral Offset.  Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.', storage.overtakingLateralOffset, StorageManager.options_min[StorageManager.Options.OvertakingLateralOffset], StorageManager.options_max[StorageManager.Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
 
     if yieldingSide == overtakingSide then
       ui.textColored('Warning: Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
@@ -190,20 +192,20 @@ SettingsWindow.draw = function()
     if ui.checkbox('Handle yielding', storage.handleYielding) then storage.handleYielding = not storage.handleYielding end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to yield on the correct lane') end
 
-    storage.detectCarBehind_meters =  renderSlider('Detect car behind (m)', 'Start yielding if the player is behind and within this distance', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH)
+    storage.detectCarBehind_meters =  renderSlider('Detect car behind (m)', 'Start yielding if the player is behind and within this distance', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
-    storage.rampSpeed_mps =  renderSlider('Yield offset ramp (m/s)', 'How quickly the lateral offset ramps up when yielding.', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps], DEFAULT_SLIDER_WIDTH)
+    storage.rampSpeed_mps =  renderSlider('Yield offset ramp (m/s)', 'How quickly the lateral offset ramps up when yielding.', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s')
 
-    storage.rampRelease_mps =  renderSlider('Yield offset release (m/s)', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the yielding car.', storage.rampRelease_mps, StorageManager.options_min[StorageManager.Options.RampRelease_mps], StorageManager.options_max[StorageManager.Options.RampRelease_mps], DEFAULT_SLIDER_WIDTH)
+    storage.rampRelease_mps =  renderSlider('Yield offset release (m/s)', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the yielding car.', storage.rampRelease_mps, StorageManager.options_min[StorageManager.Options.RampRelease_mps], StorageManager.options_max[StorageManager.Options.RampRelease_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s')
 
     ui.newLine(1)
 
-    storage.speedLimitValueToOvertakingCar = renderSlider('Speed limit value to overtaking car', 'When yielding, the yielding car speed will be limited to this fraction of the overtaking car speed to let it pass more easily. 1.0 = same speed as overtaking car, 0.5 = half the speed of the overtaking car.', storage.speedLimitValueToOvertakingCar, StorageManager.options_min[StorageManager.Options.SpeedLimitValueToOvertakingCar], StorageManager.options_max[StorageManager.Options.SpeedLimitValueToOvertakingCar], DEFAULT_SLIDER_WIDTH)
+    storage.speedLimitValueToOvertakingCar = renderSlider('Speed limit value to overtaking car [0..1]', 'When yielding, the yielding car speed will be limited to this fraction of the overtaking car speed to let it pass more easily. 1.0 = same speed as overtaking car, 0.5 = half the speed of the overtaking car.', storage.speedLimitValueToOvertakingCar, StorageManager.options_min[StorageManager.Options.SpeedLimitValueToOvertakingCar], StorageManager.options_max[StorageManager.Options.SpeedLimitValueToOvertakingCar], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
     local speedLimitValueToOvertakingCar  = storage.speedLimitValueToOvertakingCar
     createDisabledSection(speedLimitValueToOvertakingCar >= 1.0, function()
-        storage.distanceToOvertakingCarToLimitSpeed = renderSlider('Distance to overtaking car to limit speed (m)', 'When yielding, if an overtaking car is within this distance behind us, we will limit our speed to let it pass more easily.', storage.distanceToOvertakingCarToLimitSpeed, StorageManager.options_min[StorageManager.Options.DistanceToOvertakingCarToLimitSpeed], StorageManager.options_max[StorageManager.Options.DistanceToOvertakingCarToLimitSpeed], DEFAULT_SLIDER_WIDTH)
+        storage.distanceToOvertakingCarToLimitSpeed = renderSlider('Distance to overtaking car to limit speed (m)', 'When yielding, if an overtaking car is within this distance behind us, we will limit our speed to let it pass more easily.', storage.distanceToOvertakingCarToLimitSpeed, StorageManager.options_min[StorageManager.Options.DistanceToOvertakingCarToLimitSpeed], StorageManager.options_max[StorageManager.Options.DistanceToOvertakingCarToLimitSpeed], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
-        storage.minimumSpeedLimitKmhToLimitToOvertakingCar = renderSlider('Minimum speed limit (km/h) to limit to overtaking car', 'When yielding, the yielding car speed will not be limited below this speed even if the overtaking car is very slow.', storage.minimumSpeedLimitKmhToLimitToOvertakingCar, StorageManager.options_min[StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar], StorageManager.options_max[StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar], DEFAULT_SLIDER_WIDTH)
+        storage.minimumSpeedLimitKmhToLimitToOvertakingCar = renderSlider('Minimum speed limit (km/h) to limit to overtaking car', 'When yielding, the yielding car speed will not be limited below this speed even if the overtaking car is very slow.', storage.minimumSpeedLimitKmhToLimitToOvertakingCar, StorageManager.options_min[StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar], StorageManager.options_max[StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar], DEFAULT_SLIDER_WIDTH, '%.2f km/h')
     end)
 
     --ui.separator()
@@ -217,11 +219,11 @@ SettingsWindow.draw = function()
     if ui.checkbox('Handle overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
 
-    storage.detectCarAhead_meters =  renderSlider('Detect car ahead (m)', 'Start overtaking if the car in front is within this distance', storage.detectCarAhead_meters, StorageManager.options_min[StorageManager.Options.DetectCarAhead_meters], StorageManager.options_max[StorageManager.Options.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH)
+    storage.detectCarAhead_meters =  renderSlider('Detect car ahead (m)', 'Start overtaking if the car in front is within this distance', storage.detectCarAhead_meters, StorageManager.options_min[StorageManager.Options.DetectCarAhead_meters], StorageManager.options_max[StorageManager.Options.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
-    storage.overtakeRampSpeed_mps =  renderSlider('Overtake offset ramp (m/s)', 'How quickly the lateral offset ramps up when overtaking another car.', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH)
+    storage.overtakeRampSpeed_mps =  renderSlider('Overtake offset ramp (m/s)', 'How quickly the lateral offset ramps up when overtaking another car.', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s')
 
-    storage.overtakeRampRelease_mps =  renderSlider('Overtake offset release (m/s)', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the overtaken car.', storage.overtakeRampRelease_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampRelease_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampRelease_mps], DEFAULT_SLIDER_WIDTH)
+    storage.overtakeRampRelease_mps =  renderSlider('Overtake offset release (m/s)', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the overtaken car.', storage.overtakeRampRelease_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampRelease_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampRelease_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s')
 
     -- finish two columns
     ui.columns(1, false)
@@ -236,9 +238,9 @@ SettingsWindow.draw = function()
     if ui.checkbox('Handle accidents (WORK IN PROGRESS - BEST NOT USED FOR NOW)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
     if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
 
-    storage.distanceFromAccidentToSeeYellowFlag_meters =  renderSlider('Distance from accident to see yellow flag (m)', 'Distance from accident at which AI will see the yellow flag and start slowing down.', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500, DEFAULT_SLIDER_WIDTH)
+    storage.distanceFromAccidentToSeeYellowFlag_meters =  renderSlider('Distance from accident to see yellow flag (m)', 'Distance from accident at which AI will see the yellow flag and start slowing down.', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500, DEFAULT_SLIDER_WIDTH, '%.2f m')
 
-    storage.distanceToStartNavigatingAroundCarInAccident_meters =  renderSlider('Distance to start navigating around car in accident (m)', 'Distance from accident at which AI will start navigating around the car in accident.', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100, DEFAULT_SLIDER_WIDTH)
+    storage.distanceToStartNavigatingAroundCarInAccident_meters =  renderSlider('Distance to start navigating around car in accident (m)', 'Distance from accident at which AI will start navigating around the car in accident.', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100, DEFAULT_SLIDER_WIDTH, '%.2f m')
 
     ui.newLine(1)
     ui.separator()
@@ -247,7 +249,7 @@ SettingsWindow.draw = function()
     ui.dwriteText('Other', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    storage.clearAhead_meters = renderSlider('The distance (m) which determines whether a car is far enough ahead of another car', 'When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters], DEFAULT_SLIDER_WIDTH)
+    storage.clearAhead_meters = renderSlider('The distance (m) which determines whether a car is far enough ahead of another car', 'When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
     ui.separator()
 
