@@ -1,5 +1,18 @@
 local RaceTrackManager = {}
 
+---The names of the different session types
+--- @type table<ac.SessionType, string>
+local SESSION_TYPE_NAMES = {
+    [ac.SessionType.Undefined] = "Undefined",
+    [ac.SessionType.Practice] = "Practice",
+    [ac.SessionType.Qualify] = "Qualify",
+    [ac.SessionType.Race] = "Race",
+    [ac.SessionType.Hotlap] = "Hotlap",
+    [ac.SessionType.TimeAttack] = "TimeAttack",
+    [ac.SessionType.Drift] = "Drift",
+    [ac.SessionType.Drag] = "Drag",
+}
+
 local yellowZonesCompletableIndex = CompletableIndexCollectionManager.createNewIndex()
 
 local yellowZones_startSplinePosition = {}
@@ -26,18 +39,24 @@ local lateralOffsetSigns = {
 }
 
 local sim = ac.getSim()
-local trackLength_meters = sim.trackLengthM -- todo: rename as CONSTANT
+local TRACK_NAME = ac.getTrackName()
+local TRACK_LENGTH_METERS = sim.trackLengthM -- todo: rename as CONSTANT
+local SESSION_TYPE = sim.raceSessionType
+local SESSION_TYPE_NAME = SESSION_TYPE_NAMES[SESSION_TYPE] or "Unknown"
 
 --- Returns the total track length in meters
 ---@return number trackLength_meters
 RaceTrackManager.getTrackLengthMeters = function()
-    return trackLength_meters
+    return TRACK_LENGTH_METERS
 end
 
-local trackName = ac.getTrackName()
 
 RaceTrackManager.getTrackName = function()
-    return trackName
+    return TRACK_NAME
+end
+
+RaceTrackManager.getSessionTypeName = function()
+    return SESSION_TYPE_NAME
 end
 
 --- Converts a spline span value representing a fraction of the track length (0..1) to meters
@@ -45,7 +64,7 @@ end
 ---@param splineValue number
 ---@return number
 RaceTrackManager.splineSpanToMeters = function(splineValue)
-    return splineValue * trackLength_meters
+    return splineValue * TRACK_LENGTH_METERS
 end
 
 ---Converts a distance in meters to a spline span value representing a fraction of the track length (0..1)
@@ -53,7 +72,7 @@ end
 ---@param meters number
 ---@return number
 RaceTrackManager.metersToSplineSpan = function(meters)
-    return meters / trackLength_meters
+    return meters / TRACK_LENGTH_METERS
 end
 
 --- Returns RIGHT if given LEFT and vice versa
@@ -118,7 +137,7 @@ end
 local getYellowZoneSizeNormalized = function()
     local storage = StorageManager.getStorage()
     local yellowZoneSizeMeters = storage.distanceFromAccidentToSeeYellowFlag_meters
-    local yellowZoneSizeNormalized = yellowZoneSizeMeters / trackLength_meters
+    local yellowZoneSizeNormalized = yellowZoneSizeMeters / TRACK_LENGTH_METERS
     return yellowZoneSizeNormalized
 end
 

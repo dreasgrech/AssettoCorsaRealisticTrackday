@@ -118,9 +118,9 @@ SettingsWindow.draw = function()
     local enabledCheckBoxColor = appEnabled and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
     ui.pushStyleColor(ui.StyleColor.Text, enabledCheckBoxColor)
     local enabledDisabledText = appEnabled and 'Enabled' or 'Disabled'
-    if ui.checkbox('Realistic Trackday ' .. enabledDisabledText, appEnabled) then storage.enabled = not storage.enabled end
+    if ui.checkbox(string.format('Realistic Trackday %s for: %s (Mode: %s)', enabledDisabledText, RaceTrackManager.getTrackName(), RaceTrackManager.getSessionTypeName()), appEnabled) then storage.enabled = not storage.enabled end
     ui.popStyleColor(1)
-    if ui.itemHovered() then ui.setTooltip('Master switch for this app.') end
+    if ui.itemHovered() then ui.setTooltip('Master switch for this app.\n\nEach track and session mode type use different settings.') end
 
     ui.newLine(1)
 
