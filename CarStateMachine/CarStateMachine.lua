@@ -529,7 +529,7 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
     local overtakingSide = RaceTrackManager.getOvertakingSide()
     local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakingSide)
     if not isOvertakingCarOnOvertakingLane then
-      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.WeAreFasterThanOvertakingCar)
+      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarNotOnOvertakingSide)
       return
     end
 
