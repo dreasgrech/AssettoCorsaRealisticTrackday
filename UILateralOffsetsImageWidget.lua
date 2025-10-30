@@ -162,18 +162,30 @@ function UILateralOffsetsImageWidget.draw(storage)
   local yYielding = rowY(trackMidY, YIELDING_ROW_INDEX)
   local yOvertake = rowY(trackMidY, OVERTAKE_ROW_INDEX)
 
+  local handleYielding = storage.handleYielding
+  local handleOvertaking = storage.handleOvertaking
+
   -- Draw markers
   drawCarMarker(xDefault,  yDefault,  COLOR_DEFAULT_MARKER)
-  drawCarMarker(xYielding, yYielding, COLOR_YIELDING_MARKER)
-  drawCarMarker(xOvertake, yOvertake, COLOR_OVERTAKE_MARKER)
+  if handleYielding then
+    drawCarMarker(xYielding, yYielding, COLOR_YIELDING_MARKER)
+  end
+
+  if handleOvertaking then
+    drawCarMarker(xOvertake, yOvertake, COLOR_OVERTAKE_MARKER)
+  end
 
   -- Captions under each marker
   if SHOW_CAPTIONS then
     ui.dwriteDrawText(CAPTION_DEFAULT_TEXT,  CAPTION_FONT_SIZE, vec2(xDefault  - 20, yDefault  + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
 
-    ui.dwriteDrawText(CAPTION_YIELDING_TEXT, CAPTION_FONT_SIZE, vec2(xYielding - 20, yYielding + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
+    if handleYielding then
+        ui.dwriteDrawText(CAPTION_YIELDING_TEXT, CAPTION_FONT_SIZE, vec2(xYielding - 20, yYielding + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
+    end
 
-    ui.dwriteDrawText(CAPTION_OVERTAKE_TEXT, CAPTION_FONT_SIZE, vec2(xOvertake - 20, yOvertake + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
+    if handleOvertaking then
+        ui.dwriteDrawText(CAPTION_OVERTAKE_TEXT, CAPTION_FONT_SIZE, vec2(xOvertake - 20, yOvertake + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
+    end
   end
 
   -- Reserve layout space so following UI doesn’t overlap the drawing
