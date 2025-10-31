@@ -246,7 +246,8 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
       queuedStatesToTransitionInto[carIndex] = nil
 
       -- If this is not our first state, check if we've been in the previous state for at least some time, otherwise warn because there might be an issue
-      local logFastStateChanges = storage.debugLogFastStateChanges
+      local storage_Debugging = StorageManager.getStorage_Debugging()
+      local logFastStateChanges = storage_Debugging.debugLogFastStateChanges
       if logFastStateChanges then
         local currentStateBeforeChange = CarStateMachine.getCurrentState(carIndex)
         if currentStateBeforeChange then

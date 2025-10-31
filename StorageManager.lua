@@ -1,5 +1,34 @@
 local StorageManager = {}
 
+local fillInDoDTables = function(collection_beforeDoD, options_default, options_min, options_max)
+    options_default = {}
+    options_min = {}
+    options_max = {}
+
+    for i, option in ipairs(collection_beforeDoD) do
+        local optionName = option.name
+        options_default[optionName] = option.default
+        options_min[optionName] = option.min
+        options_max[optionName] = option.max
+    end
+
+    return options_default, options_min, options_max
+end
+
+---@param storageID string|nil
+---@param trackID string
+---@param sessionType string
+---@return string
+local getStorageKeyForTrackAndMode = function(storageID, trackID, sessionType)
+    -- TODO: this if-check here is done for backwards compatibility, remove later
+    if storageID == nil then
+        return string.format("%s_%s", trackID, sessionType)
+    end
+
+    return string.format("%s_%s_%s", storageID, trackID, sessionType)
+end
+
+
 ---@enum StorageManager.Options
 StorageManager.Options ={
     Enabled = 1,
@@ -49,6 +78,29 @@ StorageManager.Options ={
     DebugLogCarOvertaking = 36,
 }
 
+---@enum StorageManager.Options_Debugging
+StorageManager.Options_Debugging = {
+    DebugShowCarStateOverheadText = 1,
+    DebugCarStateOverheadShowDistance = 2,
+    DebugShowRaycastsWhileDrivingLaterally = 3,
+    DebugDrawSideOfftrack = 4,
+    DrawCarList = 5,
+    DebugLogFastStateChanges = 6,
+    DebugLogCarYielding = 7,
+    DebugLogCarOvertaking = 8,
+}
+
+local optionsCollection_Debgging_beforeDoD = {
+    { name = StorageManager.Options_Debugging.DebugShowCarStateOverheadText, default=false, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DebugCarStateOverheadShowDistance, default=125.0, min=10.0, max=500.0 },
+    { name = StorageManager.Options_Debugging.DebugShowRaycastsWhileDrivingLaterally, default=false, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DrawCarList, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DebugLogFastStateChanges, default=false, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DebugLogCarYielding, default=false, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DebugLogCarOvertaking, default=false, min=nil, max=nil },
+}
+
 -- local RAMP_SPEEDS_MAX = 10
 
 -- only used to build the actual tables that hold the runtime values
@@ -94,16 +146,17 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DistanceFromAccidentToSeeYellowFlag_meters, default=200.0, min=50.0, max=500.0 },
     { name = StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters, default=30.0, min=10.0, max=100.0 },
 
-    { name = StorageManager.Options.DebugShowCarStateOverheadText, default=false, min=nil, max=nil },
-    { name = StorageManager.Options.DebugCarStateOverheadShowDistance, default=125.0, min=10.0, max=500.0 },
-    { name = StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally, default=false, min=nil, max=nil },
-    { name = StorageManager.Options.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
-    { name = StorageManager.Options.DrawCarList, default=true, min=nil, max=nil },
-    { name = StorageManager.Options.DebugLogFastStateChanges, default=false, min=nil, max=nil },
-    { name = StorageManager.Options.DebugLogCarYielding, default=false, min=nil, max=nil },
-    { name = StorageManager.Options.DebugLogCarOvertaking, default=false, min=nil, max=nil },
+    -- { name = StorageManager.Options.DebugShowCarStateOverheadText, default=false, min=nil, max=nil },
+    -- { name = StorageManager.Options.DebugCarStateOverheadShowDistance, default=125.0, min=10.0, max=500.0 },
+    -- { name = StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally, default=false, min=nil, max=nil },
+    -- { name = StorageManager.Options.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
+    -- { name = StorageManager.Options.DrawCarList, default=true, min=nil, max=nil },
+    -- { name = StorageManager.Options.DebugLogFastStateChanges, default=false, min=nil, max=nil },
+    -- { name = StorageManager.Options.DebugLogCarYielding, default=false, min=nil, max=nil },
+    -- { name = StorageManager.Options.DebugLogCarOvertaking, default=false, min=nil, max=nil },
 }
 
+--[====[
 StorageManager.options_default = {}
 StorageManager.options_min = {}
 StorageManager.options_max = {}
@@ -114,8 +167,29 @@ for i, option in ipairs(optionsCollection_beforeDoD) do
     StorageManager.options_min[optionName] = option.min
     StorageManager.options_max[optionName] = option.max
 end
+--]====]
+
+StorageManager.options_default,
+StorageManager.options_min,
+StorageManager.options_max = fillInDoDTables(
+    optionsCollection_beforeDoD,
+    StorageManager.options_default,
+    StorageManager.options_min,
+    StorageManager.options_max
+)
 
 optionsCollection_beforeDoD = nil  -- free memory
+
+StorageManager.options_Debugging_default,
+StorageManager.options_Debugging_min,
+StorageManager.options_Debugging_max = fillInDoDTables(
+    optionsCollection_Debgging_beforeDoD,
+    StorageManager.options_Debugging_default,
+    StorageManager.options_Debugging_min,
+    StorageManager.options_Debugging_max
+)
+
+optionsCollection_Debgging_beforeDoD = nil  -- free memory
 
 ---@class StorageTable
 ---@field enabled boolean
@@ -148,14 +222,6 @@ optionsCollection_beforeDoD = nil  -- free memory
 ---@field handleAccidents boolean
 ---@field distanceFromAccidentToSeeYellowFlag_meters number
 ---@field distanceToStartNavigatingAroundCarInAccident_meters number
----@field debugShowCarStateOverheadText boolean
----@field debugCarStateOverheadShowDistance number
----@field debugShowRaycastsWhileDrivingLaterally boolean
----@field debugDrawSideOfftrack boolean
----@field drawCarList boolean
----@field debugLogFastStateChanges boolean
----@field debugLogCarYielding boolean
----@field debugLogCarOvertaking boolean
 
 ---@type StorageTable
 local storageTable = {
@@ -195,46 +261,72 @@ local storageTable = {
     distanceFromAccidentToSeeYellowFlag_meters = StorageManager.options_default[StorageManager.Options.DistanceFromAccidentToSeeYellowFlag_meters],
     distanceToStartNavigatingAroundCarInAccident_meters = StorageManager.options_default[StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters],
 
-    debugShowCarStateOverheadText = StorageManager.options_default[StorageManager.Options.DebugShowCarStateOverheadText],
-    debugCarStateOverheadShowDistance = StorageManager.options_default[StorageManager.Options.DebugCarStateOverheadShowDistance],
-    debugShowRaycastsWhileDrivingLaterally = StorageManager.options_default[StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally],
-    debugDrawSideOfftrack = StorageManager.options_default[StorageManager.Options.DebugDrawSideOfftrack],
-    drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],
-    debugLogFastStateChanges = StorageManager.options_default[StorageManager.Options.DebugLogFastStateChanges],
-    debugLogCarYielding = StorageManager.options_default[StorageManager.Options.DebugLogCarYielding],
-    debugLogCarOvertaking = StorageManager.options_default[StorageManager.Options.DebugLogCarOvertaking],
+    -- debugShowCarStateOverheadText = StorageManager.options_default[StorageManager.Options.DebugShowCarStateOverheadText],
+    -- debugCarStateOverheadShowDistance = StorageManager.options_default[StorageManager.Options.DebugCarStateOverheadShowDistance],
+    -- debugShowRaycastsWhileDrivingLaterally = StorageManager.options_default[StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally],
+    -- debugDrawSideOfftrack = StorageManager.options_default[StorageManager.Options.DebugDrawSideOfftrack],
+    -- drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],
+    -- debugLogFastStateChanges = StorageManager.options_default[StorageManager.Options.DebugLogFastStateChanges],
+    -- debugLogCarYielding = StorageManager.options_default[StorageManager.Options.DebugLogCarYielding],
+    -- debugLogCarOvertaking = StorageManager.options_default[StorageManager.Options.DebugLogCarOvertaking],
+}
+
+---@class StorageTable_Debugging
+---@field debugShowCarStateOverheadText boolean
+---@field debugCarStateOverheadShowDistance number
+---@field debugShowRaycastsWhileDrivingLaterally boolean
+---@field debugDrawSideOfftrack boolean
+---@field drawCarList boolean
+---@field debugLogFastStateChanges boolean
+---@field debugLogCarYielding boolean
+---@field debugLogCarOvertaking boolean
+
+---@type StorageTable_Debugging
+local storageTable_Debugging = {
+    debugShowCarStateOverheadText = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugShowCarStateOverheadText],
+    debugCarStateOverheadShowDistance = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugCarStateOverheadShowDistance],
+    debugShowRaycastsWhileDrivingLaterally = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugShowRaycastsWhileDrivingLaterally],
+    debugDrawSideOfftrack = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugDrawSideOfftrack],
+    drawCarList = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DrawCarList],
+    debugLogFastStateChanges = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugLogFastStateChanges],
+    debugLogCarYielding = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugLogCarYielding],
+    debugLogCarOvertaking = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugLogCarOvertaking],
+}
+
+---@class StorageTable_Global
+---@field appRanFirstTime boolean
+
+---@type StorageTable_Global
+local storageTable_Global = {
+    appRanFirstTime = false,
 }
 
 local sim = ac.getSim()
 local raceSessionType = sim.raceSessionType
-
 local fullTrackID = ac.getTrackFullID("_")
 
-local perTrackPerModeStorageKey = string.format("%s_%s", fullTrackID, raceSessionType)
-local perTrackPerModeStorage = ac.storage(storageTable, perTrackPerModeStorageKey)
+local perTrackPerModeStorageKey = getStorageKeyForTrackAndMode(nil, fullTrackID, raceSessionType)
 
----@class GlobalStorageTable
----@field appRanFirstTime boolean
+local storage_PerTrackPerMode = ac.storage(storageTable, perTrackPerModeStorageKey)
+local storage_Global = ac.storage(storageTable_Global, "global")
+local storage_Debugging = ac.storage(storageTable_Debugging, getStorageKeyForTrackAndMode("debugging", fullTrackID, raceSessionType))
 
----@type GlobalStorageTable
-
-local globalStorageTable = {
-    appRanFirstTime = false,
-}
-
-local globalStorage = ac.storage(globalStorageTable, "global")
-
----@return StorageTable storage
+---@return StorageTable storage_PerTrackPerMode
 function StorageManager.getStorage()
-    return perTrackPerModeStorage
+    return storage_PerTrackPerMode
 end
 
----@return GlobalStorageTable globalStorage
-function StorageManager.getGlobalStorage()
-    return globalStorage
+---@return StorageTable_Global storage_Global
+function StorageManager.getStorage_Global()
+    return storage_Global
 end
 
-function StorageManager.getStorageKey()
+---@return StorageTable_Debugging storage_Debugging
+function StorageManager.getStorage_Debugging()
+    return storage_Debugging
+end
+
+function StorageManager.getPerTrackPerModeStorageKey()
     return perTrackPerModeStorageKey
 end
 

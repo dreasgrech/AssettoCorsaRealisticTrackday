@@ -4,9 +4,9 @@ QueueManager = require("DataStructures.QueueManager")
 CompletableIndexCollectionManager = require("DataStructures.CompletableIndexCollectionManager")
 
 Constants = require("Constants")
+Logger = require("Logger")
 ColorManager = require("ColorManager")
 RaceTrackManager = require("RaceTrackManager")
-Logger = require("Logger")
 StorageManager = require("StorageManager")
 MathHelpers = require("MathHelpers")
 CarOperations = require("CarOperations")
@@ -41,9 +41,12 @@ UIManager = require("UIManager")
 -- CarSpeedLimiter = require("CarSpeedLimiter")
 CustomAIFloodManager = require("CustomAIFloodManager")
 CollisionAvoidanceManager = require("CollisionAvoidanceManager")
--- FrenetAvoid = require("FrenetAvoid")
+FrenetAvoid = require("FrenetAvoid")
 
 SettingsWindow = require("SettingsWindow")
+UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
+
+local WHILE_WORKING_ON_FRENET = false
 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
@@ -60,7 +63,7 @@ local function awake()
   -- Logger.log(ac.getTrackFullID())
   -- Logger.log(ac.getSim().raceSessionType)
 
-  local globalStorage = StorageManager.getGlobalStorage()
+  local globalStorage = StorageManager.getStorage_Global()
   if not globalStorage.appRanFirstTime then
     Logger.log('First time app run detected.  Showing app windows')
     UIManager.openMainWindow()
@@ -259,8 +262,12 @@ function script.MANIFEST__UPDATE(dt)
 
   RaceTrackManager.updateYellowFlagZones()
 
-  -- local offset = FrenetAvoid.computeOffset(sortedCars, ac.getCar(0), dt)
-  -- physics.setAISplineOffset(0, offset, true)
+  if WHILE_WORKING_ON_FRENET then
+    local offset = FrenetAvoid.computeOffset(sortedCars, ac.getCar(0), dt)
+    -- physics.setAISplineOffset(0, offset, true)
+    CarOperations.driveSafelyToSide(0, dt, ac.getCar(0), offset, 500, true, false)  -- empty storage since we don't need to save anything for the player car
+    Logger.log(string.format("Player car frenet offset set to %.2f", offset))
+  end
 end
 
 --[====[
@@ -310,9 +317,9 @@ end)
 ---
 function script.MANIFEST__TRANSPARENT(dt)
   if (not shouldAppRun()) then return end
-  local storage = StorageManager.getStorage()
+  local storage_Debugging = StorageManager.getStorage_Debugging()
 
-  if storage.debugDrawSideOfftrack then
+  if storage_Debugging.debugDrawSideOfftrack then
     for i, car in ac.iterateCars() do
       local carIndex = car.index
       CarOperations.renderCarSideOffTrack(carIndex)
@@ -380,14 +387,16 @@ function script.MANIFEST__TRANSPARENT(dt)
   -- ----------------------------------------------------------------
   
 
-  if storage.debugShowRaycastsWhileDrivingLaterally then
+  if storage_Debugging.debugShowRaycastsWhileDrivingLaterally then
     for i, car in ac.iterateCars() do
       local carIndex = car.index
         CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
     end
   end
 
-  -- FrenetAvoid.debugDraw(0)
+  if WHILE_WORKING_ON_FRENET then
+    FrenetAvoid.debugDraw(0)
+  end
 
 
   -- render.setDepthMode(render.DepthMode.Normal)

@@ -35,7 +35,8 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   local turningLights = RaceTrackManager.getYieldingSide()  == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
   CarOperations.toggleTurningLights(carIndex, turningLights)
 
-  if storage.debugLogCarYielding then
+  local storage_Debugging = StorageManager.getStorage_Debugging()
+  if storage_Debugging.debugLogCarYielding then
     local currentlyYieldingToCar = ac.getCar(currentlyYieldingToCarIndex)
     if currentlyYieldingToCar then
       local carBehindPosition = currentlyYieldingToCar.position

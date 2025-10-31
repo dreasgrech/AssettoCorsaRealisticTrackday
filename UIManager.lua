@@ -92,7 +92,7 @@ carTableColumns_dataBeforeDoD = nil  -- free memory
 local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 
 UIManager.drawMainWindowContent = function()
-  local storage = StorageManager.getStorage()
+  local storage_Debugging = StorageManager.getStorage_Debugging()
 
   ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[RaceTrackManager.getYieldingSide()]))
 
@@ -134,7 +134,7 @@ UIManager.drawMainWindowContent = function()
   -- end
   -- ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
-  if not storage.drawCarList then
+  if not storage_Debugging.drawCarList then
     return
   end
 
@@ -345,8 +345,9 @@ end
 -- end
 
 function UIManager.drawCarStateOverheadText()
-  local storage = StorageManager.getStorage()
-  if not storage.debugShowCarStateOverheadText then return end
+  --local storage = StorageManager.getStorage()
+  local storage_Debugging = StorageManager.getStorage_Debugging()
+  if not storage_Debugging.debugShowCarStateOverheadText then return end
   local sim = ac.getSim()
   -- local depthModeBeforeModification = render.DepthMode
   -- if storage.drawOnTop then
@@ -370,7 +371,7 @@ function UIManager.drawCarStateOverheadText()
 
   -- for i = 1, sim.carsCount - 1 do
 
-  local debugCarStateOverheadShowDistance = storage.debugCarStateOverheadShowDistance
+  local debugCarStateOverheadShowDistance = storage_Debugging.debugCarStateOverheadShowDistance
   local debugCarStateOverheadShowDistanceSqr = debugCarStateOverheadShowDistance * debugCarStateOverheadShowDistance
   local carsCount = sim.carsCount
   local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()

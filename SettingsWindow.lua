@@ -39,7 +39,8 @@ local renderSliderWithInnerText = function(sliderID, labelFormat, tooltip, value
     return newValue
 end
 
-local renderDebuggingSection = function(storage)
+---@param storage_Debugging StorageTable_Debugging
+local renderDebuggingSection = function(storage_Debugging)
     -- ui.text('Debugging')
     ui.newLine(1)
     ui.dwriteText('Debugging', UI_HEADER_TEXT_FONT_SIZE)
@@ -47,30 +48,30 @@ local renderDebuggingSection = function(storage)
 
     ui.columns(3, false, "debuggingSection")
 
-    if ui.checkbox('Show car state overhead text', storage.debugShowCarStateOverheadText) then storage.debugShowCarStateOverheadText = not storage.debugShowCarStateOverheadText end
+    if ui.checkbox('Show car state overhead text', storage_Debugging.debugShowCarStateOverheadText) then storage_Debugging.debugShowCarStateOverheadText = not storage_Debugging.debugShowCarStateOverheadText end
     if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
 
     -- storage.debugCarStateOverheadShowDistance = renderSlider('Car state overhead show distance (m)', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage.debugCarStateOverheadShowDistance, StorageManager.options_min[StorageManager.Options.DebugCarStateOverheadShowDistance], StorageManager.options_max[StorageManager.Options.DebugCarStateOverheadShowDistance], DEFAULT_SLIDER_WIDTH)
-    storage.debugCarStateOverheadShowDistance = renderSliderWithInnerText('##debugCarStateOverheadShowDistance', 'Overhead text distance: %.0fm', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage.debugCarStateOverheadShowDistance, StorageManager.options_min[StorageManager.Options.DebugCarStateOverheadShowDistance], StorageManager.options_max[StorageManager.Options.DebugCarStateOverheadShowDistance], DEFAULT_SLIDER_WIDTH)
+    storage_Debugging.debugCarStateOverheadShowDistance = renderSliderWithInnerText('##debugCarStateOverheadShowDistance', 'Overhead text distance: %.0fm', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage_Debugging.debugCarStateOverheadShowDistance, StorageManager.options_min[StorageManager.Options.DebugCarStateOverheadShowDistance], StorageManager.options_max[StorageManager.Options.DebugCarStateOverheadShowDistance], DEFAULT_SLIDER_WIDTH)
 
-    if ui.checkbox('Show raycasts when driving laterally', storage.debugShowRaycastsWhileDrivingLaterally) then storage.debugShowRaycastsWhileDrivingLaterally = not storage.debugShowRaycastsWhileDrivingLaterally end
+    if ui.checkbox('Show raycasts when driving laterally', storage_Debugging.debugShowRaycastsWhileDrivingLaterally) then storage_Debugging.debugShowRaycastsWhileDrivingLaterally = not storage_Debugging.debugShowRaycastsWhileDrivingLaterally end
     if ui.itemHovered() then ui.setTooltip('Shows the raycasts used to check for side clearance when driving checking for cars on the side') end
 
-    if ui.checkbox('Draw tyres side offtrack gizmos', storage.debugDrawSideOfftrack) then storage.debugDrawSideOfftrack = not storage.debugDrawSideOfftrack end
+    if ui.checkbox('Draw tyres side offtrack gizmos', storage_Debugging.debugDrawSideOfftrack) then storage_Debugging.debugDrawSideOfftrack = not storage_Debugging.debugDrawSideOfftrack end
     if ui.itemHovered() then ui.setTooltip('Shows gizmos for the car\'s tyres when offtrack') end
 
-    if ui.checkbox('Draw Car List', storage.drawCarList) then storage.drawCarList = not storage.drawCarList end
+    if ui.checkbox('Draw Car List', storage_Debugging.drawCarList) then storage_Debugging.drawCarList = not storage_Debugging.drawCarList end
     if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
 
     ui.nextColumn()
 
-    if ui.checkbox('Log fast AI state changes', storage.debugLogFastStateChanges) then storage.debugLogFastStateChanges = not storage.debugLogFastStateChanges end
+    if ui.checkbox('Log fast AI state changes', storage_Debugging.debugLogFastStateChanges) then storage_Debugging.debugLogFastStateChanges = not storage_Debugging.debugLogFastStateChanges end
     if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car changes from one state to another very quickly') end
 
-    if ui.checkbox('Log car yielding', storage.debugLogCarYielding) then storage.debugLogCarYielding = not storage.debugLogCarYielding end
+    if ui.checkbox('Log car yielding', storage_Debugging.debugLogCarYielding) then storage_Debugging.debugLogCarYielding = not storage_Debugging.debugLogCarYielding end
     if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car is yielding to another car') end
 
-    if ui.checkbox('Log car overtaking', storage.debugLogCarOvertaking) then storage.debugLogCarOvertaking = not storage.debugLogCarOvertaking end
+    if ui.checkbox('Log car overtaking', storage_Debugging.debugLogCarOvertaking) then storage_Debugging.debugLogCarOvertaking = not storage_Debugging.debugLogCarOvertaking end
     if ui.itemHovered() then ui.setTooltip('If enabled, will write to the CSP log if an ai car is overtaking another car') end
 
     ui.nextColumn()
@@ -110,7 +111,7 @@ SettingsWindow.draw = function()
 
     ui.pushDWriteFont('Segoe UI')
 
-    ui.text(string.format('Settings loaded for %s', StorageManager.getStorageKey()))
+    ui.text(string.format('Settings loaded for %s', StorageManager.getPerTrackPerModeStorageKey()))
     ui.newLine(1)
 
     -- Draw the Enabled checkbox
@@ -292,7 +293,8 @@ SettingsWindow.draw = function()
 
     ui.separator()
 
-    renderDebuggingSection(storage)
+    local storage_Debugging = StorageManager.getStorage_Debugging()
+    renderDebuggingSection(storage_Debugging)
 
 --[===[
     ui.separator()
