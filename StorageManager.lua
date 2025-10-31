@@ -28,7 +28,6 @@ local getStorageKeyForTrackAndMode = function(storageID, trackID, sessionType)
     return string.format("%s_%s_%s", storageID, trackID, sessionType)
 end
 
-
 ---@enum StorageManager.Options
 StorageManager.Options ={
     Enabled = 1,
@@ -67,15 +66,6 @@ StorageManager.Options ={
     HandleAccidents = 26,
     DistanceFromAccidentToSeeYellowFlag_meters = 27,
     DistanceToStartNavigatingAroundCarInAccident_meters = 28,
-
-    DebugShowCarStateOverheadText = 29,
-    DebugCarStateOverheadShowDistance = 30,
-    DebugShowRaycastsWhileDrivingLaterally = 31,
-    DebugDrawSideOfftrack = 32,
-    DrawCarList = 33,
-    DebugLogFastStateChanges = 34,
-    DebugLogCarYielding = 35,
-    DebugLogCarOvertaking = 36,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -177,7 +167,6 @@ StorageManager.options_max = fillInDoDTables(
     StorageManager.options_min,
     StorageManager.options_max
 )
-
 optionsCollection_beforeDoD = nil  -- free memory
 
 StorageManager.options_Debugging_default,
@@ -188,7 +177,6 @@ StorageManager.options_Debugging_max = fillInDoDTables(
     StorageManager.options_Debugging_min,
     StorageManager.options_Debugging_max
 )
-
 optionsCollection_Debgging_beforeDoD = nil  -- free memory
 
 ---@class StorageTable
@@ -260,15 +248,6 @@ local storageTable = {
     handleAccidents = StorageManager.options_default[StorageManager.Options.HandleAccidents],
     distanceFromAccidentToSeeYellowFlag_meters = StorageManager.options_default[StorageManager.Options.DistanceFromAccidentToSeeYellowFlag_meters],
     distanceToStartNavigatingAroundCarInAccident_meters = StorageManager.options_default[StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters],
-
-    -- debugShowCarStateOverheadText = StorageManager.options_default[StorageManager.Options.DebugShowCarStateOverheadText],
-    -- debugCarStateOverheadShowDistance = StorageManager.options_default[StorageManager.Options.DebugCarStateOverheadShowDistance],
-    -- debugShowRaycastsWhileDrivingLaterally = StorageManager.options_default[StorageManager.Options.DebugShowRaycastsWhileDrivingLaterally],
-    -- debugDrawSideOfftrack = StorageManager.options_default[StorageManager.Options.DebugDrawSideOfftrack],
-    -- drawCarList = StorageManager.options_default[StorageManager.Options.DrawCarList],
-    -- debugLogFastStateChanges = StorageManager.options_default[StorageManager.Options.DebugLogFastStateChanges],
-    -- debugLogCarYielding = StorageManager.options_default[StorageManager.Options.DebugLogCarYielding],
-    -- debugLogCarOvertaking = StorageManager.options_default[StorageManager.Options.DebugLogCarOvertaking],
 }
 
 ---@class StorageTable_Debugging
