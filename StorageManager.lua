@@ -32,40 +32,41 @@ end
 StorageManager.Options ={
     Enabled = 1,
     HandleSideChecking = 2,
+    HandleSideCheckingWhenOvertaking = 3,
     -- YieldSide = 3,
-    OverrideAiAwareness = 3,
-    DefaultAICaution = 4,
-    OverrideOriginalAIAggression_DrivingNormally = 5,
-    OverrideOriginalAIAggression_Overtaking = 6,
-    DefaultAIAggression = 7,
+    OverrideAiAwareness = 4,
+    DefaultAICaution = 5,
+    OverrideOriginalAIAggression_DrivingNormally = 6,
+    OverrideOriginalAIAggression_Overtaking = 7,
+    DefaultAIAggression = 8,
 
-    DefaultLateralOffset = 8,
-    YieldingLateralOffset = 9,
-    OvertakingLateralOffset = 10,
+    DefaultLateralOffset = 9,
+    YieldingLateralOffset = 10,
+    OvertakingLateralOffset = 11,
     -- MaxLateralOffset_normalized = 10,
 
-    ClearAhead_meters = 11,
+    ClearAhead_meters = 12,
 
-    HandleYielding = 12,
-    DetectCarBehind_meters = 13,
-    RampSpeed_mps = 14,
-    RampRelease_mps = 15,
-    DistanceToOvertakingCarToLimitSpeed = 16,
-    SpeedLimitValueToOvertakingCar = 17,
-    MinimumSpeedLimitKmhToLimitToOvertakingCar = 18,
+    HandleYielding = 13,
+    DetectCarBehind_meters = 14,
+    RampSpeed_mps = 15,
+    RampRelease_mps = 16,
+    DistanceToOvertakingCarToLimitSpeed = 17,
+    SpeedLimitValueToOvertakingCar = 18,
+    MinimumSpeedLimitKmhToLimitToOvertakingCar = 19,
 
-    HandleOvertaking = 19,
-    DetectCarAhead_meters = 20,
-    OvertakeRampSpeed_mps = 21,
-    OvertakeRampRelease_mps = 22,
+    HandleOvertaking = 20,
+    DetectCarAhead_meters = 21,
+    OvertakeRampSpeed_mps = 22,
+    OvertakeRampRelease_mps = 23,
 
-    CustomAIFlood_enabled = 23,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 24,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 25,
+    CustomAIFlood_enabled = 24,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 25,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 26,
 
-    HandleAccidents = 26,
-    DistanceFromAccidentToSeeYellowFlag_meters = 27,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 28,
+    HandleAccidents = 27,
+    DistanceFromAccidentToSeeYellowFlag_meters = 28,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 29,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -97,6 +98,7 @@ local optionsCollection_Debgging_beforeDoD = {
 local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.Enabled, default=false, min=nil, max=nil },
     { name = StorageManager.Options.HandleSideChecking, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options.YieldSide, default=RaceTrackManager.TrackSide.RIGHT, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
@@ -182,6 +184,7 @@ optionsCollection_Debgging_beforeDoD = nil  -- free memory
 ---@class StorageTable
 ---@field enabled boolean
 ---@field handleSideChecking boolean
+---@field handleSideCheckingWhenOvertaking boolean
 -- ---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
 ---@field defaultAICaution integer
@@ -215,6 +218,7 @@ optionsCollection_Debgging_beforeDoD = nil  -- free memory
 local storageTable = {
     enabled = StorageManager.options_default[StorageManager.Options.Enabled],
     handleSideChecking = StorageManager.options_default[StorageManager.Options.HandleSideChecking],
+    handleSideCheckingWhenOvertaking = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenOvertaking],
     -- yieldSide = StorageManager.options_default[StorageManager.Options.YieldSide],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
@@ -289,6 +293,9 @@ local perTrackPerModeStorageKey = getStorageKeyForTrackAndMode(nil, fullTrackID,
 local storage_PerTrackPerMode = ac.storage(storageTable, perTrackPerModeStorageKey)
 local storage_Global = ac.storage(storageTable_Global, "global")
 local storage_Debugging = ac.storage(storageTable_Debugging, getStorageKeyForTrackAndMode("debugging", fullTrackID, raceSessionType))
+
+-- DISABLING ACCIDENTS FOR NOW SINCE IT'S STILL WIP
+storage_PerTrackPerMode.handleAccidents = Constants.ENABLE_ACCIDENT_HANDLING_IN_APP -- got this setting here for now since accidents are still wip
 
 ---@return StorageTable storage_PerTrackPerMode
 function StorageManager.getStorage()

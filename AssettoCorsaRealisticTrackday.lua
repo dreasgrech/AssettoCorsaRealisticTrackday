@@ -77,8 +77,13 @@ local function awake()
   for i, car in ac.iterateCars() do
     local carIndex = car.index
     local originalCarAIAggression = car.aiAggression
+    local originalCarAILevel = car.aiLevel
+
     CarManager.cars_ORIGINAL_AI_AGGRESSION[carIndex] = originalCarAIAggression
-    Logger.log(string.format('Car %d AI Aggression: %.3f', i, car.aiAggression))
+    Logger.log(string.format('Original #%d AI Aggression: %.3f', i, car.aiAggression))
+
+    CarManager.cars_ORIGINAL_AI_DIFFICULTY_LEVEL[carIndex] = originalCarAILevel
+    Logger.log(string.format('Original #%d AI Difficulty Level: %.3f', i, originalCarAILevel))
   end
 end
 awake()
@@ -272,7 +277,6 @@ function script.MANIFEST__UPDATE(dt)
     if playerCar then -- if-block only to satisfty the linter because player 0 car always exists
       --local offset = FrenetAvoid.computeOffset(sortedCars, playerCar, dt)
       local offset = frenetOffsets[FRENET_DEBUGGING_CAR_INDEX+1]
-      -- physics.setAISplineOffset(0, offset, true)
       Logger.log(string.format("Setting player car frenet offset to %.2f", offset))
       CarOperations.driveSafelyToSide(FRENET_DEBUGGING_CAR_INDEX, dt, playerCar, offset, 500, true, false)  -- empty storage since we don't need to save anything for the player car
       Logger.log(string.format("Player car frenet offset set to %.2f", offset))

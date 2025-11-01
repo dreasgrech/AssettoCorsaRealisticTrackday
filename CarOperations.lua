@@ -492,7 +492,8 @@ function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
     local overrideAiAwareness = storage.overrideAiAwareness
 
     -- return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
-    return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
+    local handleSideCheckingWhenOvertaking = storage.handleSideCheckingWhenOvertaking
+    return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, handleSideCheckingWhenOvertaking)
 end
 
 --- Drives the car to the yielding lane while making sure there are no cars blocking the side.
@@ -510,7 +511,8 @@ function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
       local overrideAiAwareness = storage.overrideAiAwareness
 
       -- return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
-      return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
+      local handleSideCheckingWhenYielding = storage.handleSideChecking
+      return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, handleSideCheckingWhenYielding)
 end
 
 ---Calculated the overtaking car's ai caution value while overtaking another car.

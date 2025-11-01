@@ -39,6 +39,21 @@ local renderSliderWithInnerText = function(sliderID, labelFormat, tooltip, value
     return newValue
 end
 
+--- Creates a disabled section in the UI.
+---@param createSection boolean @If true, will create a disabled section.
+---@param callback function @Function to call to render the contents of the section.
+local createDisabledSection = function(createSection, callback)
+    if createSection then
+        ui.pushDisabled()
+    end
+
+    callback()
+
+    if createSection then
+        ui.popDisabled()
+    end
+end
+
 ---@param storage_Debugging StorageTable_Debugging
 local renderDebuggingSection = function(storage_Debugging)
     -- ui.text('Debugging')
@@ -76,27 +91,14 @@ local renderDebuggingSection = function(storage_Debugging)
 
     ui.nextColumn()
 
-    if ui.button('Simulate accident', ui.ButtonFlags.None) then
-        AccidentManager.simulateAccident()
-    end
+    createDisabledSection(not Constants.ENABLE_ACCIDENT_HANDLING_IN_APP, function()
+        if ui.button('Simulate accident', ui.ButtonFlags.None) then
+            AccidentManager.simulateAccident()
+        end
+    end)
 
     -- reset the column layout
     ui.columns(1, false)
-end
-
---- Creates a disabled section in the UI.
----@param createSection boolean @If true, will create a disabled section.
----@param callback function @Function to call to render the contents of the section.
-local createDisabledSection = function(createSection, callback)
-    if createSection then
-        ui.pushDisabled()
-    end
-
-    callback()
-
-    if createSection then
-        ui.popDisabled()
-    end
 end
 
 SettingsWindow.draw = function()
@@ -136,12 +138,6 @@ SettingsWindow.draw = function()
     -- local comboValueChanged
     -- storage.yieldSide, comboValueChanged = ui.combo('Yielding Side', storage.yieldSide, ui.ComboFlags.NoPreview, RaceTrackManager.TrackSideStrings)
     -- if ui.itemHovered() then ui.setTooltip('The track side which AI will yield to when you approach from the rear.') end
-
-    if ui.checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
-    if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily. (EXPERIMENTAL)') end
-
-    if ui.checkbox('Handle side checking while yielding/overtaking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
-    if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding/overtaking.') end
 
     ui.columns(3, false, "cautionAndAggressionSection")
     ui.setColumnWidth(0, 380)
@@ -238,6 +234,9 @@ SettingsWindow.draw = function()
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to yield on the correct lane') end
 
     createDisabledSection(not handleYielding, function()
+        if ui.checkbox('Check sides while yielding', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
+        if ui.itemHovered() then ui.setTooltip("If enabled, cars will check for other cars on the side when yielding so they don't crash into them.") end
+
         storage.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the player is behind and within this distance', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
         storage.rampSpeed_mps =  renderSlider('Yielding Lateral Offset increment step', 'How quickly the lateral offset ramps up when yielding to an overtaking car.\nThe higher it is, the more quickly cars will change lanes when moving to the yielding side.', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s')
@@ -270,6 +269,9 @@ SettingsWindow.draw = function()
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
     
     createDisabledSection(not handleOvertaking, function()
+        if ui.checkbox('Check sides while overtaking', storage.handleSideCheckingWhenOvertaking) then storage.handleSideCheckingWhenOvertaking = not storage.handleSideCheckingWhenOvertaking end
+        if ui.itemHovered() then ui.setTooltip("If enabled, cars will check for other cars on the side when overtaking so they don't crash into them.") end
+
         storage.detectCarAhead_meters =  renderSlider('Detect car ahead distance', 'Start overtaking if the car in front is within this distance', storage.detectCarAhead_meters, StorageManager.options_min[StorageManager.Options.DetectCarAhead_meters], StorageManager.options_max[StorageManager.Options.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
         storage.overtakeRampSpeed_mps =  renderSlider('Overtaking Lateral Offset increment step', 'How quickly the lateral offset ramps up when overtaking another car.\nThe higher it is, the more quickly cars will change lanes when moving to the overtaking side', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s')
@@ -283,19 +285,22 @@ SettingsWindow.draw = function()
     ui.newLine(1)
     ui.separator()
 
-    ui.newLine(1)
-    ui.dwriteText('Accidents', UI_HEADER_TEXT_FONT_SIZE)
-    ui.newLine(1)
+    createDisabledSection(not Constants.ENABLE_ACCIDENT_HANDLING_IN_APP, function()
+        ui.newLine(1)
+        ui.dwriteText('Accidents', UI_HEADER_TEXT_FONT_SIZE)
+        ui.newLine(1)
 
-    if ui.checkbox('Handle accidents (WORK IN PROGRESS - BEST NOT USED FOR NOW)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
-    if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
+        if ui.checkbox('Handle accidents (WORK IN PROGRESS - BEST NOT USED FOR NOW)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
+        if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
 
-    local handleAccidents = storage.handleAccidents
-    createDisabledSection(not handleAccidents, function()
-        storage.distanceFromAccidentToSeeYellowFlag_meters =  renderSlider('Distance from accident to see yellow flag (m)', 'Distance from accident at which AI will see the yellow flag and start slowing down.', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500, DEFAULT_SLIDER_WIDTH, '%.2f m')
+        local handleAccidents = storage.handleAccidents
+        createDisabledSection(not handleAccidents, function()
+            storage.distanceFromAccidentToSeeYellowFlag_meters =  renderSlider('Distance from accident to see yellow flag (m)', 'Distance from accident at which AI will see the yellow flag and start slowing down.', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500, DEFAULT_SLIDER_WIDTH, '%.2f m')
 
-        storage.distanceToStartNavigatingAroundCarInAccident_meters =  renderSlider('Distance to start navigating around car in accident (m)', 'Distance from accident at which AI will start navigating around the car in accident.', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100, DEFAULT_SLIDER_WIDTH, '%.2f m')
+            storage.distanceToStartNavigatingAroundCarInAccident_meters =  renderSlider('Distance to start navigating around car in accident (m)', 'Distance from accident at which AI will start navigating around the car in accident.', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100, DEFAULT_SLIDER_WIDTH, '%.2f m')
+        end)
     end)
+
 
     ui.newLine(1)
     ui.separator()
@@ -303,6 +308,9 @@ SettingsWindow.draw = function()
     ui.newLine(1)
     ui.dwriteText('Other', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
+
+    if ui.checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI will be less aware of the player car and may yield more easily. (EXPERIMENTAL)') end
 
     storage.clearAhead_meters = renderSlider('The distance (m) which determines whether a car is far enough ahead of another car', 'When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 

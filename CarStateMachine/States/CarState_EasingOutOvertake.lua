@@ -48,7 +48,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local targetOffset = storage.defaultLateralOffset
     local rampSpeed_mps = storage.overtakeRampRelease_mps
     -- CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
-    CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
+    local handleSideCheckingWhenOvertaking = storage.handleSideCheckingWhenOvertaking
+    CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, handleSideCheckingWhenOvertaking)
 end
 
 -- TRANSITION FUNCTION

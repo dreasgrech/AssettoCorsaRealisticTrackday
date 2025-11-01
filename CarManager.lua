@@ -11,6 +11,8 @@ CarManager.cars_initialized = {}
 CarManager.cars_MAXTOPSPEED = {} -- do not reset this
 ---@type table<integer,integer>
 CarManager.cars_ORIGINAL_AI_AGGRESSION = {} -- do not reset this
+---@type table<integer,integer>
+CarManager.cars_ORIGINAL_AI_DIFFICULTY_LEVEL = {} -- do not reset this
 
 ---@type table<integer,number>
 CarManager.cars_currentSplineOffset = {}
@@ -236,7 +238,6 @@ CarManager.getDefaultAIAggression = function(carIndex)
     storage.overrideOriginalAIAggression_drivingNormally and storage.defaultAIAggression
     or CarManager.cars_ORIGINAL_AI_AGGRESSION[carIndex]
 end
-
 
 -- local SIDE_DETERMINATION_THRESHOLD = 0.1
 local SIDE_DETERMINATION_THRESHOLD = 0.3

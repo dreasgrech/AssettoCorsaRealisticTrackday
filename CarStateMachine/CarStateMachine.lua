@@ -110,22 +110,19 @@ local ReasonWhyCantOvertakeStringNames = Strings.StringNames[Strings.StringCateg
 ---@return boolean
 -- local isSafeToDriveToTheSide = function(carIndex, drivingToSide)
 CarStateMachine.isSafeToDriveToTheSide = function(carIndex, drivingToSide)
-    local storage = StorageManager.getStorage()
-    -- check if there's a car on our side
-    if storage.handleSideChecking then
-      local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays(carIndex, drivingToSide)
-      if isCarOnSide then
-          -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
-          local trackSideOfBlockingCar = CarOperations.getTrackSideFromCarDirection(carOnSideDirection)
-          local isSideCarOnTheSameSideAsYielding = drivingToSide == trackSideOfBlockingCar
-          
-          if isSideCarOnTheSameSideAsYielding then
-            -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
-            -- TODO: get this setReasonWhyCantYield out of here!
-            CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.TargetSideBlocked)
-            return false
-          end
-      end
+  -- check if there's a car on our side
+    local isCarOnSide, carOnSideDirection, carOnSideDistance = CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays(carIndex, drivingToSide)
+    if isCarOnSide then
+        -- if the car on our side is on the same side as the side we're trying to yield to, then we cannot yield
+        local trackSideOfBlockingCar = CarOperations.getTrackSideFromCarDirection(carOnSideDirection)
+        local isSideCarOnTheSameSideAsYielding = drivingToSide == trackSideOfBlockingCar
+        
+        if isSideCarOnTheSameSideAsYielding then
+          -- Logger.log(string.format("Car %d: Car on side detected: %s  distance=%.2f m", carIndex, CarOperations.CarDirectionsStrings[carOnSideDirection], carOnSideDistance or -1))
+          -- TODO: get this setReasonWhyCantYield out of here!
+          CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.TargetSideBlocked)
+          return false
+        end
     end
 
     --[====[
