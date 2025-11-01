@@ -60,14 +60,15 @@ StorageManager.Options ={
     DetectCarAhead_meters = 22,
     OvertakeRampSpeed_mps = 23,
     OvertakeRampRelease_mps = 24,
+    RequireYieldingCarToBeOnYieldingLaneToOvertake = 25,
 
-    CustomAIFlood_enabled = 25,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 26,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 27,
+    CustomAIFlood_enabled = 26,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 27,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 28,
 
-    HandleAccidents = 28,
-    DistanceFromAccidentToSeeYellowFlag_meters = 29,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 30,
+    HandleAccidents = 29,
+    DistanceFromAccidentToSeeYellowFlag_meters = 30,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 31,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -129,6 +130,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DetectCarAhead_meters, default=100, min=50, max=500 },
     { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=1.0 },
     { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.5, min=0.1, max=1.0 },
+    { name = StorageManager.Options.RequireYieldingCarToBeOnYieldingLaneToOvertake, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=RAMP_SPEEDS_MAX },
     -- { name = StorageManager.Options.OvertakeRampRelease_mps, default=0.5, min=0.1, max=RAMP_SPEEDS_MAX },
 
@@ -210,6 +212,7 @@ optionsCollection_Debgging_beforeDoD = nil  -- free memory
 ---@field clearAhead_meters number
 ---@field overtakeRampSpeed_mps number
 ---@field overtakeRampRelease_mps number
+---@field requireYieldingCarToBeOnYieldingLane boolean
 ---@field customAIFlood_enabled boolean
 ---@field customAIFlood_distanceBehindPlayerToCycle_meters number
 ---@field customAIFlood_distanceAheadOfPlayerToCycle_meters number
@@ -248,6 +251,7 @@ local storageTable = {
     clearAhead_meters = StorageManager.options_default[StorageManager.Options.ClearAhead_meters],
     overtakeRampSpeed_mps = StorageManager.options_default[StorageManager.Options.OvertakeRampSpeed_mps],
     overtakeRampRelease_mps = StorageManager.options_default[StorageManager.Options.OvertakeRampRelease_mps],
+    requireYieldingCarToBeOnYieldingLane = StorageManager.options_default[StorageManager.Options.RequireYieldingCarToBeOnYieldingLaneToOvertake],
 
     customAIFlood_enabled = StorageManager.options_default[StorageManager.Options.CustomAIFlood_enabled],
     customAIFlood_distanceBehindPlayerToCycle_meters = StorageManager.options_default[StorageManager.Options.CustomAIFlood_distanceBehindPlayerToCycle_meters],

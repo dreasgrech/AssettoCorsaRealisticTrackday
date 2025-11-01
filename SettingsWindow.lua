@@ -275,6 +275,9 @@ SettingsWindow.draw = function()
         if ui.checkbox('Check sides while overtaking', storage.handleSideCheckingWhenOvertaking) then storage.handleSideCheckingWhenOvertaking = not storage.handleSideCheckingWhenOvertaking end
         if ui.itemHovered() then ui.setTooltip("If enabled, cars will check for other cars on the side when overtaking so they don't crash into them.") end
 
+        if ui.checkbox('Require yielding car to be on yielding lane to overtake', storage.requireYieldingCarToBeOnYieldingLane) then storage.requireYieldingCarToBeOnYieldingLane = not storage.requireYieldingCarToBeOnYieldingLane end
+        if ui.itemHovered() then ui.setTooltip("If enabled, the overtaking car will only overtake if the yielding car is actually driving on the yielding lane.") end
+
         storage.detectCarAhead_meters =  renderSlider('Detect car ahead distance', 'Start overtaking if the car in front is within this distance', storage.detectCarAhead_meters, StorageManager.options_min[StorageManager.Options.DetectCarAhead_meters], StorageManager.options_max[StorageManager.Options.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
         storage.overtakeRampSpeed_mps =  renderSlider('Overtaking Lateral Offset increment step', 'How quickly the lateral offset ramps up when overtaking another car.\nThe higher it is, the more quickly cars will change lanes when moving to the overtaking side', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s')
