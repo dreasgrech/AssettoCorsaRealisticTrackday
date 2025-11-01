@@ -143,8 +143,21 @@ SettingsWindow.draw = function()
     if ui.checkbox('Handle side checking while yielding/overtaking', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
     if ui.itemHovered() then ui.setTooltip('If enabled, cars will check for other cars on the side when yielding/overtaking.') end
 
+    ui.columns(3, false, "cautionAndAggressionSection")
+    ui.setColumnWidth(0, 380)
+    ui.setColumnWidth(1, 500)
+
+    ui.newLine(1)
+    ui.dwriteText('AI Caution', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
+
     storage.defaultAICaution =  renderSlider('Default AI Caution', 'Base AI caution level (higher = more cautious, slower but less accident prone).', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT) -- do not drop the minimum below 2 because 1 is used while overtaking
 
+    ui.nextColumn()
+
+    ui.newLine(1)
+    ui.dwriteText('AI Aggression', UI_HEADER_TEXT_FONT_SIZE)
+    ui.newLine(1)
 
     if ui.checkbox('Override original AI aggression when driving normally', storage.overrideOriginalAIAggression_drivingNormally) then storage.overrideOriginalAIAggression_drivingNormally = not storage.overrideOriginalAIAggression_drivingNormally end
     if ui.itemHovered() then ui.setTooltip('If enabled, will override the original AI aggression value thats is set from the game launcher when the car is driving normally.') end
@@ -157,6 +170,8 @@ SettingsWindow.draw = function()
 
     if ui.checkbox('Override original AI aggression when overtaking', storage.overrideOriginalAIAggression_overtaking) then storage.overrideOriginalAIAggression_overtaking = not storage.overrideOriginalAIAggression_overtaking end
     if ui.itemHovered() then ui.setTooltip('If enabled, will override the original AI aggression value thats is set from the game launcher when the car is overtaking another car.') end
+
+    ui.columns(1, false)
 
     ui.newLine(1)
     ui.separator()
