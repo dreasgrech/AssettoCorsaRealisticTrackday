@@ -524,11 +524,14 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
     end
 
     -- check if the car overtaking car is actually driving on the overtaking lane
-    local overtakingSide = RaceTrackManager.getOvertakingSide()
-    local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakingSide)
-    if not isOvertakingCarOnOvertakingLane then
-      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarNotOnOvertakingSide)
-      return
+    local requireOvertakingCarToBeOnOvertakingLane = storage.requireOvertakingCarToBeOnOvertakingLane
+    if requireOvertakingCarToBeOnOvertakingLane then
+      local overtakingSide = RaceTrackManager.getOvertakingSide()
+      local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakingSide)
+      if not isOvertakingCarOnOvertakingLane then
+        CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarNotOnOvertakingSide)
+        return
+      end
     end
 
     -- TODO: also check if our car is a lot more powerful than the overtaking car, think twice before yielding

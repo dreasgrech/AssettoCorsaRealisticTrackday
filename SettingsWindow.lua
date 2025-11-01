@@ -237,6 +237,9 @@ SettingsWindow.draw = function()
         if ui.checkbox('Check sides while yielding', storage.handleSideCheckingWhenYielding) then storage.handleSideCheckingWhenYielding = not storage.handleSideCheckingWhenYielding end
         if ui.itemHovered() then ui.setTooltip("If enabled, cars will check for other cars on the side when yielding so they don't crash into them.") end
 
+        if ui.checkbox('Require overtaking car to be on overtaking lane to yield', storage.requireOvertakingCarToBeOnOvertakingLane) then storage.requireOvertakingCarToBeOnOvertakingLane = not storage.requireOvertakingCarToBeOnOvertakingLane end
+        if ui.itemHovered() then ui.setTooltip("If enabled, the yielding car will only yield if the overtaking car is actually driving on the overtaking lane.") end
+
         storage.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the player is behind and within this distance', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
         storage.rampSpeed_mps =  renderSlider('Yielding Lateral Offset increment step', 'How quickly the lateral offset ramps up when yielding to an overtaking car.\nThe higher it is, the more quickly cars will change lanes when moving to the yielding side.', storage.rampSpeed_mps, StorageManager.options_min[StorageManager.Options.RampSpeed_mps], StorageManager.options_max[StorageManager.Options.RampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s')

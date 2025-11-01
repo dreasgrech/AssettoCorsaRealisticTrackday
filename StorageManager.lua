@@ -54,19 +54,20 @@ StorageManager.Options ={
     DistanceToOvertakingCarToLimitSpeed = 17,
     SpeedLimitValueToOvertakingCar = 18,
     MinimumSpeedLimitKmhToLimitToOvertakingCar = 19,
+    RequireOvertakingCarToBeOnOvertakingLaneToYield = 20,
 
-    HandleOvertaking = 20,
-    DetectCarAhead_meters = 21,
-    OvertakeRampSpeed_mps = 22,
-    OvertakeRampRelease_mps = 23,
+    HandleOvertaking = 21,
+    DetectCarAhead_meters = 22,
+    OvertakeRampSpeed_mps = 23,
+    OvertakeRampRelease_mps = 24,
 
-    CustomAIFlood_enabled = 24,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 25,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 26,
+    CustomAIFlood_enabled = 25,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 26,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 27,
 
-    HandleAccidents = 27,
-    DistanceFromAccidentToSeeYellowFlag_meters = 28,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 29,
+    HandleAccidents = 28,
+    DistanceFromAccidentToSeeYellowFlag_meters = 29,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 30,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -120,6 +121,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DistanceToOvertakingCarToLimitSpeed, default=10.0, min=1.0, max=100.0 },
     { name = StorageManager.Options.SpeedLimitValueToOvertakingCar, default=0.7, min=0.0, max=1.0 },
     { name = StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar, default=60.0, min=0.0, max=300.0 },
+    { name = StorageManager.Options.RequireOvertakingCarToBeOnOvertakingLaneToYield, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options.RampSpeed_mps, default=0.25, min=0.1, max=RAMP_SPEEDS_MAX },
     -- { name = StorageManager.Options.RampRelease_mps, default=0.1, min=0.1, max=RAMP_SPEEDS_MAX },
 
@@ -202,6 +204,7 @@ optionsCollection_Debgging_beforeDoD = nil  -- free memory
 ---@field distanceToOvertakingCarToLimitSpeed number
 ---@field speedLimitValueToOvertakingCar number
 ---@field minimumSpeedLimitKmhToLimitToOvertakingCar number
+---@field requireOvertakingCarToBeOnOvertakingLane boolean
 ---@field handleOvertaking boolean
 ---@field detectCarAhead_meters number
 ---@field clearAhead_meters number
@@ -238,6 +241,7 @@ local storageTable = {
     distanceToOvertakingCarToLimitSpeed = StorageManager.options_default[StorageManager.Options.DistanceToOvertakingCarToLimitSpeed],
     speedLimitValueToOvertakingCar = StorageManager.options_default[StorageManager.Options.SpeedLimitValueToOvertakingCar],
     minimumSpeedLimitKmhToLimitToOvertakingCar = StorageManager.options_default[StorageManager.Options.MinimumSpeedLimitKmhToLimitToOvertakingCar],
+    requireOvertakingCarToBeOnOvertakingLane = StorageManager.options_default[StorageManager.Options.RequireOvertakingCarToBeOnOvertakingLaneToYield],
 
     handleOvertaking = StorageManager.options_default[StorageManager.Options.HandleOvertaking],
     detectCarAhead_meters = StorageManager.options_default[StorageManager.Options.DetectCarAhead_meters],
