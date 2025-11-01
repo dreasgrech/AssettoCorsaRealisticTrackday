@@ -73,7 +73,7 @@ StorageManager.Options ={
 ---@enum StorageManager.Options_Debugging
 StorageManager.Options_Debugging = {
     DebugShowCarStateOverheadText = 1,
-    DebugCarStateOverheadShowDistance = 2,
+    DebugCarGizmosDrawistance = 2,
     DebugShowRaycastsWhileDrivingLaterally = 3,
     DebugDrawSideOfftrack = 4,
     DrawCarList = 5,
@@ -84,7 +84,7 @@ StorageManager.Options_Debugging = {
 
 local optionsCollection_Debgging_beforeDoD = {
     { name = StorageManager.Options_Debugging.DebugShowCarStateOverheadText, default=false, min=nil, max=nil },
-    { name = StorageManager.Options_Debugging.DebugCarStateOverheadShowDistance, default=125.0, min=10.0, max=500.0 },
+    { name = StorageManager.Options_Debugging.DebugCarGizmosDrawistance, default=125.0, min=10.0, max=500.0 },
     { name = StorageManager.Options_Debugging.DebugShowRaycastsWhileDrivingLaterally, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DrawCarList, default=true, min=nil, max=nil },
@@ -260,7 +260,7 @@ local storageTable = {
 
 ---@class StorageTable_Debugging
 ---@field debugShowCarStateOverheadText boolean
----@field debugCarStateOverheadShowDistance number
+---@field debugCarGizmosDrawistance number
 ---@field debugShowRaycastsWhileDrivingLaterally boolean
 ---@field debugDrawSideOfftrack boolean
 ---@field drawCarList boolean
@@ -271,7 +271,7 @@ local storageTable = {
 ---@type StorageTable_Debugging
 local storageTable_Debugging = {
     debugShowCarStateOverheadText = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugShowCarStateOverheadText],
-    debugCarStateOverheadShowDistance = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugCarStateOverheadShowDistance],
+    debugCarGizmosDrawistance = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugCarGizmosDrawistance],
     debugShowRaycastsWhileDrivingLaterally = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugShowRaycastsWhileDrivingLaterally],
     debugDrawSideOfftrack = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugDrawSideOfftrack],
     drawCarList = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DrawCarList],

@@ -371,12 +371,13 @@ function UIManager.drawCarStateOverheadText()
 
   -- for i = 1, sim.carsCount - 1 do
 
-  local debugCarStateOverheadShowDistance = storage_Debugging.debugCarStateOverheadShowDistance
+  local debugCarStateOverheadShowDistance = storage_Debugging.debugCarGizmosDrawistance
   local debugCarStateOverheadShowDistanceSqr = debugCarStateOverheadShowDistance * debugCarStateOverheadShowDistance
-  local carsCount = sim.carsCount
   local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()
   local cameraFocusedCar = ac.getCar(cameraFocusedCarIndex)
+  local carsCount = sim.carsCount
   if cameraFocusedCar then
+    local cameraFocusedCarPosition = cameraFocusedCar.position
     for i = 0, carsCount do
     -- for i, car in ac.iterateCars() do
       -- CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
@@ -386,7 +387,7 @@ function UIManager.drawCarStateOverheadText()
       if showText then
         local car = ac.getCar(i)
         if car then
-          local distanceFromCameraFocusedCarToThisCarSqr = MathHelpers.distanceBetweenVec3sSqr(car.position, cameraFocusedCar.position)
+          local distanceFromCameraFocusedCarToThisCarSqr = MathHelpers.distanceBetweenVec3sSqr(car.position, cameraFocusedCarPosition)
           local isThisCarCloseToCameraFocusedCar = distanceFromCameraFocusedCarToThisCarSqr < debugCarStateOverheadShowDistanceSqr
           if isThisCarCloseToCameraFocusedCar then
             local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])

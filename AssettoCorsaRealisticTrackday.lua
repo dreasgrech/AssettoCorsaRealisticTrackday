@@ -402,9 +402,20 @@ function script.MANIFEST__TRANSPARENT(dt)
   
 
   if storage_Debugging.debugShowRaycastsWhileDrivingLaterally then
-    for i, car in ac.iterateCars() do
-      local carIndex = car.index
-        CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
+    local debugCarStateOverheadShowDistance = storage_Debugging.debugCarGizmosDrawistance
+    local debugCarStateOverheadShowDistanceSqr = debugCarStateOverheadShowDistance * debugCarStateOverheadShowDistance
+    local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()
+    local cameraFocusedCar = ac.getCar(cameraFocusedCarIndex)
+    if cameraFocusedCar then
+      local cameraFocusedCarPosition = cameraFocusedCar.position
+      for i, car in ac.iterateCars() do
+        local carIndex = car.index
+        local distanceFromCameraFocusedCarToThisCarSqr = MathHelpers.distanceBetweenVec3sSqr(car.position, cameraFocusedCarPosition)
+        local isThisCarCloseToCameraFocusedCar = distanceFromCameraFocusedCarToThisCarSqr < debugCarStateOverheadShowDistanceSqr
+        if isThisCarCloseToCameraFocusedCar then
+          CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH(carIndex)
+        end
+      end
     end
   end
 
