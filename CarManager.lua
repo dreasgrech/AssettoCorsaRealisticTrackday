@@ -7,8 +7,8 @@ local CAR_SPEEDS_BUFFER_SIZE = 600
 
 ---@type table<integer,boolean>
 CarManager.cars_initialized = {}
----@type table<integer,number>
-CarManager.cars_MAXTOPSPEED = {} -- do not reset this
+-- ---@type table<integer,number>
+-- CarManager.cars_MAXTOPSPEED = {} -- do not reset this
 ---@type table<integer,integer>
 CarManager.cars_ORIGINAL_AI_AGGRESSION = {} -- do not reset this
 ---@type table<integer,integer>
@@ -101,11 +101,11 @@ CarManager.sortedCarList_carIndexToSortedIndex = {} -- [carIndex] = sortedListIn
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
 
--- calculate the max top speeds of each car
-for i, car in ac.iterateCars() do
-  local carIndex = car.index
-  CarManager.cars_MAXTOPSPEED[carIndex] = CarOperations.calculateMaxTopSpeed(carIndex)
-end
+-- -- calculate the max top speeds of each car
+-- for i, car in ac.iterateCars() do
+  -- local carIndex = car.index
+  -- CarManager.cars_MAXTOPSPEED[carIndex] = CarOperations.calculateMaxTopSpeed(carIndex)
+-- end
 
 ---@enum CarManager.AICautionValues
 ---Holds the different AI Caution levels used in different situations
