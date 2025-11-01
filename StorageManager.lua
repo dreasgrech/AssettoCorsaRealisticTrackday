@@ -31,7 +31,7 @@ end
 ---@enum StorageManager.Options
 StorageManager.Options ={
     Enabled = 1,
-    HandleSideChecking = 2,
+    HandleSideCheckingWhenYielding = 2,
     HandleSideCheckingWhenOvertaking = 3,
     -- YieldSide = 3,
     OverrideAiAwareness = 4,
@@ -97,7 +97,7 @@ local optionsCollection_Debgging_beforeDoD = {
 -- only used to build the actual tables that hold the runtime values
 local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.Enabled, default=false, min=nil, max=nil },
-    { name = StorageManager.Options.HandleSideChecking, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.HandleSideCheckingWhenYielding, default=true, min=nil, max=nil },
     { name = StorageManager.Options.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options.YieldSide, default=RaceTrackManager.TrackSide.RIGHT, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
@@ -183,7 +183,7 @@ optionsCollection_Debgging_beforeDoD = nil  -- free memory
 
 ---@class StorageTable
 ---@field enabled boolean
----@field handleSideChecking boolean
+---@field handleSideCheckingWhenYielding boolean
 ---@field handleSideCheckingWhenOvertaking boolean
 -- ---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
@@ -217,7 +217,7 @@ optionsCollection_Debgging_beforeDoD = nil  -- free memory
 ---@type StorageTable
 local storageTable = {
     enabled = StorageManager.options_default[StorageManager.Options.Enabled],
-    handleSideChecking = StorageManager.options_default[StorageManager.Options.HandleSideChecking],
+    handleSideCheckingWhenYielding = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenYielding],
     handleSideCheckingWhenOvertaking = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenOvertaking],
     -- yieldSide = StorageManager.options_default[StorageManager.Options.YieldSide],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],

@@ -511,7 +511,7 @@ function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
       local overrideAiAwareness = storage.overrideAiAwareness
 
       -- return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
-      local handleSideCheckingWhenYielding = storage.handleSideChecking
+      local handleSideCheckingWhenYielding = storage.handleSideCheckingWhenYielding
       return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, handleSideCheckingWhenYielding)
 end
 

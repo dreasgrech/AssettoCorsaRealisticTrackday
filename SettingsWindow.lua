@@ -234,7 +234,7 @@ SettingsWindow.draw = function()
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to yield on the correct lane') end
 
     createDisabledSection(not handleYielding, function()
-        if ui.checkbox('Check sides while yielding', storage.handleSideChecking) then storage.handleSideChecking = not storage.handleSideChecking end
+        if ui.checkbox('Check sides while yielding', storage.handleSideCheckingWhenYielding) then storage.handleSideCheckingWhenYielding = not storage.handleSideCheckingWhenYielding end
         if ui.itemHovered() then ui.setTooltip("If enabled, cars will check for other cars on the side when yielding so they don't crash into them.") end
 
         storage.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the player is behind and within this distance', storage.detectCarBehind_meters, StorageManager.options_min[StorageManager.Options.DetectCarBehind_meters], StorageManager.options_max[StorageManager.Options.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
