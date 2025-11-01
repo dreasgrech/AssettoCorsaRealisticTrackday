@@ -8,6 +8,7 @@ local rgbm = rgbm
 local approach = MathHelpers.approach
 local vsub = MathHelpers.vsub
 local dot = MathHelpers.dot
+local CarManager = CarManager
 
 --[====[
 ---@alias CarOperations.CarDirections 
@@ -53,8 +54,8 @@ CarOperations.CarDirectionsStrings = {
   [CarOperations.CarDirections.RearRightAngled] = "RearRightAngled",
 }
 
-local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 3.0
-local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
+-- local SIDE_DISTANCE_TO_CHECK_FOR_BLOCKING = 3.0
+-- local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
 
 local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
 
@@ -604,14 +605,32 @@ CarOperations.getSideAnchorPoints = function(carPosition, carForward, carLeft, c
   }
 end
 
-local checkForOtherCars = function(worldPosition, direction, distance)
+local checkForOtherCars = function(carIndex, worldPosition, direction, distance)
   --  Maybe using physics.raycastTrack(...) could be faster
   --  Andreas: it seems like physics.raycastTrack does not hit cars, only the track
   -- local raycastHitDistance = physics.raycastTrack(worldPosition, direction, distance) 
   local carRay = render.createRay(worldPosition,  direction, distance)
+  --[===[]
   local raycastHitDistance = carRay:cars(BACKFACE_CULLING_FOR_BLOCKING)
   local rayHit = not (raycastHitDistance == -1)
   return rayHit, raycastHitDistance
+  --]===]
+
+  -- TODO: Optimize this because we certainly do not need to check all cars every time
+  -- TODO: Optimize this because we certainly do not need to check all cars every time
+  -- TODO: Optimize this because we certainly do not need to check all cars every time
+  local sortedCarsList = CarManager.currentSortedCarsList
+  for i = 1, #sortedCarsList do
+    local car = sortedCarsList[i]
+    local otherCarIndex = car.index
+    if otherCarIndex ~= carIndex then
+      local raycastHitDistance = carRay:carCollider(otherCarIndex)
+      local rayHit = not (raycastHitDistance == -1)
+      if rayHit then
+        return rayHit, raycastHitDistance
+      end
+    end
+  end
 end
 
 --[=====[
@@ -783,7 +802,7 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(car
     local ray_dir = carForward
     -- local ray_len = (halfAABBSize.z * 2)
     local ray_len = (halfAABBSize.z * 4)
-    local hitCar, hitCarDistance = checkForOtherCars(ray_pos, ray_dir, ray_len)
+    local hitCar, hitCarDistance = checkForOtherCars(carIndex, ray_pos, ray_dir, ray_len)
 
     CarManager.cars_sideBlockRaysData[carIndex][0] = ray_pos
     CarManager.cars_sideBlockRaysData[carIndex][1] = ray_dir
