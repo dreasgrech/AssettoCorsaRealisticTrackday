@@ -103,7 +103,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
 
       -- if there's a car in front of us, check if we can overtake it
-      local newStateDueToCarFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
+      local newStateDueToCarFront = CarStateMachine.handleShouldWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
       if newStateDueToCarFront then
         -- CarStateMachine.setStateExitReason(carIndex, string.format("Overtaking car #%d", carFront.index))
         CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCar)

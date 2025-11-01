@@ -379,7 +379,7 @@ CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking = function(carIndex,
     local carFrontIndex = carFront.index
     local isCarInFrontSameAsWeAreOvertaking = carFrontIndex == currentlyOvertakingCarIndex
     if not isCarInFrontSameAsWeAreOvertaking then
-        local newStateDueToCarInFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
+        local newStateDueToCarInFront = CarStateMachine.handleShouldWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
         if newStateDueToCarInFront then
             CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
             CarManager.cars_currentlyOvertakingCarIndex[carIndex] = carFrontIndex -- start overtaking the new car in front of us
@@ -395,7 +395,7 @@ end
 ---@param carFront ac.StateCar
 ---@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
-CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)
+CarStateMachine.handleShouldWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)
   local handleOvertaking = storage.handleOvertaking
   if not handleOvertaking then
     return
