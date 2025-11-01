@@ -40,7 +40,7 @@ CarManager.cars_statesExitReason_NAME = {}
 ---@type table<integer,integer>
 CarManager.cars_totalSideBlockRaysData = {} -- {[carIndex] = 1, [carIndex] = 0, ...}
 ---@type table<integer,table>
-CarManager.cars_sideBlockRaysData = {} -- Example: one ray=> {pos,dir,len}. two rays: {pos,dir,len,pos,dir,len}
+CarManager.cars_sideBlockRaysData = {} -- Example: one ray=> {pos,dir,len,hit}. two rays: {pos,dir,len,hit,pos,dir,len,hit}
 
 ---@type table<integer,number>
 CarManager.cars_throttleLimit = {}

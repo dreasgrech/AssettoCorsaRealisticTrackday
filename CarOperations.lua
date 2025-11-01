@@ -58,8 +58,10 @@ local BACKFACE_CULLING_FOR_BLOCKING = 1 -- set to 0 to disable backface culling,
 
 local INV_SQRT2 = 0.7071067811865476 -- 1/sqrt(2) for exact 45° blend
 
-local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
-local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
+-- local RENDER_CAR_BLOCK_CHECK_RAYS_LEFT_COLOR = rgbm(0,0,1,1) -- blue
+-- local RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR = rgbm(1,0,0,1) -- red
+local RENDER_CAR_BLOCK_CHECK_RAYS_NON_HIT_COLOR = ColorManager.RGBM_Colors.Red
+local RENDER_CAR_BLOCK_CHECK_RAYS_HIT_COLOR = ColorManager.RGBM_Colors.SeaGreen
 
 local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level
 
@@ -781,11 +783,13 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(car
     local ray_dir = carForward
     -- local ray_len = (halfAABBSize.z * 2)
     local ray_len = (halfAABBSize.z * 4)
+    local hitCar, hitCarDistance = checkForOtherCars(ray_pos, ray_dir, ray_len)
+
     CarManager.cars_sideBlockRaysData[carIndex][0] = ray_pos
     CarManager.cars_sideBlockRaysData[carIndex][1] = ray_dir
     CarManager.cars_sideBlockRaysData[carIndex][2] = ray_len
+    CarManager.cars_sideBlockRaysData[carIndex][3] = hitCar
 
-    local hitCar, hitCarDistance = checkForOtherCars(ray_pos, ray_dir, ray_len)
     return hitCar, hitDirection, hitCarDistance
     -- if hitCar then
       -- return true, hitDirection, hitCarDistance
@@ -847,12 +851,14 @@ CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH = function(carIndex)
 
   local sideBlockRaysData = CarManager.cars_sideBlockRaysData[carIndex]
   for i = 0, totalSideBlockRaysData - 1 do
-    local pos = sideBlockRaysData[(i*3)]
-    local dir = sideBlockRaysData[(i*3)+1]
-    local len = sideBlockRaysData[(i*3)+2]
+    local pos = sideBlockRaysData[(i*4)]
+    local dir = sideBlockRaysData[(i*4)+1]
+    local len = sideBlockRaysData[(i*4)+2]
+    local hit = sideBlockRaysData[(i*4)+3]
 
     -- Logger.log(string.format("CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH: car #%d pos: %s, dir: %s, len: %s", carIndex, tostring(pos), tostring(dir), tostring(len)))
-    render.debugLine(pos, pos + dir * len, RENDER_CAR_BLOCK_CHECK_RAYS_RIGHT_COLOR)
+    local color = hit and RENDER_CAR_BLOCK_CHECK_RAYS_HIT_COLOR or RENDER_CAR_BLOCK_CHECK_RAYS_NON_HIT_COLOR
+    render.debugLine(pos, pos + dir * len, color)
   end
 end
 
