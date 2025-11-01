@@ -5,7 +5,7 @@
 local FrenetAvoid = {}
 
 ---------------------------------------------------------------------------------------------------
--- Tunables (same semantics as before; some widened defaults for robustness)
+-- Tunables
 ---------------------------------------------------------------------------------------------------
 local planningHorizonSeconds     = 1.60
 local sampleTimeStepSeconds      = 0.08
@@ -49,38 +49,34 @@ local drawOpponentDiscs          = true
 local drawRejectionMarkers       = true
 local drawEgoFootprint           = true
 local drawAnchorLink             = true
+local drawReturnedOffsetPole     = true   -- NEW: shows exactly what we return each frame
 
 -- Visual colors
 local colAll    = rgbm(0.3, 0.9, 0.3, 0.15)   -- pale for non-chosen
 local colChosen = rgbm(1.0, 0.2, 0.9, 1.0)    -- magenta, thick
+local colPole   = rgbm(0.2, 1.0, 1.0, 0.9)    -- cyan pole = actual outN
 
 ---------------------------------------------------------------------------------------------------
--- Data-Oriented Per-Car Scratch Arenas
+-- Per-car arenas (SoA, zero-GC)
 ---------------------------------------------------------------------------------------------------
--- Each car gets its own scratch arena to avoid contention and GC:
---   samples: SoA arrays (positions, normalized offsets, progress, clearance)
---   cand:    descriptors (startIdx, endIdx, cost, minClr, dT, T)
---   rejects: list of world positions where a candidate collided
---   nearby:  array of opponent references
-
 ---@class CarArena
----@field samplesPos table     -- [1..N] of vec3
----@field samplesN   table     -- [1..N] of number
----@field samplesZ   table     -- [1..N] of number
----@field samplesClr table     -- [1..N] of number
----@field samplesCount integer -- current size
----@field candStart  table     -- [1..C] start sample index (into samples arrays)
----@field candEnd    table     -- [1..C] end sample index
----@field candCost   table     -- [1..C] cost
----@field candMinClr table     -- [1..C] min clearance
----@field candDT     table     -- [1..C] terminal lateral offset (normalized)
----@field candT      table     -- [1..C] duration seconds
+---@field samplesPos table
+---@field samplesN   table
+---@field samplesZ   table
+---@field samplesClr table
+---@field samplesCount integer
+---@field candStart  table
+---@field candEnd    table
+---@field candCost   table
+---@field candMinClr table
+---@field candDT     table
+---@field candT      table
 ---@field candCount  integer
----@field rejectsPos table     -- [1..R] of vec3
+---@field rejectsPos table
 ---@field rejectsCount integer
----@field nearbyCars table     -- [1..K] list of opponent car states
+---@field nearbyCars table
 ---@field nearbyCount integer
----@field lastOutN   number    -- last output (normalized)
+---@field lastOutN   number
 
 local __car = {}  -- [carIndex] = CarArena
 
@@ -112,8 +108,7 @@ local function wrap01(z) z = z % 1.0; return (z < 0) and (z + 1.0) or z end
 local function clampN(n) return math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, n)) end
 
 local function offsetNormToMeters(offsetN, progressZ)
-  -- Converts normalized offset to meters with CSP’s API. We still return normalized to physics.
-  local sides = ac.getTrackAISplineSides(progressZ) -- vec2 left/right meters
+  local sides = ac.getTrackAISplineSides(progressZ) -- vec2: left/right in meters
   return (offsetN < 0) and (offsetN * sides.x) or (offsetN * sides.y)
 end
 
@@ -133,12 +128,10 @@ local function makeLateralQuintic(d0, dDot0, dT, T)
   return dAt, jerkMag
 end
 
--- Clearance to opponent disks
 local function minClearanceMeters(worldPos, opponents, egoIndex, count)
   local best = 1e9
   for i = 1, count do
     local opp = opponents[i]
-    -- skip ego if it ever sneaks in
     if opp and opp.index ~= egoIndex then
       local d = (opp.position - worldPos):length()
       local clr = d - (opponentRadiusMeters + egoRadiusMeters)
@@ -148,7 +141,6 @@ local function minClearanceMeters(worldPos, opponents, egoIndex, count)
   return best
 end
 
--- Opponents near us (wrap-aware progress window)
 local function collectNearbyOpponents(egoZ, allCars, arena, egoIndex)
   local n, out = 0, arena.nearbyCars
   for i = 1, #allCars do
@@ -167,7 +159,6 @@ local function collectNearbyOpponents(egoZ, allCars, arena, egoIndex)
   arena.nearbyCount = n
 end
 
--- Map time→progress Z, optionally speed-aware (meters→Δz). World positions are used for collision anyway.
 local function progressAtTime(egoZ, egoSpeedMps, t)
   if not useSpeedAwareLookahead then
     local frac = t / planningHorizonSeconds
@@ -199,8 +190,7 @@ function FrenetAvoid.computeOffsetForCar(allCars, carIndex, dt)
   local arena = arenaGet(carIndex)
   arenaReset(arena)
 
-  -- Ego Frenet-ish state
-  local tc = ac.worldCoordinateToTrack(ego.position)  -- x: normalized lateral, z: progress
+  local tc = ac.worldCoordinateToTrack(ego.position)   -- x: normalized lateral, z: progress
   local egoZ = wrap01(tc.z)
   local egoN = clampN(tc.x)
   local vLat0 = 0.0
@@ -211,18 +201,15 @@ function FrenetAvoid.computeOffsetForCar(allCars, carIndex, dt)
       carIndex, egoZ, egoN, dt or -1, egoSpeedMps))
   end
 
-  -- Opponents
   collectNearbyOpponents(egoZ, allCars, arena, carIndex)
   if Logger then Logger.log("Nearby opponents: "..tostring(arena.nearbyCount).." for car "..tostring(carIndex)) end
 
   local bestCost, bestIdx = 1e9, 0
 
-  -- Candidate generation
-  -- Keep a single SoA samples arena; each candidate stores [startIdx,endIdx]
-  local samplesPos, samplesN, samplesZ, samplesClr = arena.samplesPos, arena.samplesN, arena.samplesZ, arena.samplesClr
-  local candStart, candEnd, candCost, candMinClr, candDT, candT = arena.candStart, arena.candEnd, arena.candCost, arena.candMinClr, arena.candDT, arena.candT
-
-  local baseCount = arena.samplesCount
+  local samplesPos, samplesN, samplesZ, samplesClr =
+    arena.samplesPos, arena.samplesN, arena.samplesZ, arena.samplesClr
+  local candStart, candEnd, candCost, candMinClr, candDT, candT =
+    arena.candStart, arena.candEnd, arena.candCost, arena.candMinClr, arena.candDT, arena.candT
 
   for ci = 1, #candidateTerminalOffsetsN do
     local nT = clampN(candidateTerminalOffsetsN[ci])
@@ -232,7 +219,7 @@ function FrenetAvoid.computeOffsetForCar(allCars, carIndex, dt)
 
       local startIdx = arena.samplesCount + 1
 
-      -- Anchor sample[1] at ego pose
+      -- anchor sample[1] at ego pose
       arena.samplesCount = arena.samplesCount + 1
       local k = arena.samplesCount
       samplesZ[k] = egoZ
@@ -253,7 +240,6 @@ function FrenetAvoid.computeOffsetForCar(allCars, carIndex, dt)
         local clr = minClearanceMeters(world, arena.nearbyCars, carIndex, arena.nearbyCount)
         if clr < 0.0 then
           collided = true
-          -- rejection marker
           if drawRejectionMarkers then
             local r = arena.rejectsCount + 1
             arena.rejectsPos[r] = world
@@ -293,7 +279,6 @@ function FrenetAvoid.computeOffsetForCar(allCars, carIndex, dt)
         if Logger then Logger.log(string.format("OK car=%d dT=%.2f T=%.2f samples=%d minClr=%.2f cost=%.3f", carIndex, nT, T, count, minClr, cost)) end
         if cost < bestCost then bestCost, bestIdx = cost, c end
       else
-        -- rolled-back samples stay for drawing rejection markers only (harmless)
         if Logger then Logger.log(string.format("DROP car=%d dT=%.2f T=%.2f collided=%s", carIndex, nT, T, tostring(collided))) end
       end
     end
@@ -309,10 +294,10 @@ function FrenetAvoid.computeOffsetForCar(allCars, carIndex, dt)
     return outN
   end
 
-  -- Choose best and move toward its second sample (close to ego)
+  -- Move toward the *next* sample of the best path (sample[2] is very close to the car)
   local sIdx = candStart[bestIdx]
   local eIdx = candEnd[bestIdx]
-  local nextN = samplesN[ math.min(sIdx + 1, eIdx) ]
+  local nextN = arena.samplesN[ math.min(sIdx + 1, eIdx) ]
   local stepMax = maxOffsetChangePerSecondN * dt
   local outN = clampN(egoN + math.max(-stepMax, math.min(stepMax, nextN - egoN)))
   arena.lastOutN = outN
@@ -327,19 +312,14 @@ function FrenetAvoid.computeOffsetForCar(allCars, carIndex, dt)
 end
 
 ---------------------------------------------------------------------------------------------------
--- Batch helper: compute offsets for many cars (fills outOffsets[i])
+-- Batch helper: compute offsets for many cars (fills outOffsets[carIndex+1])
 ---------------------------------------------------------------------------------------------------
----comment
----@param allCars table<integer,ac.StateCar>
----@param dt number
----@param outOffsets table<integer,number>
----@return any
 function FrenetAvoid.computeOffsetsForAll(allCars, dt, outOffsets)
-  -- outOffsets: numeric array; on return outOffsets[i] = normalized offset for car i (alive only)
   for i = 1, #allCars do
     local c = allCars[i]
     if c then
-      outOffsets[i] = FrenetAvoid.computeOffsetForCar(allCars, c.index, dt)
+      -- IMPORTANT: store by carIndex+1, not by list position
+      outOffsets[c.index + 1] = FrenetAvoid.computeOffsetForCar(allCars, c.index, dt)
     end
   end
   return outOffsets
@@ -376,16 +356,14 @@ function FrenetAvoid.debugDraw(carIndex)
     end
   end
 
-  -- Nothing to draw?
   if a.candCount == 0 then
     if Logger then Logger.log("debugDraw: no candidates for car "..tostring(carIndex)) end
     return
   end
 
-  -- Draw non-chosen (thin)
+  -- Draw all non-chosen paths
   local drawn = 0
   for ci = 1, a.candCount do
-    -- we’ll find best separately
     local sIdx = a.candStart[ci]
     local eIdx = a.candEnd[ci]
     for j = sIdx, eIdx - 1 do
@@ -399,14 +377,13 @@ function FrenetAvoid.debugDraw(carIndex)
     drawn = drawn + 1; if drawn >= debugMaxPathsDrawn then break end
   end
 
-  -- Find best
+  -- Chosen
   local bestIdx, bestCost = 1, a.candCost[1]
   for ci = 2, a.candCount do
     local c = a.candCost[ci]
     if c < bestCost then bestIdx, bestCost = ci, c end
   end
 
-  -- Draw chosen, thick + head marker + label + anchor line to next sample
   local sIdx = a.candStart[bestIdx]
   local eIdx = a.candEnd[bestIdx]
   for j = sIdx, eIdx - 1 do
@@ -423,11 +400,20 @@ function FrenetAvoid.debugDraw(carIndex)
     render.debugText(mid + vec3(0,0.4,0), txt)
   end
 
-  if drawAnchorLink then
-    local ego = ac.getCar(carIndex)
-    if ego and sIdx + 1 <= eIdx then
-      render.debugLine(ego.position, a.samplesPos[sIdx + 1], rgbm(1,1,1,0.9))
-    end
+  -- Ego → next-sample link (steering target)
+  local ego = ac.getCar(carIndex)
+  if drawAnchorLink and ego and sIdx + 1 <= eIdx then
+    render.debugLine(ego.position, a.samplesPos[sIdx + 1], rgbm(1,1,1,0.9))
+  end
+
+  -- NEW: Cyan pole at the exact offset we *returned* (audits controller input)
+  if drawReturnedOffsetPole and ego then
+    local tc = ac.worldCoordinateToTrack(ego.position)
+    local poleWorld = ac.trackCoordinateToWorld(vec3(a.lastOutN, 0.0, tc.z))
+    render.debugLine(poleWorld + vec3(0,0.00,0), poleWorld + vec3(0,1.2,0), colPole)
+    render.debugSphere(poleWorld + vec3(0,1.2,0), 0.10, colPole)
+    render.debugText(poleWorld + vec3(0,1.35,0),
+      string.format("outN=%.3f  (egoN=%.3f)", a.lastOutN, tc.x))
   end
 end
 
