@@ -46,7 +46,8 @@ FrenetAvoid = require("FrenetAvoid")
 SettingsWindow = require("SettingsWindow")
 UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
 
-local WHILE_WORKING_ON_FRENET = false
+local FRENET_DEBUGGING = false
+local FRENET_DEBUGGING_CAR_INDEX = 0
 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
@@ -163,6 +164,8 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   UIManager.drawMainWindowContent()
 end
 
+local frenetOffsets = {}
+
 ---
 -- wiki: called after a whole simulation update
 ---
@@ -262,11 +265,18 @@ function script.MANIFEST__UPDATE(dt)
 
   RaceTrackManager.updateYellowFlagZones()
 
-  if WHILE_WORKING_ON_FRENET then
-    local offset = FrenetAvoid.computeOffset(sortedCars, ac.getCar(0), dt)
-    -- physics.setAISplineOffset(0, offset, true)
-    CarOperations.driveSafelyToSide(0, dt, ac.getCar(0), offset, 500, true, false)  -- empty storage since we don't need to save anything for the player car
-    Logger.log(string.format("Player car frenet offset set to %.2f", offset))
+  if FRENET_DEBUGGING then
+    frenetOffsets = FrenetAvoid.computeOffsetsForAll(sortedCars, dt, frenetOffsets)
+
+    local playerCar = ac.getCar(FRENET_DEBUGGING_CAR_INDEX)
+    if playerCar then -- if-block only to satisfty the linter because player 0 car always exists
+      --local offset = FrenetAvoid.computeOffset(sortedCars, playerCar, dt)
+      local offset = frenetOffsets[FRENET_DEBUGGING_CAR_INDEX+1]
+      -- physics.setAISplineOffset(0, offset, true)
+      Logger.log(string.format("Setting player car frenet offset to %.2f", offset))
+      CarOperations.driveSafelyToSide(FRENET_DEBUGGING_CAR_INDEX, dt, playerCar, offset, 500, true, false)  -- empty storage since we don't need to save anything for the player car
+      Logger.log(string.format("Player car frenet offset set to %.2f", offset))
+    end
   end
 end
 
@@ -394,8 +404,8 @@ function script.MANIFEST__TRANSPARENT(dt)
     end
   end
 
-  if WHILE_WORKING_ON_FRENET then
-    FrenetAvoid.debugDraw(0)
+  if FRENET_DEBUGGING then
+    FrenetAvoid.debugDraw(FRENET_DEBUGGING_CAR_INDEX)
   end
 
 
