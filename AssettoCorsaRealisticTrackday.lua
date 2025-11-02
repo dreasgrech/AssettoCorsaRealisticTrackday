@@ -94,6 +94,8 @@ FrenetAvoid = require("FrenetAvoid")
 SettingsWindow = require("SettingsWindow")
 UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
 
+-- local ENABLE_CUSTOM_AI_FLOOD_MANAGER = false
+
 local FRENET_DEBUGGING = false
 local FRENET_DEBUGGING_CAR_INDEX = 0
 
@@ -327,8 +329,10 @@ function script.MANIFEST__UPDATE(dt)
   end
 
   -- custom ai flood handling
-  local localPlayerSortedCarListIndex = CarManager.sortedCarList_carIndexToSortedIndex[0]
-  CustomAIFloodManager.handleFlood(sortedCars, localPlayerSortedCarListIndex)
+  -- if ENABLE_CUSTOM_AI_FLOOD_MANAGER then
+    -- local localPlayerSortedCarListIndex = CarManager.sortedCarList_carIndexToSortedIndex[0]
+    -- CustomAIFloodManager.handleFlood(sortedCars, localPlayerSortedCarListIndex)
+  -- end
 
   RaceTrackManager.updateYellowFlagZones()
 
