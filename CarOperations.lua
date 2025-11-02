@@ -509,8 +509,9 @@ function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
       local driveToSide = RaceTrackManager.getYieldingSide()
       -- local targetOffset = storage.maxLateralOffset_normalized
       -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
+      local storage_Yielding = StorageManager.getStorage_Yielding()
       local targetOffset = storage.yieldingLateralOffset
-      local rampSpeed_mps = storage.rampSpeed_mps
+      local rampSpeed_mps = storage_Yielding.rampSpeed_mps
       local overrideAiAwareness = storage.overrideAiAwareness
 
       -- return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)

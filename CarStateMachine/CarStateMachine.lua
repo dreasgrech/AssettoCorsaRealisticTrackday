@@ -379,7 +379,7 @@ CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking = function(carIndex,
     local carFrontIndex = carFront.index
     local isCarInFrontSameAsWeAreOvertaking = carFrontIndex == currentlyOvertakingCarIndex
     if not isCarInFrontSameAsWeAreOvertaking then
-        local newStateDueToCarInFront = CarStateMachine.handleCanWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
+        local newStateDueToCarInFront = CarStateMachine.handleShouldWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
         if newStateDueToCarInFront then
             CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
             CarManager.cars_currentlyOvertakingCarIndex[carIndex] = carFrontIndex -- start overtaking the new car in front of us
@@ -395,7 +395,7 @@ end
 ---@param carFront ac.StateCar
 ---@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
-CarStateMachine.handleCanWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)
+CarStateMachine.handleShouldWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)
   local handleOvertaking = storage.handleOvertaking
   if not handleOvertaking then
     return
@@ -484,12 +484,14 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
       return
     end
 
+    local storage_Yielding = StorageManager.getStorage_Yielding()
+
     local carBehindIndex = carBehind.index
 
     -- If this car is not close to the overtaking car, do nothing
     local carPosition = car.position
     local carBehindPosition = carBehind.position
-    local detectCarBehind_meters = storage.detectCarBehind_meters
+    local detectCarBehind_meters = storage_Yielding.detectCarBehind_meters
     local detectCarBehind_metersSqr = detectCarBehind_meters * detectCarBehind_meters
     -- local distanceFromOvertakingCarToYieldingCar = MathHelpers.distanceBetweenVec3s(carBehindPosition, carPosition)
     local distanceFromOvertakingCarToYieldingCarSqr = MathHelpers.distanceBetweenVec3sSqr(carBehindPosition, carPosition)
@@ -527,7 +529,7 @@ local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storag
     end
 
     -- check if the car overtaking car is actually driving on the overtaking lane
-    local requireOvertakingCarToBeOnOvertakingLane = storage.requireOvertakingCarToBeOnOvertakingLane
+    local requireOvertakingCarToBeOnOvertakingLane = storage_Yielding.requireOvertakingCarToBeOnOvertakingLane
     if requireOvertakingCarToBeOnOvertakingLane then
       local overtakingSide = RaceTrackManager.getOvertakingSide()
       local isOvertakingCarOnOvertakingLane = CarManager.isCarDrivingOnSide(carBehindIndex, overtakingSide)
@@ -570,7 +572,8 @@ end
 ---@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
 CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sortedCarsListIndex, storage)
-  local handleYielding = storage.handleYielding
+  local storage_Yielding = StorageManager.getStorage_Yielding()
+  local handleYielding = storage_Yielding.handleYielding
   if not handleYielding then
     return
   end
@@ -578,7 +581,7 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sorted
     local car = sortedCarsList[sortedCarsListIndex]
 
     --Check all the cars behind us within our detection radius to see if we need to yield to any of them
-    local detectedCarBehind_meters = storage.detectCarBehind_meters
+    local detectedCarBehind_meters = storage_Yielding.detectCarBehind_meters
     local detectedCarBehind_metersSqr = detectedCarBehind_meters * detectedCarBehind_meters
     -- for loop through all the cars behind us within our detection radius
     local totalCarsBehindUs = #sortedCarsList - sortedCarsListIndex

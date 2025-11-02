@@ -48,8 +48,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
       -- local easeOutYieldSide = RaceTrackManager.getOvertakingSide() -- always ease out yield to the overtaking side
       -- local targetOffset = 0
+      local storage_Yielding = StorageManager.getStorage_Yielding()
       local targetOffset = storage.defaultLateralOffset
-      local rampSpeed_mps = storage.rampRelease_mps
+      local rampSpeed_mps = storage_Yielding.rampRelease_mps
       -- CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
       local handleSideCheckingWhenYielding = storage.handleSideCheckingWhenYielding
       CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, handleSideCheckingWhenYielding)

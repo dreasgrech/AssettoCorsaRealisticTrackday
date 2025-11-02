@@ -102,6 +102,8 @@ end
 
 ---@param storage StorageTable
 function UILateralOffsetsImageWidget.draw(storage)
+  local storage_Yielding = StorageManager.getStorage_Yielding()
+
   -- Reserve block area from current cursor
   local cursor = ui.getCursor()
   local tl = vec2(cursor.x, cursor.y)
@@ -162,7 +164,7 @@ function UILateralOffsetsImageWidget.draw(storage)
   local yYielding = rowY(trackMidY, YIELDING_ROW_INDEX)
   local yOvertake = rowY(trackMidY, OVERTAKE_ROW_INDEX)
 
-  local handleYielding = storage.handleYielding
+  local handleYielding = storage_Yielding.handleYielding
   local handleOvertaking = storage.handleOvertaking
 
   -- Draw markers
