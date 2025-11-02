@@ -32,7 +32,7 @@ end
 StorageManager.Options ={
     Enabled = 1,
     -- HandleSideCheckingWhenYielding = 2,
-    HandleSideCheckingWhenOvertaking = 3,
+    -- HandleSideCheckingWhenOvertaking = 3,
     OverrideAiAwareness = 4,
     DefaultAICaution = 5,
     OverrideOriginalAIAggression_DrivingNormally = 6,
@@ -82,10 +82,11 @@ StorageManager.Options_Yielding = {
 ---@enum StorageManager.Options_Overtaking
 StorageManager.Options_Overtaking = {
     HandleOvertaking = 1,
-    DetectCarAhead_meters = 2,
-    OvertakeRampSpeed_mps = 3,
-    OvertakeRampRelease_mps = 4,
-    RequireYieldingCarToBeOnYieldingLaneToOvertake = 5,
+    HandleSideCheckingWhenOvertaking = 2,
+    DetectCarAhead_meters = 3,
+    OvertakeRampSpeed_mps = 4,
+    OvertakeRampRelease_mps = 5,
+    RequireYieldingCarToBeOnYieldingLaneToOvertake = 6,
 }
 
 local optionsCollection_Debugging_beforeDoD = {
@@ -115,6 +116,7 @@ local optionsCollection_Yielding_beforeDoD = {
 
 local optionsCollection_Overtaking_beforeDoD = {
     { name = StorageManager.Options_Overtaking.HandleOvertaking, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Overtaking.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options_Overtaking.DetectCarAhead_meters, default=100, min=50, max=500 },
     { name = StorageManager.Options_Overtaking.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=1.0 },
     { name = StorageManager.Options_Overtaking.OvertakeRampRelease_mps, default=0.5, min=0.1, max=1.0 },
@@ -129,7 +131,7 @@ local optionsCollection_Overtaking_beforeDoD = {
 local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.Enabled, default=false, min=nil, max=nil },
     -- { name = StorageManager.Options.HandleSideCheckingWhenYielding, default=true, min=nil, max=nil },
-    { name = StorageManager.Options.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
+    -- { name = StorageManager.Options.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
     { name = StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally, default=true, min=nil, max=false },
@@ -208,7 +210,7 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 ---@class StorageTable
 ---@field enabled boolean
 -- ---@field handleSideCheckingWhenYielding boolean
----@field handleSideCheckingWhenOvertaking boolean
+-- ---@field handleSideCheckingWhenOvertaking boolean
 -- ---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
 ---@field defaultAICaution integer
@@ -230,7 +232,7 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 local storageTable = {
     enabled = StorageManager.options_default[StorageManager.Options.Enabled],
     -- handleSideCheckingWhenYielding = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenYielding],
-    handleSideCheckingWhenOvertaking = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenOvertaking],
+    -- handleSideCheckingWhenOvertaking = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenOvertaking],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
     overrideOriginalAIAggression_drivingNormally = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally],
@@ -300,6 +302,7 @@ local storageTable_Yielding = {
 
 ---@class StorageTable_Overtaking
 ---@field handleOvertaking boolean
+---@field handleSideCheckingWhenOvertaking boolean
 ---@field detectCarAhead_meters number
 ---@field overtakeRampSpeed_mps number
 ---@field overtakeRampRelease_mps number
@@ -308,6 +311,7 @@ local storageTable_Yielding = {
 ---@type StorageTable_Overtaking
 local storageTable_Overtaking = {
     handleOvertaking = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.HandleOvertaking],
+    handleSideCheckingWhenOvertaking = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.HandleSideCheckingWhenOvertaking],
     detectCarAhead_meters = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.DetectCarAhead_meters],
     overtakeRampSpeed_mps = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.OvertakeRampSpeed_mps],
     overtakeRampRelease_mps = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.OvertakeRampRelease_mps],

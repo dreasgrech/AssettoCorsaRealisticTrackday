@@ -49,7 +49,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local targetOffset = storage.defaultLateralOffset
     local rampSpeed_mps = storage_Overtaking.overtakeRampRelease_mps
     -- CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
-    local handleSideCheckingWhenOvertaking = storage.handleSideCheckingWhenOvertaking
+    local handleSideCheckingWhenOvertaking = storage_Overtaking.handleSideCheckingWhenOvertaking
     CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, handleSideCheckingWhenOvertaking)
 end
 

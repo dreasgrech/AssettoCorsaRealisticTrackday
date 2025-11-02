@@ -496,7 +496,7 @@ function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
     local overrideAiAwareness = storage.overrideAiAwareness
 
     -- return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
-    local handleSideCheckingWhenOvertaking = storage.handleSideCheckingWhenOvertaking
+    local handleSideCheckingWhenOvertaking = storage_Overtaking.handleSideCheckingWhenOvertaking
     return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, handleSideCheckingWhenOvertaking)
 end
 

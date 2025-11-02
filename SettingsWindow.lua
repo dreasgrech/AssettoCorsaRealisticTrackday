@@ -274,7 +274,7 @@ SettingsWindow.draw = function()
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake to the specified Overtaking Lateral Offset side of the track') end
     
     createDisabledSection(not handleOvertaking, function()
-        if ui.checkbox('Check sides while overtaking', storage.handleSideCheckingWhenOvertaking) then storage.handleSideCheckingWhenOvertaking = not storage.handleSideCheckingWhenOvertaking end
+        if ui.checkbox('Check sides while overtaking', storage_Overtaking.handleSideCheckingWhenOvertaking) then storage_Overtaking.handleSideCheckingWhenOvertaking = not storage_Overtaking.handleSideCheckingWhenOvertaking end
         if ui.itemHovered() then ui.setTooltip("If enabled, cars will check for other cars on the side when overtaking so they don't crash into them.") end
 
         if ui.checkbox('Require yielding car to be on yielding lane to overtake', storage_Overtaking.requireYieldingCarToBeOnYieldingLane) then storage_Overtaking.requireYieldingCarToBeOnYieldingLane = not storage_Overtaking.requireYieldingCarToBeOnYieldingLane end
