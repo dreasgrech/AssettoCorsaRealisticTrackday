@@ -52,7 +52,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local targetOffset = storage.defaultLateralOffset
       local rampSpeed_mps = storage_Yielding.rampRelease_mps
       -- CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
-      local handleSideCheckingWhenYielding = storage.handleSideCheckingWhenYielding
+      local handleSideCheckingWhenYielding = storage_Yielding.handleSideCheckingWhenYielding
       CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, handleSideCheckingWhenYielding)
 end
 

@@ -236,7 +236,7 @@ SettingsWindow.draw = function()
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to yield to the specified Yielding Lateral Offset side of the track') end
 
     createDisabledSection(not handleYielding, function()
-        if ui.checkbox('Check sides while yielding', storage.handleSideCheckingWhenYielding) then storage.handleSideCheckingWhenYielding = not storage.handleSideCheckingWhenYielding end
+        if ui.checkbox('Check sides while yielding', storage_Yielding.handleSideCheckingWhenYielding) then storage_Yielding.handleSideCheckingWhenYielding = not storage_Yielding.handleSideCheckingWhenYielding end
         if ui.itemHovered() then ui.setTooltip("If enabled, cars will check for other cars on the side when yielding so they don't crash into them.") end
 
         if ui.checkbox('Require overtaking car to be on overtaking lane to yield', storage_Yielding.requireOvertakingCarToBeOnOvertakingLane) then storage_Yielding.requireOvertakingCarToBeOnOvertakingLane = not storage_Yielding.requireOvertakingCarToBeOnOvertakingLane end

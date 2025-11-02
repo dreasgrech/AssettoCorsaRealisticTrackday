@@ -31,7 +31,7 @@ end
 ---@enum StorageManager.Options
 StorageManager.Options ={
     Enabled = 1,
-    HandleSideCheckingWhenYielding = 2,
+    -- HandleSideCheckingWhenYielding = 2,
     HandleSideCheckingWhenOvertaking = 3,
     OverrideAiAwareness = 4,
     DefaultAICaution = 5,
@@ -69,13 +69,14 @@ StorageManager.Options_Debugging = {
 ---@enum StorageManager.Options_Yielding
 StorageManager.Options_Yielding = {
     HandleYielding = 1,
-    DetectCarBehind_meters = 2,
-    RampSpeed_mps = 3,
-    RampRelease_mps = 4,
-    DistanceToOvertakingCarToLimitSpeed = 5,
-    SpeedLimitValueToOvertakingCar = 6,
-    MinimumSpeedLimitKmhToLimitToOvertakingCar = 7,
-    RequireOvertakingCarToBeOnOvertakingLaneToYield = 8,
+    HandleSideCheckingWhenYielding = 2,
+    DetectCarBehind_meters = 3,
+    RampSpeed_mps = 4,
+    RampRelease_mps = 5,
+    DistanceToOvertakingCarToLimitSpeed = 6,
+    SpeedLimitValueToOvertakingCar = 7,
+    MinimumSpeedLimitKmhToLimitToOvertakingCar = 8,
+    RequireOvertakingCarToBeOnOvertakingLaneToYield = 9,
 }
 
 ---@enum StorageManager.Options_Overtaking
@@ -100,6 +101,7 @@ local optionsCollection_Debugging_beforeDoD = {
 
 local optionsCollection_Yielding_beforeDoD = {
     { name = StorageManager.Options_Yielding.HandleYielding, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Yielding.HandleSideCheckingWhenYielding, default=true, min=nil, max=nil },
     { name = StorageManager.Options_Yielding.DetectCarBehind_meters, default=90, min=10, max=500 },
     { name = StorageManager.Options_Yielding.RampSpeed_mps, default=0.25, min=0.1, max=1.0 },
     { name = StorageManager.Options_Yielding.RampRelease_mps, default=0.25, min=0.1, max=1.0 },
@@ -126,7 +128,7 @@ local optionsCollection_Overtaking_beforeDoD = {
 -- only used to build the actual tables that hold the runtime values
 local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.Enabled, default=false, min=nil, max=nil },
-    { name = StorageManager.Options.HandleSideCheckingWhenYielding, default=true, min=nil, max=nil },
+    -- { name = StorageManager.Options.HandleSideCheckingWhenYielding, default=true, min=nil, max=nil },
     { name = StorageManager.Options.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
     { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
@@ -205,7 +207,7 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 
 ---@class StorageTable
 ---@field enabled boolean
----@field handleSideCheckingWhenYielding boolean
+-- ---@field handleSideCheckingWhenYielding boolean
 ---@field handleSideCheckingWhenOvertaking boolean
 -- ---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
@@ -227,7 +229,7 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 ---@type StorageTable
 local storageTable = {
     enabled = StorageManager.options_default[StorageManager.Options.Enabled],
-    handleSideCheckingWhenYielding = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenYielding],
+    -- handleSideCheckingWhenYielding = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenYielding],
     handleSideCheckingWhenOvertaking = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenOvertaking],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
@@ -274,6 +276,7 @@ local storageTable_Debugging = {
 
 ---@class StorageTable_Yielding
 ---@field handleYielding boolean
+---@field handleSideCheckingWhenYielding boolean
 ---@field detectCarBehind_meters number
 ---@field rampSpeed_mps number
 ---@field rampRelease_mps number
@@ -285,6 +288,7 @@ local storageTable_Debugging = {
 ---@type StorageTable_Yielding
 local storageTable_Yielding = {
     handleYielding = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.HandleYielding],
+    handleSideCheckingWhenYielding = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.HandleSideCheckingWhenYielding],
     detectCarBehind_meters = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.DetectCarBehind_meters],
     rampSpeed_mps = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.RampSpeed_mps],
     rampRelease_mps = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.RampRelease_mps],
