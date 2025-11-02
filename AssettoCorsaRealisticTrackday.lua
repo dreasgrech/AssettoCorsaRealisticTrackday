@@ -1,10 +1,58 @@
+Constants = require("Constants")
+Logger = require("Logger")
+CSPCompatibilityManager = require("CSPCompatibilityManager")
+
+local showErrorModalDialog = function(message)
+  local neededFunctionsForModalDialogAvailable =
+    ui.modalDialog ~= nil or
+    ui.textWrapped ~= nil or
+    ui.newLine ~= nil or
+    ui.button ~= nil or
+    ac.setClipboardText ~= nil or
+    ui.sameLine ~= nil
+
+    if not neededFunctionsForModalDialogAvailable then
+      Logger.error(string.format("Cannot show error dialog because some required CSP elements are missing.\nError text: %s", message))
+      return
+    end
+
+  ui.modalDialog('[Error] Missing CSP elements needed to run Realistic Trackday app', function()
+    ui.textColored(message, rgbm(1, 0, 0, 1))
+    ui.newLine()
+    if ui.modernButton('Copy error', vec2(110, 40)) then ac.setClipboardText(message) end
+    ui.sameLine()
+    if ui.modernButton('Close', vec2(120, 40)) then return true end
+    return false
+  end, true)
+end
+
+-- Check if any CSP elements used by the app are missing
+local missingCSPElements = CSPCompatibilityManager.checkForMissingCSPElements()
+CSPCompatibilityManager.clearElementsMetadataMemory()  -- free up memory since we don't need the metadata anymore
+local anyMissingCSPElements = (#missingCSPElements > 0)
+
+-- Show an error modal dialog if any CSP elements are missing
+if anyMissingCSPElements then
+  local errorMessage = "Realistic Trackday may not run as expected because some required Custom Shaders Patch elements are missing."
+  errorMessage = errorMessage .. "\n\nThe following CSP elements are needed by the app:\n"
+    for _, elementName in ipairs(missingCSPElements) do
+        errorMessage = errorMessage .. " - " .. elementName .. "\n"
+    end
+  errorMessage = errorMessage .. "\nSee the CSP log in \"\\Documents\\Assetto Corsa\\logs\\custom_shaders_patch.log\" for more details."
+  errorMessage = errorMessage .. "\n\nTo fix the issue, please make sure you're on the latest version of Custom Shaders Patch (https://www.patreon.com/c/x4fab/posts)"
+
+  -- Log the error to the CSP log as well
+  Logger.error(errorMessage)
+
+  -- Show the error modal dialog
+  showErrorModalDialog(errorMessage)
+end
+
 DequeManager = require("DataStructures.DequeManager")
 StackManager = require("DataStructures.StackManager")
 QueueManager = require("DataStructures.QueueManager")
 CompletableIndexCollectionManager = require("DataStructures.CompletableIndexCollectionManager")
 
-Constants = require("Constants")
-Logger = require("Logger")
 ColorManager = require("ColorManager")
 RaceTrackManager = require("RaceTrackManager")
 StorageManager = require("StorageManager")
@@ -80,10 +128,10 @@ local function awake()
     local originalCarAILevel = car.aiLevel
 
     CarManager.cars_ORIGINAL_AI_AGGRESSION[carIndex] = originalCarAIAggression
-    Logger.log(string.format('Original #%d AI Aggression: %.3f', i, car.aiAggression))
+    -- Logger.log(string.format('Original #%d AI Aggression: %.3f', i, car.aiAggression))
 
     CarManager.cars_ORIGINAL_AI_DIFFICULTY_LEVEL[carIndex] = originalCarAILevel
-    Logger.log(string.format('Original #%d AI Difficulty Level: %.3f', i, originalCarAILevel))
+    -- Logger.log(string.format('Original #%d AI Difficulty Level: %.3f', i, originalCarAILevel))
   end
 end
 awake()
@@ -154,6 +202,20 @@ end)
 -- wiki: function to be called each frame to draw window content
 ---
 function script.MANIFEST__FUNCTION_MAIN(dt)
+  -- Show the missing CSP elements error message if needed
+  if anyMissingCSPElements then
+    ui.textColored("Realistic Trackday might not work correctly due to missing required CSP elements.  See the CSP log for more details.  The following CSP elements are needed by the app:", rgbm(1, 0, 0, 1))
+    for _, elementName in ipairs(missingCSPElements) do
+        ui.textColored(" - " .. elementName, rgbm(1, 0, 0, 1))
+    end
+    ui.newLine(1)
+    ui.textColored('See the CSP log in "\\Documents\\Assetto Corsa\\logs\\custom_shaders_patch.log" for more details.', rgbm(1, 0, 0, 1))
+    ui.newLine(1)
+    ui.textColored("To fix the issue, please make sure you're on the latest version of Custom Shaders Patch (https://www.patreon.com/c/x4fab/posts)", rgbm(1, 0, 0, 1))
+    ui.newLine(1)
+    ui.separator()
+    ui.newLine(1)
+  end
 
   if ui.button('Modify Settings') then
     UIManager.toggleSettingsWindow()
