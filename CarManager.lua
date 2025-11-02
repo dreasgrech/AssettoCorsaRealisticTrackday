@@ -101,6 +101,7 @@ CarManager.sortedCarList_carIndexToSortedIndex = {} -- [carIndex] = sortedListIn
 -- -- evacuate state so we don’t re-trigger while a car is already evacuating
 -- local evacuating = {}
 
+--TODO: don't leave this here, put it in awake()
 -- -- calculate the max top speeds of each car
 -- for i, car in ac.iterateCars() do
   -- local carIndex = car.index
