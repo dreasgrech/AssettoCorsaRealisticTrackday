@@ -233,7 +233,7 @@ SettingsWindow.draw = function()
     ui.pushStyleColor(ui.StyleColor.Text, handleYieldingCheckboxColor)
     if ui.checkbox('Handle Yielding', storage_Yielding.handleYielding) then storage_Yielding.handleYielding = not storage_Yielding.handleYielding end
     ui.popStyleColor(1)
-    if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to yield on the correct lane') end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to yield to the specified Yielding Lateral Offset side of the track') end
 
     createDisabledSection(not handleYielding, function()
         if ui.checkbox('Check sides while yielding', storage.handleSideCheckingWhenYielding) then storage.handleSideCheckingWhenYielding = not storage.handleSideCheckingWhenYielding end
@@ -271,7 +271,7 @@ SettingsWindow.draw = function()
     ui.pushStyleColor(ui.StyleColor.Text, handleOvertakingCheckboxColor)
     if ui.checkbox('Handle Overtaking', storage_Overtaking.handleOvertaking) then storage_Overtaking.handleOvertaking = not storage_Overtaking.handleOvertaking end
     ui.popStyleColor(1)
-    if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
+    if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake to the specified Overtaking Lateral Offset side of the track') end
     
     createDisabledSection(not handleOvertaking, function()
         if ui.checkbox('Check sides while overtaking', storage.handleSideCheckingWhenOvertaking) then storage.handleSideCheckingWhenOvertaking = not storage.handleSideCheckingWhenOvertaking end
