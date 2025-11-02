@@ -2,7 +2,10 @@ Constants = require("Constants")
 Logger = require("Logger")
 CSPCompatibilityManager = require("CSPCompatibilityManager")
 
-local showErrorModalDialog = function(message)
+local cspVersion = CSPCompatibilityManager.getCSPVersion()
+Logger.log(string.format("Launching Realistic Trackday.  Custom Shaders Patch version: %s", cspVersion))
+
+local showMissingCSPElementsErrorModalDialog = function(message)
   local neededFunctionsForModalDialogAvailable =
     ui.modalDialog ~= nil or
     ui.textWrapped ~= nil or
@@ -19,9 +22,14 @@ local showErrorModalDialog = function(message)
   ui.modalDialog('[Error] Missing CSP elements needed to run Realistic Trackday app', function()
     ui.textColored(message, rgbm(1, 0, 0, 1))
     ui.newLine()
-    if ui.modernButton('Copy error', vec2(110, 40)) then ac.setClipboardText(message) end
+    if ui.modernButton('Copy', vec2(110, 40)) then
+      ac.setClipboardText(message) 
+    end
     ui.sameLine()
-    if ui.modernButton('Close', vec2(120, 40)) then return true end
+    if ui.modernButton('Close', vec2(120, 40)) then
+      return true
+    end
+
     return false
   end, true)
 end
@@ -30,22 +38,25 @@ end
 local missingCSPElements = CSPCompatibilityManager.checkForMissingCSPElements()
 CSPCompatibilityManager.clearElementsMetadataMemory()  -- free up memory since we don't need the metadata anymore
 local anyMissingCSPElements = (#missingCSPElements > 0)
+local missingCSPElementsErrorMessage
 
 -- Show an error modal dialog if any CSP elements are missing
 if anyMissingCSPElements then
-  local errorMessage = "Realistic Trackday may not run as expected because some required Custom Shaders Patch elements are missing."
-  errorMessage = errorMessage .. "\n\nThe following CSP elements are needed by the app:\n"
-    for _, elementName in ipairs(missingCSPElements) do
-        errorMessage = errorMessage .. " - " .. elementName .. "\n"
-    end
-  errorMessage = errorMessage .. "\nSee the CSP log in \"\\Documents\\Assetto Corsa\\logs\\custom_shaders_patch.log\" for more details."
-  errorMessage = errorMessage .. "\n\nTo fix the issue, please make sure you're on the latest version of Custom Shaders Patch (https://www.patreon.com/c/x4fab/posts)"
+  -- Build the CSP missing elements error message
+  missingCSPElementsErrorMessage = "Realistic Trackday may not run as expected because some required Custom Shaders Patch elements are missing."
+  missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. "\n\nThe following CSP elements are needed by the app:\n"
+  for _, elementName in ipairs(missingCSPElements) do
+      missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. " - " .. elementName .. "\n"
+  end
+  missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. "\nSee the CSP log in \"\\Documents\\Assetto Corsa\\logs\\custom_shaders_patch.log\" for more details."
+  missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. "\n\nTo fix the issue, please make sure you're on the latest version of Custom Shaders Patch (https://www.patreon.com/c/x4fab/posts)"
+  missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. string.format("\nYour CSP version is %s", cspVersion)
 
   -- Log the error to the CSP log as well
-  Logger.error(errorMessage)
+  Logger.error(missingCSPElementsErrorMessage)
 
   -- Show the error modal dialog
-  showErrorModalDialog(errorMessage)
+  showMissingCSPElementsErrorModalDialog(missingCSPElementsErrorMessage)
 end
 
 DequeManager = require("DataStructures.DequeManager")
@@ -206,14 +217,7 @@ end)
 function script.MANIFEST__FUNCTION_MAIN(dt)
   -- Show the missing CSP elements error message if needed
   if anyMissingCSPElements then
-    ui.textColored("Realistic Trackday might not work correctly due to missing required CSP elements.  See the CSP log for more details.  The following CSP elements are needed by the app:", rgbm(1, 0, 0, 1))
-    for _, elementName in ipairs(missingCSPElements) do
-        ui.textColored(" - " .. elementName, rgbm(1, 0, 0, 1))
-    end
-    ui.newLine(1)
-    ui.textColored('See the CSP log in "\\Documents\\Assetto Corsa\\logs\\custom_shaders_patch.log" for more details.', rgbm(1, 0, 0, 1))
-    ui.newLine(1)
-    ui.textColored("To fix the issue, please make sure you're on the latest version of Custom Shaders Patch (https://www.patreon.com/c/x4fab/posts)", rgbm(1, 0, 0, 1))
+    ui.textColored(missingCSPElementsErrorMessage, rgbm(1, 0, 0, 1))
     ui.newLine(1)
     ui.separator()
     ui.newLine(1)
