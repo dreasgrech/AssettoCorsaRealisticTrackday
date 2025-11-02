@@ -487,11 +487,12 @@ end
 ---@param storage StorageTable
 ---@return boolean
 function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
+    local storage_Overtaking = StorageManager.getStorage_Overtaking()
     local driveToSide = RaceTrackManager.getOvertakingSide()
     -- local targetOffset = storage.maxLateralOffset_normalized
     -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
     local targetOffset = storage.overtakingLateralOffset
-    local rampSpeed_mps = storage.overtakeRampSpeed_mps
+    local rampSpeed_mps = storage_Overtaking.overtakeRampSpeed_mps
     local overrideAiAwareness = storage.overrideAiAwareness
 
     -- return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)

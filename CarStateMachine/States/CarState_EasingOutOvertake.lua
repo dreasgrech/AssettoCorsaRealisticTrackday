@@ -30,6 +30,7 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+    local storage_Overtaking = StorageManager.getStorage_Overtaking()
     local car = sortedCarsList[sortedCarsListIndex]
     -- local carFront = sortedCarsList[sortedCarsListIndex - 1]
     -- if (not carFront) then
@@ -46,7 +47,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local driveToSide = RaceTrackManager.getYieldingSide()
     -- local targetOffset = 0
     local targetOffset = storage.defaultLateralOffset
-    local rampSpeed_mps = storage.overtakeRampRelease_mps
+    local rampSpeed_mps = storage_Overtaking.overtakeRampRelease_mps
     -- CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
     local handleSideCheckingWhenOvertaking = storage.handleSideCheckingWhenOvertaking
     CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, handleSideCheckingWhenOvertaking)

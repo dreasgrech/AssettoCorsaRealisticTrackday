@@ -104,6 +104,7 @@ end
 SettingsWindow.draw = function()
     local storage = StorageManager.getStorage()
     local storage_Yielding = StorageManager.getStorage_Yielding()
+    local storage_Overtaking = StorageManager.getStorage_Overtaking()
 
     -- Draw the app icon at the top-right of the settings window
     local settingsWindowSize = ui.windowSize()
@@ -185,7 +186,7 @@ SettingsWindow.draw = function()
     -- currentValue = ui.slider('##someSliderID', currentValue, 0, 100, 'Quantity: %.0f')
 
     local handleYielding = storage_Yielding.handleYielding
-    local handleOvertaking = storage.handleOvertaking
+    local handleOvertaking = storage_Overtaking.handleOvertaking
 
     local yieldingSide = RaceTrackManager.getYieldingSide()
     createDisabledSection(not handleYielding, function()
@@ -268,7 +269,7 @@ SettingsWindow.draw = function()
 
     local handleOvertakingCheckboxColor = handleOvertaking and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
     ui.pushStyleColor(ui.StyleColor.Text, handleOvertakingCheckboxColor)
-    if ui.checkbox('Handle Overtaking', storage.handleOvertaking) then storage.handleOvertaking = not storage.handleOvertaking end
+    if ui.checkbox('Handle Overtaking', storage_Overtaking.handleOvertaking) then storage_Overtaking.handleOvertaking = not storage_Overtaking.handleOvertaking end
     ui.popStyleColor(1)
     if ui.itemHovered() then ui.setTooltip('If enabled, AI cars will attempt to overtake on the correct lane') end
     
@@ -276,14 +277,14 @@ SettingsWindow.draw = function()
         if ui.checkbox('Check sides while overtaking', storage.handleSideCheckingWhenOvertaking) then storage.handleSideCheckingWhenOvertaking = not storage.handleSideCheckingWhenOvertaking end
         if ui.itemHovered() then ui.setTooltip("If enabled, cars will check for other cars on the side when overtaking so they don't crash into them.") end
 
-        if ui.checkbox('Require yielding car to be on yielding lane to overtake', storage.requireYieldingCarToBeOnYieldingLane) then storage.requireYieldingCarToBeOnYieldingLane = not storage.requireYieldingCarToBeOnYieldingLane end
+        if ui.checkbox('Require yielding car to be on yielding lane to overtake', storage_Overtaking.requireYieldingCarToBeOnYieldingLane) then storage_Overtaking.requireYieldingCarToBeOnYieldingLane = not storage_Overtaking.requireYieldingCarToBeOnYieldingLane end
         if ui.itemHovered() then ui.setTooltip("If enabled, the overtaking car will only overtake if the yielding car is actually driving on the yielding lane.") end
 
-        storage.detectCarAhead_meters =  renderSlider('Detect car ahead distance', 'Start overtaking if the car in front is within this distance', storage.detectCarAhead_meters, StorageManager.options_min[StorageManager.Options.DetectCarAhead_meters], StorageManager.options_max[StorageManager.Options.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
+        storage_Overtaking.detectCarAhead_meters =  renderSlider('Detect car ahead distance', 'Start overtaking if the car in front is within this distance', storage_Overtaking.detectCarAhead_meters, StorageManager.options_Overtaking_min[StorageManager.Options_Overtaking.DetectCarAhead_meters], StorageManager.options_Overtaking_max[StorageManager.Options_Overtaking.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
-        storage.overtakeRampSpeed_mps =  renderSlider('Overtaking Lateral Offset increment step', 'How quickly the lateral offset ramps up when overtaking another car.\nThe higher it is, the more quickly cars will change lanes when moving to the overtaking side', storage.overtakeRampSpeed_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampSpeed_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s')
+        storage_Overtaking.overtakeRampSpeed_mps =  renderSlider('Overtaking Lateral Offset increment step', 'How quickly the lateral offset ramps up when overtaking another car.\nThe higher it is, the more quickly cars will change lanes when moving to the overtaking side', storage_Overtaking.overtakeRampSpeed_mps, StorageManager.options_Overtaking_min[StorageManager.Options_Overtaking.OvertakeRampSpeed_mps], StorageManager.options_Overtaking_max[StorageManager.Options_Overtaking.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s')
 
-        storage.overtakeRampRelease_mps =  renderSlider('Overtaking Lateral Offset decrement step', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the overtaken car.\nThe higher it is, the more quickly cars will change lanes moving back to the default lateral offset after finishing overtaking.', storage.overtakeRampRelease_mps, StorageManager.options_min[StorageManager.Options.OvertakeRampRelease_mps], StorageManager.options_max[StorageManager.Options.OvertakeRampRelease_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s')
+        storage_Overtaking.overtakeRampRelease_mps =  renderSlider('Overtaking Lateral Offset decrement step', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the overtaken car.\nThe higher it is, the more quickly cars will change lanes moving back to the default lateral offset after finishing overtaking.', storage_Overtaking.overtakeRampRelease_mps, StorageManager.options_Overtaking_min[StorageManager.Options_Overtaking.OvertakeRampRelease_mps], StorageManager.options_Overtaking_max[StorageManager.Options_Overtaking.OvertakeRampRelease_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s')
     end)
 
     -- finish two columns

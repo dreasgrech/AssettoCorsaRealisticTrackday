@@ -103,6 +103,7 @@ end
 ---@param storage StorageTable
 function UILateralOffsetsImageWidget.draw(storage)
   local storage_Yielding = StorageManager.getStorage_Yielding()
+  local storage_Overtaking = StorageManager.getStorage_Overtaking()
 
   -- Reserve block area from current cursor
   local cursor = ui.getCursor()
@@ -165,7 +166,7 @@ function UILateralOffsetsImageWidget.draw(storage)
   local yOvertake = rowY(trackMidY, OVERTAKE_ROW_INDEX)
 
   local handleYielding = storage_Yielding.handleYielding
-  local handleOvertaking = storage.handleOvertaking
+  local handleOvertaking = storage_Overtaking.handleOvertaking
 
   -- Draw markers
   drawCarMarker(xDefault,  yDefault,  COLOR_DEFAULT_MARKER)
