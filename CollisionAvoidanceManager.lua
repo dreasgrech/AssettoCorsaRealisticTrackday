@@ -95,7 +95,8 @@ function CollisionAvoidanceManager.computeDesiredLateralOffset(egoCarIndex, stop
 
   -- Track progress and meter spacing (Frenet s)
   local s0 = ac.worldCoordinateToTrackProgress(ego.position) or 0.0
-  local trackLengthM = (ac.getTrackLengthMeters and ac.getTrackLengthMeters()) or 6500.0
+  
+  local trackLengthM = RaceTrackManager.getTrackLengthMeters()
   local invL = 1.0 / trackLengthM
 
   for k = 1, steps do
