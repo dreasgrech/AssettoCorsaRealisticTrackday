@@ -40,7 +40,7 @@ local lateralOffsetSigns = {
 
 local sim = ac.getSim()
 local TRACK_NAME = ac.getTrackName()
-local TRACK_LENGTH_METERS = sim.trackLengthM -- todo: rename as CONSTANT
+local TRACK_LENGTH_METERS = sim.trackLengthM
 local SESSION_TYPE = sim.raceSessionType
 local SESSION_TYPE_NAME = SESSION_TYPE_NAMES[SESSION_TYPE] or "Unknown"
 
