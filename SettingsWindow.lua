@@ -55,7 +55,12 @@ local renderDebuggingSection = function(storage_Debugging)
     ui.dwriteText('Debugging', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
+    ui.textColored('Warning: Enabling debugging options may impact performance.', ColorManager.RGBM_Colors.Yellow)
+
     ui.columns(3, false, "debuggingSection")
+
+    if ui.checkbox('Show UI Car List', storage_Debugging.drawCarList) then storage_Debugging.drawCarList = not storage_Debugging.drawCarList end
+    if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
 
     if ui.checkbox('Show car state overhead text', storage_Debugging.debugShowCarStateOverheadText) then storage_Debugging.debugShowCarStateOverheadText = not storage_Debugging.debugShowCarStateOverheadText end
     if ui.itemHovered() then ui.setTooltip("Shows the car's current state as text over the car") end
@@ -68,9 +73,6 @@ local renderDebuggingSection = function(storage_Debugging)
 
     if ui.checkbox('Draw tyres side offtrack gizmos', storage_Debugging.debugDrawSideOfftrack) then storage_Debugging.debugDrawSideOfftrack = not storage_Debugging.debugDrawSideOfftrack end
     if ui.itemHovered() then ui.setTooltip('Shows gizmos for the car\'s tyres when offtrack') end
-
-    if ui.checkbox('Draw Car List', storage_Debugging.drawCarList) then storage_Debugging.drawCarList = not storage_Debugging.drawCarList end
-    if ui.itemHovered() then ui.setTooltip('Shows a list of all cars in the scene') end
 
     ui.nextColumn()
 

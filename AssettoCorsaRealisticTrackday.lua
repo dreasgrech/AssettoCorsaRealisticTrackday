@@ -63,6 +63,7 @@ StackManager = require("DataStructures.StackManager")
 QueueManager = require("DataStructures.QueueManager")
 CompletableIndexCollectionManager = require("DataStructures.CompletableIndexCollectionManager")
 
+AppIconRenderer = require("AppIconRenderer")
 ColorManager = require("ColorManager")
 RaceTrackManager = require("RaceTrackManager")
 StorageManager = require("StorageManager")
@@ -222,18 +223,27 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
     ui.newLine(1)
   end
 
+  AppIconRenderer.draw()
+
   if ui.button('Modify Settings') then
     UIManager.toggleSettingsWindow()
   end
-
   ui.newLine(1)
+
+  local storage = StorageManager.getStorage()
+
+  -- If the app is not running, show a message and stop drawing further UI
   if (not shouldAppRun()) then
-    local storage = StorageManager.getStorage()
-    ui.text(string.format('App not running.  Enabled: %s,  Online? %s', tostring(storage.enabled), tostring(Constants.IS_ONLINE)))
+    UIManager.drawAppNotRunningMessageInMainWindow()
     return
   end
 
-  UIManager.drawMainWindowContent()
+  -- ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[RaceTrackManager.getYieldingSide()]))
+  -- ui.newLine(1)
+
+  UIManager.drawMainWindowLateralOffsetsSection()
+
+  UIManager.drawUICarList()
 end
 
 local frenetOffsets = {}

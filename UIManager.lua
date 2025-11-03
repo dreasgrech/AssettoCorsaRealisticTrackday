@@ -91,10 +91,8 @@ carTableColumns_dataBeforeDoD = nil  -- free memory
 
 local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 
-UIManager.drawMainWindowContent = function()
+UIManager.drawUICarList = function()
   local storage_Debugging = StorageManager.getStorage_Debugging()
-
-  ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[RaceTrackManager.getYieldingSide()]))
 
   --[====[
   if ui.button('Teleport', ui.ButtonFlags.None) then
@@ -135,6 +133,9 @@ UIManager.drawMainWindowContent = function()
   -- ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
 
   if not storage_Debugging.drawCarList then
+    ui.newLine(1)
+    ui.textColored('To understand exactly what each AI car is doing, enable the "Show the UI Car List" option in the Debugging settings.', ColorManager.RGBM_Colors.Aquamarine)
+    ui.textColored('A table of all the cars will then be displayed here showing all kinds of data about the cars and the kinds of decisions they are taking.', ColorManager.RGBM_Colors.Aquamarine)
     return
   end
 
@@ -416,6 +417,63 @@ function UIManager.drawCarStateOverheadText()
   -- render.setDepthMode(prevDepth)
 
   -- render.setDepthMode(depthModeBeforeModification)
+end
+
+UIManager.drawMainWindowLateralOffsetsSection = function()
+    -- ui.dwriteText('Driving Lanes', 15)
+    -- ui.newLine(1)
+
+    ui.columns(2, false, "mainWindow_lateralsSection")
+    ui.setColumnWidth(0, 260)
+
+    local storage = StorageManager.getStorage()
+    local storage_Yielding = StorageManager.getStorage_Yielding()
+    local storage_Overtaking = StorageManager.getStorage_Overtaking()
+
+    local handleYielding = storage_Yielding.handleYielding
+    local handleOvertaking = storage_Overtaking.handleOvertaking
+
+    ui.text(string.format('Default Lateral Offset: %.3f', storage.defaultLateralOffset))
+    if handleYielding then
+      ui.newLine(1)
+      ui.text(string.format('Yielding Lateral Offset: %.3f', storage.yieldingLateralOffset))
+    end
+    if handleOvertaking then
+      ui.newLine(1)
+      ui.text(string.format('Overtaking Lateral Offset: %.3f', storage.overtakingLateralOffset))
+    end
+
+    ui.nextColumn()
+
+    UILateralOffsetsImageWidget.draw(storage)
+
+    -- end the table
+    ui.columns(1, false)
+
+    local yieldingSide = RaceTrackManager.getYieldingSide()
+    local overtakingSide = RaceTrackManager.getOvertakingSide()
+    if yieldingSide == overtakingSide then
+      ui.newLine(1)
+      ui.textColored('Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
+    end
+end
+
+UIManager.drawAppNotRunningMessageInMainWindow = function()
+    local storage = StorageManager.getStorage()
+    ui.textColored(string.format('Realistic Trackday not running.', tostring(storage.enabled), tostring(Constants.IS_ONLINE)), ColorManager.RGBM_Colors.Red)
+    ui.newLine(1)
+
+    local appEnabled = storage.enabled
+    ui.text('App Enabled: ')
+    ui.sameLine()
+    local appEnabledColor = appEnabled and ColorManager.RGBM_Colors.Green or ColorManager.RGBM_Colors.Red
+    ui.textColored(string.format('%s', tostring(appEnabled)), appEnabledColor)
+
+    local isOnline = Constants.IS_ONLINE
+    ui.text('Playing Online: ')
+    ui.sameLine()
+    local isOnlineColor = isOnline and ColorManager.RGBM_Colors.Green or ColorManager.RGBM_Colors.Red
+    ui.textColored(string.format('%s', tostring(isOnline)), isOnlineColor)
 end
 
 ---Opens or closes the specified window.
