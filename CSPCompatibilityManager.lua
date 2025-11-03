@@ -24,11 +24,12 @@ end
 ---Returns the current version of Custom Shaders Patch
 ---@return string
 CSPCompatibilityManager.getCSPVersion = function()
-    if not ac.getPatchVersion then
+    local getPatchVersionFn = ac.getPatchVersion
+    if not getPatchVersionFn then
         return "Unknown"
     end
 
-    local versionStr = ac.getPatchVersion()
+    local versionStr = getPatchVersionFn()
     return string.format("v%s", versionStr)
 end
 
