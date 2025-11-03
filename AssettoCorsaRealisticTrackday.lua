@@ -3,7 +3,7 @@ Logger = require("Logger")
 CSPCompatibilityManager = require("CSPCompatibilityManager")
 
 local cspVersion = CSPCompatibilityManager.getCSPVersion()
-Logger.log(string.format("Launching Realistic Trackday.  Custom Shaders Patch version: %s", cspVersion))
+Logger.log(string.format("Launching Realistic Trackday v%s.  Custom Shaders Patch: %s", Constants.APP_VERSION, cspVersion))
 
 local showMissingCSPElementsErrorModalDialog = function(message)
   local neededFunctionsForModalDialogAvailable =
