@@ -91,6 +91,37 @@ carTableColumns_dataBeforeDoD = nil  -- free memory
 
 local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 
+-- Minimal, robust overlay for column-header tooltips.
+-- Expands the hover rect to full column width + sensible row height.
+local function addTooltipOverLastItem(text, colWidth, idSuffix)
+  if not text or text == '' then return end
+
+  -- Header item rect in *window* coordinates:
+  local min = ui.itemRectMin()
+  local max = ui.itemRectMax()
+
+  -- Ensure a usable height (some headers report a 1px-ish line):
+  local h = math.max(max.y - min.y, ui.textLineHeightWithSpacing())
+
+  -- Expand to full column width:
+  local w = math.max(colWidth or (max.x - min.x), 1)
+
+  -- Place an invisible hitbox over that area (in *screen* space):
+  local saved = ui.cursorScreenPos()
+  ui.setItemAllowOverlap()
+  ui.setCursorScreenPos(ui.windowPos() + min)
+  ui.invisibleButton('##hdrTip'..(idSuffix or ''), vec2(w, h))
+
+  if ui.itemHovered() then
+    ui.setTooltip(text)
+    -- (Rich tooltip option:)
+    -- ui.tooltip(function() ui.textWrapped(text) end)
+    Logger.log('Showing tooltip: '..text)
+  end
+  ui.setCursorScreenPos(saved)
+end
+
+
 UIManager.drawUICarList = function()
   local storage_Debugging = StorageManager.getStorage_Debugging()
 
@@ -145,6 +176,8 @@ UIManager.drawUICarList = function()
   ui.columns(totalColumns, true)
   for col = 1, totalColumns do
     ui.columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
+    addTooltipOverLastItem(carTableColumns_tooltip[col], carTableColumns_width[col], col)
+
     ui.setColumnWidth(col-1, carTableColumns_width[col])
   end
 
