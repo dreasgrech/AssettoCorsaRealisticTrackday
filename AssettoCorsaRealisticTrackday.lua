@@ -36,7 +36,6 @@ end
 
 -- Check if any CSP elements used by the app are missing
 local missingCSPElements = CSPCompatibilityManager.checkForMissingCSPElements()
-CSPCompatibilityManager.clearElementsMetadataMemory()  -- free up memory since we don't need the metadata anymore
 local anyMissingCSPElements = (#missingCSPElements > 0)
 local missingCSPElementsErrorMessage
 
