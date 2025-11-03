@@ -450,7 +450,6 @@ end
 UIManager.drawMainWindowLateralOffsetsSection = function()
     -- ui.dwriteText('Driving Lanes', 15)
     -- ui.newLine(1)
-    ui.textColored("These are the current lane settings for the AI cars which dictate the side of the track they should drive on depending on what they are currently doing (modifyable from the Settings):", ColorManager.RGBM_Colors.LimeGreen)
 
     ui.columns(2, false, "mainWindow_lateralsSection")
     ui.setColumnWidth(0, 260)
@@ -491,6 +490,10 @@ UIManager.drawMainWindowLateralOffsetsSection = function()
 
     -- end the table
     ui.columns(1, false)
+    ui.newLine(1)
+    ui.textColored(
+      "These lateral offsets for the AI cars dictate the side of the track they should drive on depending on what they are currently doing (modifyable from the Settings).", 
+      ColorManager.RGBM_Colors.DarkGray)
 end
 
 UIManager.drawAppNotRunningMessageInMainWindow = function()
