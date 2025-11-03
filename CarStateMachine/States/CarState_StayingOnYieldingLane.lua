@@ -7,6 +7,17 @@ local v = constTable.value
 ac.log(string.format("Const value is %d", v))
 --]====]
 
+-- bindings
+local ac = ac
+local CarManager = CarManager
+local StorageManager = StorageManager
+local CarStateMachine = CarStateMachine
+local CarOperations = CarOperations
+local RaceTrackManager = RaceTrackManager
+local Strings = Strings
+local MathHelpers = MathHelpers
+local Logger = Logger
+
 local STATE = CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
 
 CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnYieldingLane"
@@ -82,7 +93,10 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         -- Andreas: be careful about this because if the ai keeps on pressing the gas while we're pressing the brake here, the car can spin out...
         -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Brake, 0.1) 
         -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.8)
-
+      else
+        -- reset the yielding car throttle limit since we're no longer close to the overtaking car
+        CarOperations.resetAIThrottleLimit(carIndex)
+        CarOperations.removeAITopSpeed(carIndex)
       end
 
       -- continue driving to the yielding side so that if we got pushed a bit off the side, we drive back to the correct side
