@@ -422,6 +422,7 @@ end
 UIManager.drawMainWindowLateralOffsetsSection = function()
     -- ui.dwriteText('Driving Lanes', 15)
     -- ui.newLine(1)
+    ui.textColored("These are the current lane settings for the AI cars which dictate the side of the track they should drive on depending on what they are currently doing (modifyable from the Settings):", ColorManager.RGBM_Colors.LimeGreen)
 
     ui.columns(2, false, "mainWindow_lateralsSection")
     ui.setColumnWidth(0, 260)
@@ -433,29 +434,35 @@ UIManager.drawMainWindowLateralOffsetsSection = function()
     local handleYielding = storage_Yielding.handleYielding
     local handleOvertaking = storage_Overtaking.handleOvertaking
 
-    ui.text(string.format('Default Lateral Offset: %.3f', storage.defaultLateralOffset))
+    local yieldingSide = RaceTrackManager.getYieldingSide()
+    local overtakingSide = RaceTrackManager.getOvertakingSide()
+    local defaultDrivingSide = RaceTrackManager.getDefaultDrivingSide()
+    local yieldingSideString = RaceTrackManager.TrackSideStrings[yieldingSide]
+    local overtakingSideString = RaceTrackManager.TrackSideStrings[overtakingSide]
+    local defaultDrivingSideString = RaceTrackManager.TrackSideStrings[defaultDrivingSide]
+
+    ui.newLine(1)
+    if handleOvertaking then
+      ui.text(string.format('Overtaking Lateral Offset: %.3f (%s)', storage.overtakingLateralOffset, overtakingSideString))
+      ui.newLine(1)
+    end
+    ui.text(string.format('Default Lateral Offset: %.3f (%s)', storage.defaultLateralOffset, defaultDrivingSideString))
     if handleYielding then
       ui.newLine(1)
-      ui.text(string.format('Yielding Lateral Offset: %.3f', storage.yieldingLateralOffset))
-    end
-    if handleOvertaking then
-      ui.newLine(1)
-      ui.text(string.format('Overtaking Lateral Offset: %.3f', storage.overtakingLateralOffset))
+      ui.text(string.format('Yielding Lateral Offset: %.3f (%s)', storage.yieldingLateralOffset, yieldingSideString))
     end
 
     ui.nextColumn()
 
     UILateralOffsetsImageWidget.draw(storage)
+    --ui.textColored(string.format('Yielding side: %s, Overtaking side: %s', yieldingSideString, overtakingSideString), ColorManager.RGBM_Colors.LightSeaGreen)
+
+    if yieldingSide == overtakingSide then
+      ui.textColored('Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
+    end
 
     -- end the table
     ui.columns(1, false)
-
-    local yieldingSide = RaceTrackManager.getYieldingSide()
-    local overtakingSide = RaceTrackManager.getOvertakingSide()
-    if yieldingSide == overtakingSide then
-      ui.newLine(1)
-      ui.textColored('Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
-    end
 end
 
 UIManager.drawAppNotRunningMessageInMainWindow = function()

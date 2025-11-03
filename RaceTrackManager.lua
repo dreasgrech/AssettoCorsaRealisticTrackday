@@ -107,6 +107,15 @@ RaceTrackManager.getOvertakingSide = function()
     return overtakingSide
 end
 
+---Returns the default driving side as configured in the settings
+---@return RaceTrackManager.TrackSide defaultDrivingSide
+RaceTrackManager.getDefaultDrivingSide = function()
+    local storage = StorageManager.getStorage()
+    local defaultDrivingLateralOffset = storage.defaultLateralOffset
+    local defaultDrivingSide = RaceTrackManager.getSideFromLateralOffset(defaultDrivingLateralOffset)
+    return defaultDrivingSide
+end
+
 ---Returns the side of the track based on the lateral offset
 ---@param lateralOffset number
 ---@return RaceTrackManager.TrackSide

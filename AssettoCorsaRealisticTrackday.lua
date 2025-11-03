@@ -215,6 +215,9 @@ end)
 -- wiki: function to be called each frame to draw window content
 ---
 function script.MANIFEST__FUNCTION_MAIN(dt)
+  ui.textColored("Realistic Trackday allows you to alter the AI cars' behavior to act more like humans driving during a track day event by yielding to faster cars and overtaking slower cars.", ColorManager.RGBM_Colors.WhiteSmoke)
+  ui.newLine(1)
+
   -- Show the missing CSP elements error message if needed
   if anyMissingCSPElements then
     ui.textColored(missingCSPElementsErrorMessage, rgbm(1, 0, 0, 1))
@@ -230,8 +233,6 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   end
   ui.newLine(1)
 
-  local storage = StorageManager.getStorage()
-
   -- If the app is not running, show a message and stop drawing further UI
   if (not shouldAppRun()) then
     UIManager.drawAppNotRunningMessageInMainWindow()
@@ -242,6 +243,8 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   -- ui.newLine(1)
 
   UIManager.drawMainWindowLateralOffsetsSection()
+
+  ui.newLine(1)
 
   UIManager.drawUICarList()
 end
