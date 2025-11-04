@@ -412,6 +412,9 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
     local currentActualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carPosition)
     local side = targetLateralOffset < currentActualTrackLateralOffset and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
 
+    -- save a copy of the original side for indicator lights because we may change the side variable later
+    local sideForIndicatorLights = side
+
     -- make sure there isn't any car on the side we're trying to drive to so we don't crash into it
     if sideCheck then
       local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
@@ -423,10 +426,6 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
           -- return false
           -- drive to the other side to avoid colliding with the car on this side
           side = RaceTrackManager.getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
-          -- driveToSideMaxOffset = driveToSideMaxOffset * 0.5 -- drive to the other side but not fully
-          -- targetLateralOffset = targetLateralOffset * 0.5 -- drive to the other side but not fully
-          targetLateralOffset = -targetLateralOffset * 0.5 -- drive to the other side but not fully
-          rampSpeed_mps = rampSpeed_mps * 0.5 -- drive more slowly to the other side
 
           -- do another side check on the other side since we're driving to the other side now
           local isOtherSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
@@ -434,6 +433,12 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
             -- both sides are blocked, so we can't drive to either side safely
             return false
           end
+
+          -- driveToSideMaxOffset = driveToSideMaxOffset * 0.5 -- drive to the other side but not fully
+          -- targetLateralOffset = targetLateralOffset * 0.5 -- drive to the other side but not fully
+          targetLateralOffset = -targetLateralOffset * 0.5 -- drive to the other side but not fully
+          rampSpeed_mps = rampSpeed_mps * 0.5 -- drive more slowly to the other side
+          -- useIndicatorLights = false -- don't use indicator lights when driving to the other side temporarily
       end
     end
 
@@ -469,11 +474,10 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
       -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
+      -- keep the turning lights on while driving to the side
       if useIndicatorLights then
-        -- keep the turning lights on while driving to the side
-        local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
+        local drivingToTheLeft = sideForIndicatorLights == RaceTrackManager.TrackSide.LEFT
         local turningLights = drivingToTheLeft and ac.TurningLights.Left or ac.TurningLights.Right
-        -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
         CarOperations.toggleTurningLights(carIndex, turningLights)
       end
 
