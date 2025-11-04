@@ -55,8 +55,6 @@ local renderDebuggingSection = function(storage_Debugging)
     ui.dwriteText('Debugging', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    ui.textColored('Warning: Enabling debugging options may impact performance.', ColorManager.RGBM_Colors.Yellow)
-
     ui.columns(3, false, "debuggingSection")
 
     if ui.checkbox('Show UI Car List', storage_Debugging.drawCarList) then storage_Debugging.drawCarList = not storage_Debugging.drawCarList end
@@ -95,6 +93,9 @@ local renderDebuggingSection = function(storage_Debugging)
 
     -- reset the column layout
     ui.columns(1, false)
+
+    ui.newLine(1)
+    ui.textColored('Warning: Enabling debugging options may impact performance.', ColorManager.RGBM_Colors.Yellow)
 end
 
 SettingsWindow.draw = function()
@@ -117,7 +118,7 @@ SettingsWindow.draw = function()
     local enabledDisabledText = appEnabled and 'Enabled' or 'Disabled'
     if ui.checkbox(string.format('Realistic Trackday %s for: %s (Mode: %s)', enabledDisabledText, RaceTrackManager.getTrackName(), RaceTrackManager.getSessionTypeName()), appEnabled) then storage.enabled = not storage.enabled end
     ui.popStyleColor(1)
-    if ui.itemHovered() then ui.setTooltip('Master switch for this app.\n\nEach track and session mode type use different settings.') end
+    if ui.itemHovered() then ui.setTooltip('Enable the Realistic Trackday app for this specific track and session mode.\n\nEach track and session mode type use individually saved settings.') end
 
     ui.newLine(1)
 
@@ -141,7 +142,7 @@ SettingsWindow.draw = function()
     ui.dwriteText('AI Caution', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
-    storage.defaultAICaution =  renderSlider('Default AI Caution', 'Base AI caution level (higher = more cautious, slower but less accident prone).', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT) -- do not drop the minimum below 2 because 1 is used while overtaking
+    storage.defaultAICaution =  renderSlider('Base AI Caution', 'The default gap cars keep between each other while driving on the default driving lane.\n\nThe higher this value is, the more cautious the cars will be by keeping a larger gap between each other, which can provide a more relaxed trackday experience.', storage.defaultAICaution, StorageManager.options_min[StorageManager.Options.DefaultAICaution], StorageManager.options_max[StorageManager.Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT) -- do not drop the minimum below 2 because 1 is used while overtaking
 
     ui.nextColumn()
 
@@ -155,7 +156,7 @@ SettingsWindow.draw = function()
     local overrideOriginalAIAggression_drivingNormally = storage.overrideOriginalAIAggression_drivingNormally
 
     createDisabledSection(not overrideOriginalAIAggression_drivingNormally, function()
-        storage.defaultAIAggression =  renderSlider('Overridden AI Aggression when driving normally', 'Base AI aggression level (higher = more aggressive, faster but more accident prone).', storage.defaultAIAggression, StorageManager.options_min[StorageManager.Options.DefaultAIAggression], StorageManager.options_max[StorageManager.Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
+        storage.defaultAIAggression =  renderSlider('Overridden Base AI Aggression', 'The default aggression level cars exhibit when driving on the default driving lane.\n\nThe higher this value is, the more aggressive the cars will be (although the exact definition of aggression is still a bit unclear at the moment).', storage.defaultAIAggression, StorageManager.options_min[StorageManager.Options.DefaultAIAggression], StorageManager.options_max[StorageManager.Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
     end)
 
     if ui.checkbox('Override original AI aggression when overtaking', storage.overrideOriginalAIAggression_overtaking) then storage.overrideOriginalAIAggression_overtaking = not storage.overrideOriginalAIAggression_overtaking end
@@ -167,7 +168,7 @@ SettingsWindow.draw = function()
     ui.separator()
 
     ui.newLine(1)
-    ui.dwriteText('Driving Lanes', UI_HEADER_TEXT_FONT_SIZE)
+    ui.dwriteText('Lateral Offsets (Driving Lanes)', UI_HEADER_TEXT_FONT_SIZE)
     ui.newLine(1)
 
     ui.columns(2, false, "lateralsSection")
@@ -235,17 +236,17 @@ SettingsWindow.draw = function()
         ui.newLine(1)
 
         if ui.checkbox('Use indicator lights when easing in yield', storage_Yielding.UseIndicatorLightsWhenEasingInYield) then storage_Yielding.UseIndicatorLightsWhenEasingInYield = not storage_Yielding.UseIndicatorLightsWhenEasingInYield end
-        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when easing in to the yielding lane.") end
+        if ui.itemHovered() then ui.setTooltip("If enabled, cars will use their indicator lights while driving to the reach the yielding lane.") end
 
         if ui.checkbox('Use indicator lights when easing out of yield', storage_Yielding.UseIndicatorLightsWhenEasingOutYield) then storage_Yielding.UseIndicatorLightsWhenEasingOutYield = not storage_Yielding.UseIndicatorLightsWhenEasingOutYield end
-        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when easing out of the yielding lane.") end
+        if ui.itemHovered() then ui.setTooltip("If enabled, cars will use their indicator lights while driving from the yielding lane back to the default driving lane.") end
 
         if ui.checkbox('Use indicator lights when driving on yielding lane', storage_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane) then storage_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane = not storage_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane end
-        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when driving on the yielding lane.") end
+        if ui.itemHovered() then ui.setTooltip("If enabled, cars will keep their indicator lights on while driving on the yielding lane.") end
 
         ui.newLine(1)
 
-        storage_Yielding.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the player is behind and within this distance', storage_Yielding.detectCarBehind_meters, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.DetectCarBehind_meters], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
+        storage_Yielding.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the car behind is within this distance', storage_Yielding.detectCarBehind_meters, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.DetectCarBehind_meters], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
         storage_Yielding.rampSpeed_mps =  renderSlider('Yielding Lateral Offset increment step', 'How quickly the lateral offset ramps up when yielding to an overtaking car.\nThe higher it is, the more quickly cars will change lanes when moving to the yielding side.', storage_Yielding.rampSpeed_mps, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.RampSpeed_mps], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.RampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s')
 
@@ -286,13 +287,13 @@ SettingsWindow.draw = function()
         ui.newLine(1)
 
         if ui.checkbox('Use indicator lights when easing in to overtake', storage_Overtaking.UseIndicatorLightsWhenEasingInOvertaking) then storage_Overtaking.UseIndicatorLightsWhenEasingInOvertaking = not storage_Overtaking.UseIndicatorLightsWhenEasingInOvertaking end
-        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when easing in to the overtaking lane.") end
+        if ui.itemHovered() then ui.setTooltip("If enabled, cars will use their indicator lights when driving to the overtaking lane.") end
 
         if ui.checkbox('Use indicator lights when easing out of overtaking', storage_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking) then storage_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking = not storage_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking end
-        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when easing out of the overtaking lane.") end
+        if ui.itemHovered() then ui.setTooltip("If enabled, cars will use their indicator lights when driving from the overtaking lane back to the default driving lane.") end
 
         if ui.checkbox('Use indicator lights when driving on overtaking lane', storage_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane) then storage_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane = not storage_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane end
-        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when driving on the overtaking lane.") end
+        if ui.itemHovered() then ui.setTooltip("If enabled, cars will keep their indicator lights on while driving on the overtaking lane.") end
 
         ui.newLine(1)
 
@@ -315,7 +316,7 @@ SettingsWindow.draw = function()
         ui.newLine(1)
 
         if ui.checkbox('Handle accidents (WORK IN PROGRESS - BEST NOT USED FOR NOW)', storage.handleAccidents) then storage.handleAccidents = not storage.handleAccidents end
-        if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the player car passes.') end
+        if ui.itemHovered() then ui.setTooltip('If enabled, AI will stop and remain stopped after an accident until the other cars pass.') end
 
         local handleAccidents = storage.handleAccidents
         createDisabledSection(not handleAccidents, function()
