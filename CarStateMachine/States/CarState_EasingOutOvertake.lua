@@ -22,6 +22,8 @@ local RaceTrackManager_getYieldingSide = RaceTrackManager.getYieldingSide
 local StorageManager = StorageManager
 local StorageManager_getStorage_Overtaking = StorageManager.getStorage_Overtaking
 local Strings = Strings
+
+
 local STATE = CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
 
 CarStateMachine.CarStateTypeStrings[STATE] = "EasingOutOvertake"
