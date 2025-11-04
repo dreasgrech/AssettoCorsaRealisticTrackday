@@ -1,3 +1,21 @@
+-- bindings
+local ac = ac
+local ac_getCar = ac.getCar
+local Logger = Logger
+local CarManager = CarManager
+local CarManager_getActualTrackLateralOffset = CarManager.getActualTrackLateralOffset
+local CarManager_setCalculatedTrackLateralOffset = CarManager.setCalculatedTrackLateralOffset
+local CarOperations = CarOperations
+local CarStateMachine = CarStateMachine
+local CarStateMachine_getPreviousState = CarStateMachine.getPreviousState
+local CarStateMachine_handleYellowFlagZone = CarStateMachine.handleYellowFlagZone
+local RaceTrackManager = RaceTrackManager
+local RaceTrackManager_getYieldingSide = RaceTrackManager.getYieldingSide
+local StorageManager = StorageManager
+local StorageManager_getStorage_Debugging = StorageManager.getStorage_Debugging
+local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
+local Strings = Strings
+
 local STATE = CarStateMachine.CarStateType.EASING_IN_YIELD
 
 CarStateMachine.CarStateTypeStrings[STATE] = "EasingInYield"
@@ -21,7 +39,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   -- make sure that we're also not overtaking to another car at the same time
   local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
   if currentlyOvertakingCarIndex then
-    local previousState = CarStateMachine.getPreviousState(carIndex)
+    local previousState = CarStateMachine_getPreviousState(carIndex)
     Logger.error(string.format('[CarState_EasingInYield] Car %d is both yielding to car %d and overtaking car %d at the same time!  Previous state: %s',
     carIndex, currentlyYieldingToCarIndex, currentlyOvertakingCarIndex, CarStateMachine.CarStateTypeStrings[previousState]))
   end
@@ -29,15 +47,15 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   local car = sortedCarsList[sortedCarsListIndex]
 
   -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
-  CarManager.setCalculatedTrackLateralOffset(carIndex, CarManager.getActualTrackLateralOffset(car.position))
+  CarManager_setCalculatedTrackLateralOffset(carIndex, CarManager_getActualTrackLateralOffset(car.position))
 
   -- turn on turning lights
-  local turningLights = RaceTrackManager.getYieldingSide()  == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
+  local turningLights = RaceTrackManager_getYieldingSide()  == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
   CarOperations.toggleTurningLights(carIndex, turningLights)
 
-  local storage_Debugging = StorageManager.getStorage_Debugging()
+  local storage_Debugging = StorageManager_getStorage_Debugging()
   if storage_Debugging.debugLogCarYielding then
-    local currentlyYieldingToCar = ac.getCar(currentlyYieldingToCarIndex)
+    local currentlyYieldingToCar = ac_getCar(currentlyYieldingToCarIndex)
     if currentlyYieldingToCar then
       local carBehindPosition = currentlyYieldingToCar.position
       Logger.log(string.format("[EasingInYield] #%d yielding to #%d. CarAvgSpeed: %.3f, CarBehindAvgSpeed: %.3f, CarBehindLateralOffset: %.3f",
@@ -45,7 +63,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
       currentlyYieldingToCarIndex,
       CarManager.cars_averageSpeedKmh[carIndex],
       CarManager.cars_averageSpeedKmh[currentlyYieldingToCarIndex],
-      CarManager.getActualTrackLateralOffset(carBehindPosition)
+      CarManager_getActualTrackLateralOffset(carBehindPosition)
       ))
     end
   end
@@ -59,12 +77,12 @@ end
 ---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       local car = sortedCarsList[sortedCarsListIndex]
-      --local yieldSide = RaceTrackManager.getYieldingSide()
+      --local yieldSide = getYieldingSide()
       --local targetOffset = storage.maxLateralOffset_normalized
       --local rampSpeed_mps = storage.rampSpeed_mps
       --local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
-      local storage_Yielding = StorageManager.getStorage_Yielding()
+      local storage_Yielding = StorageManager_getStorage_Yielding()
       local useIndicatorLights = storage_Yielding.UseIndicatorLightsWhenEasingInYield
       local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
       if not droveSafelyToSide then
@@ -95,14 +113,14 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- local carBehind = sortedCarList[sortedCarListIndex + 1]
 
       -- check if we're now in a yellow flag zone
-      local newStateDueToYellowFlagZone = CarStateMachine.handleYellowFlagZone(carIndex, car)
+      local newStateDueToYellowFlagZone = CarStateMachine_handleYellowFlagZone(carIndex, car)
       if newStateDueToYellowFlagZone then
         CarStateMachine.setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
         return newStateDueToYellowFlagZone
       end
 
       local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
-      local carWeAreYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
+      local carWeAreYieldingTo = ac_getCar(currentlyYieldingToCarIndex)
 
       -- if the car we're yielding to is now clearly ahead of us, we can ease out our yielding
       local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, carWeAreYieldingTo, storage.clearAhead_meters)
@@ -123,7 +141,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- end
 
       -- if we have reached the target offset, we can go to the next state
-      local yieldSide = RaceTrackManager.getYieldingSide()
+      local yieldSide = RaceTrackManager_getYieldingSide()
       local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, yieldSide)
       if arrivedAtTargetOffset then
         -- CarStateMachine.setStateExitReason(carIndex, 'Arrived at yielding position, now staying on yielding lane')

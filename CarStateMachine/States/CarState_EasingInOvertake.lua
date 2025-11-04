@@ -1,16 +1,20 @@
 -- bindings
 local ac = ac
-local getCar = ac.getCar
+local ac_getCar = ac.getCar
 local Logger = Logger
 local CarManager = CarManager
-local getActualTrackLateralOffset = CarManager.getActualTrackLateralOffset
+local CarManager_getActualTrackLateralOffset = CarManager.getActualTrackLateralOffset
+local CarManager_setCalculatedTrackLateralOffset = CarManager.setCalculatedTrackLateralOffset
 local CarOperations = CarOperations
-local calculateAICautionAndAggressionWhileOvertaking = CarOperations.calculateAICautionAndAggressionWhileOvertaking
+local CarOperations_calculateAICautionAndAggressionWhileOvertaking = CarOperations.calculateAICautionAndAggressionWhileOvertaking
 local CarStateMachine = CarStateMachine
-local getPreviousState = CarStateMachine.getPreviousState
-local handleYellowFlagZone = CarStateMachine.handleYellowFlagZone
+local CarStateMachine_getPreviousState = CarStateMachine.getPreviousState
+local CarStateMachine_handleYellowFlagZone = CarStateMachine.handleYellowFlagZone
 local RaceTrackManager = RaceTrackManager
+local RaceTrackManager_getYieldingSide = RaceTrackManager.getYieldingSide
 local StorageManager = StorageManager
+local StorageManager_getStorage_Debugging = StorageManager.getStorage_Debugging
+local StorageManager_getStorage_Overtaking = StorageManager.getStorage_Overtaking
 local Strings = Strings
 
 local STATE = CarStateMachine.CarStateType.EASING_IN_OVERTAKE
@@ -36,25 +40,25 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   -- make sure that we're also not yielding to another car at the same time
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
   if currentlyYieldingToCarIndex then
-    local previousState = getPreviousState(carIndex)
+    local previousState = CarStateMachine_getPreviousState(carIndex)
     Logger.error(string.format('[CarState_EasingInOvertake] Car %d is both yielding to car %d and overtaking car %d at the same time!  Previous state: %s', carIndex, currentlyYieldingToCarIndex, currentlyOvertakingCarIndex, CarStateMachine.CarStateTypeStrings[previousState]))
   end
 
   local car = sortedCarsList[sortedCarsListIndex]
   -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
-  CarManager.setCalculatedTrackLateralOffset(carIndex, getActualTrackLateralOffset(car.position))
+  CarManager_setCalculatedTrackLateralOffset(carIndex, CarManager_getActualTrackLateralOffset(car.position))
 
-  local storage_Debugging = StorageManager.getStorage_Debugging()
+  local storage_Debugging = StorageManager_getStorage_Debugging()
   if storage_Debugging.debugLogCarOvertaking then
-    local currentlyOvertakingCar = getCar(currentlyOvertakingCarIndex)
+    local currentlyOvertakingCar = ac_getCar(currentlyOvertakingCarIndex)
     if currentlyOvertakingCar then
       local carFrontPosition = currentlyOvertakingCar.position
       Logger.log(string.format("[EasingInOvertake] #%d overtaking #%d. YieldingSide: %s, CarFrontPosition: %s, CarFrontLateralOffset: %.3f",
       carIndex,
       currentlyOvertakingCarIndex,
-      RaceTrackManager.getYieldingSide(),
+      RaceTrackManager_getYieldingSide(),
       carFrontPosition,
-      getActualTrackLateralOffset(carFrontPosition)
+      CarManager_getActualTrackLateralOffset(carFrontPosition)
       ))
     end
   end
@@ -70,7 +74,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local car = sortedCarsList[sortedCarsListIndex]
     -- local carFront = sortedCarsList[sortedCarsListIndex - 1]
     local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
-    local carFront = getCar(currentlyOvertakingCarIndex)
+    local carFront = ac_getCar(currentlyOvertakingCarIndex)
     if (not carFront) then
         return
     end
@@ -85,9 +89,9 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
     -- set the ai caution while we're overtaking
     local yieldingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex] -- fetch the index of the car we're overtaking
-    local yieldingCar = getCar(yieldingCarIndex)
+    local yieldingCar = ac_getCar(yieldingCarIndex)
     -- local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
-    local aiCaution, aiAggression = calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
+    local aiCaution, aiAggression = CarOperations_calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
     CarOperations.setAICaution(carIndex, aiCaution)
     
     if storage.overrideOriginalAIAggression_overtaking then
@@ -101,7 +105,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
     -- ease in to the overtaking lane
-    local storage_Overtaking = StorageManager.getStorage_Overtaking()
+    local storage_Overtaking = StorageManager_getStorage_Overtaking()
     local useIndicatorLights = storage_Overtaking.UseIndicatorLightsWhenEasingInOvertaking
     local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
@@ -124,7 +128,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     local car = sortedCarsList[sortedCarsListIndex]
 
       -- check if we're now in a yellow flag zone
-      local newStateDueToYellowFlagZone = handleYellowFlagZone(carIndex, car)
+      local newStateDueToYellowFlagZone = CarStateMachine_handleYellowFlagZone(carIndex, car)
       if newStateDueToYellowFlagZone then
         CarStateMachine.setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
         return newStateDueToYellowFlagZone
@@ -140,7 +144,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     -- end
 
     -- make sure the car we're overtaking is still valid
-    local currentlyOvertakingCar = getCar(currentlyOvertakingCarIndex)
+    local currentlyOvertakingCar = ac_getCar(currentlyOvertakingCarIndex)
     if (not currentlyOvertakingCar) then
         -- the car we're overtaking is no longer valid, return to easing out overtake
         Logger.warn(string.format('Car %d in state DrivingToSideToOvertake but the car it was overtaking (car %d) is no longer valid, returning to normal driving', carIndex, currentlyOvertakingCarIndex))

@@ -105,22 +105,75 @@ FrenetAvoid = require("FrenetAvoid")
 SettingsWindow = require("SettingsWindow")
 UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
 
+-- bindings
+local ac = ac
+local ac_getCar = ac.getCar
+local ac_getSim = ac.getSim
+local ac_iterateCars = ac.iterateCars
+local ui = ui
+local ui_textColored = ui.textColored
+local ui_newLine = ui.newLine
+local ui_separator = ui.separator
+local ui_button = ui.button
+local Constants = Constants
+local Logger = Logger
+local Logger_error = Logger.error
+local string = string
+local string_format = string.format
+local RaceTrackManager = RaceTrackManager
+local RaceTrackManager_isSplinePositionInYellowZone = RaceTrackManager.isSplinePositionInYellowZone
+local RaceTrackManager_updateYellowFlagZones = RaceTrackManager.updateYellowFlagZones
+local AccidentManager = AccidentManager
+local AccidentManager_registerCollision = AccidentManager.registerCollision
+local AccidentManager_informAboutCarReset = AccidentManager.informAboutCarReset
+local AppIconRenderer = AppIconRenderer
+local AppIconRenderer_draw = AppIconRenderer.draw
+local CameraManager = CameraManager
+local CameraManager_getFocusedCarIndex = CameraManager.getFocusedCarIndex
+local CarManager = CarManager
+local CarManager_ensureDefaults = CarManager.ensureDefaults
+local CarManager_saveCarSpeed = CarManager.saveCarSpeed
+local CarManager_sortCarListByTrackPosition = CarManager.sortCarListByTrackPosition
+local CarOperations = CarOperations
+local CarStateMachine = CarStateMachine
+local CarStateMachine_updateCar = CarStateMachine.updateCar
+local CarStateMachine_handleQueuedAccidents = CarStateMachine.handleQueuedAccidents
+local UIManager = UIManager
+local UIManager_toggleSettingsWindow = UIManager.toggleSettingsWindow
+local UIManager_drawMainWindowLateralOffsetsSection = UIManager.drawMainWindowLateralOffsetsSection
+local UIManager_drawUICarList = UIManager.drawUICarList
+local UIManager_drawCarStateOverheadText = UIManager.drawCarStateOverheadText
+local RaceFlagManager = RaceFlagManager
+local RaceFlagManager_setRaceFlag = RaceFlagManager.setRaceFlag
+local RaceFlagManager_removeRaceFlag = RaceFlagManager.removeRaceFlag
+local SettingsWindow = SettingsWindow
+local SettingsWindow_draw = SettingsWindow.draw
+
+
+
+
 -- local ENABLE_CUSTOM_AI_FLOOD_MANAGER = false
 
 local FRENET_DEBUGGING = false
 local FRENET_DEBUGGING_CAR_INDEX = 0
 
+local CAN_APP_RUN = Constants.CAN_APP_RUN
+
+
+local storage = StorageManager.getStorage()
+local storage_Debugging = StorageManager.getStorage_Debugging()
+
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
 ---
 local function awake()
-  if (not Constants.CAN_APP_RUN) then
+  if (not CAN_APP_RUN) then
     Logger.log('App can not run.  Online? ' .. tostring(Constants.IS_ONLINE))
     return
   end
 
   -- Logger.log('Initializing')
-  CarManager.ensureDefaults(0) -- ensure defaults on local player car
+  CarManager_ensureDefaults(0) -- ensure defaults on local player car
 
   -- Logger.log(ac.getTrackFullID())
   -- Logger.log(ac.getSim().raceSessionType)
@@ -135,7 +188,7 @@ local function awake()
   end
 
   -- Collect some initial data about all the cars
-  for i, car in ac.iterateCars() do
+  for i, car in ac_iterateCars() do
     local carIndex = car.index
     local originalCarAIAggression = car.aiAggression
     local originalCarAILevel = car.aiLevel
@@ -150,21 +203,22 @@ end
 awake()
 
 local function shouldAppRun()
-    local storage = StorageManager.getStorage()
+    -- local storage = StorageManager.getStorage()
     return
-        Constants.CAN_APP_RUN
+        CAN_APP_RUN
+        -- and storage.enabled
         and storage.enabled
 end
 
 ---The callback function for when a car collision event occurs
 ---@param carIndex integer
 OnCarEventManager.OnCarEventExecutions[OnCarEventManager.OnCarEventType.Collision] = function (carIndex)
-  local storage = StorageManager.getStorage()
+  -- local storage = StorageManager.getStorage()
   if storage.handleAccidents then
       -- Register an accident for the car collision
-      local car = ac.getCar(carIndex)
+      local car = ac_getCar(carIndex)
       if not car then
-          Logger.error(string.format('OnCarEventManager: OnCarEventType.Collision called for invalid car index %d', carIndex))
+          Logger_error(string_format('OnCarEventManager: OnCarEventType.Collision called for invalid car index %d', carIndex))
           return
       end
 
@@ -176,7 +230,7 @@ OnCarEventManager.OnCarEventExecutions[OnCarEventManager.OnCarEventType.Collisio
 
       CarStateMachine.informAboutAccident(accidentIndex)
       --]====]
-      AccidentManager.registerCollision(carIndex, car.collisionPosition, car.collidedWith)
+      AccidentManager_registerCollision(carIndex, car.collisionPosition, car.collidedWith)
   end
 end
 
@@ -184,7 +238,7 @@ end
 ---@param carIndex integer
 OnCarEventManager.OnCarEventExecutions[OnCarEventManager.OnCarEventType.Jumped] = function (carIndex)
   -- Inform the accident manager about the car reset
-  AccidentManager.informAboutCarReset(carIndex)
+  AccidentManager_informAboutCarReset(carIndex)
 
   -- finally reset all our car data
   if not CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] then
@@ -195,7 +249,7 @@ end
 -- Monitor car collisions so we can register an accident
 ac.onCarCollision(-1, function (carIndex)
     if (not shouldAppRun()) then return end
-    local car = ac.getCar(carIndex)
+    local car = ac_getCar(carIndex)
     if not car then return end
 
     OnCarEventManager.enqueueOnCarEvent(OnCarEventManager.OnCarEventType.Collision, carIndex)
@@ -204,7 +258,7 @@ end)
 -- Monitor flood ai cars cycle event so that we also reset our state
 ac.onCarJumped(-1, function(carIndex)
     if (not shouldAppRun()) then return end
-    local car = ac.getCar(carIndex)
+    local car = ac_getCar(carIndex)
     if not car then return end
 
     OnCarEventManager.enqueueOnCarEvent(OnCarEventManager.OnCarEventType.Jumped, carIndex)
@@ -215,23 +269,23 @@ end)
 -- wiki: function to be called each frame to draw window content
 ---
 function script.MANIFEST__FUNCTION_MAIN(dt)
-  ui.textColored("Realistic Trackday allows you to alter the AI cars' behavior to act more like humans driving during a track day event by yielding to faster cars and overtaking slower cars.", ColorManager.RGBM_Colors.WhiteSmoke)
-  ui.newLine(1)
+  ui_textColored("Realistic Trackday allows you to alter the AI cars' behavior to act more like humans driving during a track day event by yielding to faster cars and overtaking slower cars.", ColorManager.RGBM_Colors.WhiteSmoke)
+  ui_newLine(1)
 
   -- Show the missing CSP elements error message if needed
   if anyMissingCSPElements then
-    ui.textColored(missingCSPElementsErrorMessage, rgbm(1, 0, 0, 1))
-    ui.newLine(1)
-    ui.separator()
-    ui.newLine(1)
+    ui_textColored(missingCSPElementsErrorMessage, rgbm(1, 0, 0, 1))
+    ui_newLine(1)
+    ui_separator()
+    ui_newLine(1)
   end
 
-  AppIconRenderer.draw()
+  AppIconRenderer_draw()
 
-  if ui.button('Modify Settings') then
-    UIManager.toggleSettingsWindow()
+  if ui_button('Modify Settings') then
+    UIManager_toggleSettingsWindow()
   end
-  ui.newLine(1)
+  ui_newLine(1)
 
   -- If the app is not running, show a message and stop drawing further UI
   if (not shouldAppRun()) then
@@ -242,11 +296,11 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   -- ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[RaceTrackManager.getYieldingSide()]))
   -- ui.newLine(1)
 
-  UIManager.drawMainWindowLateralOffsetsSection()
+  UIManager_drawMainWindowLateralOffsetsSection()
 
-  ui.newLine(1)
+  ui_newLine(1)
 
-  UIManager.drawUICarList()
+  UIManager_drawUICarList()
 end
 
 local frenetOffsets = {}
@@ -257,7 +311,7 @@ local frenetOffsets = {}
 function script.MANIFEST__UPDATE(dt)
   if (not shouldAppRun()) then return end
 
-  local sim = ac.getSim()
+  local sim = ac_getSim()
   if sim.isPaused then return end
 
   -------------------
@@ -275,26 +329,26 @@ function script.MANIFEST__UPDATE(dt)
   --]====]
   -------------------
 
-  local storage = StorageManager.getStorage()
-  local playerCar = ac.getCar(0)
+  -- local storage = StorageManager.getStorage()
+  -- local playerCar = ac_getCar(0)
 
   -- check if the player is coming up to an accident so we can set a caution flag
   -- local isPlayerComingUpToAccidentIndex = AccidentManager.isCarComingUpToAccident(playerCar, storage.distanceFromAccidentToSeeYellowFlag_meters)
   -- if isPlayerComingUpToAccidentIndex then
-  local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()
+  local cameraFocusedCarIndex = CameraManager_getFocusedCarIndex()
   -- Logger.log(string.format("Camera focused car index is %d", cameraFocusedCarIndex or -1))
-  local cameraFocusedCar = ac.getCar(cameraFocusedCarIndex)
+  local cameraFocusedCar = ac_getCar(cameraFocusedCarIndex)
   if cameraFocusedCar then
     local cameraFocusedCarSplinePosition = cameraFocusedCar.splinePosition
-    local isFocusedCarInYellowFlagZone = RaceTrackManager.isSplinePositionInYellowZone(cameraFocusedCarSplinePosition)
+    local isFocusedCarInYellowFlagZone = RaceTrackManager_isSplinePositionInYellowZone(cameraFocusedCarSplinePosition)
     if isFocusedCarInYellowFlagZone then
-      RaceFlagManager.setRaceFlag(ac.FlagType.Caution)
+      RaceFlagManager_setRaceFlag(ac.FlagType.Caution)
     else
-      RaceFlagManager.removeRaceFlag()
+      RaceFlagManager_removeRaceFlag()
     end
   end
   -- local playerCarSplinePosition = playerCar.splinePosition
-  -- local isPlayerInYellowFlagZone = RaceTrackManager.isSplinePositionInYellowZone(playerCarSplinePosition)
+  -- local isPlayerInYellowFlagZone = RaceTrackManager_isSplinePositionInYellowZone(playerCarSplinePosition)
   -- if isPlayerInYellowFlagZone then
     -- RaceFlagManager.setRaceFlag(ac.FlagType.Caution)
   -- else
@@ -304,13 +358,13 @@ function script.MANIFEST__UPDATE(dt)
   -- build the sorted car list and do any per-car operations that doesn't require the sorted list
   ---@type table<integer,ac.StateCar>
   local carList = {}
-  for i, car in ac.iterateCars() do
+  for i, car in ac_iterateCars() do
     carList[i] = car
 
     local carIndex = car.index
-    CarManager.ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
+    CarManager_ensureDefaults(carIndex) -- Ensure defaults are set if this car hasn't been initialized yet
 
-    CarManager.saveCarSpeed(car)
+    CarManager_saveCarSpeed(car)
 
     -- clear the reason why we can't yield/overtake for this car, we'll re-set it below if needed
     CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
@@ -320,14 +374,14 @@ function script.MANIFEST__UPDATE(dt)
     -- if isCarComingUpToAccident then
     -- end
   end
-  local sortedCars = CarManager.sortCarListByTrackPosition(carList)
+  local sortedCars = CarManager_sortCarListByTrackPosition(carList)
 
   -- save a reference to the current sorted cars list for other parts of the app to use
   CarManager.currentSortedCarsList = sortedCars
 
   -- handle any queued accidents before updating the car state machines
   OnCarEventManager.processQueuedEvents()
-  CarStateMachine.handleQueuedAccidents() -- todo: check if this can be integrated with the processQueuedEvents() above
+  CarStateMachine_handleQueuedAccidents() -- todo: check if this can be integrated with the processQueuedEvents() above
 
   local totalCars = #sortedCars
   for i = 1, totalCars do
@@ -336,7 +390,7 @@ function script.MANIFEST__UPDATE(dt)
     CarManager.sortedCarList_carIndexToSortedIndex[carIndex] = i -- save the mapping of carIndex to sorted list index
     if car.isAIControlled then -- including the player car if it's AI controlled
       -- execute the state machine for this car
-      CarStateMachine.updateCar(carIndex, dt, sortedCars, i, storage)
+      CarStateMachine_updateCar(carIndex, dt, sortedCars, i, storage)
 
       -- local carState = CarStateMachine.getCurrentState(carIndex)
       -- local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
@@ -350,18 +404,18 @@ function script.MANIFEST__UPDATE(dt)
     -- CustomAIFloodManager.handleFlood(sortedCars, localPlayerSortedCarListIndex)
   -- end
 
-  RaceTrackManager.updateYellowFlagZones()
+  RaceTrackManager_updateYellowFlagZones()
 
   if FRENET_DEBUGGING then
     frenetOffsets = FrenetAvoid.computeOffsetsForAll(sortedCars, dt, frenetOffsets)
 
-    local playerCar = ac.getCar(FRENET_DEBUGGING_CAR_INDEX)
+    local playerCar = ac_getCar(FRENET_DEBUGGING_CAR_INDEX)
     if playerCar then -- if-block only to satisfty the linter because player 0 car always exists
       --local offset = FrenetAvoid.computeOffset(sortedCars, playerCar, dt)
       local offset = frenetOffsets[FRENET_DEBUGGING_CAR_INDEX+1]
-      Logger.log(string.format("Setting player car frenet offset to %.2f", offset))
+      Logger.log(string_format("Setting player car frenet offset to %.2f", offset))
       CarOperations.driveSafelyToSide(FRENET_DEBUGGING_CAR_INDEX, dt, playerCar, offset, 500, true, false, false)  -- empty storage since we don't need to save anything for the player car
-      Logger.log(string.format("Player car frenet offset set to %.2f", offset))
+      Logger.log(string_format("Player car frenet offset set to %.2f", offset))
     end
   end
 end
@@ -413,15 +467,15 @@ end)
 ---
 function script.MANIFEST__TRANSPARENT(dt)
   if (not shouldAppRun()) then return end
-  local storage_Debugging = StorageManager.getStorage_Debugging()
+  -- local storage_Debugging = StorageManager.getStorage_Debugging()
 
   if storage_Debugging.debugDrawSideOfftrack then
-    for i, car in ac.iterateCars() do
+    for i, car in ac_iterateCars() do
       local carIndex = car.index
       CarOperations.renderCarSideOffTrack(carIndex)
     end
   end
-  UIManager.drawCarStateOverheadText()
+  UIManager_drawCarStateOverheadText()
 
   -- render.debugSphere(playerCarPosition, 1, rgbm(1, 0, 0, 1))
   -- render.debugBox(playerCarPosition + vec3(0, 1, 0), vec3(1, 1, 1), rgbm(0, 1, 0, 1))
@@ -486,11 +540,11 @@ function script.MANIFEST__TRANSPARENT(dt)
   if storage_Debugging.debugShowRaycastsWhileDrivingLaterally then
     local debugCarStateOverheadShowDistance = storage_Debugging.debugCarGizmosDrawistance
     local debugCarStateOverheadShowDistanceSqr = debugCarStateOverheadShowDistance * debugCarStateOverheadShowDistance
-    local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()
-    local cameraFocusedCar = ac.getCar(cameraFocusedCarIndex)
+    local cameraFocusedCarIndex = CameraManager_getFocusedCarIndex()
+    local cameraFocusedCar = ac_getCar(cameraFocusedCarIndex)
     if cameraFocusedCar then
       local cameraFocusedCarPosition = cameraFocusedCar.position
-      for i, car in ac.iterateCars() do
+      for i, car in ac_iterateCars() do
         local carIndex = car.index
         local distanceFromCameraFocusedCarToThisCarSqr = MathHelpers.distanceBetweenVec3sSqr(car.position, cameraFocusedCarPosition)
         local isThisCarCloseToCameraFocusedCar = distanceFromCameraFocusedCarToThisCarSqr < debugCarStateOverheadShowDistanceSqr
@@ -513,9 +567,9 @@ end
 -- wiki: function to be called to draw content of corresponding settings window (only with “SETTINGS” flag)
 ---
 function script.MANIFEST__FUNCTION_SETTINGS()
-  if (not Constants.CAN_APP_RUN) then return end
+  if (not CAN_APP_RUN) then return end
 
-  SettingsWindow.draw()
+  SettingsWindow_draw()
 end
 
 --[=====[ 
