@@ -3,7 +3,8 @@ local CarManager = {}
 -- Andreas: used while still writing the accident system
 local DISABLE_ACCIDENTCOLLISION_DETECTION = true
 
-local CAR_SPEEDS_BUFFER_SIZE = 600
+-- local CAR_SPEEDS_BUFFER_SIZE = 600
+local CAR_SPEEDS_BUFFER_SIZE = 300
 
 ---@type table<integer,boolean>
 CarManager.cars_initialized = {}
@@ -241,7 +242,8 @@ CarManager.getDefaultAIAggression = function(carIndex)
 end
 
 -- local SIDE_DETERMINATION_THRESHOLD = 0.1
-local SIDE_DETERMINATION_THRESHOLD = 0.3
+-- local SIDE_DETERMINATION_THRESHOLD = 0.3
+local SIDE_DETERMINATION_THRESHOLD = 0
 
 --- returns a boolean value indicating whether the car is on the overtaking lane
 ---@param carIndex number
