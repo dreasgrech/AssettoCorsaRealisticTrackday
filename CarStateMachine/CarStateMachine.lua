@@ -3,6 +3,11 @@
 --]====]
 local CarStateMachine = {}
 
+-- bindings
+-- local ac = ac
+local table = table
+local table_clear = table.clear
+
 -- local LOG_CAR_STATEMACHINE_IN_CSP_LOG = true
 local LOG_CAR_STATEMACHINE_IN_CSP_LOG = false
 
@@ -230,10 +235,10 @@ end
 ---@param sortedCarList table<integer,ac.StateCar>
 ---@param sortedCarListIndex integer #1-based index of the car in sortedCarList
 -- ---@param storage StorageTable
-CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListIndex)--, storage)
+CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListIndex)
     -- CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
     CarManager.cars_totalSideBlockRaysData[carIndex] = 0
-    table.clear(CarManager.cars_sideBlockRaysData[carIndex])
+    table_clear(CarManager.cars_sideBlockRaysData[carIndex])
 
     -- check if there's a new state we need to transition into
     local newStateToTransitionIntoThisFrame = queuedStatesToTransitionInto[carIndex]
