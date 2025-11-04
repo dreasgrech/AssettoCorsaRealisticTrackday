@@ -60,7 +60,7 @@ local LABEL_LEFT_TEXT            = "L"
 local LABEL_CENTER_TEXT          = "0"
 local LABEL_RIGHT_TEXT           = "R"
 local CAPTION_DEFAULT_TEXT       = "Default"
-local CAPTION_YIELDING_TEXT      = "Yielding"
+local CAPTION_YIELDING_TEXT      = "Yield"
 local CAPTION_OVERTAKE_TEXT      = "Overtake"
 
 local function clampNorm(x)
@@ -183,7 +183,7 @@ function UILateralOffsetsImageWidget.draw(storage)
     ui.dwriteDrawText(CAPTION_DEFAULT_TEXT,  CAPTION_FONT_SIZE, vec2(xDefault  - 20, yDefault  + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
 
     if handleYielding then
-        ui.dwriteDrawText(CAPTION_YIELDING_TEXT, CAPTION_FONT_SIZE, vec2(xYielding - 20, yYielding + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
+        ui.dwriteDrawText(CAPTION_YIELDING_TEXT, CAPTION_FONT_SIZE, vec2(xYielding - 13, yYielding + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
     end
 
     if handleOvertaking then
