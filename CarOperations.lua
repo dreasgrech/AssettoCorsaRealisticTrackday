@@ -249,14 +249,14 @@ function CarOperations.isFirstCarBehindSecondCar(firstCar, secondCar)
     -- return MathHelpers.dot(aiCarFwd, rel) < 0
 end
 
----Returns a boolean value indicating whether the first car is currently faster than the second car.
----@param firstCar ac.StateCar
----@param secondCar ac.StateCar
----@param firstCarSpeedLeeway number @The extra speed that's allowed to the second car to still be considered "faster".
----@return boolean
-function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCar, firstCarSpeedLeeway)
-  return firstCar.speedKmh > secondCar.speedKmh + firstCarSpeedLeeway
-end
+-- ---Returns a boolean value indicating whether the first car is currently faster than the second car.
+-- ---@param firstCar ac.StateCar
+-- ---@param secondCar ac.StateCar
+-- ---@param firstCarSpeedLeeway number @The extra speed that's allowed to the second car to still be considered "faster".
+-- ---@return boolean
+-- function CarOperations.isFirstCarCurrentlyFasterThanSecondCar(firstCar, secondCar, firstCarSpeedLeeway)
+  -- return firstCar.speedKmh > secondCar.speedKmh + firstCarSpeedLeeway
+-- end
 
 ---Returns a boolean value indicating whether the first car is faster than the second car.
 ---@param firstCarIndex integer
