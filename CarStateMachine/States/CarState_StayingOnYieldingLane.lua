@@ -9,14 +9,43 @@ ac.log(string.format("Const value is %d", v))
 
 -- bindings
 local ac = ac
+local ac_getCar = ac.getCar
+local string = string
+local string_format = string.format
+local math = math
+local math_min = math.min
+local math_max = math.max
+local Logger = Logger
+local Logger_warn = Logger.warn
+local Logger_error = Logger.error
 local CarManager = CarManager
-local StorageManager = StorageManager
-local CarStateMachine = CarStateMachine
+local CarManager_isCarDrivingOnSide = CarManager.isCarDrivingOnSide
 local CarOperations = CarOperations
+local CarOperations_setAICaution = CarOperations.setAICaution
+local CarOperations_toggleTurningLights = CarOperations.toggleTurningLights
+local CarOperations_isSecondCarClearlyAhead = CarOperations.isSecondCarClearlyAhead
+local CarOperations_removeAICaution = CarOperations.removeAICaution
+local CarOperations_setAIThrottleLimit = CarOperations.setAIThrottleLimit
+local CarOperations_setAITopSpeed = CarOperations.setAITopSpeed
+local CarOperations_resetAIThrottleLimit = CarOperations.resetAIThrottleLimit
+local CarOperations_removeAITopSpeed = CarOperations.removeAITopSpeed
+local CarOperations_yieldSafelyToSide = CarOperations.yieldSafelyToSide
+local CarOperations_isSecondCarClearlyBehindFirstCar = CarOperations.isSecondCarClearlyBehindFirstCar
+local CarOperations_isFirstCarFasterThanSecondCar = CarOperations.isFirstCarFasterThanSecondCar
+local CarOperations_resetPedalPosition = CarOperations.resetPedalPosition
+local CarStateMachine = CarStateMachine
+local CarStateMachine_handleYellowFlagZone = CarStateMachine.handleYellowFlagZone
+local CarStateMachine_setStateExitReason = CarStateMachine.setStateExitReason
+local CarStateMachine_handleShouldWeYieldToBehindCar = CarStateMachine.handleShouldWeYieldToBehindCar
+local CarStateMachine_setReasonWhyCantYield = CarStateMachine.setReasonWhyCantYield
 local RaceTrackManager = RaceTrackManager
+local RaceTrackManager_getOvertakingSide = RaceTrackManager.getOvertakingSide
+local StorageManager = StorageManager
+local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
 local Strings = Strings
 local MathHelpers = MathHelpers
-local Logger = Logger
+local MathHelpers_distanceBetweenVec3sSqr = MathHelpers.distanceBetweenVec3sSqr
+
 
 local STATE = CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE
 
@@ -38,10 +67,10 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   -- make sure the state before us has saved the carIndex of the car we're yielding to
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
   if not currentlyYieldingToCarIndex then
-    Logger.error(string.format('Car %d in state StayingOnYieldingLane but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
+    Logger_error(string_format('Car %d in state StayingOnYieldingLane but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
   end
 
-  CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
+  CarStateMachine_setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
 end
 
 -- UPDATE FUNCTION
@@ -53,25 +82,25 @@ end
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       -- local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
-      local carWeAreCurrentlyYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
+      local carWeAreCurrentlyYieldingTo = ac_getCar(currentlyYieldingToCarIndex)
 
       -- if the car we're yielding to doesn't exist anymore, don't do anything and then we'll transition out of this state in the transition function
       if not carWeAreCurrentlyYieldingTo then
         return
       end
 
-      local storage_Yielding = StorageManager.getStorage_Yielding()
+      local storage_Yielding = StorageManager_getStorage_Yielding()
 
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       -- make the yielding car leave more space in between the car in front while driving on the yielding lane
-      CarOperations.setAICaution(carIndex, CarManager.AICautionValues.YIELDING)
+      CarOperations_setAICaution(carIndex, CarManager.AICautionValues.YIELDING)
 
       local car = sortedCarsList[sortedCarsListIndex]
       local carPosition = car.position
       local carWeAreCurrentlyYieldingToPosition = carWeAreCurrentlyYieldingTo.position
       -- local distanceBetweenCars = MathHelpers.distanceBetweenVec3s(carPosition, carWeAreCurrentlyYieldingToPosition)
-      local distanceBetweenCarsSqr = MathHelpers.distanceBetweenVec3sSqr(carPosition, carWeAreCurrentlyYieldingToPosition)
+      local distanceBetweenCarsSqr = MathHelpers_distanceBetweenVec3sSqr(carPosition, carWeAreCurrentlyYieldingToPosition)
       
       -- if the overtaking car is very close behind us, limit our speed to let it pass more easily
       -- local limitSpeedToLetOvertakingCarPass = distanceBetweenCars < 10
@@ -80,14 +109,14 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local limitSpeedToLetOvertakingCarPass = distanceBetweenCarsSqr < distanceToOvertakingCarToLimitSpeedSqr
       if limitSpeedToLetOvertakingCarPass then
         -- limit the yielding car throttle while driving on the yielding lane
-        CarOperations.setAIThrottleLimit(carIndex, 0.5)
+        CarOperations_setAIThrottleLimit(carIndex, 0.5)
 
         local speedLimitValueToOvertakingCar = storage_Yielding.speedLimitValueToOvertakingCar
         -- local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)
-        local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*speedLimitValueToOvertakingCar)
+        local topSpeed = math_min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*speedLimitValueToOvertakingCar)
         -- topSpeed = math.max(topSpeed, 60) -- don't let the top speed drop too much
-        topSpeed = math.max(topSpeed, storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar) -- don't let the top speed drop too much
-        CarOperations.setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
+        topSpeed = math_max(topSpeed, storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar) -- don't let the top speed drop too much
+        CarOperations_setAITopSpeed(carIndex, topSpeed) -- limit the yielding car top speed based on the overtaking car speed while driving on the yielding lane
         
         -- press some brake to help slow down the car a bit because the top speed limit is broken in csp atm in trackday ai flood mode
         -- Andreas: be careful about this because if the ai keeps on pressing the gas while we're pressing the brake here, the car can spin out...
@@ -95,13 +124,13 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
         -- CarOperations.setPedalPosition(carIndex, CarOperations.CarPedals.Gas, 0.8)
       else
         -- reset the yielding car throttle limit since we're no longer close to the overtaking car
-        CarOperations.resetAIThrottleLimit(carIndex)
-        CarOperations.removeAITopSpeed(carIndex)
+        CarOperations_resetAIThrottleLimit(carIndex)
+        CarOperations_removeAITopSpeed(carIndex)
       end
 
       -- continue driving to the yielding side so that if we got pushed a bit off the side, we drive back to the correct side
       local useIndicatorLights = storage_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane
-      local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
+      local droveSafelyToSide = CarOperations_yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
 
 -- TRANSITION FUNCTION
@@ -114,9 +143,9 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local car = sortedCarsList[sortedCarsListIndex]
 
       -- check if we're now in a yellow flag zone
-      local newStateDueToYellowFlagZone = CarStateMachine.handleYellowFlagZone(carIndex, car)
+      local newStateDueToYellowFlagZone = CarStateMachine_handleYellowFlagZone(carIndex, car)
       if newStateDueToYellowFlagZone then
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
         return newStateDueToYellowFlagZone
       end
 
@@ -147,10 +176,10 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
       --]====]
 
-      local storage_Yielding = StorageManager.getStorage_Yielding()
+      local storage_Yielding = StorageManager_getStorage_Yielding()
 
       -- Check again if we should yield to a new car behind us
-      local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
+      local newStateDueToCarBehind = CarStateMachine_handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
       if newStateDueToCarBehind then
         -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
         -- CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
@@ -160,45 +189,45 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
 
       local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
-      local carWeAreYieldingTo = ac.getCar(currentlyYieldingToCarIndex)
+      local carWeAreYieldingTo = ac_getCar(currentlyYieldingToCarIndex)
 
       -- if we don't have an overtaking car anymore, we can ease out our yielding
       if not carWeAreYieldingTo then
         -- CarStateMachine.setStateExitReason(carIndex, 'No overtaking car so not staying on yielding lane')
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarNoLongerExists)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.OvertakingCarNoLongerExists)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       -- If the yielding car is yielding and the overtaking car is now clearly ahead, we can ease out our yielding
-      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations.isSecondCarClearlyAhead(car, carWeAreYieldingTo, storage.clearAhead_meters)
+      local isOvertakingCarClearlyAheadOfYieldingCar = CarOperations_isSecondCarClearlyAhead(car, carWeAreYieldingTo, storage.clearAhead_meters)
       if isOvertakingCarClearlyAheadOfYieldingCar then
         -- CarStateMachine.setStateExitReason(carIndex, 'Overtaking car is clearly ahead of us so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyAhead)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyAhead)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       -- if the overtaking car is far enough back, then we can begin easing out
-      local isOvertakingCarClearlyBehindYieldingCar = CarOperations.isSecondCarClearlyBehindFirstCar(car, carWeAreYieldingTo, storage_Yielding.detectCarBehind_meters)
+      local isOvertakingCarClearlyBehindYieldingCar = CarOperations_isSecondCarClearlyBehindFirstCar(car, carWeAreYieldingTo, storage_Yielding.detectCarBehind_meters)
       if isOvertakingCarClearlyBehindYieldingCar then
         -- CarStateMachine.setStateExitReason(carIndex, 'Overtaking car is clearly behind us so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyBehind)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyBehind)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       --  if we're currently faster than the car trying to overtake us, we can ease out our yielding
       -- local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarCurrentlyFasterThanSecondCar(car, carWeAreYieldingTo, OVERTAKING_CAR_FASTER_LEEWAY)
-      local isYieldingCarFasterThanOvertakingCar = CarOperations.isFirstCarFasterThanSecondCar(carIndex, currentlyYieldingToCarIndex, OVERTAKING_CAR_FASTER_LEEWAY)
+      local isYieldingCarFasterThanOvertakingCar = CarOperations_isFirstCarFasterThanSecondCar(carIndex, currentlyYieldingToCarIndex, OVERTAKING_CAR_FASTER_LEEWAY)
       if isYieldingCarFasterThanOvertakingCar then
         -- CarStateMachine.setStateExitReason(carIndex, 'We are now faster than the car behind, so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingCarIsFasterThenOvertakingCar)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.YieldingCarIsFasterThenOvertakingCar)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 
       -- if the car we're yielding to is no longer on the overtaking lane, we can ease out our yielding
-      local carWeAreYieldingToDrivingOnOvertakingLane = CarManager.isCarDrivingOnSide(currentlyYieldingToCarIndex, RaceTrackManager.getOvertakingSide())
+      local carWeAreYieldingToDrivingOnOvertakingLane = CarManager_isCarDrivingOnSide(currentlyYieldingToCarIndex, RaceTrackManager_getOvertakingSide())
       if not carWeAreYieldingToDrivingOnOvertakingLane then
         -- CarStateMachine.setStateExitReason(carIndex, 'Overtaking car no longer on overtaking lane, so easing out yield')
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarNotOnOvertakingSide)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.OvertakingCarNotOnOvertakingSide)
         return CarStateMachine.CarStateType.EASING_OUT_YIELD
       end
 end
@@ -210,10 +239,10 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-  CarOperations.removeAICaution(carIndex)
-  CarOperations.removeAITopSpeed(carIndex)
-  CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
-  CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
-  CarOperations.resetAIThrottleLimit(carIndex)
-  CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
+  CarOperations_removeAICaution(carIndex)
+  CarOperations_removeAITopSpeed(carIndex)
+  CarOperations_resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
+  CarOperations_resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
+  CarOperations_resetAIThrottleLimit(carIndex)
+  CarOperations_toggleTurningLights(carIndex, ac.TurningLights.None)
 end
