@@ -378,7 +378,6 @@ end
 -- end
 
 function UIManager.drawCarStateOverheadText()
-  --local storage = StorageManager.getStorage()
   local storage_Debugging = StorageManager.getStorage_Debugging()
   if not storage_Debugging.debugShowCarStateOverheadText then return end
   local sim = ac.getSim()
@@ -497,7 +496,6 @@ UIManager.drawMainWindowLateralOffsetsSection = function()
 end
 
 UIManager.drawAppNotRunningMessageInMainWindow = function()
-    local storage = StorageManager.getStorage()
     ui.textColored(string.format('Realistic Trackday not running.', tostring(storage.enabled), tostring(Constants.IS_ONLINE)), ColorManager.RGBM_Colors.Red)
     ui.newLine(1)
 
