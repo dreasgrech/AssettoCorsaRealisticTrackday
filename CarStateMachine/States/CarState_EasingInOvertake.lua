@@ -86,7 +86,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
     -- ease in to the overtaking lane
-    local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
+    local useIndicatorLights = true
+    local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
 
 -- TRANSITION FUNCTION

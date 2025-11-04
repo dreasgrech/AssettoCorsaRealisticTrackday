@@ -54,7 +54,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarsList[sortedCarsListIndex]
 
       -- Keep driving towards the default lateral offset to try and keep the lane as much as possible
-      CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
+      CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true, false)
 end
 
 -- TRANSITION FUNCTION

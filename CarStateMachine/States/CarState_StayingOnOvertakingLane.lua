@@ -34,7 +34,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     end
 
     -- keep driving to the overtaking side even while staying on the overtaking lane since sometimes the cars still end up drifting back to the normal lanes mostly because of high speed corners
-    local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
+    local useIndicatorLights = true
+    local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
 
 --- TRANSITION FUNCTION

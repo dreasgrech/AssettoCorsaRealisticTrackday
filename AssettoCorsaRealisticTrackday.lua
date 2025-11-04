@@ -360,7 +360,7 @@ function script.MANIFEST__UPDATE(dt)
       --local offset = FrenetAvoid.computeOffset(sortedCars, playerCar, dt)
       local offset = frenetOffsets[FRENET_DEBUGGING_CAR_INDEX+1]
       Logger.log(string.format("Setting player car frenet offset to %.2f", offset))
-      CarOperations.driveSafelyToSide(FRENET_DEBUGGING_CAR_INDEX, dt, playerCar, offset, 500, true, false)  -- empty storage since we don't need to save anything for the player car
+      CarOperations.driveSafelyToSide(FRENET_DEBUGGING_CAR_INDEX, dt, playerCar, offset, 500, true, false, false)  -- empty storage since we don't need to save anything for the player car
       Logger.log(string.format("Player car frenet offset set to %.2f", offset))
     end
   end

@@ -403,9 +403,10 @@ end
 ---@param rampSpeed_mps number @The speed at which to ramp up the lateral offset.
 ---@param overrideAiAwareness boolean @Whether to override AI awareness.
 ---@param sideCheck boolean @Whether to check if the side is safe to drive to.
+---@param useIndicatorLights boolean @Whether to use indicator lights while driving to the side.
 ---@return boolean
 -- function CarOperations.driveSafelyToSide(carIndex, dt, car, side, driveToSideMaxOffset, rampSpeed_mps, overrideAiAwareness, sideCheck)
-function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset, rampSpeed_mps, overrideAiAwareness, sideCheck)
+function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset, rampSpeed_mps, overrideAiAwareness, sideCheck, useIndicatorLights)
     -- calculate the side we're driving to based on the car's current lateral offset and the target lateral offset
     local carPosition = car.position
     local currentActualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carPosition)
@@ -468,11 +469,13 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
       -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
       physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
-      -- keep the turning lights on while driving to the side
-      local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
-      local turningLights = drivingToTheLeft and ac.TurningLights.Left or ac.TurningLights.Right
-      -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
-      CarOperations.toggleTurningLights(carIndex, turningLights)
+      if useIndicatorLights then
+        -- keep the turning lights on while driving to the side
+        local drivingToTheLeft = side == RaceTrackManager.TrackSide.LEFT
+        local turningLights = drivingToTheLeft and ac.TurningLights.Left or ac.TurningLights.Right
+        -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
+        CarOperations.toggleTurningLights(carIndex, turningLights)
+      end
 
       CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
@@ -485,8 +488,9 @@ end
 ---@param dt number
 ---@param car ac.StateCar
 ---@param storage StorageTable
+---@param useIndicatorLights boolean
 ---@return boolean
-function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
+function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
     local storage_Overtaking = StorageManager.getStorage_Overtaking()
     local driveToSide = RaceTrackManager.getOvertakingSide()
     -- local targetOffset = storage.maxLateralOffset_normalized
@@ -497,7 +501,7 @@ function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage)
 
     -- return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
     local handleSideCheckingWhenOvertaking = storage_Overtaking.handleSideCheckingWhenOvertaking
-    return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, handleSideCheckingWhenOvertaking)
+    return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, handleSideCheckingWhenOvertaking, useIndicatorLights)
 end
 
 --- Drives the car to the yielding lane while making sure there are no cars blocking the side.
@@ -505,8 +509,9 @@ end
 ---@param dt number
 ---@param car ac.StateCar
 ---@param storage StorageTable
+---@param useIndicatorLights boolean
 ---@return boolean
-function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
+function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
       local driveToSide = RaceTrackManager.getYieldingSide()
       -- local targetOffset = storage.maxLateralOffset_normalized
       -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
@@ -517,7 +522,7 @@ function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
 
       -- return CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, overrideAiAwareness, true)
       local handleSideCheckingWhenYielding = storage_Yielding.handleSideCheckingWhenYielding
-      return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, handleSideCheckingWhenYielding)
+      return CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, overrideAiAwareness, handleSideCheckingWhenYielding, useIndicatorLights)
 end
 
 ---Calculated the overtaking car's ai caution value while overtaking another car.

@@ -100,7 +100,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       end
 
       -- continue driving to the yielding side so that if we got pushed a bit off the side, we drive back to the correct side
-      local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage)
+      local useIndicatorLights = true
+      local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
 
 -- TRANSITION FUNCTION
