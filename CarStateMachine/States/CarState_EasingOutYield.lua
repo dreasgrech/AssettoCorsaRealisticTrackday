@@ -21,7 +21,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   local car = sortedCarsList[sortedCarsListIndex]
 
   -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
-  CarManager.cars_currentSplineOffset[carIndex] = CarManager.getActualTrackLateralOffset(car.position)
+  CarManager.setCalculatedTrackLateralOffset(carIndex, CarManager.getActualTrackLateralOffset(car.position))
 
   -- remove the yielding car throttle limit since we will now start easing out the yield
   CarOperations.resetAIThrottleLimit(carIndex)

@@ -15,8 +15,16 @@ local ReasonWhyCantYield = Strings.StringNames[Strings.StringCategories.ReasonWh
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-      CarManager.cars_currentSplineOffset[carIndex] = 0
-      CarManager.cars_targetSplineOffset[carIndex] = 0
+      local car = sortedCarsList[sortedCarsListIndex]
+      local carPosition = car.position
+
+      -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
+      local actualLateralOffset = CarManager.getActualTrackLateralOffset(carPosition)
+      CarManager.setCalculatedTrackLateralOffset(carIndex, actualLateralOffset)
+
+      local targetOffset = storage.defaultLateralOffset
+      CarManager.cars_targetSplineOffset[carIndex] = targetOffset
+
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
 

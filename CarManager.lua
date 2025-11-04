@@ -140,7 +140,7 @@ CarManager.GripValues = {
 CarManager.setInitializedDefaults = function(carIndex)
   CarManager.cars_initialized[carIndex] = true
 
-  CarManager.cars_currentSplineOffset[carIndex] = 0
+  CarManager.setCalculatedTrackLateralOffset(carIndex, 0)
   CarManager.cars_targetSplineOffset[carIndex] = 0
 
   CarManager.cars_maxSideMargin[carIndex] = 0
@@ -214,10 +214,17 @@ function CarManager.ensureDefaults(carIndex)
 end
 
 --- returns the calculated spline offset of the car, which is the one we use when easing driving to the side
----@param carIndex any
----@return unknown
+---@param carIndex integer
+---@return number
 function CarManager.getCalculatedTrackLateralOffset(carIndex)
   return CarManager.cars_currentSplineOffset[carIndex]
+end
+
+---Sets the calculated track lateral offset
+---@param carIndex integer
+---@param calculatedLateralOffset number
+function CarManager.setCalculatedTrackLateralOffset(carIndex, calculatedLateralOffset)
+  CarManager.cars_currentSplineOffset[carIndex] = calculatedLateralOffset
 end
 
 -- function CarManager.getActualTrackLateralOffset(carIndex)

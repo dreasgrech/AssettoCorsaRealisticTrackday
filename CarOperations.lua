@@ -481,7 +481,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
         CarOperations.toggleTurningLights(carIndex, turningLights)
       end
 
-      CarManager.cars_currentSplineOffset[carIndex] = currentSplineOffset
+      CarManager.setCalculatedTrackLateralOffset(carIndex, currentSplineOffset)
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 
       return true
