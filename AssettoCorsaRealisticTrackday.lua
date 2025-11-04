@@ -102,8 +102,8 @@ UIManager = require("UIManager")
 -- CollisionAvoidanceManager = require("CollisionAvoidanceManager")
 FrenetAvoid = require("FrenetAvoid")
 
-SettingsWindow = require("SettingsWindow")
 UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
+SettingsWindow = require("SettingsWindow")
 
 -- bindings
 local ac = ac
