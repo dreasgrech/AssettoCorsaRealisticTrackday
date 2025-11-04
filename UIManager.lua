@@ -510,7 +510,7 @@ UIManager.drawAppNotRunningMessageInMainWindow = function()
     local isOnline = Constants.IS_ONLINE
     ui.text('Playing Online: ')
     ui.sameLine()
-    local isOnlineColor = isOnline and ColorManager.RGBM_Colors.Green or ColorManager.RGBM_Colors.Red
+    local isOnlineColor = isOnline and ColorManager.RGBM_Colors.Red or ColorManager.RGBM_Colors.Green
     ui.textColored(string.format('%s', tostring(isOnline)), isOnlineColor)
 end
 
