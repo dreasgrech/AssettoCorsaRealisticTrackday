@@ -1,3 +1,30 @@
+-- bindings
+local ac = ac
+local ac_getCar = ac.getCar
+local string = string
+local string_format = string.format
+local Logger = Logger
+local Logger_warn = Logger.warn
+local CarManager = CarManager
+local CarOperations = CarOperations
+local CarOperations_setAICaution = CarOperations.setAICaution
+local CarOperations_setAIAggression = CarOperations.setAIAggression
+local CarOperations_toggleTurningLights = CarOperations.toggleTurningLights
+local CarOperations_overtakeSafelyToSide = CarOperations.overtakeSafelyToSide
+local CarOperations_calculateAICautionAndAggressionWhileOvertaking = CarOperations.calculateAICautionAndAggressionWhileOvertaking
+local CarOperations_isSecondCarClearlyAhead = CarOperations.isSecondCarClearlyAhead
+local CarOperations_removeAICaution = CarOperations.removeAICaution
+local CarOperations_setDefaultAIAggression = CarOperations.setDefaultAIAggression
+local CarStateMachine = CarStateMachine
+local CarStateMachine_handleYellowFlagZone = CarStateMachine.handleYellowFlagZone
+local CarStateMachine_setStateExitReason = CarStateMachine.setStateExitReason
+local CarStateMachine_handleShouldWeYieldToBehindCar = CarStateMachine.handleShouldWeYieldToBehindCar
+local CarStateMachine_handleOvertakeNextCarWhileAlreadyOvertaking = CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking
+local StorageManager = StorageManager
+local StorageManager_getStorage_Overtaking = StorageManager.getStorage_Overtaking
+local Strings = Strings
+
+
 local STATE = CarStateMachine.CarStateType.STAYING_ON_OVERTAKING_LANE
 
 CarStateMachine.CarStateTypeStrings[STATE] = "StayingOnOvertakingLane"
@@ -25,18 +52,18 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local carFront = sortedCarsList[sortedCarsListIndex - 1]
     -- local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
     local yieldingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
-    local yieldingCar = ac.getCar(yieldingCarIndex)
-    local aiCaution, aiAggression = CarOperations.calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
-    CarOperations.setAICaution(carIndex, aiCaution)
+    local yieldingCar = ac_getCar(yieldingCarIndex)
+    local aiCaution, aiAggression = CarOperations_calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
+    CarOperations_setAICaution(carIndex, aiCaution)
 
     if storage.overrideOriginalAIAggression_overtaking then
-        CarOperations.setAIAggression(carIndex, aiAggression)
+        CarOperations_setAIAggression(carIndex, aiAggression)
     end
 
     -- keep driving to the overtaking side even while staying on the overtaking lane since sometimes the cars still end up drifting back to the normal lanes mostly because of high speed corners
-    local storage_Overtaking = StorageManager.getStorage_Overtaking()
+    local storage_Overtaking = StorageManager_getStorage_Overtaking()
     local useIndicatorLights = storage_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane
-    local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
+    local droveSafelyToSide = CarOperations_overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
 
 --- TRANSITION FUNCTION
@@ -49,9 +76,9 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     local car = sortedCarsList[sortedCarsListIndex]
 
     -- check if we're now in a yellow flag zone
-    local newStateDueToYellowFlagZone = CarStateMachine.handleYellowFlagZone(carIndex, car)
+    local newStateDueToYellowFlagZone = CarStateMachine_handleYellowFlagZone(carIndex, car)
     if newStateDueToYellowFlagZone then
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
         return newStateDueToYellowFlagZone
     end
 
@@ -59,13 +86,13 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
     local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
-    local currentlyOvertakingCar = ac.getCar(currentlyOvertakingCarIndex)
+    local currentlyOvertakingCar = ac_getCar(currentlyOvertakingCarIndex)
     if (not currentlyOvertakingCar) then
         -- the car we're overtaking is no longer valid, return to easing out overtake
-        Logger.warn(string.format('Car %d in state StayingOnOvertakingLane but the car it was overtaking (car %d) is no longer valid, returning to ease out overtake', carIndex, currentlyOvertakingCarIndex))
+        Logger_warn(string_format('Car %d in state StayingOnOvertakingLane but the car it was overtaking (car %d) is no longer valid, returning to ease out overtake', carIndex, currentlyOvertakingCarIndex))
         -- CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
         -- CarStateMachine.setStateExitReason(carIndex, string.format('Car %d in state StayingOnOvertakingLane but the car it was overtaking (car %d) is no longer valid, returning to ease out overtake', carIndex, currentlyOvertakingCarIndex))
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarNoLongerExists)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.OvertakingCarNoLongerExists)
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
@@ -78,7 +105,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     -- end
 
     -- If there's a different car to the one we're currently overtaking in front of us, check if we can overtake it as well
-    local newStateDueToOvertakingNextCar = CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking(carIndex, car, carFront, carBehind, storage, currentlyOvertakingCarIndex)
+    local newStateDueToOvertakingNextCar = CarStateMachine_handleOvertakeNextCarWhileAlreadyOvertaking(carIndex, car, carFront, carBehind, storage, currentlyOvertakingCarIndex)
     if newStateDueToOvertakingNextCar then
         -- CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
         -- return newStateDueToOvertakingNextCar
@@ -87,11 +114,11 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
     -- if we're now clearly ahead of the car we're overtaking, we can ease out our overtaking
     -- local areWeClearlyAheadOfCarWeAreOvertaking = CarOperations.isSecondCarClearlyAhead(carBehind, car, storage.clearAhead_meters)
-    local areWeClearlyAheadOfCarWeAreOvertaking = CarOperations.isSecondCarClearlyAhead(currentlyOvertakingCar, car, storage.clearAhead_meters)
+    local areWeClearlyAheadOfCarWeAreOvertaking = CarOperations_isSecondCarClearlyAhead(currentlyOvertakingCar, car, storage.clearAhead_meters)
     if areWeClearlyAheadOfCarWeAreOvertaking then
         -- go to trying to start easing out yield state
         -- CarStateMachine.setStateExitReason(carIndex, 'Clearly ahead of car we were overtaking so easing out overtake')
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.ClearlyAheadOfYieldingCar)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.ClearlyAheadOfYieldingCar)
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
@@ -100,10 +127,10 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     -- if the car we're overtaking is now clearly ahead of us, than we also need to ease out our overtaking
     -- local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, carBehind, storage.clearAhead_meters)
     local overtakingCarLeeway = 40
-    local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations.isSecondCarClearlyAhead(car, currentlyOvertakingCar, storage.clearAhead_meters + overtakingCarLeeway)
+    local isCarWeAreOvertakingIsClearlyAheadOfUs = CarOperations_isSecondCarClearlyAhead(car, currentlyOvertakingCar, storage.clearAhead_meters + overtakingCarLeeway)
     if isCarWeAreOvertakingIsClearlyAheadOfUs then
         -- go to trying to start easing out yield state
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyAhead)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.OvertakingCarIsClearlyAhead)
         return CarStateMachine.CarStateType.EASING_OUT_OVERTAKE
     end
 
@@ -114,11 +141,11 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         -- if the car behind us is not the same car we're overtaking, check if we should start yielding to it instead
         if not isCarBehindSameAsCarWeAreOvertaking then
             -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-            local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
+            local newStateDueToCarBehind = CarStateMachine_handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
             if newStateDueToCarBehind then
                 CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
                 -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to car #%d instead", carBehind.index))
-                CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
+                CarStateMachine_setStateExitReason(carIndex, StateExitReason.YieldingToCar)
                 return newStateDueToCarBehind
             end
         end
@@ -128,7 +155,7 @@ end
 -- EXIT FUNCTION
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     -- reset the overtaking car caution back to normal
-    CarOperations.removeAICaution(carIndex)
-    CarOperations.setDefaultAIAggression(carIndex)
-    CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
+    CarOperations_removeAICaution(carIndex)
+    CarOperations_setDefaultAIAggression(carIndex)
+    CarOperations_toggleTurningLights(carIndex, ac.TurningLights.None)
 end
