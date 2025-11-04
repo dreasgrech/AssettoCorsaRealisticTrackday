@@ -115,6 +115,8 @@ local ui_textColored = ui.textColored
 local ui_newLine = ui.newLine
 local ui_separator = ui.separator
 local ui_button = ui.button
+local math = math
+local math_min = math.min
 local Constants = Constants
 local Logger = Logger
 local Logger_error = Logger.error
@@ -135,7 +137,10 @@ local CarManager_ensureDefaults = CarManager.ensureDefaults
 local CarManager_saveCarSpeed = CarManager.saveCarSpeed
 local CarManager_sortCarListByTrackPosition = CarManager.sortCarListByTrackPosition
 local CarOperations = CarOperations
+local CarOperations_setAITopSpeed = CarOperations.setAITopSpeed
 local CarStateMachine = CarStateMachine
+local CarStateMachine_setReasonWhyCantOvertake = CarStateMachine.setReasonWhyCantOvertake
+local CarStateMachine_setReasonWhyCantYield = CarStateMachine.setReasonWhyCantYield
 local CarStateMachine_updateCar = CarStateMachine.updateCar
 local CarStateMachine_handleQueuedAccidents = CarStateMachine.handleQueuedAccidents
 local UIManager = UIManager
@@ -162,6 +167,8 @@ local CAN_APP_RUN = Constants.CAN_APP_RUN
 
 local storage = StorageManager.getStorage()
 local storage_Debugging = StorageManager.getStorage_Debugging()
+
+local math_huge = math.huge
 
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
@@ -367,8 +374,8 @@ function script.MANIFEST__UPDATE(dt)
     CarManager_saveCarSpeed(car)
 
     -- clear the reason why we can't yield/overtake for this car, we'll re-set it below if needed
-    CarStateMachine.setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
-    CarStateMachine.setReasonWhyCantOvertake(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantOvertake].None)
+    CarStateMachine_setReasonWhyCantYield(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield].None)
+    CarStateMachine_setReasonWhyCantOvertake(carIndex, Strings.StringNames[Strings.StringCategories.ReasonWhyCantOvertake].None)
 
     -- local isCarComingUpToAccident = AccidentManager.isCarComingUpToAccident(car)
     -- if isCarComingUpToAccident then
@@ -383,6 +390,11 @@ function script.MANIFEST__UPDATE(dt)
   OnCarEventManager.processQueuedEvents()
   CarStateMachine_handleQueuedAccidents() -- todo: check if this can be integrated with the processQueuedEvents() above
 
+  local globalTopSpeedLimitKmh = storage.globalTopSpeedLimitKmh
+  if globalTopSpeedLimitKmh == 0 then
+    globalTopSpeedLimitKmh = math_huge
+  end
+
   local totalCars = #sortedCars
   for i = 1, totalCars do
     local car = sortedCars[i]
@@ -395,6 +407,11 @@ function script.MANIFEST__UPDATE(dt)
       -- local carState = CarStateMachine.getCurrentState(carIndex)
       -- local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)
       -- CarManager.cars_currentlyYielding[carIndex] = aiCarCurrentlyYielding
+
+      -- Apply the global top speed limit to this car
+      local requestedCarTopSpeedLimitKmh = CarManager.cars_aiTopSpeed[carIndex]
+      local appliedCarTopSpeedLimitKmh = math_min(requestedCarTopSpeedLimitKmh, globalTopSpeedLimitKmh)
+      CarOperations_setAITopSpeed(carIndex, appliedCarTopSpeedLimitKmh)
     end
   end
 

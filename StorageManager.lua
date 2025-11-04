@@ -38,20 +38,21 @@ StorageManager.Options ={
     OverrideOriginalAIAggression_DrivingNormally = 6,
     OverrideOriginalAIAggression_Overtaking = 7,
     DefaultAIAggression = 8,
+    GlobalTopSpeedLimitKmh = 9,
 
-    DefaultLateralOffset = 9,
-    YieldingLateralOffset = 10,
-    OvertakingLateralOffset = 11,
+    DefaultLateralOffset = 10,
+    YieldingLateralOffset = 11,
+    OvertakingLateralOffset = 12,
 
-    ClearAhead_meters = 12,
+    ClearAhead_meters = 13,
 
-    CustomAIFlood_enabled = 13,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 14,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 15,
+    CustomAIFlood_enabled = 14,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 15,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 16,
 
-    HandleAccidents = 16,
-    DistanceFromAccidentToSeeYellowFlag_meters = 17,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 18,
+    HandleAccidents = 17,
+    DistanceFromAccidentToSeeYellowFlag_meters = 18,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 19,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -151,6 +152,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally, default=true, min=nil, max=false },
     { name = StorageManager.Options.OverrideOriginalAIAggression_Overtaking, default=true, min=nil, max=false },
     { name = StorageManager.Options.DefaultAIAggression, default=.5, min=0, max=0.95 }, -- The max is .95 because it's mentioned in the docs for physics.setAIAggression that the value from the launcher is multiplied by .95 so that's the max
+    { name = StorageManager.Options.GlobalTopSpeedLimitKmh, default=0, min=0, max=500 },
 
     { name = StorageManager.Options.DefaultLateralOffset, default=0, min=-1, max=1 },
     { name = StorageManager.Options.YieldingLateralOffset, default=0.8, min=-1, max=1 },
@@ -231,6 +233,7 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 ---@field overrideOriginalAIAggression_drivingNormally boolean
 ---@field overrideOriginalAIAggression_overtaking boolean
 ---@field defaultAIAggression integer
+---@field globalTopSpeedLimitKmh number
 ---@field defaultLateralOffset number
 ---@field yieldingLateralOffset number
 ---@field overtakingLateralOffset number
@@ -252,6 +255,7 @@ local storageTable = {
     overrideOriginalAIAggression_drivingNormally = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally],
     overrideOriginalAIAggression_overtaking = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_Overtaking],
     defaultAIAggression = StorageManager.options_default[StorageManager.Options.DefaultAIAggression],
+    globalTopSpeedLimitKmh = StorageManager.options_default[StorageManager.Options.GlobalTopSpeedLimitKmh],
 
     defaultLateralOffset = StorageManager.options_default[StorageManager.Options.DefaultLateralOffset],
     yieldingLateralOffset = StorageManager.options_default[StorageManager.Options.YieldingLateralOffset],

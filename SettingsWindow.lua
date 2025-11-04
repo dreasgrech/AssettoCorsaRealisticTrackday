@@ -380,10 +380,12 @@ SettingsWindow.draw = function()
     ui_dwriteText('Other', UI_HEADER_TEXT_FONT_SIZE)
     ui_newLine(1)
 
+    storage.globalTopSpeedLimitKmh = renderSlider('Global top speed limit', 'A global top speed limit applied to all AI cars.\n0  = no global top speed limit.', storage.globalTopSpeedLimitKmh, StorageManager.options_min[StorageManager.Options.GlobalTopSpeedLimitKmh], StorageManager.options_max[StorageManager.Options.GlobalTopSpeedLimitKmh], DEFAULT_SLIDER_WIDTH, '%.2f km/h')
+
     if ui_checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
     if ui_itemHovered() then ui_setTooltip('If enabled, our computed lateral offset will override the value from Kunos, otherwise our computed lateral offset adds to it. (EXPERIMENTAL)') end
 
-    storage.clearAhead_meters = renderSlider('The distance (m) which determines whether a car is far enough ahead of another car', 'When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
+    storage.clearAhead_meters = renderSlider('The distance which determines whether a car is far enough ahead of another car', 'When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.', storage.clearAhead_meters, StorageManager.options_min[StorageManager.Options.ClearAhead_meters], StorageManager.options_max[StorageManager.Options.ClearAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
     ui_separator()
 
