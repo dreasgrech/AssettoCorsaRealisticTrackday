@@ -21,8 +21,8 @@ local CarStateMachine_handleShouldWeYieldToBehindCar = CarStateMachine.handleSho
 local RaceTrackManager = RaceTrackManager
 local RaceTrackManager_getYieldingSide = RaceTrackManager.getYieldingSide
 local RaceTrackManager_getOvertakingSide = RaceTrackManager.getOvertakingSide
-local StorageManager = StorageManager
-local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
+-- local StorageManager = StorageManager
+-- local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
 local Strings = Strings
 
 
@@ -32,6 +32,8 @@ CarStateMachine.CarStateTypeStrings[STATE] = "EasingOutYield"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+
+local storage_Yielding = StorageManager.getStorage_Yielding()
 
 -- ENTRY FUNCTION
 ---@param carIndex integer
@@ -76,7 +78,6 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
       -- local easeOutYieldSide = RaceTrackManager.getOvertakingSide() -- always ease out yield to the overtaking side
       -- local targetOffset = 0
-      local storage_Yielding = StorageManager_getStorage_Yielding()
       local targetOffset = storage.defaultLateralOffset
       local rampSpeed_mps = storage_Yielding.rampRelease_mps
       -- CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
@@ -106,7 +107,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
       -- if there's a car behind us, check if we should start yielding to it
       -- jlocal newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-      local newStateDueToCarBehind = CarStateMachine_handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
+      local newStateDueToCarBehind = CarStateMachine_handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex)
       if newStateDueToCarBehind then
         -- Andreas: don't clear the cars_currentlyYieldingCarToIndex value since handleShouldWeYieldToBehindCar writes to it
         -- CarStateMachine.setStateExitReason(carIndex, string.format('Yielding to new car behind #%d instead', carBehind.index))

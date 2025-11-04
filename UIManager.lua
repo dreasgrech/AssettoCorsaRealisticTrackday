@@ -18,6 +18,10 @@ local CARLIST_ROW_BACKGROUND_COLOR_CLICKED = rgbm(1, 0, 0, 0.3)
 local CARLIST_ROW_BACKGROUND_COLOR_HOVERED = rgbm(1, 0, 0, 0.1)
 local CARLIST_ROW_TEXT_COLOR_LOCALPLAYER = ColorManager.RGBM_Colors.Violet
 
+local storage = StorageManager.getStorage()
+local storage_Yielding = StorageManager.getStorage_Yielding()
+local storage_Overtaking = StorageManager.getStorage_Overtaking()
+
 local CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE = {
   [CarStateMachine.CarStateType.DRIVING_NORMALLY] = ColorManager.RGBM_Colors.White,
   [CarStateMachine.CarStateType.EASING_IN_YIELD] = ColorManager.RGBM_Colors.LimeGreen,
@@ -453,10 +457,6 @@ UIManager.drawMainWindowLateralOffsetsSection = function()
 
     ui.columns(2, false, "mainWindow_lateralsSection")
     ui.setColumnWidth(0, 260)
-
-    local storage = StorageManager.getStorage()
-    local storage_Yielding = StorageManager.getStorage_Yielding()
-    local storage_Overtaking = StorageManager.getStorage_Overtaking()
 
     local handleYielding = storage_Yielding.handleYielding
     local handleOvertaking = storage_Overtaking.handleOvertaking

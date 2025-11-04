@@ -39,8 +39,8 @@ local CarStateMachine_handleShouldWeYieldToBehindCar = CarStateMachine.handleSho
 local CarStateMachine_setReasonWhyCantYield = CarStateMachine.setReasonWhyCantYield
 local RaceTrackManager = RaceTrackManager
 local RaceTrackManager_getOvertakingSide = RaceTrackManager.getOvertakingSide
-local StorageManager = StorageManager
-local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
+-- local StorageManager = StorageManager
+-- local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
 local Strings = Strings
 local MathHelpers = MathHelpers
 local MathHelpers_distanceBetweenVec3sSqr = MathHelpers.distanceBetweenVec3sSqr
@@ -55,6 +55,8 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 local OVERTAKING_CAR_FASTER_LEEWAY = 20 -- the leeway given to the yielding car to be considered "faster" than the car trying to overtake it.  This means that the yielding car needs to be at least this much faster than the car behind it to consider it faster
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+
+local storage_Yielding = StorageManager.getStorage_Yielding()
 
 -- ENTRY FUNCTION
 ---@param carIndex integer
@@ -87,8 +89,6 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       if not carWeAreCurrentlyYieldingTo then
         return
       end
-
-      local storage_Yielding = StorageManager_getStorage_Yielding()
 
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
@@ -176,10 +176,8 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       end
       --]====]
 
-      local storage_Yielding = StorageManager_getStorage_Yielding()
-
       -- Check again if we should yield to a new car behind us
-      local newStateDueToCarBehind = CarStateMachine_handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
+      local newStateDueToCarBehind = CarStateMachine_handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex)
       if newStateDueToCarBehind then
         -- Logger.log(string.format('[StayingOnYieldingLane] Car %d is yielding to car #%d but will now yield to new car behind #%d instead', carIndex, currentlyYieldingToCarIndex, carBehindIndex))
         -- CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)

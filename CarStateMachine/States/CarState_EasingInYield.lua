@@ -25,8 +25,8 @@ local CarStateMachine_setStateExitReason = CarStateMachine.setStateExitReason
 local RaceTrackManager = RaceTrackManager
 local RaceTrackManager_getYieldingSide = RaceTrackManager.getYieldingSide
 local StorageManager = StorageManager
-local StorageManager_getStorage_Debugging = StorageManager.getStorage_Debugging
-local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
+-- local StorageManager_getStorage_Debugging = StorageManager.getStorage_Debugging
+-- local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
 local Strings = Strings
 
 
@@ -36,6 +36,9 @@ CarStateMachine.CarStateTypeStrings[STATE] = "EasingInYield"
 CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
+
+local storage_Debugging = StorageManager.getStorage_Debugging()
+local storage_Yielding = StorageManager.getStorage_Yielding()
 
 -- ENTRY FUNCTION
 ---@param carIndex integer
@@ -67,7 +70,6 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   local turningLights = RaceTrackManager_getYieldingSide()  == RaceTrackManager.TrackSide.LEFT and ac.TurningLights.Left or ac.TurningLights.Right
   CarOperations_toggleTurningLights(carIndex, turningLights)
 
-  local storage_Debugging = StorageManager_getStorage_Debugging()
   if storage_Debugging.debugLogCarYielding then
     local currentlyYieldingToCar = ac_getCar(currentlyYieldingToCarIndex)
     if currentlyYieldingToCar then
@@ -96,7 +98,6 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       --local rampSpeed_mps = storage.rampSpeed_mps
       --local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
-      local storage_Yielding = StorageManager_getStorage_Yielding()
       local useIndicatorLights = storage_Yielding.UseIndicatorLightsWhenEasingInYield
       local droveSafelyToSide = CarOperations_yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
       if not droveSafelyToSide then

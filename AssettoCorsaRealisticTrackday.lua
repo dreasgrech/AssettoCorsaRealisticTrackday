@@ -390,7 +390,7 @@ function script.MANIFEST__UPDATE(dt)
     CarManager.sortedCarList_carIndexToSortedIndex[carIndex] = i -- save the mapping of carIndex to sorted list index
     if car.isAIControlled then -- including the player car if it's AI controlled
       -- execute the state machine for this car
-      CarStateMachine_updateCar(carIndex, dt, sortedCars, i, storage)
+      CarStateMachine_updateCar(carIndex, dt, sortedCars, i)--, storage)
 
       -- local carState = CarStateMachine.getCurrentState(carIndex)
       -- local aiCarCurrentlyYielding = (carState == CarStateMachine.CarStateType.EASING_IN_YIELD) or (carState == CarStateMachine.CarStateType.STAYING_ON_YIELDING_LANE)

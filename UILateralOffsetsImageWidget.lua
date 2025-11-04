@@ -63,6 +63,9 @@ local CAPTION_DEFAULT_TEXT       = "Default"
 local CAPTION_YIELDING_TEXT      = "Yield"
 local CAPTION_OVERTAKE_TEXT      = "Overtake"
 
+local storage_Yielding = StorageManager.getStorage_Yielding()
+local storage_Overtaking = StorageManager.getStorage_Overtaking()
+
 local function clampNorm(x)
   if x < -1 then return -1 end
   if x >  1 then return  1 end
@@ -102,9 +105,6 @@ end
 
 ---@param storage StorageTable
 function UILateralOffsetsImageWidget.draw(storage)
-  local storage_Yielding = StorageManager.getStorage_Yielding()
-  local storage_Overtaking = StorageManager.getStorage_Overtaking()
-
   -- Reserve block area from current cursor
   local cursor = ui.getCursor()
   local tl = vec2(cursor.x, cursor.y)

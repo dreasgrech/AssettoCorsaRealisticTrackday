@@ -58,6 +58,11 @@ ac.log(string.format("CarStateMachine debug_state = %d", debug_state))
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
+local storage_Yielding = StorageManager.getStorage_Yielding()
+local storage_Debugging = StorageManager.getStorage_Debugging()
+local storage_Overtaking = StorageManager.getStorage_Overtaking()
+local storage = StorageManager.getStorage()
+
 ---Changes the state of the car to the new state
 ---@param carIndex integer
 ---@param newState CarStateMachine.CarStateType
@@ -224,8 +229,8 @@ end
 ---@param dt number
 ---@param sortedCarList table<integer,ac.StateCar>
 ---@param sortedCarListIndex integer #1-based index of the car in sortedCarList
----@param storage StorageTable
-CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListIndex, storage)
+-- ---@param storage StorageTable
+CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListIndex)--, storage)
     -- CarManager.cars_anchorPoints[carIndex] = nil -- clear the anchor points each frame, they will be recalculated if needed
     CarManager.cars_totalSideBlockRaysData[carIndex] = 0
     table.clear(CarManager.cars_sideBlockRaysData[carIndex])
@@ -243,7 +248,6 @@ CarStateMachine.updateCar = function(carIndex, dt, sortedCarList, sortedCarListI
       queuedStatesToTransitionInto[carIndex] = nil
 
       -- If this is not our first state, check if we've been in the previous state for at least some time, otherwise warn because there might be an issue
-      local storage_Debugging = StorageManager.getStorage_Debugging()
       local logFastStateChanges = storage_Debugging.debugLogFastStateChanges
       if logFastStateChanges then
         local currentStateBeforeChange = CarStateMachine.getCurrentState(carIndex)
@@ -339,7 +343,6 @@ end
 -- CarStateMachine.handleShouldWeStartNavigatingAroundAccident = function(carIndex, car)
 CarStateMachine.handleYellowFlagZone = function(carIndex, car)
   -- return false
-    local storage = StorageManager.getStorage()
     local handleAccidents = storage.handleAccidents
     if not handleAccidents then
       return nil
@@ -367,10 +370,9 @@ end
 ---@param car ac.StateCar
 ---@param carFront ac.StateCar
 ---@param carBehind ac.StateCar
----@param storage StorageTable
 ---@param currentlyOvertakingCarIndex integer
 ---@return CarStateMachine.CarStateType|nil
-CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking = function(carIndex, car, carFront, carBehind, storage, currentlyOvertakingCarIndex)
+CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking = function(carIndex, car, carFront, carBehind, currentlyOvertakingCarIndex)
     if not carFront then
       return
     end
@@ -379,7 +381,7 @@ CarStateMachine.handleOvertakeNextCarWhileAlreadyOvertaking = function(carIndex,
     local carFrontIndex = carFront.index
     local isCarInFrontSameAsWeAreOvertaking = carFrontIndex == currentlyOvertakingCarIndex
     if not isCarInFrontSameAsWeAreOvertaking then
-        local newStateDueToCarInFront = CarStateMachine.handleShouldWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
+        local newStateDueToCarInFront = CarStateMachine.handleShouldWeOvertakeFrontCar(carIndex, car, carFront, carBehind)
         if newStateDueToCarInFront then
             CarStateMachine.setStateExitReason(carIndex, StateExitReason.ContinuingOvertakingNextCar)
             CarManager.cars_currentlyOvertakingCarIndex[carIndex] = carFrontIndex -- start overtaking the new car in front of us
@@ -393,10 +395,8 @@ end
 ---@param car ac.StateCar
 ---@param carBehind ac.StateCar
 ---@param carFront ac.StateCar
----@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
-CarStateMachine.handleShouldWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind, storage)
-  local storage_Overtaking = StorageManager.getStorage_Overtaking()
+CarStateMachine.handleShouldWeOvertakeFrontCar = function(carIndex, car, carFront, carBehind)
   local handleOvertaking = storage_Overtaking.handleOvertaking
   if not handleOvertaking then
     return
@@ -475,17 +475,14 @@ end
 
 ---@param car ac.StateCar
 ---@param carBehind ac.StateCar
----@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
-local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind, storage)
+local handleShouldWeYieldToBehindCar_singleCar = function(car, carBehind)
     local carIndex = car.index
 
     if CarOperations.isCarInPits(carBehind) then
       CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYieldStringNames.OvertakingCarInPits)
       return
     end
-
-    local storage_Yielding = StorageManager.getStorage_Yielding()
 
     local carBehindIndex = carBehind.index
 
@@ -570,10 +567,8 @@ end
 ---Returns the EASING_IN_YIELD state if the car passes all the checks required to start yielding to a car behind it
 ---@param sortedCarsList table<integer,ac.StateCar>
 ---@param sortedCarsListIndex integer #1-based index of the car in sortedCarList
----@param storage StorageTable
 ---@return CarStateMachine.CarStateType|nil
-CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sortedCarsListIndex, storage)
-  local storage_Yielding = StorageManager.getStorage_Yielding()
+CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sortedCarsListIndex)
   local handleYielding = storage_Yielding.handleYielding
   if not handleYielding then
     return
@@ -594,7 +589,7 @@ CarStateMachine.handleShouldWeYieldToBehindCar = function(sortedCarsList, sorted
       local distanceFromCarBehindToUsSqr = MathHelpers.distanceBetweenVec3sSqr(carBehind.position, car.position)
       local isCarBehindWithinRadius = distanceFromCarBehindToUsSqr <= detectedCarBehind_metersSqr
       if isCarBehindWithinRadius then
-        local stateDueToYield = handleShouldWeYieldToBehindCar_singleCar(car, carBehind, storage)
+        local stateDueToYield = handleShouldWeYieldToBehindCar_singleCar(car, carBehind)
         if stateDueToYield then
           return stateDueToYield
         end
