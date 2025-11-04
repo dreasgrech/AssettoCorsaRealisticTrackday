@@ -1,3 +1,25 @@
+-- bindings
+local ac = ac
+local CarManager = CarManager
+local CarManager_getActualTrackLateralOffset = CarManager.getActualTrackLateralOffset
+local CarManager_setCalculatedTrackLateralOffset = CarManager.setCalculatedTrackLateralOffset
+local CarOperations = CarOperations
+local CarOperations_removeAICaution = CarOperations.removeAICaution
+local CarOperations_setDefaultAIAggression = CarOperations.setDefaultAIAggression
+local CarOperations_toggleTurningLights = CarOperations.toggleTurningLights
+local CarOperations_resetAIThrottleLimit = CarOperations.resetAIThrottleLimit
+local CarOperations_setDefaultAIGrip = CarOperations.setDefaultAIGrip
+local CarOperations_driveSafelyToSide = CarOperations.driveSafelyToSide
+local CarOperations_isCarInPits = CarOperations.isCarInPits
+local CarStateMachine = CarStateMachine
+local CarStateMachine_handleShouldWeYieldToBehindCar = CarStateMachine.handleShouldWeYieldToBehindCar
+local CarStateMachine_handleShouldWeOvertakeFrontCar = CarStateMachine.handleShouldWeOvertakeFrontCar
+local CarStateMachine_handleYellowFlagZone = CarStateMachine.handleYellowFlagZone
+local CarStateMachine_setStateExitReason = CarStateMachine.setStateExitReason
+local CarStateMachine_setReasonWhyCantYield = CarStateMachine.setReasonWhyCantYield
+local Strings = Strings
+
+
 local STATE = CarStateMachine.CarStateType.DRIVING_NORMALLY
 
 CarStateMachine.CarStateTypeStrings[STATE] = "DrivingNormally"
@@ -7,6 +29,7 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 ---@type Strings.ReasonWhyCantYield
 local ReasonWhyCantYield = Strings.StringNames[Strings.StringCategories.ReasonWhyCantYield]
+
 
 -- ENTRY FUNCTION
 ---@param carIndex integer
@@ -19,31 +42,31 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
       local carPosition = car.position
 
       -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
-      local actualLateralOffset = CarManager.getActualTrackLateralOffset(carPosition)
-      CarManager.setCalculatedTrackLateralOffset(carIndex, actualLateralOffset)
+      local actualLateralOffset = CarManager_getActualTrackLateralOffset(carPosition)
+      CarManager_setCalculatedTrackLateralOffset(carIndex, actualLateralOffset)
 
       local targetOffset = storage.defaultLateralOffset
       CarManager.cars_targetSplineOffset[carIndex] = targetOffset
 
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
-      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
+      CarStateMachine_setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
 
       -- remove any reference to a car we may have been overtaking or yielding
       CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
       CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil
 
       -- turn off turning lights
-      CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
+      CarOperations_toggleTurningLights(carIndex, ac.TurningLights.None)
 
       -- reset the yielding car caution back to normal
-      CarOperations.removeAICaution(carIndex)
+      CarOperations_removeAICaution(carIndex)
 
-      CarOperations.setDefaultAIAggression(carIndex)
+      CarOperations_setDefaultAIAggression(carIndex)
 
       -- remove the yielding car throttle limit since we will now be driving normally
-      CarOperations.resetAIThrottleLimit(carIndex)
+      CarOperations_resetAIThrottleLimit(carIndex)
       
-      CarOperations.setDefaultAIGrip(carIndex)
+      CarOperations_setDefaultAIGrip(carIndex)
 end
 
 -- UPDATE FUNCTION
@@ -54,7 +77,7 @@ end
 ---@param storage StorageTable
 CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
       -- Keep setting this per tick because the default ai aggression can be changed from the settings
-      CarOperations.setDefaultAIAggression(carIndex)
+      CarOperations_setDefaultAIAggression(carIndex)
 
       local rampSpeed_mps = 1000 -- high value so they keep on the lane as much as possible?
       local targetOffset = storage.defaultLateralOffset
@@ -62,7 +85,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local car = sortedCarsList[sortedCarsListIndex]
 
       -- Keep driving towards the default lateral offset to try and keep the lane as much as possible
-      CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true, false)
+      CarOperations_driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true, false)
 end
 
 -- TRANSITION FUNCTION
@@ -86,7 +109,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
 
       -- don't do anything if we're in the pits
       -- TODO: This should be changed such that being in pits should have it's own separate state for the state machine
-      local areWeInPits = CarOperations.isCarInPits(car)
+      local areWeInPits = CarOperations_isCarInPits(car)
       if areWeInPits then
         return
       end
@@ -95,26 +118,26 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
       -- check if we're now in a yellow flag zone
-      local newStateDueToYellowFlagZone = CarStateMachine.handleYellowFlagZone(carIndex, car)
+      local newStateDueToYellowFlagZone = CarStateMachine_handleYellowFlagZone(carIndex, car)
       if newStateDueToYellowFlagZone then
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
         return newStateDueToYellowFlagZone
       end
 
       -- If there's a car behind us, check if we should start yielding to it
       -- local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-      local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
+      local newStateDueToCarBehind = CarStateMachine_handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
       if newStateDueToCarBehind then
         -- CarStateMachine.setStateExitReason(carIndex, string.format("Yielding to car #%d", carBehind.index))
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.YieldingToCar)
         return newStateDueToCarBehind
       end
 
       -- if there's a car in front of us, check if we can overtake it
-      local newStateDueToCarFront = CarStateMachine.handleShouldWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
+      local newStateDueToCarFront = CarStateMachine_handleShouldWeOvertakeFrontCar(carIndex, car, carFront, carBehind, storage)
       if newStateDueToCarFront then
         -- CarStateMachine.setStateExitReason(carIndex, string.format("Overtaking car #%d", carFront.index))
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.OvertakingCar)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.OvertakingCar)
         return newStateDueToCarFront
       end
 end
@@ -126,5 +149,5 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-      CarStateMachine.setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
+      CarStateMachine_setReasonWhyCantYield(carIndex, ReasonWhyCantYield.None)
 end
