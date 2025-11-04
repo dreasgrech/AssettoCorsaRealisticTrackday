@@ -50,7 +50,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local rampSpeed_mps = storage_Overtaking.overtakeRampRelease_mps
     -- CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
     local handleSideCheckingWhenOvertaking = storage_Overtaking.handleSideCheckingWhenOvertaking
-    local useIndicatorLights = true
+    local useIndicatorLights = storage_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking
     CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, handleSideCheckingWhenOvertaking, useIndicatorLights)
 end
 
@@ -138,5 +138,5 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-
+    CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
 end

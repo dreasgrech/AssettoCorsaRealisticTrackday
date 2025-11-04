@@ -77,6 +77,9 @@ StorageManager.Options_Yielding = {
     SpeedLimitValueToOvertakingCar = 7,
     MinimumSpeedLimitKmhToLimitToOvertakingCar = 8,
     RequireOvertakingCarToBeOnOvertakingLaneToYield = 9,
+    UseIndicatorLightsWhenEasingInYield = 10,
+    UseIndicatorLightsWhenEasingOutYield = 11,
+    UseIndicatorLightsWhenDrivingOnYieldingLane = 12,
 }
 
 ---@enum StorageManager.Options_Overtaking
@@ -87,6 +90,9 @@ StorageManager.Options_Overtaking = {
     OvertakeRampSpeed_mps = 4,
     OvertakeRampRelease_mps = 5,
     RequireYieldingCarToBeOnYieldingLaneToOvertake = 6,
+    UseIndicatorLightsWhenEasingInOvertaking = 7,
+    UseIndicatorLightsWhenEasingOutOvertaking = 8,
+    UseIndicatorLightsWhenDrivingOnOvertakingLane = 9,
 }
 
 local optionsCollection_Debugging_beforeDoD = {
@@ -110,6 +116,9 @@ local optionsCollection_Yielding_beforeDoD = {
     { name = StorageManager.Options_Yielding.SpeedLimitValueToOvertakingCar, default=0.7, min=0.0, max=1.0 },
     { name = StorageManager.Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar, default=60.0, min=0.0, max=300.0 },
     { name = StorageManager.Options_Yielding.RequireOvertakingCarToBeOnOvertakingLaneToYield, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Yielding.UseIndicatorLightsWhenEasingInYield, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Yielding.UseIndicatorLightsWhenEasingOutYield, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options_Yielding.RampSpeed_mps, default=0.25, min=0.1, max=RAMP_SPEEDS_MAX },
     -- { name = StorageManager.Options_Yielding.RampRelease_mps, default=0.1, min=0.1, max=RAMP_SPEEDS_MAX },
 }
@@ -121,6 +130,9 @@ local optionsCollection_Overtaking_beforeDoD = {
     { name = StorageManager.Options_Overtaking.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=1.0 },
     { name = StorageManager.Options_Overtaking.OvertakeRampRelease_mps, default=0.5, min=0.1, max=1.0 },
     { name = StorageManager.Options_Overtaking.RequireYieldingCarToBeOnYieldingLaneToOvertake, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Overtaking.UseIndicatorLightsWhenEasingInOvertaking, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options_Overtaking.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=RAMP_SPEEDS_MAX },
     -- { name = StorageManager.Options_Overtaking.OvertakeRampRelease_mps, default=0.5, min=0.1, max=RAMP_SPEEDS_MAX },
 }
@@ -286,6 +298,9 @@ local storageTable_Debugging = {
 ---@field speedLimitValueToOvertakingCar number
 ---@field minimumSpeedLimitKmhToLimitToOvertakingCar number
 ---@field requireOvertakingCarToBeOnOvertakingLane boolean
+---@field UseIndicatorLightsWhenEasingInYield boolean
+---@field UseIndicatorLightsWhenEasingOutYield boolean
+---@field UseIndicatorLightsWhenDrivingOnYieldingLane boolean
 
 ---@type StorageTable_Yielding
 local storageTable_Yielding = {
@@ -298,6 +313,9 @@ local storageTable_Yielding = {
     speedLimitValueToOvertakingCar = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.SpeedLimitValueToOvertakingCar],
     minimumSpeedLimitKmhToLimitToOvertakingCar = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar],
     requireOvertakingCarToBeOnOvertakingLane = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.RequireOvertakingCarToBeOnOvertakingLaneToYield],
+    UseIndicatorLightsWhenEasingInYield = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.UseIndicatorLightsWhenEasingInYield],
+    UseIndicatorLightsWhenEasingOutYield = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.UseIndicatorLightsWhenEasingOutYield],
+    UseIndicatorLightsWhenDrivingOnYieldingLane = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane],
 }
 
 ---@class StorageTable_Overtaking
@@ -307,6 +325,9 @@ local storageTable_Yielding = {
 ---@field overtakeRampSpeed_mps number
 ---@field overtakeRampRelease_mps number
 ---@field requireYieldingCarToBeOnYieldingLane boolean
+---@field UseIndicatorLightsWhenEasingInOvertaking boolean
+---@field UseIndicatorLightsWhenEasingOutOvertaking boolean
+---@field UseIndicatorLightsWhenDrivingOnOvertakingLane boolean
 
 ---@type StorageTable_Overtaking
 local storageTable_Overtaking = {
@@ -316,6 +337,9 @@ local storageTable_Overtaking = {
     overtakeRampSpeed_mps = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.OvertakeRampSpeed_mps],
     overtakeRampRelease_mps = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.OvertakeRampRelease_mps],
     requireYieldingCarToBeOnYieldingLane = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.RequireYieldingCarToBeOnYieldingLaneToOvertake],
+    UseIndicatorLightsWhenEasingInOvertaking = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.UseIndicatorLightsWhenEasingInOvertaking],
+    UseIndicatorLightsWhenEasingOutOvertaking = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking],
+    UseIndicatorLightsWhenDrivingOnOvertakingLane = StorageManager.options_Overtaking_default[StorageManager.Options_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane],
 }
 
 ---@class StorageTable_Global

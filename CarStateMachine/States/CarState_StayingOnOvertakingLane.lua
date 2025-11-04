@@ -34,7 +34,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     end
 
     -- keep driving to the overtaking side even while staying on the overtaking lane since sometimes the cars still end up drifting back to the normal lanes mostly because of high speed corners
-    local useIndicatorLights = true
+    local storage_Overtaking = StorageManager.getStorage_Overtaking()
+    local useIndicatorLights = storage_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane
     local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
 
@@ -129,4 +130,5 @@ CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCars
     -- reset the overtaking car caution back to normal
     CarOperations.removeAICaution(carIndex)
     CarOperations.setDefaultAIAggression(carIndex)
+    CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
 end

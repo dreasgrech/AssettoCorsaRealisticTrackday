@@ -100,7 +100,7 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       end
 
       -- continue driving to the yielding side so that if we got pushed a bit off the side, we drive back to the correct side
-      local useIndicatorLights = true
+      local useIndicatorLights = storage_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane
       local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
 
@@ -215,4 +215,5 @@ CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCars
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
   CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
   CarOperations.resetAIThrottleLimit(carIndex)
+  CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
 end

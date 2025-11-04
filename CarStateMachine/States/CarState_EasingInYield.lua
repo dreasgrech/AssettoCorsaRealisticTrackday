@@ -64,7 +64,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       --local rampSpeed_mps = storage.rampSpeed_mps
       --local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, yieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
-      local useIndicatorLights = true
+      local storage_Yielding = StorageManager.getStorage_Yielding()
+      local useIndicatorLights = storage_Yielding.UseIndicatorLightsWhenEasingInYield
       local droveSafelyToSide = CarOperations.yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
       if not droveSafelyToSide then
         -- reduce the car speed so that we can find a gap
@@ -140,4 +141,5 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
     CarOperations.resetAIThrottleLimit(carIndex)
+    CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
 end

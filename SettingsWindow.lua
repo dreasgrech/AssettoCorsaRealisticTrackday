@@ -232,6 +232,19 @@ SettingsWindow.draw = function()
         if ui.checkbox('Require overtaking car to be on overtaking lane to yield', storage_Yielding.requireOvertakingCarToBeOnOvertakingLane) then storage_Yielding.requireOvertakingCarToBeOnOvertakingLane = not storage_Yielding.requireOvertakingCarToBeOnOvertakingLane end
         if ui.itemHovered() then ui.setTooltip("If enabled, the yielding car will only yield if the overtaking car is actually driving on the overtaking lane.") end
 
+        ui.newLine(1)
+
+        if ui.checkbox('Use indicator lights when easing in yield', storage_Yielding.UseIndicatorLightsWhenEasingInYield) then storage_Yielding.UseIndicatorLightsWhenEasingInYield = not storage_Yielding.UseIndicatorLightsWhenEasingInYield end
+        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when easing in to the yielding lane.") end
+
+        if ui.checkbox('Use indicator lights when easing out of yield', storage_Yielding.UseIndicatorLightsWhenEasingOutYield) then storage_Yielding.UseIndicatorLightsWhenEasingOutYield = not storage_Yielding.UseIndicatorLightsWhenEasingOutYield end
+        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when easing out of the yielding lane.") end
+
+        if ui.checkbox('Use indicator lights when driving on yielding lane', storage_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane) then storage_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane = not storage_Yielding.UseIndicatorLightsWhenDrivingOnYieldingLane end
+        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when driving on the yielding lane.") end
+
+        ui.newLine(1)
+
         storage_Yielding.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the player is behind and within this distance', storage_Yielding.detectCarBehind_meters, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.DetectCarBehind_meters], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 
         storage_Yielding.rampSpeed_mps =  renderSlider('Yielding Lateral Offset increment step', 'How quickly the lateral offset ramps up when yielding to an overtaking car.\nThe higher it is, the more quickly cars will change lanes when moving to the yielding side.', storage_Yielding.rampSpeed_mps, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.RampSpeed_mps], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.RampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s')
@@ -269,6 +282,19 @@ SettingsWindow.draw = function()
 
         if ui.checkbox('Require yielding car to be on yielding lane to overtake', storage_Overtaking.requireYieldingCarToBeOnYieldingLane) then storage_Overtaking.requireYieldingCarToBeOnYieldingLane = not storage_Overtaking.requireYieldingCarToBeOnYieldingLane end
         if ui.itemHovered() then ui.setTooltip("If enabled, the overtaking car will only overtake if the yielding car is actually driving on the yielding lane.") end
+
+        ui.newLine(1)
+
+        if ui.checkbox('Use indicator lights when easing in to overtake', storage_Overtaking.UseIndicatorLightsWhenEasingInOvertaking) then storage_Overtaking.UseIndicatorLightsWhenEasingInOvertaking = not storage_Overtaking.UseIndicatorLightsWhenEasingInOvertaking end
+        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when easing in to the overtaking lane.") end
+
+        if ui.checkbox('Use indicator lights when easing out of overtaking', storage_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking) then storage_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking = not storage_Overtaking.UseIndicatorLightsWhenEasingOutOvertaking end
+        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when easing out of the overtaking lane.") end
+
+        if ui.checkbox('Use indicator lights when driving on overtaking lane', storage_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane) then storage_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane = not storage_Overtaking.UseIndicatorLightsWhenDrivingOnOvertakingLane end
+        if ui.itemHovered() then ui.setTooltip("If enabled, the car will use its indicator lights when driving on the overtaking lane.") end
+
+        ui.newLine(1)
 
         storage_Overtaking.detectCarAhead_meters =  renderSlider('Detect car ahead distance', 'Start overtaking if the car in front is within this distance', storage_Overtaking.detectCarAhead_meters, StorageManager.options_Overtaking_min[StorageManager.Options_Overtaking.DetectCarAhead_meters], StorageManager.options_Overtaking_max[StorageManager.Options_Overtaking.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m')
 

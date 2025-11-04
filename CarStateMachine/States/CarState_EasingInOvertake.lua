@@ -1,3 +1,12 @@
+-- bindings
+local ac = ac
+local Logger = Logger
+local CarManager = CarManager
+local CarOperations = CarOperations
+local RaceTrackManager = RaceTrackManager
+local StorageManager = StorageManager
+local Strings = Strings
+
 local STATE = CarStateMachine.CarStateType.EASING_IN_OVERTAKE
 
 CarStateMachine.CarStateTypeStrings[STATE] = "EasingInOvertake"
@@ -86,7 +95,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local droveSafelyToSide = CarOperations.driveSafelyToSide(carIndex, dt, car, driveToSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness)
 
     -- ease in to the overtaking lane
-    local useIndicatorLights = true
+    local storage_Overtaking = StorageManager.getStorage_Overtaking()
+    local useIndicatorLights = storage_Overtaking.UseIndicatorLightsWhenEasingInOvertaking
     local droveSafelyToSide = CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
 end
 
@@ -195,4 +205,5 @@ CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCars
     -- reset the overtaking car caution back to normal
     CarOperations.removeAICaution(carIndex)
     CarOperations.setDefaultAIAggression(carIndex)
+    CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
 end
