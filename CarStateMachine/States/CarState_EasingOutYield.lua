@@ -1,3 +1,31 @@
+-- bindings
+local ac = ac
+local string = string
+local string_format = string.format
+local Logger = Logger
+local Logger_error = Logger.error
+local CarManager = CarManager
+local CarManager_getActualTrackLateralOffset = CarManager.getActualTrackLateralOffset
+local CarManager_setCalculatedTrackLateralOffset = CarManager.setCalculatedTrackLateralOffset
+local CarOperations = CarOperations
+local CarOperations_toggleTurningLights = CarOperations.toggleTurningLights
+local CarOperations_hasArrivedAtTargetSplineOffset = CarOperations.hasArrivedAtTargetSplineOffset
+local CarOperations_resetAIThrottleLimit = CarOperations.resetAIThrottleLimit
+local CarOperations_removeAITopSpeed = CarOperations.removeAITopSpeed
+local CarOperations_removeAICaution = CarOperations.removeAICaution
+local CarOperations_driveSafelyToSide = CarOperations.driveSafelyToSide
+local CarStateMachine = CarStateMachine
+local CarStateMachine_handleYellowFlagZone = CarStateMachine.handleYellowFlagZone
+local CarStateMachine_setStateExitReason = CarStateMachine.setStateExitReason
+local CarStateMachine_handleShouldWeYieldToBehindCar = CarStateMachine.handleShouldWeYieldToBehindCar
+local RaceTrackManager = RaceTrackManager
+local RaceTrackManager_getYieldingSide = RaceTrackManager.getYieldingSide
+local RaceTrackManager_getOvertakingSide = RaceTrackManager.getOvertakingSide
+local StorageManager = StorageManager
+local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
+local Strings = Strings
+
+
 local STATE = CarStateMachine.CarStateType.EASING_OUT_YIELD
 
 CarStateMachine.CarStateTypeStrings[STATE] = "EasingOutYield"
@@ -15,25 +43,25 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   -- make sure the state before us has saved the carIndex of the car we're yielding to
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
   if not currentlyYieldingToCarIndex then
-    Logger.error(string.format('Car %d in state EasingOutYield but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
+    Logger_error(string_format('Car %d in state EasingOutYield but has no reference to the car it is yielding to!  Previous state needs to set it.', carIndex))
   end
 
   local car = sortedCarsList[sortedCarsListIndex]
 
   -- set the current spline offset to our actual lateral offset so we start easing in from the correct position
-  CarManager.setCalculatedTrackLateralOffset(carIndex, CarManager.getActualTrackLateralOffset(car.position))
+  CarManager_setCalculatedTrackLateralOffset(carIndex, CarManager_getActualTrackLateralOffset(car.position))
 
   -- remove the yielding car throttle limit since we will now start easing out the yield
-  CarOperations.resetAIThrottleLimit(carIndex)
-  CarOperations.removeAITopSpeed(carIndex)
+  CarOperations_resetAIThrottleLimit(carIndex)
+  CarOperations_removeAITopSpeed(carIndex)
 
   -- reset the yielding car caution back to normal
-  CarOperations.removeAICaution(carIndex)
+  CarOperations_removeAICaution(carIndex)
 
   -- inverse the turning lights while easing out yield (inverted yield direction since the car is now going back to center)
-  local turningLights = (not RaceTrackManager.getYieldingSide() == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
+  local turningLights = (not RaceTrackManager_getYieldingSide() == RaceTrackManager.TrackSide.LEFT) and ac.TurningLights.Left or ac.TurningLights.Right
   -- CarOperations.toggleTurningLights(carIndex, car, turningLights)
-  CarOperations.toggleTurningLights(carIndex, turningLights)
+  CarOperations_toggleTurningLights(carIndex, turningLights)
 end
 
 -- UPDATE FUNCTION
@@ -48,13 +76,13 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       -- this is the side we're currently easing out to, which is the inverse of the side we yielded to
       -- local easeOutYieldSide = RaceTrackManager.getOvertakingSide() -- always ease out yield to the overtaking side
       -- local targetOffset = 0
-      local storage_Yielding = StorageManager.getStorage_Yielding()
+      local storage_Yielding = StorageManager_getStorage_Yielding()
       local targetOffset = storage.defaultLateralOffset
       local rampSpeed_mps = storage_Yielding.rampRelease_mps
       -- CarOperations.driveSafelyToSide(carIndex, dt, car, easeOutYieldSide, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true)
       local handleSideCheckingWhenYielding = storage_Yielding.handleSideCheckingWhenYielding
       local useIndicatorLights = storage_Yielding.UseIndicatorLightsWhenEasingOutYield
-      CarOperations.driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, handleSideCheckingWhenYielding, useIndicatorLights)
+      CarOperations_driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, handleSideCheckingWhenYielding, useIndicatorLights)
 end
 
 -- TRANSITION FUNCTION
@@ -67,22 +95,22 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       local car = sortedCarsList[sortedCarsListIndex]
 
       -- check if we're now in a yellow flag zone
-      local newStateDueToYellowFlagZone = CarStateMachine.handleYellowFlagZone(carIndex, car)
+      local newStateDueToYellowFlagZone = CarStateMachine_handleYellowFlagZone(carIndex, car)
       if newStateDueToYellowFlagZone then
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.EnteringYellowFlagZone)
         return newStateDueToYellowFlagZone
       end
 
-      local carBehind = sortedCarsList[sortedCarsListIndex + 1]
-      local carFront = sortedCarsList[sortedCarsListIndex - 1]
+      -- local carBehind = sortedCarsList[sortedCarsListIndex + 1]
+      -- local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
       -- if there's a car behind us, check if we should start yielding to it
       -- jlocal newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(carIndex, car, carBehind, carFront, storage)
-      local newStateDueToCarBehind = CarStateMachine.handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
+      local newStateDueToCarBehind = CarStateMachine_handleShouldWeYieldToBehindCar(sortedCarsList, sortedCarsListIndex, storage)
       if newStateDueToCarBehind then
         -- Andreas: don't clear the cars_currentlyYieldingCarToIndex value since handleShouldWeYieldToBehindCar writes to it
         -- CarStateMachine.setStateExitReason(carIndex, string.format('Yielding to new car behind #%d instead', carBehind.index))
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.YieldingToCar)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.YieldingToCar)
         return newStateDueToCarBehind
       end
 
@@ -106,12 +134,12 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
       -- if we're back to the center, return to normal driving
       -- local yieldSide = storage.yieldSide
       -- local easeOutYieldSide = RaceTrackManager.getOppositeSide(yieldSide)
-      local easeOutYieldSide = RaceTrackManager.getOvertakingSide()
-      local arrivedAtTargetOffset = CarOperations.hasArrivedAtTargetSplineOffset(carIndex, easeOutYieldSide)
+      local easeOutYieldSide = RaceTrackManager_getOvertakingSide()
+      local arrivedAtTargetOffset = CarOperations_hasArrivedAtTargetSplineOffset(carIndex, easeOutYieldSide)
       if arrivedAtTargetOffset then
         CarManager.cars_currentlyYieldingCarToIndex[carIndex] = nil -- clear the reference to the car we were yielding to since we'll now go back to normal driving
         -- CarStateMachine.setStateExitReason(carIndex, string.format('Arrived back to normal driving position, no longer yielding'))
-        CarStateMachine.setStateExitReason(carIndex, StateExitReason.ArrivedToNormal)
+        CarStateMachine_setStateExitReason(carIndex, StateExitReason.ArrivedToNormal)
         return CarStateMachine.CarStateType.DRIVING_NORMALLY
       end
 end
@@ -123,5 +151,5 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
-    CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
+    CarOperations_toggleTurningLights(carIndex, ac.TurningLights.None)
 end
