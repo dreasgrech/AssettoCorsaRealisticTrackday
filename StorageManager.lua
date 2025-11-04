@@ -75,11 +75,12 @@ StorageManager.Options_Yielding = {
     RampRelease_mps = 5,
     DistanceToOvertakingCarToLimitSpeed = 6,
     SpeedLimitValueToOvertakingCar = 7,
-    MinimumSpeedLimitKmhToLimitToOvertakingCar = 8,
-    RequireOvertakingCarToBeOnOvertakingLaneToYield = 9,
-    UseIndicatorLightsWhenEasingInYield = 10,
-    UseIndicatorLightsWhenEasingOutYield = 11,
-    UseIndicatorLightsWhenDrivingOnYieldingLane = 12,
+    MinimumSpeedLimitKmhToLimitToOvertakingCar = 8, -- TODO: rename to MinimumTopSpeedLimitKmhToLimitToOvertakingCar
+    ThrottlePedalLimitWhenYieldingToOvertakingCar = 9,
+    RequireOvertakingCarToBeOnOvertakingLaneToYield = 10,
+    UseIndicatorLightsWhenEasingInYield = 11,
+    UseIndicatorLightsWhenEasingOutYield = 12,
+    UseIndicatorLightsWhenDrivingOnYieldingLane = 13,
 }
 
 ---@enum StorageManager.Options_Overtaking
@@ -115,6 +116,7 @@ local optionsCollection_Yielding_beforeDoD = {
     { name = StorageManager.Options_Yielding.DistanceToOvertakingCarToLimitSpeed, default=10.0, min=1.0, max=100.0 },
     { name = StorageManager.Options_Yielding.SpeedLimitValueToOvertakingCar, default=0.7, min=0.0, max=1.0 },
     { name = StorageManager.Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar, default=60.0, min=0.0, max=300.0 },
+    { name = StorageManager.Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar, default=0.9, min=0.0, max=1.0 },
     { name = StorageManager.Options_Yielding.RequireOvertakingCarToBeOnOvertakingLaneToYield, default=true, min=nil, max=nil },
     { name = StorageManager.Options_Yielding.UseIndicatorLightsWhenEasingInYield, default=true, min=nil, max=nil },
     { name = StorageManager.Options_Yielding.UseIndicatorLightsWhenEasingOutYield, default=true, min=nil, max=nil },
@@ -297,6 +299,7 @@ local storageTable_Debugging = {
 ---@field distanceToOvertakingCarToLimitSpeed number
 ---@field speedLimitValueToOvertakingCar number
 ---@field minimumSpeedLimitKmhToLimitToOvertakingCar number
+---@field throttlePedalLimitWhenYieldingToOvertakingCar number @0.0 to 1.0 value representing throttle pedal limit when yielding to overtaking cars
 ---@field requireOvertakingCarToBeOnOvertakingLane boolean
 ---@field UseIndicatorLightsWhenEasingInYield boolean
 ---@field UseIndicatorLightsWhenEasingOutYield boolean
@@ -312,6 +315,7 @@ local storageTable_Yielding = {
     distanceToOvertakingCarToLimitSpeed = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.DistanceToOvertakingCarToLimitSpeed],
     speedLimitValueToOvertakingCar = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.SpeedLimitValueToOvertakingCar],
     minimumSpeedLimitKmhToLimitToOvertakingCar = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar],
+    throttlePedalLimitWhenYieldingToOvertakingCar = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar],
     requireOvertakingCarToBeOnOvertakingLane = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.RequireOvertakingCarToBeOnOvertakingLaneToYield],
     UseIndicatorLightsWhenEasingInYield = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.UseIndicatorLightsWhenEasingInYield],
     UseIndicatorLightsWhenEasingOutYield = StorageManager.options_Yielding_default[StorageManager.Options_Yielding.UseIndicatorLightsWhenEasingOutYield],

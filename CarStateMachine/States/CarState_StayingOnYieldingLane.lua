@@ -16,7 +16,6 @@ local math = math
 local math_min = math.min
 local math_max = math.max
 local Logger = Logger
-local Logger_warn = Logger.warn
 local Logger_error = Logger.error
 local CarManager = CarManager
 local CarManager_isCarDrivingOnSide = CarManager.isCarDrivingOnSide
@@ -109,7 +108,8 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       local limitSpeedToLetOvertakingCarPass = distanceBetweenCarsSqr < distanceToOvertakingCarToLimitSpeedSqr
       if limitSpeedToLetOvertakingCarPass then
         -- limit the yielding car throttle while driving on the yielding lane
-        CarOperations_setAIThrottleLimit(carIndex, 0.5)
+        local throttlePedalLimitWhenYieldingToOvertakingCar = storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar
+        CarOperations_setAIThrottleLimit(carIndex, throttlePedalLimitWhenYieldingToOvertakingCar)
 
         local speedLimitValueToOvertakingCar = storage_Yielding.speedLimitValueToOvertakingCar
         -- local topSpeed = math.min(car.speedKmh, carWeAreCurrentlyYieldingTo.speedKmh*0.7)

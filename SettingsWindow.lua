@@ -212,7 +212,7 @@ SettingsWindow.draw = function()
 -- ui.popDWriteFont()
 
     ui.columns(2, true, "yieldingOvertakingSection")
-    ui.setColumnWidth(0, 470)
+    ui.setColumnWidth(0, 560)
     --ui.setColumnWidth(1, 260)
 
 
@@ -254,12 +254,21 @@ SettingsWindow.draw = function()
 
         ui.newLine(1)
 
-        storage_Yielding.speedLimitValueToOvertakingCar = renderSlider('Speed limit value to overtaking car [0..1]', 'When yielding, the yielding car speed will be limited to this fraction of the overtaking car speed to let it pass more easily.\n1.0 = same speed as overtaking car so no speed limiting\n0.5 = limit to half the speed of the overtaking car.', storage_Yielding.speedLimitValueToOvertakingCar, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.SpeedLimitValueToOvertakingCar], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.SpeedLimitValueToOvertakingCar], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
+        storage_Yielding.speedLimitValueToOvertakingCar = renderSlider('Top speed limit value to overtaking car [0..1]', "When yielding, the yielding car's top speed will be limited to this fraction of the overtaking car's current speed to let it pass more easily.\n1.0 = no top speed limiting\n0.5 = limit top speed to half the current speed of the overtaking car.\n0.0 = make the car grind to a halt", storage_Yielding.speedLimitValueToOvertakingCar, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.SpeedLimitValueToOvertakingCar], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.SpeedLimitValueToOvertakingCar], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
         local speedLimitValueToOvertakingCar  = storage_Yielding.speedLimitValueToOvertakingCar
         createDisabledSection(speedLimitValueToOvertakingCar >= 1.0, function()
-            storage_Yielding.distanceToOvertakingCarToLimitSpeed = renderSlider('Distance to overtaking car to limit speed', 'When yielding, if an overtaking car is within this distance behind us, we will limit our speed to let it pass more easily.', storage_Yielding.distanceToOvertakingCarToLimitSpeed, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.DistanceToOvertakingCarToLimitSpeed], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.DistanceToOvertakingCarToLimitSpeed], DEFAULT_SLIDER_WIDTH, '%.2f m')
+            storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar = renderSlider('Minimum top speed to limit to overtaking car', "When yielding, the yielding car's top speed will not be limited below this speed even if the overtaking car is very slow.\n0.0 = no minimum top speed limit while yielding", storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar, StorageManager.options_Yielding_min[StorageManager.options_Yielding_min.MinimumSpeedLimitKmhToLimitToOvertakingCar], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar], DEFAULT_SLIDER_WIDTH, '%.2f km/h')
 
-            storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar = renderSlider('Minimum speed to limit to overtaking car', 'When yielding, the yielding car speed will not be limited below this speed even if the overtaking car is very slow.\n0.0 = no minimum speed limit', storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar, StorageManager.options_Yielding_min[StorageManager.options_Yielding_min.MinimumSpeedLimitKmhToLimitToOvertakingCar], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar], DEFAULT_SLIDER_WIDTH, '%.2f km/h')
+        end)
+
+        storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar = renderSlider('Throttle pedal limit when yielding to overtaking car [0..1]', "When yielding, the yielding car's throttle pedal input will be limited to this fraction to let the overtaking car pass more easily.\n1.0 = no throttle pedal limiting\n0.5 = limit throttle pedal input to half\n0.0 = completely let go of the throttle pedal", storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT)
+
+        local anySpeedLimitingWhileYieldingApplied = 
+            speedLimitValueToOvertakingCar < 1.0 or 
+            storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar < 1.0
+
+        createDisabledSection(not anySpeedLimitingWhileYieldingApplied, function()
+            storage_Yielding.distanceToOvertakingCarToLimitSpeed = renderSlider('Distance to overtaking car to apply speed limiting', 'When yielding, if an overtaking car is within this distance behind us, we will limit our speed to let it pass more easily.', storage_Yielding.distanceToOvertakingCarToLimitSpeed, StorageManager.options_Yielding_min[StorageManager.Options_Yielding.DistanceToOvertakingCarToLimitSpeed], StorageManager.options_Yielding_max[StorageManager.Options_Yielding.DistanceToOvertakingCarToLimitSpeed], DEFAULT_SLIDER_WIDTH, '%.2f m')
         end)
     end)
 
