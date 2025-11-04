@@ -4,6 +4,9 @@ local ac_getCar = ac.getCar
 local string = string
 local string_format = string.format
 local Logger = Logger
+local Logger_log = Logger.log
+local Logger_error = Logger.error
+local Logger_warn = Logger.warn
 local CarManager = CarManager
 local CarManager_getActualTrackLateralOffset = CarManager.getActualTrackLateralOffset
 local CarManager_setCalculatedTrackLateralOffset = CarManager.setCalculatedTrackLateralOffset
@@ -13,6 +16,9 @@ local CarOperations_calculateAICautionAndAggressionWhileOvertaking = CarOperatio
 local CarOperations_setAICaution = CarOperations.setAICaution
 local CarOperations_setAIAggression = CarOperations.setAIAggression
 local CarOperations_hasArrivedAtTargetSplineOffset = CarOperations.hasArrivedAtTargetSplineOffset
+local CarOperations_removeAICaution = CarOperations.removeAICaution
+local CarOperations_setDefaultAIAggression = CarOperations.setDefaultAIAggression
+local CarOperations_toggleTurningLights = CarOperations.toggleTurningLights
 local CarStateMachine = CarStateMachine
 local CarStateMachine_getPreviousState = CarStateMachine.getPreviousState
 local CarStateMachine_handleShouldWeYieldToBehindCar = CarStateMachine.handleShouldWeYieldToBehindCar
@@ -43,14 +49,14 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
   -- make sure the state before us has saved the carIndex of the car we're overtaking
   local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
   if not currentlyOvertakingCarIndex then
-    Logger.error(string_format('Car %d in state EasingInOvertake but has no reference to the car it is overtaking!  Previous state needs to set it.', carIndex))
+    Logger_error(string_format('Car %d in state EasingInOvertake but has no reference to the car it is overtaking!  Previous state needs to set it.', carIndex))
   end
 
   -- make sure that we're also not yielding to another car at the same time
   local currentlyYieldingToCarIndex = CarManager.cars_currentlyYieldingCarToIndex[carIndex]
   if currentlyYieldingToCarIndex then
     local previousState = CarStateMachine_getPreviousState(carIndex)
-    Logger.error(string_format('[CarState_EasingInOvertake] Car %d is both yielding to car %d and overtaking car %d at the same time!  Previous state: %s', carIndex, currentlyYieldingToCarIndex, currentlyOvertakingCarIndex, CarStateMachine.CarStateTypeStrings[previousState]))
+    Logger_error(string_format('[CarState_EasingInOvertake] Car %d is both yielding to car %d and overtaking car %d at the same time!  Previous state: %s', carIndex, currentlyYieldingToCarIndex, currentlyOvertakingCarIndex, CarStateMachine.CarStateTypeStrings[previousState]))
   end
 
   local car = sortedCarsList[sortedCarsListIndex]
@@ -62,7 +68,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
     local currentlyOvertakingCar = ac_getCar(currentlyOvertakingCarIndex)
     if currentlyOvertakingCar then
       local carFrontPosition = currentlyOvertakingCar.position
-      Logger.log(string_format("[EasingInOvertake] #%d overtaking #%d. YieldingSide: %s, CarFrontPosition: %s, CarFrontLateralOffset: %.3f",
+      Logger_log(string_format("[EasingInOvertake] #%d overtaking #%d. YieldingSide: %s, CarFrontPosition: %s, CarFrontLateralOffset: %.3f",
       carIndex,
       currentlyOvertakingCarIndex,
       RaceTrackManager_getYieldingSide(),
@@ -156,7 +162,7 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
     local currentlyOvertakingCar = ac_getCar(currentlyOvertakingCarIndex)
     if (not currentlyOvertakingCar) then
         -- the car we're overtaking is no longer valid, return to easing out overtake
-        Logger.warn(string_format('Car %d in state DrivingToSideToOvertake but the car it was overtaking (car %d) is no longer valid, returning to normal driving', carIndex, currentlyOvertakingCarIndex))
+        Logger_warn(string_format('Car %d in state DrivingToSideToOvertake but the car it was overtaking (car %d) is no longer valid, returning to normal driving', carIndex, currentlyOvertakingCarIndex))
         CarManager.cars_currentlyOvertakingCarIndex[carIndex] = nil
         -- CarStateMachine.setStateExitReason(carIndex, string.format('Car %d in state DrivingToSideToOvertake but the car it was overtaking (car %d) is no longer valid, returning to normal driving', carIndex, currentlyOvertakingCarIndex))
         CarStateMachine_setStateExitReason(carIndex, StateExitReason.OvertakingCarNoLongerExists)
@@ -222,7 +228,7 @@ end
 ---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     -- reset the overtaking car caution back to normal
-    CarOperations.removeAICaution(carIndex)
-    CarOperations.setDefaultAIAggression(carIndex)
-    CarOperations.toggleTurningLights(carIndex, ac.TurningLights.None)
+    CarOperations_removeAICaution(carIndex)
+    CarOperations_setDefaultAIAggression(carIndex)
+    CarOperations_toggleTurningLights(carIndex, ac.TurningLights.None)
 end
