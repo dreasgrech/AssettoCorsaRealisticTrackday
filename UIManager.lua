@@ -171,7 +171,7 @@ UIManager.drawUICarList = function()
   for col = 1, totalColumns do
     ui.setColumnWidth(col-1, carTableColumns_width[col])
     ui.columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
-    addTooltipOverLastItem(carTableColumns_tooltip[col], carTableColumns_width[col], col)
+    -- addTooltipOverLastItem(carTableColumns_tooltip[col], carTableColumns_width[col], col)
 
     --ui.setColumnWidth(col-1, carTableColumns_width[col])
   end
