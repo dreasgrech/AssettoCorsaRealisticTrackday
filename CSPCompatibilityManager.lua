@@ -115,6 +115,7 @@ CSPCompatibilityManager.checkForMissingCSPElements = function()
     -- Make sure we have access to the ac.getSim or ac.getSimState functions!
     ---@type table<TableForUsedElement>
     local usedAcStateSimElements
+    ---@diagnostic disable-next-line: deprecated -- ac.getSimState is deprecated but we need to check for it here for backwards compatibility
     local simStateFn = ac.getSim or ac.getSimState
     local simStateFnAvailable, sim = pcall(function() return simStateFn() end)
     if simStateFnAvailable then
