@@ -97,6 +97,7 @@ CarState_AfterCustomAIFloodTeleport = require("CarStateMachine.States.CarState_A
 AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
 UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
+UIAppNameVersionWidget = require("UIAppNameVersionWidget")
 UIManager = require("UIManager")
 -- CarSpeedLimiter = require("CarSpeedLimiter")
 -- CustomAIFloodManager = require("CustomAIFloodManager")

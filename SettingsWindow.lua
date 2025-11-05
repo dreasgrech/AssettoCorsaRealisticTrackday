@@ -37,6 +37,9 @@ local AppIconRenderer_draw = AppIconRenderer.draw
 local ColorManager = ColorManager
 local UILateralOffsetsImageWidget = UILateralOffsetsImageWidget
 local UILateralOffsetsImageWidget_draw = UILateralOffsetsImageWidget.draw
+local UIAppNameVersionWidget = UIAppNameVersionWidget
+local UIAppNameVersionWidget_drawBottomRight = UIAppNameVersionWidget.drawBottomRight
+
 
 
 local UI_HEADER_TEXT_FONT_SIZE = 15
@@ -408,12 +411,16 @@ SettingsWindow.draw = function()
     -- storage.distanceToFrontCarToOvertake =  ui.slider('Min distance to front car to overtake (m)', storage.distanceToFrontCarToOvertake, 1.0, 20.0)
     -- if ui.itemHovered() then ui.setTooltip('Minimum distance to the car in front before an AI car will consider overtaking it.') end
 --]===]
-  ui_popDWriteFont()
 
--- Close the global app-enabled disabled section if the app is disabled
-if not appEnabled then
-    ui_popDisabled()
-end
+    -- Draw the app name and version at the bottom-right of the settings window
+    UIAppNameVersionWidget_drawBottomRight(15)
+
+    ui_popDWriteFont()
+
+    -- Close the global app-enabled disabled section if the app is disabled
+    if not appEnabled then
+        ui_popDisabled()
+    end
 end
 
 --[===[

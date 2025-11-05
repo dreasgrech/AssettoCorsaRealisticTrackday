@@ -36,6 +36,7 @@ local ui_popID = ui.popID
 local ui_selectable = ui.selectable
 local ui_itemClicked = ui.itemClicked
 local ui_sameLine = ui.sameLine
+local ui_getScrollMaxY = ui.getScrollMaxY
 local render = render
 local render_debugText = render.debugText
 local math = math
@@ -78,6 +79,8 @@ local CARLIST_ROW_BACKGROUND_COLOR_SELECTED = rgbm(1, 0, 0, 0.3)
 local CARLIST_ROW_BACKGROUND_COLOR_CLICKED = rgbm(1, 0, 0, 0.3)
 local CARLIST_ROW_BACKGROUND_COLOR_HOVERED = rgbm(1, 0, 0, 0.1)
 local CARLIST_ROW_TEXT_COLOR_LOCALPLAYER = ColorManager.RGBM_Colors.Violet
+
+UIManager.VERTICAL_SCROLLBAR_WIDTH = 9 * 2 -- Andreas: the * 2 is to account for the tiny margin that's created next to the vertical scrollbar which seems to be the same size as the scrollbar width
 
 local storage = StorageManager.getStorage()
 local storage_Yielding = StorageManager.getStorage_Yielding()
@@ -180,7 +183,10 @@ local function addTooltipOverLastItem(text, _colWidth_unused, idSuffix)
   ui_setCursorScreenPos(saved)
 end
 
-
+UIManager.isVerticalScrollVisible = function()
+  local scrollMaxY = ui_getScrollMaxY()
+  return scrollMaxY > 0
+end
 
 UIManager.drawUICarList = function()
 

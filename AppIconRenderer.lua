@@ -9,7 +9,8 @@ local settingsWindowIconPositionBottomLeft = vec2(0,0) -- this is needed for the
 AppIconRenderer.draw = function()
     -- Draw the app icon at the top-right of the settings window
     local settingsWindowSize = ui.windowSize()
-    settingsWindowIconPosition.x = settingsWindowSize.x - (APP_ICON_SIZE.x + 10)
+    -- settingsWindowIconPosition.x = settingsWindowSize.x - (APP_ICON_SIZE.x + 10)
+    settingsWindowIconPosition.x = settingsWindowSize.x - (APP_ICON_SIZE.x + UIManager.VERTICAL_SCROLLBAR_WIDTH)
     settingsWindowIconPositionBottomLeft.x = settingsWindowIconPosition.x + APP_ICON_SIZE.x
     settingsWindowIconPositionBottomLeft.y = settingsWindowIconPosition.y + APP_ICON_SIZE.y
     ui.drawImage(APP_ICON_PATH, settingsWindowIconPosition, settingsWindowIconPositionBottomLeft, ui.ImageFit.Fit)
