@@ -96,13 +96,13 @@ CarState_AfterCustomAIFloodTeleport = require("CarStateMachine.States.CarState_A
 
 AccidentManager = require("AccidentManager")
 RaceFlagManager = require("RaceFlagManager")
+UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
 UIManager = require("UIManager")
 -- CarSpeedLimiter = require("CarSpeedLimiter")
 -- CustomAIFloodManager = require("CustomAIFloodManager")
 -- CollisionAvoidanceManager = require("CollisionAvoidanceManager")
 FrenetAvoid = require("FrenetAvoid")
 
-UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
 SettingsWindow = require("SettingsWindow")
 
 -- bindings
@@ -204,7 +204,7 @@ local function awake()
     -- Logger.log(string.format('Original #%d AI Aggression: %.3f', i, car.aiAggression))
 
     CarManager.cars_ORIGINAL_AI_DIFFICULTY_LEVEL[carIndex] = originalCarAILevel
-    -- Logger.log(string.format('Original #%d AI Difficulty Level: %.3f', i, originalCarAILevel))
+    Logger.log(string.format('Original #%d AI Difficulty Level: %.3f', i, originalCarAILevel))
   end
 end
 awake()
