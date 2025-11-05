@@ -2,11 +2,72 @@
 
 --bindings
 local ac = ac
+local ac_getSim = ac.getSim
+local ac_getCar = ac.getCar
+local ac_setWindowOpen = ac.setWindowOpen
+local ac_isWindowOpen = ac.isWindowOpen
+local ac_overrideCarControls = ac.overrideCarControls
+local ac_getTrackAISplineSides = ac.getTrackAISplineSides
 local ui = ui
+local ui_itemHovered = ui.itemHovered
+local ui_setTooltip = ui.setTooltip
+local ui_columns = ui.columns
+local ui_setColumnWidth = ui.setColumnWidth
+local ui_nextColumn = ui.nextColumn
+local ui_newLine = ui.newLine
+local ui_text = ui.text
+local ui_separator = ui.separator
+local ui_textColored = ui.textColored
+local ui_pushStyleColor = ui.pushStyleColor
+local ui_popStyleColor = ui.popStyleColor
+local ui_itemRectMin = ui.itemRectMin
+local ui_itemRectMax = ui.itemRectMax
+local ui_textLineHeightWithSpacing = ui.textLineHeightWithSpacing
+local ui_cursorScreenPos = ui.cursorScreenPos
+local ui_setItemAllowOverlap = ui.setItemAllowOverlap
+local ui_setCursorScreenPos = ui.setCursorScreenPos
+local ui_invisibleButton = ui.invisibleButton
+local ui_windowPos = ui.windowPos
+local ui_columnSortingHeader = ui.columnSortingHeader
+local ui_pushColumnsBackground = ui.pushColumnsBackground
+local ui_popColumnsBackground = ui.popColumnsBackground
+local ui_pushID = ui.pushID
+local ui_popID = ui.popID
+local ui_selectable = ui.selectable
+local ui_itemClicked = ui.itemClicked
+local ui_sameLine = ui.sameLine
+local render = render
+local render_debugText = render.debugText
+local math = math
+local math_max = math.max
+local math_floor = math.floor
+local string = string
+local string_format = string.format
+local StorageManager = StorageManager
+local RaceTrackManager = RaceTrackManager
+local RaceTrackManager_getDefaultDrivingSide = RaceTrackManager.getDefaultDrivingSide
+local RaceTrackManager_getOvertakingSide = RaceTrackManager.getOvertakingSide
+local RaceTrackManager_getYieldingSide = RaceTrackManager.getYieldingSide
+local ColorManager = ColorManager
+local UILateralOffsetsImageWidget = UILateralOffsetsImageWidget
+local UILateralOffsetsImageWidget_draw = UILateralOffsetsImageWidget.draw
 local CarStateMachine = CarStateMachine
+local CarStateMachine_getCurrentState = CarStateMachine.getCurrentState
+local CarStateMachine_getPreviousState = CarStateMachine.getPreviousState
 local CarManager = CarManager
+local CarManager_getCalculatedTrackLateralOffset = CarManager.getCalculatedTrackLateralOffset
+local CarManager_getActualTrackLateralOffset = CarManager.getActualTrackLateralOffset
+local CarManager_getClosingSpeed = CarManager.getClosingSpeed
 local CameraManager = CameraManager
+local CameraManager_getFocusedCarIndex = CameraManager.getFocusedCarIndex
+local CameraManager_followCarWithChaseCamera = CameraManager.followCarWithChaseCamera
 local MathHelpers = MathHelpers
+local MathHelpers_distanceBetweenVec3sSqr = MathHelpers.distanceBetweenVec3sSqr
+local StringsManager = StringsManager
+local StringsManager_resolveStringValue = StringsManager.resolveStringValue
+local Logger = Logger
+local Logger_error = Logger.error
+
 
 -- These are the window IDs as defined in the manifest.ini
 local MAIN_WINDOW_ID = 'mainWindow'
@@ -21,6 +82,7 @@ local CARLIST_ROW_TEXT_COLOR_LOCALPLAYER = ColorManager.RGBM_Colors.Violet
 local storage = StorageManager.getStorage()
 local storage_Yielding = StorageManager.getStorage_Yielding()
 local storage_Overtaking = StorageManager.getStorage_Overtaking()
+local storage_Debugging = StorageManager.getStorage_Debugging()
 
 local CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE = {
   [CarStateMachine.CarStateType.DRIVING_NORMALLY] = ColorManager.RGBM_Colors.White,
@@ -101,27 +163,26 @@ local function addTooltipOverLastItem(text, _colWidth_unused, idSuffix)
   if not text or text == '' then return end
 
   -- Header rect is returned in window space:
-  local min = ui.itemRectMin()
-  local max = ui.itemRectMax()
-  local w = math.max(max.x - min.x, 1)
-  local h = math.max(max.y - min.y, ui.textLineHeightWithSpacing())
+  local min = ui_itemRectMin()
+  local max = ui_itemRectMax()
+  local w = math_max(max.x - min.x, 1)
+  local h = math_max(max.y - min.y, ui_textLineHeightWithSpacing())
 
   -- Place a non-interfering hitbox over that exact rect (screen space):
-  local saved = ui.cursorScreenPos()
-  ui.setItemAllowOverlap()
-  ui.setCursorScreenPos(ui.windowPos() + min)
-  ui.invisibleButton('##hdrTip'..(idSuffix or ''), vec2(w, h))
-  if ui.itemHovered() then
-    ui.setTooltip(text)
+  local saved = ui_cursorScreenPos()
+  ui_setItemAllowOverlap()
+  ui_setCursorScreenPos(ui_windowPos() + min)
+  ui_invisibleButton('##hdrTip'..(idSuffix or ''), vec2(w, h))
+  if ui_itemHovered() then
+    ui_setTooltip(text)
     -- Or: ui.tooltip(function() ui.textWrapped(text) end)
   end
-  ui.setCursorScreenPos(saved)
+  ui_setCursorScreenPos(saved)
 end
 
 
 
 UIManager.drawUICarList = function()
-  local storage_Debugging = StorageManager.getStorage_Debugging()
 
   --[====[
   if ui.button('Teleport', ui.ButtonFlags.None) then
@@ -149,7 +210,7 @@ UIManager.drawUICarList = function()
   end
   --]====]
 
-  ui.separator()
+  ui_separator()
 
   -- local sim = ac.getSim()
   -- local yieldingCount = 0
@@ -159,22 +220,22 @@ UIManager.drawUICarList = function()
       -- yieldingCount = yieldingCount + 1
     -- end
   -- end
-  -- ui.text(string.format('Yielding: %d / %d', yieldingCount, totalAI))
+  -- ui.text(string_format('Yielding: %d / %d', yieldingCount, totalAI))
 
   if not storage_Debugging.drawCarList then
-    ui.newLine(1)
-    ui.textColored('To understand exactly what each AI car is doing, enable the "Show the UI Car List" option in the Debugging settings.', ColorManager.RGBM_Colors.Aquamarine)
-    ui.textColored('A table of all the cars will then be displayed here showing all kinds of data about the cars and the kinds of decisions they are taking.', ColorManager.RGBM_Colors.Aquamarine)
+    ui_newLine(1)
+    ui_textColored('To understand exactly what each AI car is doing, enable the "Show the UI Car List" option in the Debugging settings.', ColorManager.RGBM_Colors.Aquamarine)
+    ui_textColored('A table of all the cars will then be displayed here showing all kinds of data about the cars and the kinds of decisions they are taking.', ColorManager.RGBM_Colors.Aquamarine)
     return
   end
 
   -- Draw as a table: columns with headings
   -- draw the column headers including setting the width
   local totalColumns = #carTableColumns_name
-  ui.columns(totalColumns, true)
+  ui_columns(totalColumns, true)
   for col = 1, totalColumns do
-    ui.setColumnWidth(col-1, carTableColumns_width[col])
-    ui.columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
+    ui_setColumnWidth(col-1, carTableColumns_width[col])
+    ui_columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
     -- addTooltipOverLastItem(carTableColumns_tooltip[col], carTableColumns_width[col], col)
 
     --ui.setColumnWidth(col-1, carTableColumns_width[col])
@@ -187,20 +248,20 @@ UIManager.drawUICarList = function()
     local carIndex = car.index
     if car and CarManager.cars_initialized[carIndex] then
       -- local distShown = order[n].d or CarManager.cars_distanceFromPlayerToCar[carIndex]
-      local state = CarStateMachine.getCurrentState(carIndex)
-      local throttleLimitString = (not (CarManager.cars_throttleLimit[carIndex] == 1)) and string.format('%.2f', CarManager.cars_throttleLimit[carIndex]) or 'no limit'
-      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[carIndex] == math.huge)) and string.format('%d km/h', CarManager.cars_aiTopSpeed[carIndex]) or 'no limit'
+      local state = CarStateMachine_getCurrentState(carIndex)
+      local throttleLimitString = (not (CarManager.cars_throttleLimit[carIndex] == 1)) and string_format('%.2f', CarManager.cars_throttleLimit[carIndex]) or 'no limit'
+      local aiTopSpeedString = (not (CarManager.cars_aiTopSpeed[carIndex] == math.huge)) and string_format('%d km/h', CarManager.cars_aiTopSpeed[carIndex]) or 'no limit'
       -- local cantYieldReason = CarManager.cars_reasonWhyCantYield[carIndex] or ''
       -- local cantYieldReason = Strings.StringValues[Strings.StringCategories.ReasonWhyCantYield][CarManager.cars_reasonWhyCantYield_NAME[carIndex]] or ''
       -- local cantOvertakeReason = CarManager.cars_reasonWhyCantOvertake[carIndex] or ''
-      local cantYieldReason = StringsManager.resolveStringValue(Strings.StringCategories.ReasonWhyCantYield, CarManager.cars_reasonWhyCantYield_NAME[carIndex]) or ''
-      local cantOvertakeReason = StringsManager.resolveStringValue(Strings.StringCategories.ReasonWhyCantOvertake, CarManager.cars_reasonWhyCantOvertake_NAME[carIndex]) or ''
+      local cantYieldReason = StringsManager_resolveStringValue(Strings.StringCategories.ReasonWhyCantYield, CarManager.cars_reasonWhyCantYield_NAME[carIndex]) or ''
+      local cantOvertakeReason = StringsManager_resolveStringValue(Strings.StringCategories.ReasonWhyCantOvertake, CarManager.cars_reasonWhyCantOvertake_NAME[carIndex]) or ''
       local uiColor = CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[state] or ColorManager.RGBM_Colors.White
       if car.index == 0 then
         uiColor = CARLIST_ROW_TEXT_COLOR_LOCALPLAYER
       end
 
-      local carInput = ac.overrideCarControls(carIndex)
+      local carInput = ac_overrideCarControls(carIndex)
       local carInputClutch = -1
       local carInputGas = -1
       local carInputBrake = -1
@@ -215,7 +276,7 @@ UIManager.drawUICarList = function()
       local currentlyOvertakingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
       local currentlyOvertaking = currentlyOvertakingCarIndex
       -- local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carIndex)
-      local actualTrackLateralOffset = CarManager.getActualTrackLateralOffset(car.position)
+      local actualTrackLateralOffset = CarManager_getActualTrackLateralOffset(car.position)
 
       local culpritInAccidentIndex = AccidentManager.cars_culpritInAccidentIndex[carIndex]
       local victimInAccidentIndex = AccidentManager.cars_victimInAccidentIndex[carIndex]
@@ -223,17 +284,17 @@ UIManager.drawUICarList = function()
       local currentlyNavigatingAroundAccidentIndex = CarManager.cars_navigatingAroundAccidentIndex[carIndex]
 
       -- local previousCarState = CarStateMachine.cars_previousState[carIndex]
-      local previousCarState = CarStateMachine.getPreviousState(carIndex)
+      local previousCarState = CarStateMachine_getPreviousState(carIndex)
       -- local lastStateExitReason = CarManager.cars_statesExitReason[carIndex][previousCarState] or ''
-      local lastStateExitReason = StringsManager.resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousCarState]) or ''
+      local lastStateExitReason = StringsManager_resolveStringValue(Strings.StringCategories.StateExitReason, CarManager.cars_statesExitReason_NAME[carIndex][previousCarState]) or ''
 
       -- local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(carIndex)
 
       local carSplinePosition = car.splinePosition
-      local trackAISplineSides = ac.getTrackAISplineSides(carSplinePosition)
+      local trackAISplineSides = ac_getTrackAISplineSides(carSplinePosition)
 
       local carFront = sortedCarsList[n-1]
-      local closingSpeed, timeToCollision, distanceToFrontCar = CarManager.getClosingSpeed(car, carFront)
+      local closingSpeed, timeToCollision, distanceToFrontCar = CarManager_getClosingSpeed(car, carFront)
 
       local aiCaution = CarManager.cars_aiCaution[carIndex]
       -- local aiAggression = CarManager.cars_aiAggression[carIndex]
@@ -241,122 +302,122 @@ UIManager.drawUICarList = function()
 
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
-        Logger.error(string.format('Car #%d (current: %s, previous:%s) is both yielding to car #%d and overtaking car #%d at the same time!', carIndex, CarStateMachine.CarStateTypeStrings[state],CarStateMachine.CarStateTypeStrings[previousCarState], currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
+        Logger_error(string_format('Car #%d (current: %s, previous:%s) is both yielding to car #%d and overtaking car #%d at the same time!', carIndex, CarStateMachine.CarStateTypeStrings[state],CarStateMachine.CarStateTypeStrings[previousCarState], currentlyYieldingCarIndex, currentlyOvertakingCarIndex))
       end
 
       -- start a new ui id section so that we don't have name collisions
-      ui.pushID(carIndex)
+      ui_pushID(carIndex)
 
       -- cache the top-left screen position of this row so we can draw the full-row background first, then reset the cursor to the same Y before drawing cells.
-      local rowTop = ui.cursorScreenPos()  -- current screen-space cursor
+      local rowTop = ui_cursorScreenPos()  -- current screen-space cursor
 
       -- send the full-row clickable to the background so the per-cell text/controls render cleanly on top across all columns
-      ui.pushColumnsBackground()
+      ui_pushColumnsBackground()
 
       -- push the row colors we'll use for the full-row clickable
-      ui.pushStyleColor(ui.StyleColor.Header, CARLIST_ROW_BACKGROUND_COLOR_SELECTED)
-      ui.pushStyleColor(ui.StyleColor.HeaderActive, CARLIST_ROW_BACKGROUND_COLOR_CLICKED)
-      ui.pushStyleColor(ui.StyleColor.HeaderHovered, CARLIST_ROW_BACKGROUND_COLOR_HOVERED)
+      ui_pushStyleColor(ui.StyleColor.Header, CARLIST_ROW_BACKGROUND_COLOR_SELECTED)
+      ui_pushStyleColor(ui.StyleColor.HeaderActive, CARLIST_ROW_BACKGROUND_COLOR_CLICKED)
+      ui_pushStyleColor(ui.StyleColor.HeaderHovered, CARLIST_ROW_BACKGROUND_COLOR_HOVERED)
 
       -- create the full-row selectable which will be clickable
       local isRowSelected = carIndex == uiCarListSelectedIndex
-      local rowH = ui.textLineHeightWithSpacing()
+      local rowH = ui_textLineHeightWithSpacing()
       -- todo: check about this string concat here: '##row'..carIndex
-      ui.selectable('##row'..carIndex, isRowSelected, ui.SelectableFlags.SpanAllColumns, vec2(0, rowH)) -- ui.SelectableFlags.SpanAllColumns used to expand the hitbox across the entire row
+      ui_selectable('##row'..carIndex, isRowSelected, ui.SelectableFlags.SpanAllColumns, vec2(0, rowH)) -- ui.SelectableFlags.SpanAllColumns used to expand the hitbox across the entire row
 
       -- grab the itemClicked event of the selectable we just created
-      local rowClicked = ui.itemClicked()         -- capture immediately (refers to the selectable)
+      local rowClicked = ui_itemClicked()         -- capture immediately (refers to the selectable)
       -- ui.setItemAllowOverlap()                     -- allow drawing cells over the clickable area
 
       -- pop the row colors now that the selectable is done
-      ui.popStyleColor(3)
+      ui_popStyleColor(3)
 
       -- pop the columns background so that cells draw normally
-      ui.popColumnsBackground()
+      ui_popColumnsBackground()
 
       -- put cursor back so first cell draws at the right Y
       -- this is because we're drawing the clickable row first and then drawing the cells on top of it
-      ui.setCursorScreenPos(rowTop)
+      ui_setCursorScreenPos(rowTop)
 
       -- Row cells
-      ui.textColored(string.format("#%02d", carIndex), uiColor); ui.nextColumn()
+      ui_textColored(string_format("#%02d", carIndex), uiColor); ui_nextColumn()
       -- if ui.itemHovered() then ui.setTooltip(carTableColumns_tooltip[1]) end
-      -- ui.textColored(string.format("%.3f", distShown or 0), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", carSplinePosition), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.2f|%.2f", trackAISplineSides.x, trackAISplineSides.y), uiColor); ui.nextColumn()
-      -- ui.textColored(string.format("%d km/h", CarManager.cars_MAXTOPSPEED[carIndex]), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%d km/h", math.floor(car.speedKmh)), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%d km/h", math.floor(CarManager.cars_averageSpeedKmh[carIndex] or 0)), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", actualTrackLateralOffset), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", CarManager.getCalculatedTrackLateralOffset(carIndex) or 0), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.3f", CarManager.cars_targetSplineOffset[carIndex] or 0), uiColor); ui.nextColumn()
-      -- ui.textColored(string.format("%.3f", trackUpcomingTurn.x, uiColor)); ui.nextColumn()
-      -- ui.textColored(string.format("%.3f", distanceToUpcomingTurn, uiColor)); ui.nextColumn()
-      -- ui.textColored(string.format("%.3f", trackUpcomingTurn.y, uiColor)); ui.nextColumn()
-      ui.textColored(string.format("%.1f|%.1f|%.1f", carInputClutch, carInputBrake, carInputGas), uiColor); ui.nextColumn()
-      ui.textColored(throttleLimitString, uiColor); ui.nextColumn()
-      ui.textColored(aiTopSpeedString, uiColor); ui.nextColumn()
-      ui.textColored(tostring(aiCaution), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.2f", aiAggression), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.2f", CarManager.cars_grip[carIndex] or 0), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.2f km/h", closingSpeed), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.2fs", timeToCollision), uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.2f m", distanceToFrontCar), uiColor); ui.nextColumn()
+      -- ui.textColored(string_format("%.3f", distShown or 0), uiColor); ui.nextColumn()
+      ui_textColored(string_format("%.3f", carSplinePosition), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.2f|%.2f", trackAISplineSides.x, trackAISplineSides.y), uiColor); ui_nextColumn()
+      -- ui.textColored(string_format("%d km/h", CarManager.cars_MAXTOPSPEED[carIndex]), uiColor); ui.nextColumn()
+      ui_textColored(string_format("%d km/h", math_floor(car.speedKmh)), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%d km/h", math_floor(CarManager.cars_averageSpeedKmh[carIndex] or 0)), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.3f", actualTrackLateralOffset), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.3f", CarManager_getCalculatedTrackLateralOffset(carIndex) or 0), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.3f", CarManager.cars_targetSplineOffset[carIndex] or 0), uiColor); ui_nextColumn()
+      -- ui.textColored(string_format("%.3f", trackUpcomingTurn.x, uiColor)); ui.nextColumn()
+      -- ui.textColored(string_format("%.3f", distanceToUpcomingTurn, uiColor)); ui.nextColumn()
+      -- ui.textColored(string_format("%.3f", trackUpcomingTurn.y, uiColor)); ui.nextColumn()
+      ui_textColored(string_format("%.1f|%.1f|%.1f", carInputClutch, carInputBrake, carInputGas), uiColor); ui_nextColumn()
+      ui_textColored(throttleLimitString, uiColor); ui_nextColumn()
+      ui_textColored(aiTopSpeedString, uiColor); ui_nextColumn()
+      ui_textColored(tostring(aiCaution), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.2f", aiAggression), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.2f", CarManager.cars_grip[carIndex] or 0), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.2f km/h", closingSpeed), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.2fs", timeToCollision), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.2f m", distanceToFrontCar), uiColor); ui_nextColumn()
       -- ui.textColored(tostring(CarManager.cars_aiStopCounter[carIndex] or 0), uiColor); ui.nextColumn()
       -- ui.textColored(tostring(CarManager.cars_gentleStop[carIndex]), uiColor); ui.nextColumn()
-      ui.textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui.nextColumn()
-      ui.textColored(CarStateMachine.CarStateTypeStrings[state], uiColor); ui.nextColumn()
-      ui.textColored(string.format("%.1fs", CarManager.cars_timeInCurrentState[carIndex]), uiColor); ui.nextColumn()
+      ui_textColored(CarStateMachine.CarStateTypeStrings[previousCarState], uiColor); ui_nextColumn()
+      ui_textColored(CarStateMachine.CarStateTypeStrings[state], uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.1fs", CarManager.cars_timeInCurrentState[carIndex]), uiColor); ui_nextColumn()
       -- if CarManager.cars_currentlyYielding[carIndex] then
       if currentlyYielding then
-        -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[carIndex] or 0), uiColor)
-        ui.textColored(string.format("yes #%d", currentlyYieldingCarIndex), uiColor)
+        -- ui.textColored(string_format("yes (%.1fs)", CarManager.cars_yieldTime[carIndex] or 0), uiColor)
+        ui_textColored(string_format("yes #%d", currentlyYieldingCarIndex), uiColor)
       else
-        ui.textColored("no", uiColor)
+        ui_textColored("no", uiColor)
       end
-      ui.nextColumn()
+      ui_nextColumn()
       if currentlyOvertaking then
-        -- ui.textColored(string.format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
-        -- ui.textColored(string.format("yes"), uiColor)
-        ui.textColored(string.format("yes #%d", currentlyOvertakingCarIndex), uiColor)
+        -- ui.textColored(string_format("yes (%.1fs)", CarManager.cars_yieldTime[i] or 0), uiColor)
+        -- ui.textColored(string_format("yes"), uiColor)
+        ui_textColored(string_format("yes #%d", currentlyOvertakingCarIndex), uiColor)
       else
-        ui.textColored("no", uiColor)
+        ui_textColored("no", uiColor)
       end
-      ui.nextColumn()
-      
+      ui_nextColumn()
+
       -- if involvedInAccidentIndex then
         -- local culpritOrVictim = culpritInAccidentIndex and "Culprit" or "Victim"
-        -- ui.textColored(string.format("Accident:#%d %s", involvedInAccidentIndex, culpritOrVictim), uiColor)
+        -- ui.textColored(string_format("Accident:#%d %s", involvedInAccidentIndex, culpritOrVictim), uiColor)
       -- else
         -- ui.textColored("no", uiColor)
       -- end
       -- ui.nextColumn()
 
       -- if currentlyNavigatingAroundAccidentIndex and currentlyNavigatingAroundAccidentIndex > 0 then
-        -- ui.textColored(string.format("yes #%d (car: #%d)", currentlyNavigatingAroundAccidentIndex, CarManager.cars_navigatingAroundCarIndex[carIndex]), uiColor)
+        -- ui.textColored(string_format("yes #%d (car: #%d)", currentlyNavigatingAroundAccidentIndex, CarManager.cars_navigatingAroundCarIndex[carIndex]), uiColor)
       -- else
         -- ui.textColored("no", uiColor)
       -- end
       -- ui.nextColumn()
 
-      ui.textColored(lastStateExitReason, uiColor); ui.nextColumn()
-      ui.textColored(cantYieldReason, uiColor); ui.nextColumn()
-      ui.textColored(cantOvertakeReason, uiColor); ui.nextColumn()
+      ui_textColored(lastStateExitReason, uiColor); ui_nextColumn()
+      ui_textColored(cantYieldReason, uiColor); ui_nextColumn()
+      ui_textColored(cantOvertakeReason, uiColor); ui_nextColumn()
 
       -- end the ui id section
-      ui.popID()
+      ui_popID()
 
       if rowClicked then
-          -- Logger.log(string.format('UIManager: Car row %d clicked', carIndex))
+          -- Logger.log(string_format('UIManager: Car row %d clicked', carIndex))
           uiCarListSelectedIndex = carIndex
-          CameraManager.followCarWithChaseCamera(carIndex)
+          CameraManager_followCarWithChaseCamera(carIndex)
       end
 
     end
   end
 
   -- reset columns
-  ui.columns(1, false)
+  ui_columns(1, false)
 end
 
 -- UIManager.indicatorStatusText = function(i)
@@ -378,9 +439,8 @@ end
 -- end
 
 function UIManager.drawCarStateOverheadText()
-  local storage_Debugging = StorageManager.getStorage_Debugging()
   if not storage_Debugging.debugShowCarStateOverheadText then return end
-  local sim = ac.getSim()
+  local sim = ac_getSim()
   -- local depthModeBeforeModification = render.DepthMode
   -- if storage.drawOnTop then
     -- -- draw over everything (no depth testing)
@@ -405,8 +465,8 @@ function UIManager.drawCarStateOverheadText()
 
   local debugCarStateOverheadShowDistance = storage_Debugging.debugCarGizmosDrawistance
   local debugCarStateOverheadShowDistanceSqr = debugCarStateOverheadShowDistance * debugCarStateOverheadShowDistance
-  local cameraFocusedCarIndex = CameraManager.getFocusedCarIndex()
-  local cameraFocusedCar = ac.getCar(cameraFocusedCarIndex)
+  local cameraFocusedCarIndex = CameraManager_getFocusedCarIndex()
+  local cameraFocusedCar = ac_getCar(cameraFocusedCarIndex)
   local carsCount = sim.carsCount
   if cameraFocusedCar then
     local cameraFocusedCarPosition = cameraFocusedCar.position
@@ -414,18 +474,18 @@ function UIManager.drawCarStateOverheadText()
     -- for i, car in ac.iterateCars() do
       -- CarManager.ensureDefaults(i) -- Ensure defaults are set if this car hasn't been initialized yet
       -- if CarManager.cars_initialized[i] and (math.abs(CarManager.cars_currentSplineOffset_meters[i] or 0) > 0.02 or CarManager.cars_isSideBlocked[i]) then
-      local carState = CarStateMachine.getCurrentState(i)
+      local carState = CarStateMachine_getCurrentState(i)
       local showText = CarManager.cars_initialized[i] and carState ~= CarStateMachine.CarStateType.DRIVING_NORMALLY
       if showText then
-        local car = ac.getCar(i)
+        local car = ac_getCar(i)
         if car then
-          local distanceFromCameraFocusedCarToThisCarSqr = MathHelpers.distanceBetweenVec3sSqr(car.position, cameraFocusedCarPosition)
+          local distanceFromCameraFocusedCarToThisCarSqr = MathHelpers_distanceBetweenVec3sSqr(car.position, cameraFocusedCarPosition)
           local isThisCarCloseToCameraFocusedCar = distanceFromCameraFocusedCarToThisCarSqr < debugCarStateOverheadShowDistanceSqr
           if isThisCarCloseToCameraFocusedCar then
-            local text = string.format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
-            render.debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState], 1, render.FontAlign.Center)--, render.FontAlign.Center)
+            local text = string_format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
+            render_debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState], 1, render.FontAlign.Center)--, render.FontAlign.Center)
           end
-          -- local txt = string.format(
+          -- local txt = string_format(
             -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
             -- i, CarManager.cars_distanceFromPlayerToCar[i], math.floor(car.speedKmh),
             -- CarManager.cars_currentSplineOffset[i],
@@ -434,7 +494,7 @@ function UIManager.drawCarStateOverheadText()
           -- )
           -- -- do
           -- --   local indicatorStatusText = UIManager.indicatorStatusText(i)
-          -- --   txt = txt .. string.format("  ind=%s", indicatorStatusText)
+          -- --   txt = txt .. string_format("  ind=%s", indicatorStatusText)
           -- -- end
 
           -- -- render the text slightly above the car
@@ -454,75 +514,75 @@ UIManager.drawMainWindowLateralOffsetsSection = function()
     -- ui.dwriteText('Driving Lanes', 15)
     -- ui.newLine(1)
 
-    ui.columns(2, false, "mainWindow_lateralsSection")
-    ui.setColumnWidth(0, 260)
+    ui_columns(2, false, "mainWindow_lateralsSection")
+    ui_setColumnWidth(0, 260)
 
     local handleYielding = storage_Yielding.handleYielding
     local handleOvertaking = storage_Overtaking.handleOvertaking
 
-    local yieldingSide = RaceTrackManager.getYieldingSide()
-    local overtakingSide = RaceTrackManager.getOvertakingSide()
-    local defaultDrivingSide = RaceTrackManager.getDefaultDrivingSide()
+    local yieldingSide = RaceTrackManager_getYieldingSide()
+    local overtakingSide = RaceTrackManager_getOvertakingSide()
+    local defaultDrivingSide = RaceTrackManager_getDefaultDrivingSide()
     local yieldingSideString = RaceTrackManager.TrackSideStrings[yieldingSide]
     local overtakingSideString = RaceTrackManager.TrackSideStrings[overtakingSide]
     local defaultDrivingSideString = RaceTrackManager.TrackSideStrings[defaultDrivingSide]
 
-    ui.newLine(1)
+    ui_newLine(1)
     if handleOvertaking then
-      ui.text(string.format('Overtaking Lateral Offset: %.3f (%s)', storage.overtakingLateralOffset, overtakingSideString))
-      ui.newLine(1)
+      ui_text(string_format('Overtaking Lateral Offset: %.3f (%s)', storage.overtakingLateralOffset, overtakingSideString))
+      ui_newLine(1)
     end
-    ui.text(string.format('Default Lateral Offset: %.3f (%s)', storage.defaultLateralOffset, defaultDrivingSideString))
+    ui_text(string_format('Default Lateral Offset: %.3f (%s)', storage.defaultLateralOffset, defaultDrivingSideString))
     if handleYielding then
-      ui.newLine(1)
-      ui.text(string.format('Yielding Lateral Offset: %.3f (%s)', storage.yieldingLateralOffset, yieldingSideString))
+      ui_newLine(1)
+      ui_text(string_format('Yielding Lateral Offset: %.3f (%s)', storage.yieldingLateralOffset, yieldingSideString))
     end
 
-    ui.nextColumn()
+    ui_nextColumn()
 
-    UILateralOffsetsImageWidget.draw(storage)
-    --ui.textColored(string.format('Yielding side: %s, Overtaking side: %s', yieldingSideString, overtakingSideString), ColorManager.RGBM_Colors.LightSeaGreen)
+    UILateralOffsetsImageWidget_draw(storage)
+    --ui.textColored(string_format('Yielding side: %s, Overtaking side: %s', yieldingSideString, overtakingSideString), ColorManager.RGBM_Colors.LightSeaGreen)
 
     if yieldingSide == overtakingSide then
-      ui.textColored('Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
+      ui_textColored('Yielding side and overtaking side are the same!', ColorManager.RGBM_Colors.Yellow)
     end
 
     -- end the table
-    ui.columns(1, false)
-    ui.newLine(1)
-    ui.textColored(
+    ui_columns(1, false)
+    ui_newLine(1)
+    ui_textColored(
       "These lateral offsets for the AI cars dictate the side of the track they should drive on depending on what they are currently doing (modifyable from the Settings).", 
       ColorManager.RGBM_Colors.DarkGray)
 end
 
 UIManager.drawAppNotRunningMessageInMainWindow = function()
-    ui.textColored(string.format('Realistic Trackday not running.', tostring(storage.enabled), tostring(Constants.IS_ONLINE)), ColorManager.RGBM_Colors.Red)
-    ui.newLine(1)
+    ui_textColored(string_format('Realistic Trackday not running.', tostring(storage.enabled), tostring(Constants.IS_ONLINE)), ColorManager.RGBM_Colors.Red)
+    ui_newLine(1)
 
     local appEnabled = storage.enabled
-    ui.text('App Enabled: ')
-    ui.sameLine()
+    ui_text('App Enabled: ')
+    ui_sameLine()
     local appEnabledColor = appEnabled and ColorManager.RGBM_Colors.Green or ColorManager.RGBM_Colors.Red
-    ui.textColored(string.format('%s', tostring(appEnabled)), appEnabledColor)
+    ui_textColored(string_format('%s', tostring(appEnabled)), appEnabledColor)
 
     local isOnline = Constants.IS_ONLINE
-    ui.text('Playing Online: ')
-    ui.sameLine()
+    ui_text('Playing Online: ')
+    ui_sameLine()
     local isOnlineColor = isOnline and ColorManager.RGBM_Colors.Red or ColorManager.RGBM_Colors.Green
-    ui.textColored(string.format('%s', tostring(isOnline)), isOnlineColor)
+    ui_textColored(string_format('%s', tostring(isOnline)), isOnlineColor)
 end
 
 ---Opens or closes the specified window.
 ---@param windowID string
 ---@param open boolean @true to open, false to close
 local openWindow = function(windowID, open)
-  ac.setWindowOpen(windowID, open)
+  ac_setWindowOpen(windowID, open)
 end
 
 ---Opens the specified window if closed, or closes it if opened.
 ---@param windowID string
 local toggleWindow = function(windowID)
-  local windowOpen = ac.isWindowOpen(windowID)
+  local windowOpen = ac_isWindowOpen(windowID)
   openWindow(windowID, not windowOpen)
 end
 
