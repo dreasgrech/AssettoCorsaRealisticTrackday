@@ -23,6 +23,8 @@ local ui_dwriteText = ui.dwriteText
 local ui_checkbox = ui.checkbox
 local ui_pushDWriteFont = ui.pushDWriteFont
 local ui_popDWriteFont = ui.popDWriteFont
+local ui_MouseButton = ui.MouseButton
+local ui_mouseClicked = ui.mouseClicked
 local string = string
 local string_format = string.format
 local RaceTrackManager = RaceTrackManager
@@ -77,17 +79,31 @@ local storage_Debugging = StorageManager.getStorage_Debugging()
 ---@param maxValue number? @Default value: 1.
 ---@param sliderWidth number
 ---@param labelFormat string|'%.3f'|nil @C-style format string. Default value: `'%.3f'`.
----@param defaultValue number|nil @If provided, shows the default value in the tooltip.
+---@param defaultValue number @The default value to reset to on right-click and is shown in the tooltip.
 ---@return number @Possibly updated slider value.
 local renderSlider = function(label, tooltip, value, minValue, maxValue, sliderWidth, labelFormat, defaultValue)
+    -- set the width of the slider
     ui_pushItemWidth(sliderWidth)
+
+    -- render the slider
     local newValue = ui_slider(label, value, minValue, maxValue, labelFormat)
+
+    -- reset the item width
     ui_popItemWidth()
-    if defaultValue ~= nil then
-        tooltip = string_format('%s\n\nDefault: %.2f', tooltip, defaultValue)
+
+    tooltip = string_format('%s\n\nDefault: %.2f', tooltip, defaultValue)
+
+    if ui_itemHovered() then
+        -- render the tooltip
+        ui_setTooltip(tooltip)
+
+        -- reset the slider to default value on right-click
+        if ui_mouseClicked(ui_MouseButton.Right) then
+            -- Logger.log(string.format('Resetting slider "%s" to default value: %.2f', label, defaultValue))
+            newValue = defaultValue
+        end
     end
 
-    if ui_itemHovered() then ui_setTooltip(tooltip) end
     return newValue
 end
 
