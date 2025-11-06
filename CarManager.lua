@@ -112,10 +112,10 @@ CarManager.sortedCarList_carIndexToSortedIndex = {} -- [carIndex] = sortedListIn
 ---@enum CarManager.AICautionValues
 ---Holds the different AI Caution levels used in different situations
 CarManager.AICautionValues = {
-  OVERTAKING_WITH_NO_OBSTACLE_INFRONT = 0,
-  OVERTAKING_WITH_OBSTACLE_INFRONT = 1,
-  OVERTAKING_WHILE_INCORNER = 2,
-  YIELDING = 4,
+  -- OVERTAKING_WITH_NO_OBSTACLE_INFRONT = 0,
+  -- OVERTAKING_WITH_OBSTACLE_INFRONT = 1,
+  -- OVERTAKING_WHILE_INCORNER = 2,
+  -- YIELDING = 4,
   AFTER_ACCIDENT = 16
 }
 

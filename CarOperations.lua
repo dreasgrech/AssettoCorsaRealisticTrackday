@@ -66,6 +66,10 @@ local RENDER_CAR_BLOCK_CHECK_RAYS_HIT_COLOR = ColorManager.RGBM_Colors.SeaGreen
 
 local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level
 
+local storage = StorageManager.getStorage()
+local storage_Overtaking = StorageManager.getStorage_Overtaking()
+local storage_Yielding = StorageManager.getStorage_Yielding()
+
 --[===[
 https://discord.com/channels/453595061788344330/962668819933982720/1423344738576109741
 
@@ -179,7 +183,6 @@ end
 ---Removes any AI caution and sets it back to the default value.
 ---@param carIndex integer
 CarOperations.removeAICaution = function(carIndex)
-  local storage = StorageManager.getStorage()
   CarOperations.setAICaution(carIndex, storage.defaultAICaution)
 end
 
@@ -495,7 +498,6 @@ end
 ---@param useIndicatorLights boolean
 ---@return boolean
 function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
-    local storage_Overtaking = StorageManager.getStorage_Overtaking()
     local driveToSide = RaceTrackManager.getOvertakingSide()
     -- local targetOffset = storage.maxLateralOffset_normalized
     -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
@@ -519,7 +521,6 @@ function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage, useIndicato
       local driveToSide = RaceTrackManager.getYieldingSide()
       -- local targetOffset = storage.maxLateralOffset_normalized
       -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
-      local storage_Yielding = StorageManager.getStorage_Yielding()
       local targetOffset = storage.yieldingLateralOffset
       local rampSpeed_mps = storage_Yielding.rampSpeed_mps
       local overrideAiAwareness = storage.overrideAiAwareness
@@ -538,7 +539,8 @@ CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtaki
     local overtakingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(overtakingCar.position)
 
     -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
-    local aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
+    -- local aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
+    local aiCaution = storage.AICaution_OvertakingWithObstacleInFront
     local aiAggression = CarManager.AIAggressionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
 
     -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
@@ -547,8 +549,8 @@ CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtaki
         local yieldingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(yieldingCar.position)
         local lateralOffsetsDelta = math.abs(overtakingCarTrackLateralOffset - yieldingCarTrackLateralOffset)
         if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
-            -- aiCaution = AICAUTION_WHILE_OVERTAKING_AND_NO_OBSTACLE_INFRONT
-            aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
+            -- aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
+            aiCaution = storage.AICaution_OvertakingWithNoObstacleInFront
             aiAggression = CarManager.AIAggressionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
         end
     end
@@ -557,7 +559,8 @@ CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtaki
     local overtakingCarIndex = overtakingCar.index
     local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(overtakingCarIndex)
     if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION then
-        aiCaution = CarManager.AICautionValues.OVERTAKING_WHILE_INCORNER
+        -- aiCaution = CarManager.AICautionValues.OVERTAKING_WHILE_INCORNER
+        aiCaution = storage.AICaution_OvertakingWhileInCorner
         aiAggression = CarManager.AIAggressionValues.OVERTAKING_WHILE_INCORNER
     end
 

@@ -31,28 +31,31 @@ end
 ---@enum StorageManager.Options
 StorageManager.Options ={
     Enabled = 1,
-    -- HandleSideCheckingWhenYielding = 2,
-    -- HandleSideCheckingWhenOvertaking = 3,
-    OverrideAiAwareness = 4,
-    DefaultAICaution = 5,
-    OverrideOriginalAIAggression_DrivingNormally = 6,
-    OverrideOriginalAIAggression_Overtaking = 7,
-    DefaultAIAggression = 8,
-    GlobalTopSpeedLimitKmh = 9,
 
-    DefaultLateralOffset = 10,
-    YieldingLateralOffset = 11,
-    OvertakingLateralOffset = 12,
+    OverrideAiAwareness = 2,
+    DefaultAICaution = 3,
+    AICaution_OvertakingWithNoObstacleInFront = 4,
+    AICaution_OvertakingWithObstacleInFront = 5,
+    AICaution_OvertakingWhileInCorner = 6,
+    AICaution_Yielding = 7,
+    OverrideOriginalAIAggression_DrivingNormally = 8,
+    OverrideOriginalAIAggression_Overtaking = 9,
+    DefaultAIAggression = 10,
+    GlobalTopSpeedLimitKmh = 11,
 
-    ClearAhead_meters = 13,
+    DefaultLateralOffset = 12,
+    YieldingLateralOffset = 13,
+    OvertakingLateralOffset = 14,
 
-    CustomAIFlood_enabled = 14,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 15,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 16,
+    ClearAhead_meters = 15,
 
-    HandleAccidents = 17,
-    DistanceFromAccidentToSeeYellowFlag_meters = 18,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 19,
+    CustomAIFlood_enabled = 16,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 17,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 18,
+
+    HandleAccidents = 19,
+    DistanceFromAccidentToSeeYellowFlag_meters = 20,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 21,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -142,13 +145,21 @@ local optionsCollection_Overtaking_beforeDoD = {
 
 -- local RAMP_SPEEDS_MAX = 10
 
+-- local MIN_AI_CAUTION_VALUE = 3
+local MIN_AI_CAUTION_VALUE = 0
+local MAX_AI_CAUTION_VALUE = 16
+
 -- only used to build the actual tables that hold the runtime values
 local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.Enabled, default=false, min=nil, max=nil },
     -- { name = StorageManager.Options.HandleSideCheckingWhenYielding, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
-    { name = StorageManager.Options.DefaultAICaution, default=3, min=3, max=16 },
+    { name = StorageManager.Options.DefaultAICaution, default=3, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
+    { name = StorageManager.Options.AICaution_OvertakingWithNoObstacleInFront, default=0, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
+    { name = StorageManager.Options.AICaution_OvertakingWithObstacleInFront, default=1, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
+    { name = StorageManager.Options.AICaution_OvertakingWhileInCorner, default=2, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
+    { name = StorageManager.Options.AICaution_Yielding, default=4, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
     { name = StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally, default=true, min=nil, max=false },
     { name = StorageManager.Options.OverrideOriginalAIAggression_Overtaking, default=true, min=nil, max=false },
     { name = StorageManager.Options.DefaultAIAggression, default=.5, min=0, max=0.95 }, -- The max is .95 because it's mentioned in the docs for physics.setAIAggression that the value from the launcher is multiplied by .95 so that's the max
@@ -230,6 +241,10 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 -- ---@field yieldSide RaceTrackManager.TrackSide
 ---@field overrideAiAwareness boolean
 ---@field defaultAICaution integer
+---@field AICaution_OvertakingWithNoObstacleInFront integer
+---@field AICaution_OvertakingWithObstacleInFront integer
+---@field AICaution_OvertakingWhileInCorner integer
+---@field AICaution_Yielding integer
 ---@field overrideOriginalAIAggression_drivingNormally boolean
 ---@field overrideOriginalAIAggression_overtaking boolean
 ---@field defaultAIAggression integer
@@ -252,6 +267,10 @@ local storageTable = {
     -- handleSideCheckingWhenOvertaking = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenOvertaking],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
+    AICaution_OvertakingWithNoObstacleInFront = StorageManager.options_default[StorageManager.Options.AICaution_OvertakingWithNoObstacleInFront],
+    AICaution_OvertakingWithObstacleInFront = StorageManager.options_default[StorageManager.Options.AICaution_OvertakingWithObstacleInFront],
+    AICaution_OvertakingWhileInCorner = StorageManager.options_default[StorageManager.Options.AICaution_OvertakingWhileInCorner],
+    AICaution_Yielding = StorageManager.options_default[StorageManager.Options.AICaution_Yielding],
     overrideOriginalAIAggression_drivingNormally = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally],
     overrideOriginalAIAggression_overtaking = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_Overtaking],
     defaultAIAggression = StorageManager.options_default[StorageManager.Options.DefaultAIAggression],
