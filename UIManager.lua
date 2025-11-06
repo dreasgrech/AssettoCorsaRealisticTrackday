@@ -37,6 +37,8 @@ local ui_selectable = ui.selectable
 local ui_itemClicked = ui.itemClicked
 local ui_sameLine = ui.sameLine
 local ui_getScrollMaxY = ui.getScrollMaxY
+local ui_getScrollX = ui.getScrollX
+local ui_getScrollY = ui.getScrollY
 local render = render
 local render_debugText = render.debugText
 local math = math
@@ -158,29 +160,47 @@ end
 
 carTableColumns_dataBeforeDoD = nil  -- free memory
 
-local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
+local OVERHEAD_TEXT_HEIGHT_ABOVE_CAR = vec3(0, 2.0, 0)
+
+local addTooltipOverLastItem_scrollPosition = vec2(0,0)
+local addTooltipOverLastItem_invisibleButtonPosition = vec2(0,0)
+local addTooltipOverLastItem_invisibleButtonSize = vec2(0,0)
 
 -- Andreas: This function is needed because ImGui doesn't have built-in support for tooltips on column headers in tables i.e. ui.itemHovered() after a call to ui.columnSortingHeader() doesn't work.
 -- Minimal overlay for column-header tooltips.
 -- Uses the header’s own rect AFTER it’s drawn, so IDs/widths match.
-local function addTooltipOverLastItem(text, _colWidth_unused, idSuffix)
-  -- if not text or text == '' then return end
-
+local function addTooltipOnTableColumnHeader(text, idSuffix)
   -- Header rect is returned in window space:
   local itemRectMin = ui_itemRectMin()
   local itemRectMax = ui_itemRectMax()
   local w = math_max(itemRectMax.x - itemRectMin.x, 1)
   local h = math_max(itemRectMax.y - itemRectMin.y, ui_textLineHeightWithSpacing())
+  addTooltipOverLastItem_invisibleButtonSize:set(w, h)
 
-  -- Place a non-interfering hitbox over that exact rect (screen space):
-  local saved = ui_cursorScreenPos()
+  -- capture the current cursor screen position to restore it later, since we're going to move it to draw an invisible button which will capture the hover state
+  local previousCursorScreenPosition = ui_cursorScreenPos()
+
+  -- allow the invisible button to be drawn outside the normal item rect so that it can cover the entire column header area
   ui_setItemAllowOverlap()
-  ui_setCursorScreenPos(ui_windowPos() + itemRectMin)
-  ui_invisibleButton('##carListTableHeaderTip'..(idSuffix or ''), vec2(w, h))
+
+  -- determine the position of where to place the invisible button which will capture the hover for the tooltip
+  local scrollX = ui_getScrollX()
+  local scrollY = ui_getScrollY()
+  local windowPosition = ui_windowPos()
+  addTooltipOverLastItem_scrollPosition:set(scrollX, scrollY)
+  addTooltipOverLastItem_invisibleButtonPosition:set(windowPosition):sub(addTooltipOverLastItem_scrollPosition):add(itemRectMin)
+  ui_setCursorScreenPos(addTooltipOverLastItem_invisibleButtonPosition)
+
+  -- draw the invisible button over the column header
+  ui_invisibleButton('##carListTableHeaderTip'..idSuffix, addTooltipOverLastItem_invisibleButtonSize)
+
+  -- show the tooltip if hovered over the invisible button
   if ui_itemHovered() then
     ui_setTooltip(text)
   end
-  ui_setCursorScreenPos(saved)
+
+  -- restore previous cursor screen position before we added the invisible button
+  ui_setCursorScreenPos(previousCursorScreenPosition)
 end
 
 UIManager.isVerticalScrollVisible = function()
@@ -241,7 +261,7 @@ UIManager.drawUICarList = function()
   ui_columns(totalColumns, true)
   for col = 1, totalColumns do
     ui_setColumnWidth(col-1, carTableColumns_width[col])
-    addTooltipOverLastItem(carTableColumns_tooltip[col], carTableColumns_width[col], col)
+    addTooltipOnTableColumnHeader(carTableColumns_tooltip[col], col)
     ui_columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
   end
 
@@ -487,7 +507,7 @@ function UIManager.drawCarStateOverheadText()
           local isThisCarCloseToCameraFocusedCar = distanceFromCameraFocusedCarToThisCarSqr < debugCarStateOverheadShowDistanceSqr
           if isThisCarCloseToCameraFocusedCar then
             local text = string_format("#%d %s", car.index, CarStateMachine.CarStateTypeStrings[carState])
-            render_debugText(car.position + overheadTextHeightAboveCar, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState], 1, render.FontAlign.Center)--, render.FontAlign.Center)
+            render_debugText(car.position + OVERHEAD_TEXT_HEIGHT_ABOVE_CAR, text, CARSTATES_TO_CARLIST_ROW_TEXT_COLOR_CURRENTSTATE[carState], 1, render.FontAlign.Center)--, render.FontAlign.Center)
           end
           -- local txt = string_format(
             -- "#%02d d=%5.1fm  v=%3dkm/h  offset=%4.3f  targetOffset=%4.3f state=%s",
