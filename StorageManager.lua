@@ -42,20 +42,21 @@ StorageManager.Options ={
     OverrideOriginalAIAggression_Overtaking = 9,
     DefaultAIAggression = 10,
     GlobalTopSpeedLimitKmh = 11,
+    DeferTimeAfterSessionStart = 12,
 
-    DefaultLateralOffset = 12,
-    YieldingLateralOffset = 13,
-    OvertakingLateralOffset = 14,
+    DefaultLateralOffset = 13,
+    YieldingLateralOffset = 14,
+    OvertakingLateralOffset = 15,
 
-    ClearAhead_meters = 15,
+    ClearAhead_meters = 16,
 
-    CustomAIFlood_enabled = 16,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 17,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 18,
+    CustomAIFlood_enabled = 17,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 18,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 19,
 
-    HandleAccidents = 19,
-    DistanceFromAccidentToSeeYellowFlag_meters = 20,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 21,
+    HandleAccidents = 20,
+    DistanceFromAccidentToSeeYellowFlag_meters = 21,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 22,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -105,7 +106,7 @@ local optionsCollection_Debugging_beforeDoD = {
     { name = StorageManager.Options_Debugging.DebugCarGizmosDrawistance, default=125.0, min=10.0, max=500.0 },
     { name = StorageManager.Options_Debugging.DebugShowRaycastsWhileDrivingLaterally, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugDrawSideOfftrack, default=false, min=nil, max=nil },
-    { name = StorageManager.Options_Debugging.DrawCarList, default=true, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DrawCarList, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugLogFastStateChanges, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugLogCarYielding, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugLogCarOvertaking, default=false, min=nil, max=nil },
@@ -164,6 +165,7 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.OverrideOriginalAIAggression_Overtaking, default=true, min=nil, max=false },
     { name = StorageManager.Options.DefaultAIAggression, default=.5, min=0, max=0.95 }, -- The max is .95 because it's mentioned in the docs for physics.setAIAggression that the value from the launcher is multiplied by .95 so that's the max
     { name = StorageManager.Options.GlobalTopSpeedLimitKmh, default=0, min=0, max=500 },
+    { name = StorageManager.Options.DeferTimeAfterSessionStart, default=0, min=0, max=300 },
 
     { name = StorageManager.Options.DefaultLateralOffset, default=0, min=-1, max=1 },
     { name = StorageManager.Options.YieldingLateralOffset, default=0.8, min=-1, max=1 },
@@ -249,6 +251,7 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 ---@field overrideOriginalAIAggression_overtaking boolean
 ---@field defaultAIAggression integer
 ---@field globalTopSpeedLimitKmh number
+---@field deferTimeAfterSessionStart number
 ---@field defaultLateralOffset number
 ---@field yieldingLateralOffset number
 ---@field overtakingLateralOffset number
@@ -275,6 +278,7 @@ local storageTable = {
     overrideOriginalAIAggression_overtaking = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_Overtaking],
     defaultAIAggression = StorageManager.options_default[StorageManager.Options.DefaultAIAggression],
     globalTopSpeedLimitKmh = StorageManager.options_default[StorageManager.Options.GlobalTopSpeedLimitKmh],
+    deferTimeAfterSessionStart = StorageManager.options_default[StorageManager.Options.DeferTimeAfterSessionStart],
 
     defaultLateralOffset = StorageManager.options_default[StorageManager.Options.DefaultLateralOffset],
     yieldingLateralOffset = StorageManager.options_default[StorageManager.Options.YieldingLateralOffset],

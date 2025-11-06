@@ -99,6 +99,7 @@ RaceFlagManager = require("RaceFlagManager")
 UILateralOffsetsImageWidget = require("UILateralOffsetsImageWidget")
 UIAppNameVersionWidget = require("UIAppNameVersionWidget")
 UIManager = require("UIManager")
+SessionDetails = require("SessionDetails")
 -- CarSpeedLimiter = require("CarSpeedLimiter")
 -- CustomAIFloodManager = require("CustomAIFloodManager")
 -- CollisionAvoidanceManager = require("CollisionAvoidanceManager")
@@ -340,6 +341,8 @@ function script.MANIFEST__UPDATE(dt)
   -- local storage = StorageManager.getStorage()
   -- local playerCar = ac_getCar(0)
 
+  SessionDetails.update(dt)
+
   -- check if the player is coming up to an accident so we can set a caution flag
   -- local isPlayerComingUpToAccidentIndex = AccidentManager.isCarComingUpToAccident(playerCar, storage.distanceFromAccidentToSeeYellowFlag_meters)
   -- if isPlayerComingUpToAccidentIndex then
@@ -436,6 +439,12 @@ function script.MANIFEST__UPDATE(dt)
       Logger.log(string_format("Player car frenet offset set to %.2f", offset))
     end
   end
+
+  -- local sessionType = sim.raceSessionType
+  -- if sessionType == ac.SessionType.Race then
+    -- local isSessionStarted = sim.isSessionStarted
+    -- Logger.log(string_format("Race session started: %s", tostring(isSessionStarted)))
+  -- end
 end
 
 --[====[

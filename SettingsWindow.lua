@@ -451,12 +451,14 @@ SettingsWindow.draw = function()
     ui_dwriteText('Other', UI_HEADER_TEXT_FONT_SIZE)
     ui_newLine(1)
 
-    storage.globalTopSpeedLimitKmh = renderSlider('Global top speed limit', 'A global top speed limit applied to all AI cars.\n0  = no global top speed limit.', storage.globalTopSpeedLimitKmh, StorageManager_options_min[StorageManager_Options.GlobalTopSpeedLimitKmh], StorageManager_options_max[StorageManager_Options.GlobalTopSpeedLimitKmh], DEFAULT_SLIDER_WIDTH, '%.2f km/h', StorageManager_options_default[StorageManager_Options.GlobalTopSpeedLimitKmh])
-
     if ui_checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
     if ui_itemHovered() then ui_setTooltip('If enabled, our computed lateral offset will override the value from Kunos, otherwise our computed lateral offset adds to it. (EXPERIMENTAL)') end
 
+    storage.globalTopSpeedLimitKmh = renderSlider('Global top speed limit', 'A global top speed limit applied to all AI cars.\n0  = no global top speed limit.', storage.globalTopSpeedLimitKmh, StorageManager_options_min[StorageManager_Options.GlobalTopSpeedLimitKmh], StorageManager_options_max[StorageManager_Options.GlobalTopSpeedLimitKmh], DEFAULT_SLIDER_WIDTH, '%.2f km/h', StorageManager_options_default[StorageManager_Options.GlobalTopSpeedLimitKmh])
+
     storage.clearAhead_meters = renderSlider('The distance which determines whether a car is far enough ahead of another car', 'When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.', storage.clearAhead_meters, StorageManager_options_min[StorageManager_Options.ClearAhead_meters], StorageManager_options_max[StorageManager_Options.ClearAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_default[StorageManager_Options.ClearAhead_meters])
+
+    storage.deferTimeAfterSessionStart = renderSlider('Defer yielding/overtaking for a while after session start', "The time after the session starts during which no yielding or overtaking will be performed by AI cars.\n\nUsually only applicable for race scenarios where you don't want the cars to try and yield immediately after start because it creates chaos.", storage.deferTimeAfterSessionStart, StorageManager_options_min[StorageManager_Options.DeferTimeAfterSessionStart], StorageManager_options_max[StorageManager_Options.DeferTimeAfterSessionStart], DEFAULT_SLIDER_WIDTH, '%.2f seconds', StorageManager_options_default[StorageManager_Options.DeferTimeAfterSessionStart])
 
     ui_separator()
 

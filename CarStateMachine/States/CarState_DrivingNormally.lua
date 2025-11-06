@@ -114,6 +114,14 @@ CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sort
         return
       end
 
+      -- Check if we need to defer yielding/overtaking due to session just starting
+      local deferTimeAfterSessionStart = storage.deferTimeAfterSessionStart
+      local timeSinceSessionStarted = SessionDetails.getTimeSinceSessionStarted()
+      if timeSinceSessionStarted < deferTimeAfterSessionStart then
+        -- Logger.log(string.format("Car %d: Deferring yielding/overtaking for %.2f more seconds after session start", carIndex, deferTimeAfterSessionStart - timeSinceSessionStarted))
+        return
+      end
+
       local carBehind = sortedCarsList[sortedCarsListIndex + 1]
       local carFront = sortedCarsList[sortedCarsListIndex - 1]
 
