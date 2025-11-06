@@ -36,7 +36,7 @@ end
 --- Checks for missing CSP elements (functions, fields, enums, etc...) used in the app
 --- @return table<string> @List of missing element names
 CSPCompatibilityManager.checkForMissingCSPElements = function()
-    -- bindings
+    -- bindings (need to be in here for this class since we need to check for their existence)
     local ac = ac
     local ui = ui
     local physics = physics
@@ -95,6 +95,32 @@ CSPCompatibilityManager.checkForMissingCSPElements = function()
         getTableForUsedElement(function() return ui.setColumnWidth end, "ui.setColumnWidth"),
         getTableForUsedElement(function() return ui.popDWriteFont end, "ui.popDWriteFont"),
         getTableForUsedElement(function() return ui.separator end, "ui.separator"),
+        getTableForUsedElement(function() return ui.setCursor end, "ui.setCursor"),
+        getTableForUsedElement(function() return ui.measureDWriteText end, "ui.measureDWriteText"),
+        getTableForUsedElement(function() return ui.nextColumn end, "ui.nextColumn"),
+        getTableForUsedElement(function() return ui.itemRectMin end, "ui.itemRectMin"),
+        getTableForUsedElement(function() return ui.itemRectMax end, "ui.itemRectMax"),
+        getTableForUsedElement(function() return ui.textLineHeightWithSpacing end, "ui.textLineHeightWithSpacing"),
+        getTableForUsedElement(function() return ui.cursorScreenPos end, "ui.cursorScreenPos"),
+        getTableForUsedElement(function() return ui.setItemAllowOverlap end, "ui.setItemAllowOverlap"),
+        getTableForUsedElement(function() return ui.setCursorScreenPos end, "ui.setCursorScreenPos"),
+        getTableForUsedElement(function() return ui.windowPos end, "ui.windowPos"),
+        getTableForUsedElement(function() return ui.columnSortingHeader end, "ui.columnSortingHeader"),
+        getTableForUsedElement(function() return ui.pushColumnsBackground end, "ui.pushColumnsBackground"),
+        getTableForUsedElement(function() return ui.popColumnsBackground end, "ui.popColumnsBackground"),
+        getTableForUsedElement(function() return ui.pushID end, "ui.pushID"),
+        getTableForUsedElement(function() return ui.popID end, "ui.popID"),
+        getTableForUsedElement(function() return ui.selectable end, "ui.selectable"),
+        getTableForUsedElement(function() return ui.itemClicked end, "ui.itemClicked"),
+        getTableForUsedElement(function() return ui.sameLine end, "ui.sameLine"),
+        getTableForUsedElement(function() return ui.getScrollMaxY end, "ui.getScrollMaxY"),
+        getTableForUsedElement(function() return ui.getScrollX end, "ui.getScrollX"),
+        getTableForUsedElement(function() return ui.getScrollY end, "ui.getScrollY"),
+        getTableForUsedElement(function() return ui.slider end, "ui.slider"),
+        getTableForUsedElement(function() return ui.dwriteText end, "ui.dwriteText"),
+        getTableForUsedElement(function() return ui.checkbox end, "ui.checkbox"),
+        getTableForUsedElement(function() return ui.MouseButton end, "ui.MouseButton"),
+        getTableForUsedElement(function() return ui.mouseClicked end, "ui.mouseClicked"),
     }
 
     ---@type table<TableForUsedElement>
@@ -110,6 +136,14 @@ CSPCompatibilityManager.checkForMissingCSPElements = function()
         getTableForUsedElement(function() return physics.setGentleStop end, "physics.setGentleStop"),
         getTableForUsedElement(function() return physics.preventAIFromRetiring end, "physics.preventAIFromRetiring"),
         getTableForUsedElement(function() return physics.setAISplineOffset end, "physics.setAISplineOffset"),
+        getTableForUsedElement(function() return physics.overrideRacingFlag end, "physics.overrideRacingFlag"),
+        -- getTableForUsedElement(function() return physics.setEngineStallEnabled end, "physics.setEngineStallEnabled"),
+        -- getTableForUsedElement(function() return physics.setCarPosition end, "physics.setCarPosition"),
+        -- getTableForUsedElement(function() return physics.setCarFuel end, "physics.setCarFuel"),
+        -- getTableForUsedElement(function() return physics.engageGear end, "physics.engageGear"),
+        -- getTableForUsedElement(function() return physics.setEngineRPM end, "physics.setEngineRPM"),
+        -- getTableForUsedElement(function() return physics.awakeCar end, "physics.awakeCar"),
+        -- getTableForUsedElement(function() return physics.setAINoInput end, "physics.setAINoInput"),
     }
 
     -- Make sure we have access to the ac.getSim or ac.getSimState functions!
