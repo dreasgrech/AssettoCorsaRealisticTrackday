@@ -33,35 +33,48 @@ StorageManager.Options ={
     Enabled = 1,
 
     OverrideAiAwareness = 2,
+
+
     DefaultAICaution = 3,
     AICaution_OvertakingWithNoObstacleInFront = 4,
     AICaution_OvertakingWithObstacleInFront = 5,
     AICaution_OvertakingWhileInCorner = 6,
     AICaution_Yielding = 7,
-    OverrideOriginalAIAggression_DrivingNormally = 8,
-    OverrideOriginalAIAggression_Overtaking = 9,
-    OverrideOriginalAIAggression_Yielding = 10,
-    DefaultAIAggression = 11,
+
+    DefaultAIAggression = 8,
+    OverrideOriginalAIAggression_DrivingNormally = 9,
+    OverrideOriginalAIAggression_Overtaking = 10,
+    OverrideOriginalAIAggression_Yielding = 11,
     AIAggression_OvertakingWithNoObstacleInFront = 12,
     AIAggression_OvertakingWithObstacleInFront = 13,
     AIAggression_WhileInCorner = 14,
     AIAggression_Yielding = 15,
-    GlobalTopSpeedLimitKmh = 16,
-    DeferTimeAfterSessionStart = 17,
 
-    DefaultLateralOffset = 18,
-    YieldingLateralOffset = 19,
-    OvertakingLateralOffset = 20,
+    DefaultAIDifficultyLevel = 16,
+    OverrideOriginalAIDifficultyLevel_DrivingNormally = 17,
+    OverrideOriginalAIDifficultyLevel_Overtaking = 18,
+    OverrideOriginalAIDifficultyLevel_Yielding = 19,
+    AIDifficultyLevel_OvertakingWithNoObstacleInFront = 20,
+    AIDifficultyLevel_OvertakingWithObstacleInFront = 21,
+    AIDifficultyLevel_WhileInCorner = 22,
+    AIDifficultyLevel_Yielding = 23,
 
-    ClearAhead_meters = 21,
+    GlobalTopSpeedLimitKmh = 24,
+    DeferTimeAfterSessionStart = 25,
 
-    CustomAIFlood_enabled = 22,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 23,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 24,
+    DefaultLateralOffset = 26,
+    YieldingLateralOffset = 27,
+    OvertakingLateralOffset = 28,
 
-    HandleAccidents = 25,
-    DistanceFromAccidentToSeeYellowFlag_meters = 26,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 27,
+    ClearAhead_meters = 29,
+
+    CustomAIFlood_enabled = 30,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 31,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 32,
+
+    HandleAccidents = 33,
+    DistanceFromAccidentToSeeYellowFlag_meters = 34,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 35,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -153,11 +166,14 @@ local optionsCollection_Overtaking_beforeDoD = {
 
 -- local MIN_AI_CAUTION_VALUE = 3
 local MIN_AI_CAUTION_VALUE = 0
-local MAX_AI_CAUTION_VALUE = 16
+local MAX_AI_CAUTION_VALUE = 16 -- as per physics.setAICaution function doc
 
 local MIN_AI_AGGRESSION_VALUE = 0
 -- local MAX_AI_AGGRESSION_VALUE = 0.95
-local MAX_AI_AGGRESSION_VALUE = 1.0
+local MAX_AI_AGGRESSION_VALUE = 1.0 -- as per physics.setAIAggression function doc
+
+local MIN_AI_DIFFICULTY_LEVEL = 0
+local MAX_AI_DIFFICULTY_LEVEL = 2 -- as per physics.setAILevel function doc
 
 -- only used to build the actual tables that hold the runtime values
 local optionsCollection_beforeDoD = {
@@ -165,11 +181,13 @@ local optionsCollection_beforeDoD = {
     -- { name = StorageManager.Options.HandleSideCheckingWhenYielding, default=true, min=nil, max=nil },
     -- { name = StorageManager.Options.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.OverrideAiAwareness, default=true, min=nil, max=nil },
+
     { name = StorageManager.Options.DefaultAICaution, default=3, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
     { name = StorageManager.Options.AICaution_OvertakingWithNoObstacleInFront, default=0, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
     { name = StorageManager.Options.AICaution_OvertakingWithObstacleInFront, default=1, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
     { name = StorageManager.Options.AICaution_OvertakingWhileInCorner, default=2, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
     { name = StorageManager.Options.AICaution_Yielding, default=4, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
+
     { name = StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally, default=true, min=nil, max=nil },
     { name = StorageManager.Options.OverrideOriginalAIAggression_Overtaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options.OverrideOriginalAIAggression_Yielding, default=true, min=nil, max=nil },
@@ -178,6 +196,16 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.AIAggression_OvertakingWithObstacleInFront, default=.95, min=MIN_AI_AGGRESSION_VALUE, max=MAX_AI_AGGRESSION_VALUE },
     { name = StorageManager.Options.AIAggression_WhileInCorner, default=.95, min=MIN_AI_AGGRESSION_VALUE, max=MAX_AI_AGGRESSION_VALUE },
     { name = StorageManager.Options.AIAggression_Yielding, default=.5, min=MIN_AI_AGGRESSION_VALUE, max=MAX_AI_AGGRESSION_VALUE },
+
+    { name = StorageManager.Options.DefaultAIDifficultyLevel, default=.8, min=MIN_AI_DIFFICULTY_LEVEL, max=MAX_AI_DIFFICULTY_LEVEL },
+    { name = StorageManager.Options.OverrideOriginalAIDifficultyLevel_DrivingNormally, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.OverrideOriginalAIDifficultyLevel_Overtaking, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.OverrideOriginalAIDifficultyLevel_Yielding, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.AIDifficultyLevel_OvertakingWithNoObstacleInFront, default=2, min=MIN_AI_DIFFICULTY_LEVEL, max=MAX_AI_DIFFICULTY_LEVEL },
+    { name = StorageManager.Options.AIDifficultyLevel_OvertakingWithObstacleInFront, default=1.5, min=MIN_AI_DIFFICULTY_LEVEL, max=MAX_AI_DIFFICULTY_LEVEL },
+    { name = StorageManager.Options.AIDifficultyLevel_WhileInCorner, default=.7, min=MIN_AI_DIFFICULTY_LEVEL, max=MAX_AI_DIFFICULTY_LEVEL },
+    { name = StorageManager.Options.AIDifficultyLevel_Yielding, default=.6, min=MIN_AI_DIFFICULTY_LEVEL, max=MAX_AI_DIFFICULTY_LEVEL },
+
     { name = StorageManager.Options.GlobalTopSpeedLimitKmh, default=0, min=0, max=500 },
     { name = StorageManager.Options.DeferTimeAfterSessionStart, default=0, min=0, max=300 },
 
@@ -269,6 +297,14 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 ---@field AIAggression_OvertakingWithObstacleInFront number
 ---@field AIAggression_WhileInCorner number
 ---@field AIAggression_Yielding number
+---@field defaultAIDifficultyLevel number
+---@field overrideOriginalAIDifficultyLevel_drivingNormally boolean
+---@field overrideOriginalAIDifficultyLevel_overtaking boolean
+---@field overrideOriginalAIDifficultyLevel_yielding boolean
+---@field AIDifficultyLevel_OvertakingWithNoObstacleInFront number
+---@field AIDifficultyLevel_OvertakingWithObstacleInFront number
+---@field AIDifficultyLevel_WhileInCorner number
+---@field AIDifficultyLevel_Yielding number
 ---@field globalTopSpeedLimitKmh number
 ---@field deferTimeAfterSessionStart number
 ---@field defaultLateralOffset number
@@ -288,11 +324,13 @@ local storageTable = {
     -- handleSideCheckingWhenYielding = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenYielding],
     -- handleSideCheckingWhenOvertaking = StorageManager.options_default[StorageManager.Options.HandleSideCheckingWhenOvertaking],
     overrideAiAwareness = StorageManager.options_default[StorageManager.Options.OverrideAiAwareness],
+
     defaultAICaution = StorageManager.options_default[StorageManager.Options.DefaultAICaution],
     AICaution_OvertakingWithNoObstacleInFront = StorageManager.options_default[StorageManager.Options.AICaution_OvertakingWithNoObstacleInFront],
     AICaution_OvertakingWithObstacleInFront = StorageManager.options_default[StorageManager.Options.AICaution_OvertakingWithObstacleInFront],
     AICaution_OvertakingWhileInCorner = StorageManager.options_default[StorageManager.Options.AICaution_OvertakingWhileInCorner],
     AICaution_Yielding = StorageManager.options_default[StorageManager.Options.AICaution_Yielding],
+
     overrideOriginalAIAggression_drivingNormally = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally],
     overrideOriginalAIAggression_overtaking = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_Overtaking],
     overrideOriginalAIAggression_yielding = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_Yielding],
@@ -301,6 +339,16 @@ local storageTable = {
     AIAggression_OvertakingWithObstacleInFront = StorageManager.options_default[StorageManager.Options.AIAggression_OvertakingWithObstacleInFront],
     AIAggression_WhileInCorner = StorageManager.options_default[StorageManager.Options.AIAggression_WhileInCorner],
     AIAggression_Yielding = StorageManager.options_default[StorageManager.Options.AIAggression_Yielding],
+
+    defaultAIDifficultyLevel = StorageManager.options_default[StorageManager.Options.DefaultAIDifficultyLevel],
+    overrideOriginalAIDifficultyLevel_drivingNormally = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIDifficultyLevel_DrivingNormally],
+    overrideOriginalAIDifficultyLevel_overtaking = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIDifficultyLevel_Overtaking],
+    overrideOriginalAIDifficultyLevel_yielding = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIDifficultyLevel_Yielding],
+    AIDifficultyLevel_OvertakingWithNoObstacleInFront = StorageManager.options_default[StorageManager.Options.AIDifficultyLevel_OvertakingWithNoObstacleInFront],
+    AIDifficultyLevel_OvertakingWithObstacleInFront = StorageManager.options_default[StorageManager.Options.AIDifficultyLevel_OvertakingWithObstacleInFront],
+    AIDifficultyLevel_WhileInCorner = StorageManager.options_default[StorageManager.Options.AIDifficultyLevel_WhileInCorner],
+    AIDifficultyLevel_Yielding = StorageManager.options_default[StorageManager.Options.AIDifficultyLevel_Yielding],
+
     globalTopSpeedLimitKmh = StorageManager.options_default[StorageManager.Options.GlobalTopSpeedLimitKmh],
     deferTimeAfterSessionStart = StorageManager.options_default[StorageManager.Options.DeferTimeAfterSessionStart],
 

@@ -9,12 +9,14 @@ local CarManager = CarManager
 local CarOperations = CarOperations
 local CarOperations_setAICaution = CarOperations.setAICaution
 local CarOperations_setAIAggression = CarOperations.setAIAggression
+local CarOperations_setAIDifficultyLevel = CarOperations.setAIDifficultyLevel
 local CarOperations_toggleTurningLights = CarOperations.toggleTurningLights
 local CarOperations_overtakeSafelyToSide = CarOperations.overtakeSafelyToSide
-local CarOperations_calculateAICautionAndAggressionWhileOvertaking = CarOperations.calculateAICautionAndAggressionWhileOvertaking
+local CarOperations_calculateAICautionAndAggressionWhileOvertaking = CarOperations.calculateAICautionAggressionDifficultyWhileOvertaking
 local CarOperations_isSecondCarClearlyAhead = CarOperations.isSecondCarClearlyAhead
 local CarOperations_removeAICaution = CarOperations.removeAICaution
 local CarOperations_setDefaultAIAggression = CarOperations.setDefaultAIAggression
+local CarOperations_setDefaultAIDifficultyLevel = CarOperations.setDefaultAIDifficultyLevel
 local CarStateMachine = CarStateMachine
 local CarStateMachine_handleYellowFlagZone = CarStateMachine.handleYellowFlagZone
 local CarStateMachine_setStateExitReason = CarStateMachine.setStateExitReason
@@ -53,11 +55,15 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     -- local aiCaution = CarOperations.calculateAICautionWhileOvertaking(car, carFront)
     local yieldingCarIndex = CarManager.cars_currentlyOvertakingCarIndex[carIndex]
     local yieldingCar = ac_getCar(yieldingCarIndex)
-    local aiCaution, aiAggression = CarOperations_calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
+    local aiCaution, aiAggression, aiDifficultyLevel = CarOperations_calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
     CarOperations_setAICaution(carIndex, aiCaution)
 
     if storage.overrideOriginalAIAggression_overtaking then
         CarOperations_setAIAggression(carIndex, aiAggression)
+    end
+
+    if storage.overrideOriginalAIDifficultyLevel_overtaking then
+        CarOperations_setAIDifficultyLevel(carIndex, aiDifficultyLevel)
     end
 
     -- keep driving to the overtaking side even while staying on the overtaking lane since sometimes the cars still end up drifting back to the normal lanes mostly because of high speed corners
@@ -156,6 +162,7 @@ end
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
     -- reset the overtaking car caution back to normal
     CarOperations_removeAICaution(carIndex)
+    CarOperations_setDefaultAIDifficultyLevel(carIndex)
     CarOperations_setDefaultAIAggression(carIndex)
     CarOperations_toggleTurningLights(carIndex, ac.TurningLights.None)
 end

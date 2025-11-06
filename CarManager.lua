@@ -49,6 +49,8 @@ CarManager.cars_throttleLimit = {}
 CarManager.cars_aiCaution = {}
 ---@type table<integer,integer>
 CarManager.cars_aiAggression = {}
+---@type table<integer,integer>
+CarManager.cars_aiDifficultyLevel = {}
 ---@type table<integer,number>
 CarManager.cars_aiTopSpeed = {}
 ---@type table<integer,number>
@@ -182,6 +184,7 @@ CarManager.setInitializedDefaults = function(carIndex)
   CarOperations.setGentleStop(carIndex, false)
   CarOperations.removeAICaution(carIndex)
   CarOperations.setDefaultAIAggression(carIndex)
+  CarOperations.setDefaultAIDifficultyLevel(carIndex)
   CarOperations.setDefaultAIGrip(carIndex)
 
   -- reset any pedal positions we may have set
@@ -246,6 +249,14 @@ CarManager.getDefaultAIAggression = function(carIndex)
     -- if we're not overriding the original aggression, restore revert back to the original aggression
     storage.overrideOriginalAIAggression_drivingNormally and storage.defaultAIAggression
     or CarManager.cars_ORIGINAL_AI_AGGRESSION[carIndex]
+end
+
+CarManager.getDefaultAIDifficultyLevel = function(carIndex)
+  local storage = StorageManager.getStorage()
+  return 
+    -- if we're not overriding the original difficulty level, restore revert back to the original difficulty level
+    storage.overrideOriginalAIAggression_drivingNormally and storage.defaultAIDifficultyLevel
+    or CarManager.cars_ORIGINAL_AI_DIFFICULTY_LEVEL[carIndex]
 end
 
 -- local SIDE_DETERMINATION_THRESHOLD = 0.1

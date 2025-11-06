@@ -192,6 +192,7 @@ local drawCautionAndAggressionSection = function()
     ui_columns(3, false, "cautionAndAggressionSection")
     ui_setColumnWidth(0, 500)
     ui_setColumnWidth(1, 530)
+    ui_setColumnWidth(2, 650)
 
     ui_newLine(1)
     ui_dwriteText('Caution', UI_HEADER_TEXT_FONT_SIZE)
@@ -249,6 +250,40 @@ local drawCautionAndAggressionSection = function()
     local overrideOriginalAIAggression_yielding = storage.overrideOriginalAIAggression_yielding
     createDisabledSection(not overrideOriginalAIAggression_yielding, function()
         storage.AIAggression_Yielding = renderSlider('Aggression while yielding', 'The aggression level used when yielding (giving way to faster cars).\n\nThe lower this value is, the more cautious the cars will be while yielding.', storage.AIAggression_Yielding, StorageManager_options_min[StorageManager_Options.AIAggression_Yielding], StorageManager_options_max[StorageManager_Options.AIAggression_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIAggression_Yielding])
+    end)
+
+    ui_nextColumn()
+
+    ui_newLine(1)
+    ui_dwriteText('Difficulty', UI_HEADER_TEXT_FONT_SIZE)
+
+    ui_text('Difficulty Level affects how effective the cars are with the pedals and how fast they can handle corners.\nA higher difficulty level means the cars will be overall faster and more competitive.')
+    ui_newLine(1)
+
+    if ui_checkbox('Override original Difficulty Level when driving normally', storage.overrideOriginalAIDifficultyLevel_drivingNormally) then storage.overrideOriginalAIDifficultyLevel_drivingNormally = not storage.overrideOriginalAIDifficultyLevel_drivingNormally end
+    if ui_itemHovered() then ui_setTooltip('If enabled, will override the original difficulty level thats is set from the game launcher when the car is driving normally.') end
+
+    local overrideOriginalAIDifficultyLevel_drivingNormally = storage.overrideOriginalAIDifficultyLevel_drivingNormally
+    createDisabledSection(not overrideOriginalAIDifficultyLevel_drivingNormally, function()
+        storage.defaultAIDifficultyLevel =  renderSlider('Difficulty Level while driving normally', 'The default difficulty level cars exhibit when driving on the default driving lane.\n\nThe higher this value is, the more effective the cars will be with the pedals and how fast they can handle corners.', storage.defaultAIDifficultyLevel, StorageManager_options_min[StorageManager_Options.DefaultAIDifficultyLevel], StorageManager_options_max[StorageManager_Options.DefaultAIDifficultyLevel], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.DefaultAIDifficultyLevel])
+    end)
+
+    if ui_checkbox('Override original Difficulty Level when overtaking', storage.overrideOriginalAIDifficultyLevel_overtaking) then storage.overrideOriginalAIDifficultyLevel_overtaking = not storage.overrideOriginalAIDifficultyLevel_overtaking end
+    if ui_itemHovered() then ui_setTooltip('If enabled, will override the original difficulty level thats is set from the game launcher when the car is overtaking another car.') end
+
+    local overrideOriginalAIDifficultyLevel_overtaking = storage.overrideOriginalAIDifficultyLevel_overtaking
+    createDisabledSection(not overrideOriginalAIDifficultyLevel_overtaking, function()
+        storage.AIDifficultyLevel_OvertakingWithNoObstacleInFront = renderSlider('Difficulty Level while overtaking (No obstacle in front)', 'The difficulty level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe higher this value is, the more effective the cars will be with the pedals and how fast they can handle corners while overtaking when there is no obstacle in front of them.', storage.AIDifficultyLevel_OvertakingWithNoObstacleInFront, StorageManager_options_min[StorageManager_Options.AIDifficultyLevel_OvertakingWithNoObstacleInFront], StorageManager_options_max[StorageManager_Options.AIDifficultyLevel_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIDifficultyLevel_OvertakingWithNoObstacleInFront])
+        storage.AIDifficultyLevel_OvertakingWithObstacleInFront = renderSlider('Difficulty Level while overtaking (Obstacle in front)', 'The difficulty level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while overtaking when there is an obstacle in front of them.', storage.AIDifficultyLevel_OvertakingWithObstacleInFront, StorageManager_options_min[StorageManager_Options.AIDifficultyLevel_OvertakingWithObstacleInFront], StorageManager_options_max[StorageManager_Options.AIDifficultyLevel_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIDifficultyLevel_OvertakingWithObstacleInFront])
+        storage.AIDifficultyLevel_WhileInCorner = renderSlider('Difficulty Level while overtaking in corner', 'The difficulty level used when overtaking another car while in a corner.\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while overtaking in corners.', storage.AIDifficultyLevel_WhileInCorner, StorageManager_options_min[StorageManager_Options.AIDifficultyLevel_WhileInCorner], StorageManager_options_max[StorageManager_Options.AIDifficultyLevel_WhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIDifficultyLevel_WhileInCorner])
+    end)
+
+    if ui_checkbox('Override original Difficulty Level when yielding', storage.overrideOriginalAIDifficultyLevel_yielding) then storage.overrideOriginalAIDifficultyLevel_yielding = not storage.overrideOriginalAIDifficultyLevel_yielding end
+    if ui_itemHovered() then ui_setTooltip('If enabled, will override the original difficulty level thats is set from the game launcher when the car is yielding (giving way to faster cars).') end
+
+    local overrideOriginalAIDifficultyLevel_yielding = storage.overrideOriginalAIDifficultyLevel_yielding
+    createDisabledSection(not overrideOriginalAIDifficultyLevel_yielding, function()
+        storage.AIDifficultyLevel_Yielding = renderSlider('Difficulty Level while yielding', 'The difficulty level used when yielding (giving way to faster cars).\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while yielding.', storage.AIDifficultyLevel_Yielding, StorageManager_options_min[StorageManager_Options.AIDifficultyLevel_Yielding], StorageManager_options_max[StorageManager_Options.AIDifficultyLevel_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIDifficultyLevel_Yielding])
     end)
 
     ui_columns(1, false)

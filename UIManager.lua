@@ -130,6 +130,7 @@ local carTableColumns_dataBeforeDoD = {
   { name = 'TopSpeedLimit', orderDirection = 0, width = 90, tooltip='AI top speed limit' },
   { name = 'AICaution', orderDirection = 0, width = 75, tooltip='AI caution level' },
   { name = 'AIAggression', orderDirection = 0, width = 75, tooltip='AI aggression level' },
+  { name = 'AIDifficultyLevel', orderDirection = 0, width = 75, tooltip='AI difficulty level' },
   { name = 'Grip', orderDirection = 0, width = 40, tooltip='AI grip level' },
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
@@ -330,6 +331,7 @@ UIManager.drawUICarList = function()
       local aiCaution = CarManager.cars_aiCaution[carIndex]
       -- local aiAggression = CarManager.cars_aiAggression[carIndex]
       local aiAggression = car.aiAggression
+      local aiDifficultyLevel = car.aiLevel
 
       -- TODO: this assert check should move to somewhere else
       if currentlyOvertaking and currentlyYielding then
@@ -390,6 +392,7 @@ UIManager.drawUICarList = function()
       ui_textColored(aiTopSpeedString, uiColor); ui_nextColumn()
       ui_textColored(string_format("%.2f", aiCaution), uiColor); ui_nextColumn()
       ui_textColored(string_format("%.2f", aiAggression), uiColor); ui_nextColumn()
+      ui_textColored(string_format("%.2f", aiDifficultyLevel), uiColor); ui_nextColumn()
       ui_textColored(string_format("%.2f", CarManager.cars_grip[carIndex] or 0), uiColor); ui_nextColumn()
       ui_textColored(string_format("%.2f km/h", closingSpeed), uiColor); ui_nextColumn()
       ui_textColored(string_format("%.2fs", timeToCollision), uiColor); ui_nextColumn()

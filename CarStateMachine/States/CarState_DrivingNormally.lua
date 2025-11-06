@@ -6,6 +6,7 @@ local CarManager_setCalculatedTrackLateralOffset = CarManager.setCalculatedTrack
 local CarOperations = CarOperations
 local CarOperations_removeAICaution = CarOperations.removeAICaution
 local CarOperations_setDefaultAIAggression = CarOperations.setDefaultAIAggression
+local CarOperations_setDefaultAIDifficultyLevel = CarOperations.setDefaultAIDifficultyLevel
 local CarOperations_toggleTurningLights = CarOperations.toggleTurningLights
 local CarOperations_resetAIThrottleLimit = CarOperations.resetAIThrottleLimit
 local CarOperations_setDefaultAIGrip = CarOperations.setDefaultAIGrip
@@ -62,6 +63,7 @@ CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCar
       CarOperations_removeAICaution(carIndex)
 
       CarOperations_setDefaultAIAggression(carIndex)
+      CarOperations_setDefaultAIDifficultyLevel(carIndex)
 
       -- remove the yielding car throttle limit since we will now be driving normally
       CarOperations_resetAIThrottleLimit(carIndex)

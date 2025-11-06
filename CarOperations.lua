@@ -201,6 +201,21 @@ CarOperations.setDefaultAIAggression = function(carIndex)
   CarOperations.setAIAggression(carIndex, aiAggression)
 end
 
+---Sets the AI difficulty level.
+---@param carIndex integer @0-based car index.
+---@param aiDifficultyLevel integer @AI difficulty level from 0 to 2.
+CarOperations.setAIDifficultyLevel = function(carIndex, aiDifficultyLevel)
+    physics.setAILevel(carIndex, aiDifficultyLevel)
+    CarManager.cars_aiDifficultyLevel[carIndex] = aiDifficultyLevel
+end
+
+---Removes any AI difficulty levels and sets it back to the default value.
+---@param carIndex integer @0-based car index.
+CarOperations.setDefaultAIDifficultyLevel = function(carIndex)
+  local aiDifficultyLevel = CarManager.getDefaultAIDifficultyLevel(carIndex)
+  CarOperations.setAIDifficultyLevel(carIndex, aiDifficultyLevel)
+end
+
 ---Forces AI to brake for a specified amount of time. Originally, this mechanism is used to get AIs to brake after an incident.
 ---Subsequent calls overwrite current waiting, pass 0 to get cars to move.
 ---@param carIndex integer @0-based car index.
@@ -535,13 +550,15 @@ end
 ---@param yieldingCar ac.StateCar?
 ---@return number aiCaution
 ---@return number aiAggression 
-CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtakingCar, yieldingCar)
+---@return number aiDifficultyLevel
+CarOperations.calculateAICautionAggressionDifficultyWhileOvertaking = function(overtakingCar, yieldingCar)
     local overtakingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(overtakingCar.position)
 
     -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
     -- local aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
     local aiCaution = storage.AICaution_OvertakingWithObstacleInFront
     local aiAggression = storage.AIAggression_OvertakingWithObstacleInFront
+    local aiDifficultyLevel = storage.AIDifficultyLevel_OvertakingWithObstacleInFront
 
     -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
     if yieldingCar then
@@ -552,6 +569,7 @@ CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtaki
             -- aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
             aiCaution = storage.AICaution_OvertakingWithNoObstacleInFront
             aiAggression = storage.AIAggression_OvertakingWithNoObstacleInFront
+            aiDifficultyLevel = storage.AIDifficultyLevel_OvertakingWithNoObstacleInFront
         end
     end
 
@@ -561,9 +579,10 @@ CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtaki
     if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION then
         aiCaution = storage.AICaution_OvertakingWhileInCorner
         aiAggression = storage.AIAggression_WhileInCorner
+        aiDifficultyLevel = storage.AIDifficultyLevel_WhileInCorner
     end
 
-    return aiCaution, aiAggression
+    return aiCaution, aiAggression, aiDifficultyLevel
 end
 
 -- Returns the six lateral anchor points plus some helpers
