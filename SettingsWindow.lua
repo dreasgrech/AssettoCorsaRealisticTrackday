@@ -356,7 +356,7 @@ SettingsWindow.draw = function()
 
         ui_newLine(1)
 
-        storage_Yielding.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the car behind is within this distance', storage_Yielding.detectCarBehind_meters, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.DetectCarBehind_meters], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.DetectCarBehind_meters])
+        storage_Yielding.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the overtaking car behind is within this distance', storage_Yielding.detectCarBehind_meters, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.DetectCarBehind_meters], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.DetectCarBehind_meters])
 
         storage_Yielding.rampSpeed_mps =  renderSlider('Yielding Lateral Offset increment step', 'How quickly the lateral offset ramps up when yielding to an overtaking car.\nThe higher it is, the more quickly cars will change lanes when moving to the yielding side.', storage_Yielding.rampSpeed_mps, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.RampSpeed_mps], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.RampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.RampSpeed_mps])
 

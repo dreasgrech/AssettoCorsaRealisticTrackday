@@ -115,7 +115,7 @@ local optionsCollection_Debugging_beforeDoD = {
 local optionsCollection_Yielding_beforeDoD = {
     { name = StorageManager.Options_Yielding.HandleYielding, default=true, min=nil, max=nil },
     { name = StorageManager.Options_Yielding.HandleSideCheckingWhenYielding, default=true, min=nil, max=nil },
-    { name = StorageManager.Options_Yielding.DetectCarBehind_meters, default=90, min=10, max=500 },
+    { name = StorageManager.Options_Yielding.DetectCarBehind_meters, default=50, min=5, max=200 },
     { name = StorageManager.Options_Yielding.RampSpeed_mps, default=0.25, min=0.1, max=1.0 },
     { name = StorageManager.Options_Yielding.RampRelease_mps, default=0.25, min=0.1, max=1.0 },
     { name = StorageManager.Options_Yielding.DistanceToOvertakingCarToLimitSpeed, default=10.0, min=1.0, max=100.0 },
@@ -133,7 +133,7 @@ local optionsCollection_Yielding_beforeDoD = {
 local optionsCollection_Overtaking_beforeDoD = {
     { name = StorageManager.Options_Overtaking.HandleOvertaking, default=true, min=nil, max=nil },
     { name = StorageManager.Options_Overtaking.HandleSideCheckingWhenOvertaking, default=true, min=nil, max=nil },
-    { name = StorageManager.Options_Overtaking.DetectCarAhead_meters, default=100, min=50, max=500 },
+    { name = StorageManager.Options_Overtaking.DetectCarAhead_meters, default=50, min=5, max=200 },
     { name = StorageManager.Options_Overtaking.OvertakeRampSpeed_mps, default=0.5, min=0.1, max=1.0 },
     { name = StorageManager.Options_Overtaking.OvertakeRampRelease_mps, default=0.5, min=0.1, max=1.0 },
     { name = StorageManager.Options_Overtaking.RequireYieldingCarToBeOnYieldingLaneToOvertake, default=true, min=nil, max=nil },
