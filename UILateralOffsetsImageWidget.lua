@@ -1,5 +1,18 @@
 local UILateralOffsetsImageWidget = {}
 
+-- local bindings
+local ui = ui
+local ui_drawRectFilled = ui.drawRectFilled
+local ui_drawLine = ui.drawLine
+local ui_getCursor = ui.getCursor
+local ui_drawRect = ui.drawRect
+local ui_drawTextClipped = ui.drawTextClipped
+local ui_dwriteDrawText = ui.dwriteDrawText
+local ui_invisibleButton = ui.invisibleButton
+local math = math
+local math_abs = math.abs
+local vec2 = vec2
+
 -- ========== CONFIGURABLE CONSTANTS ==========
 -- Layout
 local PREVIEW_WIDTH              = 360
@@ -78,6 +91,7 @@ local function mapOffsetToX(offsetNormalized, trackLeftX, trackWidth)
   return trackLeftX + t * trackWidth
 end
 
+
 -- Draw a simple rounded rectangle “car” with a small “nose” triangle.
 local function drawCarMarker(xCenter, midY, color)
   local halfW = CAR_WIDTH * 0.5
@@ -85,13 +99,13 @@ local function drawCarMarker(xCenter, midY, color)
   local p1 = vec2(xCenter - halfW, midY - halfH)
   local p2 = vec2(xCenter + halfW, midY + halfH)
 
-  ui.drawRectFilled(p1, p2, color, CAR_ROUNDING)
-  ui.drawRect(p1, p2, COLOR_CAR_OUTLINE, CAR_ROUNDING)
+  ui_drawRectFilled(p1, p2, color, CAR_ROUNDING)
+  ui_drawRect(p1, p2, COLOR_CAR_OUTLINE, CAR_ROUNDING)
 
   -- nose pointing “up” to hint forward direction
   local noseY = p1.y - CAR_NOSE_SIZE
-  ui.drawLine(vec2(xCenter - CAR_NOSE_SIZE, p1.y), vec2(xCenter, noseY), color, MARKER_NOSE_THICKNESS)
-  ui.drawLine(vec2(xCenter + CAR_NOSE_SIZE, p1.y), vec2(xCenter, noseY), color, MARKER_NOSE_THICKNESS)
+  ui_drawLine(vec2(xCenter - CAR_NOSE_SIZE, p1.y), vec2(xCenter, noseY), color, MARKER_NOSE_THICKNESS)
+  ui_drawLine(vec2(xCenter + CAR_NOSE_SIZE, p1.y), vec2(xCenter, noseY), color, MARKER_NOSE_THICKNESS)
 end
 
 -- Compute baseline Y for a marker based on row index and STACK_MARKERS toggle.
@@ -106,13 +120,13 @@ end
 ---@param storage StorageTable
 function UILateralOffsetsImageWidget.draw(storage)
   -- Reserve block area from current cursor
-  local cursor = ui.getCursor()
+  local cursor = ui_getCursor()
   local tl = vec2(cursor.x, cursor.y)
   local br = vec2(cursor.x + PREVIEW_WIDTH, cursor.y + PREVIEW_HEIGHT)
 
   -- Card
-  ui.drawRectFilled(tl, br, COLOR_CARD_BG, CARD_ROUNDING)
-  ui.drawRect(tl, br, COLOR_CARD_BORDER, CARD_ROUNDING)
+  ui_drawRectFilled(tl, br, COLOR_CARD_BG, CARD_ROUNDING)
+  ui_drawRect(tl, br, COLOR_CARD_BORDER, CARD_ROUNDING)
 
   -- Inner “track” rect
   local trackTL   = vec2(tl.x + PREVIEW_MARGIN, tl.y + PREVIEW_MARGIN)
@@ -121,10 +135,10 @@ function UILateralOffsetsImageWidget.draw(storage)
   local trackW    = trackBR.x - trackTL.x
 
   -- Track fill and edges
-  ui.drawRectFilled(vec2(trackTL.x, trackMidY - TRACK_HALF_HEIGHT),
+  ui_drawRectFilled(vec2(trackTL.x, trackMidY - TRACK_HALF_HEIGHT),
                     vec2(trackBR.x, trackMidY + TRACK_HALF_HEIGHT),
                     COLOR_TRACK_FILL, TRACK_ROUNDING)
-  ui.drawRect(vec2(trackTL.x, trackMidY - TRACK_HALF_HEIGHT),
+  ui_drawRect(vec2(trackTL.x, trackMidY - TRACK_HALF_HEIGHT),
               vec2(trackBR.x, trackMidY + TRACK_HALF_HEIGHT),
               COLOR_TRACK_BORDER, TRACK_ROUNDING)
 
@@ -132,21 +146,21 @@ function UILateralOffsetsImageWidget.draw(storage)
   local ticks = { -1.0, -0.5, 0.0, 0.5, 1.0 }
   for i = 1, #ticks do
     local x = mapOffsetToX(ticks[i], trackTL.x, trackW)
-    local h = (math.abs(ticks[i]) < 1e-4) and TICK_HEIGHT_CENTER or TICK_HEIGHT
-    local thick = (math.abs(ticks[i]) < 1e-4) and CENTERLINE_THICKNESS or TICK_THICKNESS
-    ui.drawLine(vec2(x, trackMidY - h), vec2(x, trackMidY + h), COLOR_TICK, thick)
+    local h = (math_abs(ticks[i]) < 1e-4) and TICK_HEIGHT_CENTER or TICK_HEIGHT
+    local thick = (math_abs(ticks[i]) < 1e-4) and CENTERLINE_THICKNESS or TICK_THICKNESS
+    ui_drawLine(vec2(x, trackMidY - h), vec2(x, trackMidY + h), COLOR_TICK, thick)
   end
 
   -- Edge labels "L | 0 | R"
   if SHOW_EDGE_LABELS_L0R then
-    ui.drawTextClipped(LABEL_LEFT_TEXT,
+    ui_drawTextClipped(LABEL_LEFT_TEXT,
       vec2(trackTL.x - 10, trackMidY - 8), vec2(trackTL.x -  2, trackMidY + 8), COLOR_TEXT_MINOR, nil, false)
-
+    
     local cx = mapOffsetToX(0, trackTL.x, trackW)
-    ui.drawTextClipped(LABEL_CENTER_TEXT,
+    ui_drawTextClipped(LABEL_CENTER_TEXT,
       vec2(cx - 5, trackMidY - 8), vec2(cx + 5, trackMidY + 8), COLOR_TEXT_MINOR, nil, false)
 
-    ui.drawTextClipped(LABEL_RIGHT_TEXT,
+    ui_drawTextClipped(LABEL_RIGHT_TEXT,
       vec2(trackBR.x +  2, trackMidY - 8), vec2(trackBR.x + 12, trackMidY + 8), COLOR_TEXT_MINOR, nil, false)
   end
 
@@ -180,19 +194,19 @@ function UILateralOffsetsImageWidget.draw(storage)
 
   -- Captions under each marker
   if SHOW_CAPTIONS then
-    ui.dwriteDrawText(CAPTION_DEFAULT_TEXT,  CAPTION_FONT_SIZE, vec2(xDefault  - 20, yDefault  + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
+    ui_dwriteDrawText(CAPTION_DEFAULT_TEXT,  CAPTION_FONT_SIZE, vec2(xDefault  - 20, yDefault  + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
 
     if handleYielding then
-        ui.dwriteDrawText(CAPTION_YIELDING_TEXT, CAPTION_FONT_SIZE, vec2(xYielding - 13, yYielding + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
+        ui_dwriteDrawText(CAPTION_YIELDING_TEXT, CAPTION_FONT_SIZE, vec2(xYielding - 13, yYielding + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
     end
 
     if handleOvertaking then
-        ui.dwriteDrawText(CAPTION_OVERTAKE_TEXT, CAPTION_FONT_SIZE, vec2(xOvertake - 20, yOvertake + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
+        ui_dwriteDrawText(CAPTION_OVERTAKE_TEXT, CAPTION_FONT_SIZE, vec2(xOvertake - 20, yOvertake + (CAR_HEIGHT * 0.5) + CAPTION_OFFSET_Y), COLOR_TEXT)
     end
   end
 
   -- Reserve layout space so following UI doesn’t overlap the drawing
-  ui.invisibleButton("##lateralPreviewReserve", vec2(PREVIEW_WIDTH, PREVIEW_HEIGHT))
+  ui_invisibleButton("##lateralPreviewReserve", vec2(PREVIEW_WIDTH, PREVIEW_HEIGHT))
 end
 
 return UILateralOffsetsImageWidget
