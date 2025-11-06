@@ -25,6 +25,7 @@ local ui_pushDWriteFont = ui.pushDWriteFont
 local ui_popDWriteFont = ui.popDWriteFont
 local ui_MouseButton = ui.MouseButton
 local ui_mouseClicked = ui.mouseClicked
+local ui_StyleColor = ui.StyleColor
 local string = string
 local string_format = string.format
 local RaceTrackManager = RaceTrackManager
@@ -65,6 +66,9 @@ local UI_HEADER_TEXT_FONT_SIZE = 15
 
 local DEFAULT_SLIDER_WIDTH = 200
 local DEFAULT_SLIDER_FORMAT = '%.2f'
+
+local DEFAULT_SLIDERGRAB_STYLECOLOR = ui.styleColor(ui_StyleColor.SliderGrab, 0)
+local AICAUTION_SLIDERGRAB_COLOR_WHEN_SET_TO_ZERO = ColorManager.RGBM_Colors.DarkKhaki
 
 local storage = StorageManager.getStorage()
 local storage_Yielding = StorageManager.getStorage_Yielding()
@@ -180,6 +184,10 @@ local renderDebuggingSection = function(storage_Debugging)
     ui_textColored('Warning: Enabling debugging options may impact performance.', ColorManager.RGBM_Colors.Yellow)
 end
 
+local getSliderColorForAICautionWhenSetToZero = function(aiCautionValue)
+    return aiCautionValue < 1 and AICAUTION_SLIDERGRAB_COLOR_WHEN_SET_TO_ZERO or DEFAULT_SLIDERGRAB_STYLECOLOR
+end
+
 SettingsWindow.draw = function()
     -- Draw the app icon at the top-right of the settings window
     AppIconRenderer_draw()
@@ -192,7 +200,7 @@ SettingsWindow.draw = function()
     -- Draw the Enabled checkbox
     local appEnabled = storage.enabled
     local enabledCheckBoxColor = appEnabled and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
-    ui_pushStyleColor(ui.StyleColor.Text, enabledCheckBoxColor)
+    ui_pushStyleColor(ui_StyleColor.Text, enabledCheckBoxColor)
     local enabledDisabledText = appEnabled and 'Enabled' or 'Disabled'
     if ui_checkbox(string_format('Realistic Trackday %s for: %s (Mode: %s)', enabledDisabledText, RaceTrackManager_getTrackName(), RaceTrackManager_getSessionTypeName()), appEnabled) then storage.enabled = not storage.enabled end
     ui_popStyleColor(1)
@@ -218,15 +226,27 @@ SettingsWindow.draw = function()
 
     ui_newLine(1)
     ui_dwriteText('Caution', UI_HEADER_TEXT_FONT_SIZE)
-    ui_newLine(1)
 
     ui_text('Caution determines how much space cars keep from each other while driving.\nA higher caution means a larger gap between cars.')
+    ui_newLine(1)
 
+    ui_pushStyleColor(ui_StyleColor.SliderGrab, getSliderColorForAICautionWhenSetToZero(storage.defaultAICaution))
     storage.defaultAICaution =  renderSlider('Caution while driving normally', 'The default gap cars keep between each other while driving on the default driving lane.\n\nThe higher this value is, the more cautious the cars will be by keeping a larger gap between each other, which can provide a more relaxed trackday experience.', storage.defaultAICaution, StorageManager_options_min[StorageManager_Options.DefaultAICaution], StorageManager_options_max[StorageManager_Options.DefaultAICaution], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.DefaultAICaution]) -- do not drop the minimum below 2 because 1 is used while overtaking
+    ui_popStyleColor()
+
     storage.AICaution_OvertakingWithNoObstacleInFront =  renderSlider('Caution while overtaking (No obstacle in front)', 'The caution level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe lower this value is, the more aggressive the cars will be while overtaking when there is no obstacle in front of them.', storage.AICaution_OvertakingWithNoObstacleInFront, StorageManager_options_min[StorageManager_Options.AICaution_OvertakingWithNoObstacleInFront], StorageManager_options_max[StorageManager_Options.AICaution_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AICaution_OvertakingWithNoObstacleInFront])
+
+    ui_pushStyleColor(ui_StyleColor.SliderGrab, getSliderColorForAICautionWhenSetToZero(storage.AICaution_OvertakingWithObstacleInFront))
     storage.AICaution_OvertakingWithObstacleInFront =  renderSlider('Caution while overtaking (Obstacle in front)', 'The caution level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe higher this value is, the more cautious the cars will be while overtaking when there is an obstacle in front of them.', storage.AICaution_OvertakingWithObstacleInFront, StorageManager_options_min[StorageManager_Options.AICaution_OvertakingWithObstacleInFront], StorageManager_options_max[StorageManager_Options.AICaution_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AICaution_OvertakingWithObstacleInFront])
+    ui_popStyleColor()
+
+    ui_pushStyleColor(ui_StyleColor.SliderGrab, getSliderColorForAICautionWhenSetToZero(storage.AICaution_OvertakingWhileInCorner))
     storage.AICaution_OvertakingWhileInCorner =  renderSlider('Caution while overtaking in corner', 'The caution level used when overtaking another car while in a corner.\n\nThe higher this value is, the more cautious the cars will be while overtaking in corners.', storage.AICaution_OvertakingWhileInCorner, StorageManager_options_min[StorageManager_Options.AICaution_OvertakingWhileInCorner], StorageManager_options_max[StorageManager_Options.AICaution_OvertakingWhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AICaution_OvertakingWhileInCorner])
+    ui_popStyleColor()
+
+    ui_pushStyleColor(ui_StyleColor.SliderGrab, getSliderColorForAICautionWhenSetToZero(storage.AICaution_Yielding))
     storage.AICaution_Yielding =  renderSlider('Caution while yielding', 'The caution level used when yielding (giving way to faster cars).\n\nThe higher this value is, the more cautious the cars will be while yielding.', storage.AICaution_Yielding, StorageManager_options_min[StorageManager_Options.AICaution_Yielding], StorageManager_options_max[StorageManager_Options.AICaution_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AICaution_Yielding])
+    ui_popStyleColor()
 
     ui_nextColumn()
 
@@ -305,7 +325,7 @@ SettingsWindow.draw = function()
     ui_newLine(1)
 
     local handleYieldingCheckboxColor = handleYielding and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
-    ui_pushStyleColor(ui.StyleColor.Text, handleYieldingCheckboxColor)
+    ui_pushStyleColor(ui_StyleColor.Text, handleYieldingCheckboxColor)
     if ui_checkbox('Handle Yielding', storage_Yielding.handleYielding) then storage_Yielding.handleYielding = not storage_Yielding.handleYielding end
     ui_popStyleColor(1)
     if ui_itemHovered() then ui_setTooltip('If enabled, AI cars will attempt to yield to the specified Yielding Lateral Offset side of the track') end
@@ -365,7 +385,7 @@ SettingsWindow.draw = function()
     ui_newLine(1)
 
     local handleOvertakingCheckboxColor = handleOvertaking and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
-    ui_pushStyleColor(ui.StyleColor.Text, handleOvertakingCheckboxColor)
+    ui_pushStyleColor(ui_StyleColor.Text, handleOvertakingCheckboxColor)
     if ui_checkbox('Handle Overtaking', storage_Overtaking.handleOvertaking) then storage_Overtaking.handleOvertaking = not storage_Overtaking.handleOvertaking end
     ui_popStyleColor(1)
     if ui_itemHovered() then ui_setTooltip('If enabled, AI cars will attempt to overtake to the specified Overtaking Lateral Offset side of the track') end
