@@ -562,20 +562,25 @@ UIManager.drawMainWindowLateralOffsetsSection = function()
 end
 
 UIManager.drawAppNotRunningMessageInMainWindow = function()
+    local isOnline = Constants.IS_ONLINE
+
     ui_textColored(string_format('Realistic Trackday not running.', tostring(storage.enabled), tostring(Constants.IS_ONLINE)), ColorManager.RGBM_Colors.Red)
+    if not isOnline then
+      -- ui_textColored('You can enable the app from the Settings', ColorManager.RGBM_Colors.Red)
+      ui_text('You can enable the app from the Settings.')
+    end
     ui_newLine(1)
 
     local appEnabled = storage.enabled
     ui_text('App Enabled: ')
     ui_sameLine()
     local appEnabledColor = appEnabled and ColorManager.RGBM_Colors.Green or ColorManager.RGBM_Colors.Red
-    ui_textColored(string_format('%s', tostring(appEnabled)), appEnabledColor)
+    ui_textColored(string_format('%s', appEnabled and "yes" or "no"), appEnabledColor)
 
-    local isOnline = Constants.IS_ONLINE
     ui_text('Playing Online: ')
     ui_sameLine()
     local isOnlineColor = isOnline and ColorManager.RGBM_Colors.Red or ColorManager.RGBM_Colors.Green
-    ui_textColored(string_format('%s', tostring(isOnline)), isOnlineColor)
+    ui_textColored(string_format('%s', isOnline and "yes" or "no"), isOnlineColor)
 end
 
 ---Opens or closes the specified window.
