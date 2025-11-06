@@ -1,29 +1,59 @@
 ﻿local CarOperations = {}
 
 -- bindings
--- TODO: Still need to add a lot more bindings here
 local ac = ac
+local ac_getCar = ac.getCar
+local ac_getCarMaxSpeedWithGear = ac.getCarMaxSpeedWithGear
+local ac_overrideCarControls = ac.overrideCarControls
+local ac_setTargetCar = ac.setTargetCar
+local ac_setTurningLights = ac.setTurningLights
+local string = string
+local string_format = string.format
+local math = math
+local math_huge = math.huge
+local math_abs = math.abs
+local math_max = math.max
 local physics = physics
+local physics_disableCarCollisions = physics.disableCarCollisions
+local physics_preventAIFromRetiring = physics.preventAIFromRetiring
+local physics_setAIAggression = physics.setAIAggression
+local physics_setAICaution = physics.setAICaution
+local physics_setAILevel = physics.setAILevel
+local physics_setAISplineOffset = physics.setAISplineOffset
+local physics_setAIStopCounter = physics.setAIStopCounter
+local physics_setAIThrottleLimit = physics.setAIThrottleLimit
+local physics_setAITopSpeed = physics.setAITopSpeed
+local physics_setExtraAIGrip = physics.setExtraAIGrip
+local physics_setGentleStop = physics.setGentleStop
 local vec3 = vec3
 local MathHelpers_approach = MathHelpers.approach
 local MathHelpers_vsub = MathHelpers.vsub
 local MathHelpers_dot = MathHelpers.dot
 local CarManager = CarManager
-
---[====[
----@alias CarOperations.CarDirections 
----| `CarOperations.CarDirections.None` @Value: 0.
----| `CarOperations.CarDirections.FrontLeft` @Value: 1.
----| `CarOperations.CarDirections.CenterLeft` @Value: 2.
----| `CarOperations.CarDirections.RearLeft` @Value: 3.
----| `CarOperations.CarDirections.FrontRight` @Value: 4.
----| `CarOperations.CarDirections.CenterRight` @Value: 5.
----| `CarOperations.CarDirections.RearRight` @Value: 6.
----| `CarOperations.CarDirections.FrontLeftAngled` @Value: 7.
----| `CarOperations.CarDirections.RearLeftAngled` @Value: 8.
----| `CarOperations.CarDirections.FrontRightAngled` @Value: 9.
----| `CarOperations.CarDirections.RearRightAngled` @Value: 10.
---]====]
+local CarManager_getActualTrackLateralOffset = CarManager.getActualTrackLateralOffset
+local CarManager_getCalculatedTrackLateralOffset = CarManager.getCalculatedTrackLateralOffset
+local CarManager_getDefaultAIAggression = CarManager.getDefaultAIAggression
+local CarManager_getDefaultAIDifficultyLevel = CarManager.getDefaultAIDifficultyLevel
+local CarManager_isCarMidCorner = CarManager.isCarMidCorner
+local CarManager_isCarOffTrack = CarManager.isCarOffTrack
+local CarManager_setCalculatedTrackLateralOffset = CarManager.setCalculatedTrackLateralOffset
+local Logger = Logger
+local Logger_error = Logger.error
+local Logger_log = Logger.log
+local Logger_warn = Logger.warn
+local RaceTrackManager = RaceTrackManager
+local RaceTrackManager_getLateralOffsetSign = RaceTrackManager.getLateralOffsetSign
+local RaceTrackManager_getOppositeSide = RaceTrackManager.getOppositeSide
+local RaceTrackManager_getOvertakingSide = RaceTrackManager.getOvertakingSide
+local RaceTrackManager_getYieldingSide = RaceTrackManager.getYieldingSide
+local StorageManager = StorageManager
+local StorageManager_getStorage = StorageManager.getStorage
+local StorageManager_getStorage_Overtaking = StorageManager.getStorage_Overtaking
+local StorageManager_getStorage_Yielding = StorageManager.getStorage_Yielding
+local render = render
+local render_createRay = render.createRay
+local render_debugBox = render.debugBox
+local render_debugLine = render.debugLine
 
 ---@enum CarOperations.CarDirections
 CarOperations.CarDirections = {
@@ -39,6 +69,21 @@ CarOperations.CarDirections = {
   FrontRightAngled = 9,
   RearRightAngled = 10,
 }
+
+--[====[
+---@alias CarOperations.CarDirections 
+---| `CarOperations.CarDirections.None` @Value: 0.
+---| `CarOperations.CarDirections.FrontLeft` @Value: 1.
+---| `CarOperations.CarDirections.CenterLeft` @Value: 2.
+---| `CarOperations.CarDirections.RearLeft` @Value: 3.
+---| `CarOperations.CarDirections.FrontRight` @Value: 4.
+---| `CarOperations.CarDirections.CenterRight` @Value: 5.
+---| `CarOperations.CarDirections.RearRight` @Value: 6.
+---| `CarOperations.CarDirections.FrontLeftAngled` @Value: 7.
+---| `CarOperations.CarDirections.RearLeftAngled` @Value: 8.
+---| `CarOperations.CarDirections.FrontRightAngled` @Value: 9.
+---| `CarOperations.CarDirections.RearRightAngled` @Value: 10.
+--]====]
 
 CarOperations.CarDirectionsStrings = {
   [CarOperations.CarDirections.None] = "None",
@@ -66,9 +111,9 @@ local RENDER_CAR_BLOCK_CHECK_RAYS_HIT_COLOR = ColorManager.RGBM_Colors.SeaGreen
 
 local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming corner is closer than this, increase the caution level
 
-local storage = StorageManager.getStorage()
-local storage_Overtaking = StorageManager.getStorage_Overtaking()
-local storage_Yielding = StorageManager.getStorage_Yielding()
+local storage = StorageManager_getStorage()
+local storage_Overtaking = StorageManager_getStorage_Overtaking()
+local storage_Yielding = StorageManager_getStorage_Yielding()
 
 --[===[
 https://discord.com/channels/453595061788344330/962668819933982720/1423344738576109741
@@ -91,7 +136,7 @@ CarOperations.CarPedals = {
 ---@param carPedal CarOperations.CarPedals
 ---@param pedalPosition number
 CarOperations.setPedalPosition = function(carIndex, carPedal, pedalPosition)
-  local carInput = ac.overrideCarControls(carIndex)
+  local carInput = ac_overrideCarControls(carIndex)
   if not carInput then return end
 
   if carPedal == CarOperations.CarPedals.Gas then
@@ -107,7 +152,7 @@ end
 ---@param carIndex integer
 ---@param carPedal CarOperations.CarPedals
 CarOperations.resetPedalPosition = function(carIndex, carPedal)
-  local carInput = ac.overrideCarControls(carIndex)
+  local carInput = ac_overrideCarControls(carIndex)
   if not carInput then return end
 
   if carPedal == CarOperations.CarPedals.Gas then
@@ -128,7 +173,7 @@ local ARRIVED_AT_TARGET_SPLINE_OFFSET_EPSILON = 0.1 -- in lateral spline offset 
 ---@return boolean
 CarOperations.hasArrivedAtTargetSplineOffset = function(carIndex, drivingToSide)
     -- local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
-    local currentSplineOffset = CarManager.getActualTrackLateralOffset(ac.getCar(carIndex).position)
+    local currentSplineOffset = CarManager_getActualTrackLateralOffset(ac_getCar(carIndex).position)
     local targetSplineOffset = CarManager.cars_targetSplineOffset[carIndex]
       if drivingToSide == RaceTrackManager.TrackSide.LEFT then
         return currentSplineOffset - ARRIVED_AT_TARGET_SPLINE_OFFSET_EPSILON <= targetSplineOffset
@@ -143,7 +188,7 @@ end
 ---@param carIndex integer @0-based car index.
 ---@param limit number @0 for limit gas pedal to 0, 1 to remove limitation.
 CarOperations.setAIThrottleLimit = function(carIndex, limit)
-    physics.setAIThrottleLimit(carIndex, limit)
+    physics_setAIThrottleLimit(carIndex, limit)
     CarManager.cars_throttleLimit[carIndex] = limit
 end
 
@@ -156,7 +201,7 @@ end
 ---@param carIndex integer @0-based car index.
 ---@param limit number @Speed in km/h.
 CarOperations.setAITopSpeed = function(carIndex, limit)
-    physics.setAITopSpeed(carIndex, limit)
+    physics_setAITopSpeed(carIndex, limit)
 
     --[===[
     -- Andreas: since physics.setAITopSpeed doesn't seem to work on ai cars atm, I'm also calling the homebrew function here
@@ -169,14 +214,14 @@ end
 ---Removes the AI top speed limit.
 ---@param carIndex integer
 CarOperations.removeAITopSpeed = function(carIndex)
-  CarOperations.setAITopSpeed(carIndex, math.huge)
+  CarOperations.setAITopSpeed(carIndex, math_huge)
 end
 
 ---Changes AI caution, altering the distance it keeps from the car in front of it. Default value: `1`. Experimental.
 ---@param carIndex integer @0-based car index.
 ---@param caution number @AI caution from 0 to 16.
 CarOperations.setAICaution = function(carIndex, caution)
-    physics.setAICaution(carIndex, caution)
+    physics_setAICaution(carIndex, caution)
     CarManager.cars_aiCaution[carIndex] = caution
 end
 
@@ -190,14 +235,14 @@ end
 ---@param carIndex integer @0-based car index.
 ---@param aggression number @AI aggression from 0 to 1. Note: aggression level set in a launcher will be multiplied by 0.95, so to set 100% aggression here, pass 0.95.
 CarOperations.setAIAggression = function(carIndex, aggression)
-    physics.setAIAggression(carIndex, aggression)
+    physics_setAIAggression(carIndex, aggression)
     CarManager.cars_aiAggression[carIndex] = aggression
 end
 
 ---Removes any AI aggression and sets it back to the default value.
 ---@param carIndex integer @0-based car index.
 CarOperations.setDefaultAIAggression = function(carIndex)
-  local aiAggression = CarManager.getDefaultAIAggression(carIndex)
+  local aiAggression = CarManager_getDefaultAIAggression(carIndex)
   CarOperations.setAIAggression(carIndex, aiAggression)
 end
 
@@ -205,14 +250,14 @@ end
 ---@param carIndex integer @0-based car index.
 ---@param aiDifficultyLevel integer @AI difficulty level from 0 to 2.
 CarOperations.setAIDifficultyLevel = function(carIndex, aiDifficultyLevel)
-    physics.setAILevel(carIndex, aiDifficultyLevel)
+    physics_setAILevel(carIndex, aiDifficultyLevel)
     CarManager.cars_aiDifficultyLevel[carIndex] = aiDifficultyLevel
 end
 
 ---Removes any AI difficulty levels and sets it back to the default value.
 ---@param carIndex integer @0-based car index.
 CarOperations.setDefaultAIDifficultyLevel = function(carIndex)
-  local aiDifficultyLevel = CarManager.getDefaultAIDifficultyLevel(carIndex)
+  local aiDifficultyLevel = CarManager_getDefaultAIDifficultyLevel(carIndex)
   CarOperations.setAIDifficultyLevel(carIndex, aiDifficultyLevel)
 end
 
@@ -221,7 +266,7 @@ end
 ---@param carIndex integer @0-based car index.
 ---@param time number @Time in seconds.
 CarOperations.setAIStopCounter = function(carIndex, time)
-    physics.setAIStopCounter(carIndex, time)
+    physics_setAIStopCounter(carIndex, time)
     CarManager.cars_aiStopCounter[carIndex] = time
 end
 
@@ -229,7 +274,7 @@ end
 ---@param carIndex integer
 ---@param grip number @grip value
 CarOperations.setGrip = function(carIndex, grip)
-    physics.setExtraAIGrip(carIndex, grip)
+    physics_setExtraAIGrip(carIndex, grip)
 
     CarManager.cars_grip[carIndex] = grip
 end
@@ -244,14 +289,14 @@ end
 ---@param carIndex integer
 ---@param collisionsEnabled boolean
 CarOperations.toggleCarCollisions = function(carIndex, collisionsEnabled)
-  physics.disableCarCollisions(carIndex, not collisionsEnabled, true)
+  physics_disableCarCollisions(carIndex, not collisionsEnabled, true)
 end
 
 ---Activates or deactivates gentle stopping.
 ---@param carIndex integer @0-based car index.
 ---@param stop boolean? @Default value: `true`.
 CarOperations.setGentleStop = function(carIndex, stop)
-    physics.setGentleStop(carIndex, stop)
+    physics_setGentleStop(carIndex, stop)
     CarManager.cars_gentleStop[carIndex] = stop
 end
 
@@ -352,7 +397,7 @@ end
 ---If not moving, they will still retire some time after this function is called, unless you’ll keep calling it.
 ---@param carIndex integer @0-based car index.
 function CarOperations.preventAIFromRetiring(carIndex)
-    physics.preventAIFromRetiring(carIndex)
+    physics_preventAIFromRetiring(carIndex)
 end
 
 ---@param turningLights ac.TurningLights
@@ -363,10 +408,10 @@ function CarOperations.toggleTurningLights(carIndex, turningLights)
         -- return
     -- end
 
-    if ac.setTargetCar(carIndex) then
-        ac.setTurningLights(turningLights)
+    if ac_setTargetCar(carIndex) then
+        ac_setTurningLights(turningLights)
     else
-      Logger.warn(string.format("CarOperations.toggleTurningLights: Could not set target car to %d", carIndex))
+      Logger_warn(string_format("CarOperations.toggleTurningLights: Could not set target car to %d", carIndex))
     end
 
     -- TODO: we don't need all of these
@@ -427,7 +472,7 @@ end
 function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset, rampSpeed_mps, overrideAiAwareness, sideCheck, useIndicatorLights)
     -- calculate the side we're driving to based on the car's current lateral offset and the target lateral offset
     local carPosition = car.position
-    local currentActualTrackLateralOffset = CarManager.getActualTrackLateralOffset(carPosition)
+    local currentActualTrackLateralOffset = CarManager_getActualTrackLateralOffset(carPosition)
     local side = targetLateralOffset < currentActualTrackLateralOffset and RaceTrackManager.TrackSide.LEFT or RaceTrackManager.TrackSide.RIGHT
 
     -- save a copy of the original side for indicator lights because we may change the side variable later
@@ -436,14 +481,14 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
     -- make sure there isn't any car on the side we're trying to drive to so we don't crash into it
     if sideCheck then
       local isSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
-      local isCarOffTrack = CarManager.isCarOffTrack(car, side)
+      local isCarOffTrack = CarManager_isCarOffTrack(car, side)
       local sideNotSafe = not isSideSafeToDrive
       -- if not isSideSafeToDrive then
       if sideNotSafe or isCarOffTrack then
           -- return false since we can't drive to the side safely
           -- return false
           -- drive to the other side to avoid colliding with the car on this side
-          side = RaceTrackManager.getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
+          side = RaceTrackManager_getOppositeSide(side) -- if the side is not safe, drive to the other side temporarily
 
           -- do another side check on the other side since we're driving to the other side now
           local isOtherSideSafeToDrive = CarStateMachine.isSafeToDriveToTheSide(carIndex, side)
@@ -475,7 +520,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
       -- local sideSign = drivingToTheLeft and -1 or 1
 
       -- TODO: Are you sure we shouldn't be using the actual track lateral offset here?
-      local currentSplineOffset = CarManager.getCalculatedTrackLateralOffset(carIndex)
+      local currentSplineOffset = CarManager_getCalculatedTrackLateralOffset(carIndex)
       -- local currentSplineOffset = currentActualTrackLateralOffset -- the problem with this one is that if the increase in offset is too low, the ai can override it and still go the other direction
 
       -- local targetSplineOffset = storage.maxLateralOffset_normalized * sideSign
@@ -490,7 +535,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
 
       -- set the spline offset on the ai car
       -- local overrideAiAwareness = storage.overrideAiAwareness -- TODO: check what this does
-      physics.setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
+      physics_setAISplineOffset(carIndex, currentSplineOffset, overrideAiAwareness)
 
       -- keep the turning lights on while driving to the side
       if useIndicatorLights then
@@ -499,7 +544,7 @@ function CarOperations.driveSafelyToSide(carIndex, dt, car, targetLateralOffset,
         CarOperations.toggleTurningLights(carIndex, turningLights)
       end
 
-      CarManager.setCalculatedTrackLateralOffset(carIndex, currentSplineOffset)
+      CarManager_setCalculatedTrackLateralOffset(carIndex, currentSplineOffset)
       CarManager.cars_targetSplineOffset[carIndex] = targetSplineOffset
 
       return true
@@ -513,7 +558,7 @@ end
 ---@param useIndicatorLights boolean
 ---@return boolean
 function CarOperations.overtakeSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
-    local driveToSide = RaceTrackManager.getOvertakingSide()
+    local driveToSide = RaceTrackManager_getOvertakingSide()
     -- local targetOffset = storage.maxLateralOffset_normalized
     -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
     local targetOffset = storage.overtakingLateralOffset
@@ -533,7 +578,7 @@ end
 ---@param useIndicatorLights boolean
 ---@return boolean
 function CarOperations.yieldSafelyToSide(carIndex, dt, car, storage, useIndicatorLights)
-      local driveToSide = RaceTrackManager.getYieldingSide()
+      local driveToSide = RaceTrackManager_getYieldingSide()
       -- local targetOffset = storage.maxLateralOffset_normalized
       -- local targetOffset = storage.maxLateralOffset_normalized * RaceTrackManager.getLateralOffsetSign(driveToSide)
       local targetOffset = storage.yieldingLateralOffset
@@ -552,7 +597,7 @@ end
 ---@return number aiAggression 
 ---@return number aiDifficultyLevel
 CarOperations.calculateAICautionAggressionDifficultyWhileOvertaking = function(overtakingCar, yieldingCar)
-    local overtakingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(overtakingCar.position)
+    local overtakingCarTrackLateralOffset = CarManager_getActualTrackLateralOffset(overtakingCar.position)
 
     -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
     -- local aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
@@ -563,8 +608,8 @@ CarOperations.calculateAICautionAggressionDifficultyWhileOvertaking = function(o
     -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
     if yieldingCar then
         -- if the car in front of us is not in front of us, we can drop the caution to 0 to speed up overtaking
-        local yieldingCarTrackLateralOffset = CarManager.getActualTrackLateralOffset(yieldingCar.position)
-        local lateralOffsetsDelta = math.abs(overtakingCarTrackLateralOffset - yieldingCarTrackLateralOffset)
+        local yieldingCarTrackLateralOffset = CarManager_getActualTrackLateralOffset(yieldingCar.position)
+        local lateralOffsetsDelta = math_abs(overtakingCarTrackLateralOffset - yieldingCarTrackLateralOffset)
         if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
             -- aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
             aiCaution = storage.AICaution_OvertakingWithNoObstacleInFront
@@ -575,7 +620,7 @@ CarOperations.calculateAICautionAggressionDifficultyWhileOvertaking = function(o
 
     -- If an upcoming corner is coming , increase the caution a bit so that we don't go flying off the track
     local overtakingCarIndex = overtakingCar.index
-    local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(overtakingCarIndex)
+    local isMidCorner, distanceToUpcomingTurn = CarManager_isCarMidCorner(overtakingCarIndex)
     if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION then
         aiCaution = storage.AICaution_OvertakingWhileInCorner
         aiAggression = storage.AIAggression_WhileInCorner
@@ -641,7 +686,7 @@ local checkForOtherCars = function(carIndex, worldPosition, direction, distance)
   --  Maybe using physics.raycastTrack(...) could be faster
   --  Andreas: it seems like physics.raycastTrack does not hit cars, only the track
   -- local raycastHitDistance = physics.raycastTrack(worldPosition, direction, distance) 
-  local carRay = render.createRay(worldPosition,  direction, distance)
+  local carRay = render_createRay(worldPosition,  direction, distance)
   --[===[]
   local raycastHitDistance = carRay:cars(BACKFACE_CULLING_FOR_BLOCKING)
   local rayHit = not (raycastHitDistance == -1)
@@ -758,7 +803,7 @@ end
 ---@return integer
 ---@return integer
 CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(carIndex, sideToCheck)
-    local car = ac.getCar(carIndex)
+    local car = ac_getCar(carIndex)
     if not car then return false, CarOperations.CarDirections.None, -1 end
 
     -- local carIndex = car.index
@@ -768,7 +813,7 @@ CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays = function(car
     local carUp       = car.up
     local halfAABBSize = CarManager.cars_HALF_AABSIZE[carIndex]
     if not halfAABBSize.z then
-      Logger.error(string.format("CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays_NEWDoDAPPROACH: Car %d has no halfAABBSize.z calculated", carIndex))
+      Logger_error(string_format("CarOperations.checkIfCarIsBlockedByAnotherCarAndSaveSideBlockRays_NEWDoDAPPROACH: Car %d has no halfAABBSize.z calculated", carIndex))
     end
 
     -- TODO: remove use of CarOperations.getSideAnchorPoints here and only calculate what we need
@@ -909,17 +954,17 @@ CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH = function(carIndex)
 
     -- Logger.log(string.format("CarOperations.renderCarBlockCheckRays_NEWDoDAPPROACH: car #%d pos: %s, dir: %s, len: %s", carIndex, tostring(pos), tostring(dir), tostring(len)))
     local color = hit and RENDER_CAR_BLOCK_CHECK_RAYS_HIT_COLOR or RENDER_CAR_BLOCK_CHECK_RAYS_NON_HIT_COLOR
-    render.debugLine(pos, pos + dir * len, color)
+    render_debugLine(pos, pos + dir * len, color)
   end
 end
 
 CarOperations.renderCarSideOffTrack = function(carIndex)
-  local car = ac.getCar(carIndex)
+  local car = ac_getCar(carIndex)
   if not car then return end
 
   local carWheels = car.wheels
-  local carOffTrackLeft = CarManager.isCarOffTrack(car, RaceTrackManager.TrackSide.LEFT)
-  local carOffTrackRight = CarManager.isCarOffTrack(car, RaceTrackManager.TrackSide.RIGHT)
+  local carOffTrackLeft = CarManager_isCarOffTrack(car, RaceTrackManager.TrackSide.LEFT)
+  local carOffTrackRight = CarManager_isCarOffTrack(car, RaceTrackManager.TrackSide.RIGHT)
   -- local carOffTrack = carOffTrackLeft or carOffTrackRight
 
   for w = 0, 3 do
@@ -948,7 +993,7 @@ CarOperations.renderCarSideOffTrack = function(carIndex)
       color = ColorManager.RGBM_Colors.Red
     end
 
-    render.debugBox(wheelPosition, debugBoxSize, color)
+    render_debugBox(wheelPosition, debugBoxSize, color)
   end
 end
 
@@ -957,14 +1002,14 @@ end
 ---@param carIndex integer
 ---@return number
 CarOperations.calculateMaxTopSpeed = function(carIndex)
-  local car = ac.getCar(carIndex)
+  local car = ac_getCar(carIndex)
   if not car then return 0 end
 
   -- todo: could you just use highest gear available instead of checking all gears?
   local maxSpeed = 0
   local gearCount = car.gearCount
   for gearIndex = 1, gearCount do
-    maxSpeed = math.max(maxSpeed, ac.getCarMaxSpeedWithGear(carIndex, gearIndex))
+    maxSpeed = math_max(maxSpeed, ac_getCarMaxSpeedWithGear(carIndex, gearIndex))
   end
   return maxSpeed
 end
