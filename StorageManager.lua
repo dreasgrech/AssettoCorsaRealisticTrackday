@@ -40,23 +40,28 @@ StorageManager.Options ={
     AICaution_Yielding = 7,
     OverrideOriginalAIAggression_DrivingNormally = 8,
     OverrideOriginalAIAggression_Overtaking = 9,
-    DefaultAIAggression = 10,
-    GlobalTopSpeedLimitKmh = 11,
-    DeferTimeAfterSessionStart = 12,
+    OverrideOriginalAIAggression_Yielding = 10,
+    DefaultAIAggression = 11,
+    AIAggression_OvertakingWithNoObstacleInFront = 12,
+    AIAggression_OvertakingWithObstacleInFront = 13,
+    AIAggression_WhileInCorner = 14,
+    AIAggression_Yielding = 15,
+    GlobalTopSpeedLimitKmh = 16,
+    DeferTimeAfterSessionStart = 17,
 
-    DefaultLateralOffset = 13,
-    YieldingLateralOffset = 14,
-    OvertakingLateralOffset = 15,
+    DefaultLateralOffset = 18,
+    YieldingLateralOffset = 19,
+    OvertakingLateralOffset = 20,
 
-    ClearAhead_meters = 16,
+    ClearAhead_meters = 21,
 
-    CustomAIFlood_enabled = 17,
-    CustomAIFlood_distanceBehindPlayerToCycle_meters = 18,
-    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 19,
+    CustomAIFlood_enabled = 22,
+    CustomAIFlood_distanceBehindPlayerToCycle_meters = 23,
+    CustomAIFlood_distanceAheadOfPlayerToCycle_meters = 24,
 
-    HandleAccidents = 20,
-    DistanceFromAccidentToSeeYellowFlag_meters = 21,
-    DistanceToStartNavigatingAroundCarInAccident_meters = 22,
+    HandleAccidents = 25,
+    DistanceFromAccidentToSeeYellowFlag_meters = 26,
+    DistanceToStartNavigatingAroundCarInAccident_meters = 27,
 }
 
 ---@enum StorageManager.Options_Debugging
@@ -150,6 +155,10 @@ local optionsCollection_Overtaking_beforeDoD = {
 local MIN_AI_CAUTION_VALUE = 0
 local MAX_AI_CAUTION_VALUE = 16
 
+local MIN_AI_AGGRESSION_VALUE = 0
+-- local MAX_AI_AGGRESSION_VALUE = 0.95
+local MAX_AI_AGGRESSION_VALUE = 1.0
+
 -- only used to build the actual tables that hold the runtime values
 local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.Enabled, default=false, min=nil, max=nil },
@@ -161,9 +170,14 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.AICaution_OvertakingWithObstacleInFront, default=1, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
     { name = StorageManager.Options.AICaution_OvertakingWhileInCorner, default=2, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
     { name = StorageManager.Options.AICaution_Yielding, default=4, min=MIN_AI_CAUTION_VALUE, max=MAX_AI_CAUTION_VALUE },
-    { name = StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally, default=true, min=nil, max=false },
-    { name = StorageManager.Options.OverrideOriginalAIAggression_Overtaking, default=true, min=nil, max=false },
-    { name = StorageManager.Options.DefaultAIAggression, default=.5, min=0, max=0.95 }, -- The max is .95 because it's mentioned in the docs for physics.setAIAggression that the value from the launcher is multiplied by .95 so that's the max
+    { name = StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.OverrideOriginalAIAggression_Overtaking, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.OverrideOriginalAIAggression_Yielding, default=true, min=nil, max=nil },
+    { name = StorageManager.Options.DefaultAIAggression, default=.5, min=MIN_AI_AGGRESSION_VALUE, max=MAX_AI_AGGRESSION_VALUE }, -- The max is .95 because it's mentioned in the docs for physics.setAIAggression that the value from the launcher is multiplied by .95 so that's the max
+    { name = StorageManager.Options.AIAggression_OvertakingWithNoObstacleInFront, default=1, min=MIN_AI_AGGRESSION_VALUE, max=MAX_AI_AGGRESSION_VALUE },
+    { name = StorageManager.Options.AIAggression_OvertakingWithObstacleInFront, default=.95, min=MIN_AI_AGGRESSION_VALUE, max=MAX_AI_AGGRESSION_VALUE },
+    { name = StorageManager.Options.AIAggression_WhileInCorner, default=.95, min=MIN_AI_AGGRESSION_VALUE, max=MAX_AI_AGGRESSION_VALUE },
+    { name = StorageManager.Options.AIAggression_Yielding, default=.5, min=MIN_AI_AGGRESSION_VALUE, max=MAX_AI_AGGRESSION_VALUE },
     { name = StorageManager.Options.GlobalTopSpeedLimitKmh, default=0, min=0, max=500 },
     { name = StorageManager.Options.DeferTimeAfterSessionStart, default=0, min=0, max=300 },
 
@@ -249,7 +263,12 @@ optionsCollection_Overtaking_beforeDoD = nil  -- free memory
 ---@field AICaution_Yielding integer
 ---@field overrideOriginalAIAggression_drivingNormally boolean
 ---@field overrideOriginalAIAggression_overtaking boolean
+---@field overrideOriginalAIAggression_yielding boolean
 ---@field defaultAIAggression integer
+---@field AIAggression_OvertakingWithNoObstacleInFront number
+---@field AIAggression_OvertakingWithObstacleInFront number
+---@field AIAggression_WhileInCorner number
+---@field AIAggression_Yielding number
 ---@field globalTopSpeedLimitKmh number
 ---@field deferTimeAfterSessionStart number
 ---@field defaultLateralOffset number
@@ -276,7 +295,12 @@ local storageTable = {
     AICaution_Yielding = StorageManager.options_default[StorageManager.Options.AICaution_Yielding],
     overrideOriginalAIAggression_drivingNormally = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_DrivingNormally],
     overrideOriginalAIAggression_overtaking = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_Overtaking],
+    overrideOriginalAIAggression_yielding = StorageManager.options_default[StorageManager.Options.OverrideOriginalAIAggression_Yielding],
     defaultAIAggression = StorageManager.options_default[StorageManager.Options.DefaultAIAggression],
+    AIAggression_OvertakingWithNoObstacleInFront = StorageManager.options_default[StorageManager.Options.AIAggression_OvertakingWithNoObstacleInFront],
+    AIAggression_OvertakingWithObstacleInFront = StorageManager.options_default[StorageManager.Options.AIAggression_OvertakingWithObstacleInFront],
+    AIAggression_WhileInCorner = StorageManager.options_default[StorageManager.Options.AIAggression_WhileInCorner],
+    AIAggression_Yielding = StorageManager.options_default[StorageManager.Options.AIAggression_Yielding],
     globalTopSpeedLimitKmh = StorageManager.options_default[StorageManager.Options.GlobalTopSpeedLimitKmh],
     deferTimeAfterSessionStart = StorageManager.options_default[StorageManager.Options.DeferTimeAfterSessionStart],
 

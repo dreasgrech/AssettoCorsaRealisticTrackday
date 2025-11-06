@@ -541,7 +541,7 @@ CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtaki
     -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
     -- local aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
     local aiCaution = storage.AICaution_OvertakingWithObstacleInFront
-    local aiAggression = CarManager.AIAggressionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
+    local aiAggression = storage.AIAggression_OvertakingWithObstacleInFront
 
     -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
     if yieldingCar then
@@ -551,7 +551,7 @@ CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtaki
         if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
             -- aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
             aiCaution = storage.AICaution_OvertakingWithNoObstacleInFront
-            aiAggression = CarManager.AIAggressionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
+            aiAggression = storage.AIAggression_OvertakingWithNoObstacleInFront
         end
     end
 
@@ -559,9 +559,8 @@ CarOperations.calculateAICautionAndAggressionWhileOvertaking = function(overtaki
     local overtakingCarIndex = overtakingCar.index
     local isMidCorner, distanceToUpcomingTurn = CarManager.isCarMidCorner(overtakingCarIndex)
     if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION then
-        -- aiCaution = CarManager.AICautionValues.OVERTAKING_WHILE_INCORNER
         aiCaution = storage.AICaution_OvertakingWhileInCorner
-        aiAggression = CarManager.AIAggressionValues.OVERTAKING_WHILE_INCORNER
+        aiAggression = storage.AIAggression_WhileInCorner
     end
 
     return aiCaution, aiAggression

@@ -21,9 +21,11 @@ local CarManager = CarManager
 local CarManager_isCarDrivingOnSide = CarManager.isCarDrivingOnSide
 local CarOperations = CarOperations
 local CarOperations_setAICaution = CarOperations.setAICaution
+local CarOperations_setAIAggression = CarOperations.setAIAggression
 local CarOperations_toggleTurningLights = CarOperations.toggleTurningLights
 local CarOperations_isSecondCarClearlyAhead = CarOperations.isSecondCarClearlyAhead
 local CarOperations_removeAICaution = CarOperations.removeAICaution
+local CarOperations_setDefaultAIAggression = CarOperations.setDefaultAIAggression
 local CarOperations_setAIThrottleLimit = CarOperations.setAIThrottleLimit
 local CarOperations_setAITopSpeed = CarOperations.setAITopSpeed
 local CarOperations_resetAIThrottleLimit = CarOperations.resetAIThrottleLimit
@@ -94,8 +96,13 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
       -- make the yielding car leave more space in between the car in front while driving on the yielding lane
       local aiCaution_Yielding = storage.AICaution_Yielding
-      -- CarOperations_setAICaution(carIndex, CarManager.AICautionValues.YIELDING)
       CarOperations_setAICaution(carIndex, aiCaution_Yielding)
+      
+      local overrideAIAggressionWhileYielding = storage.overrideOriginalAIAggression_yielding
+      if overrideAIAggressionWhileYielding then
+        local aiAggression_Yielding = storage.AIAggression_Yielding
+        CarOperations_setAIAggression(carIndex, aiAggression_Yielding)
+      end
 
       local car = sortedCarsList[sortedCarsListIndex]
       local carPosition = car.position
@@ -240,6 +247,7 @@ end
 ---@param storage StorageTable
 CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
   CarOperations_removeAICaution(carIndex)
+  CarOperations_setDefaultAIAggression(carIndex)
   CarOperations_removeAITopSpeed(carIndex)
   CarOperations_resetPedalPosition(carIndex, CarOperations.CarPedals.Brake)
   CarOperations_resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)

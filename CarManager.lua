@@ -122,10 +122,10 @@ CarManager.AICautionValues = {
 ---@enum CarManager.AIAggressionValues
 ---Holds the different AI Aggression levels used in different situations
 CarManager.AIAggressionValues = {
-  OVERTAKING_WITH_NO_OBSTACLE_INFRONT = 1,
-  OVERTAKING_WITH_OBSTACLE_INFRONT = .95,
-  OVERTAKING_WHILE_INCORNER = .95,
-  YIELDING = .5,
+  -- OVERTAKING_WITH_NO_OBSTACLE_INFRONT = 1,
+  -- OVERTAKING_WITH_OBSTACLE_INFRONT = .95,
+  -- OVERTAKING_WHILE_INCORNER = .95,
+  -- YIELDING = .5,
   AFTER_ACCIDENT = .1
 }
 

@@ -191,7 +191,7 @@ end
 local drawCautionAndAggressionSection = function()
     ui_columns(3, false, "cautionAndAggressionSection")
     ui_setColumnWidth(0, 500)
-    ui_setColumnWidth(1, 500)
+    ui_setColumnWidth(1, 530)
 
     ui_newLine(1)
     ui_dwriteText('Caution', UI_HEADER_TEXT_FONT_SIZE)
@@ -221,19 +221,35 @@ local drawCautionAndAggressionSection = function()
 
     ui_newLine(1)
     ui_dwriteText('Aggression', UI_HEADER_TEXT_FONT_SIZE)
+
+    ui_text('Aggression determines how aggressively cars drive on the track.\nA higher aggression means the cars will try to go faster and take more risks.')
     ui_newLine(1)
 
-    if ui_checkbox('Override original AI aggression when driving normally', storage.overrideOriginalAIAggression_drivingNormally) then storage.overrideOriginalAIAggression_drivingNormally = not storage.overrideOriginalAIAggression_drivingNormally end
-    if ui_itemHovered() then ui_setTooltip('If enabled, will override the original AI aggression value thats is set from the game launcher when the car is driving normally.') end
+    if ui_checkbox('Override original Aggression values when driving normally', storage.overrideOriginalAIAggression_drivingNormally) then storage.overrideOriginalAIAggression_drivingNormally = not storage.overrideOriginalAIAggression_drivingNormally end
+    if ui_itemHovered() then ui_setTooltip('If enabled, will override the original aggression value thats is set from the game launcher when the car is driving normally.') end
 
     local overrideOriginalAIAggression_drivingNormally = storage.overrideOriginalAIAggression_drivingNormally
-
     createDisabledSection(not overrideOriginalAIAggression_drivingNormally, function()
-        storage.defaultAIAggression =  renderSlider('Overridden Base AI Aggression', 'The default aggression level cars exhibit when driving on the default driving lane.\n\nThe higher this value is, the more aggressive the cars will be (although the exact definition of aggression is still a bit unclear at the moment).', storage.defaultAIAggression, StorageManager_options_min[StorageManager_Options.DefaultAIAggression], StorageManager_options_max[StorageManager_Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.DefaultAIAggression]) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
+        storage.defaultAIAggression =  renderSlider('Aggression while driving normally', 'The default aggression level cars exhibit when driving on the default driving lane.\n\nThe higher this value is, the more aggressive the cars will be (although the exact definition of aggression is still a bit unclear at the moment).', storage.defaultAIAggression, StorageManager_options_min[StorageManager_Options.DefaultAIAggression], StorageManager_options_max[StorageManager_Options.DefaultAIAggression], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.DefaultAIAggression]) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
     end)
 
-    if ui_checkbox('Override original AI aggression when overtaking', storage.overrideOriginalAIAggression_overtaking) then storage.overrideOriginalAIAggression_overtaking = not storage.overrideOriginalAIAggression_overtaking end
-    if ui_itemHovered() then ui_setTooltip('If enabled, will override the original AI aggression value thats is set from the game launcher when the car is overtaking another car.') end
+    if ui_checkbox('Override original aggression when overtaking', storage.overrideOriginalAIAggression_overtaking) then storage.overrideOriginalAIAggression_overtaking = not storage.overrideOriginalAIAggression_overtaking end
+    if ui_itemHovered() then ui_setTooltip('If enabled, will override the original aggression value thats is set from the game launcher when the car is overtaking another car.') end
+
+    local overrideOriginalAIAggression_overtaking = storage.overrideOriginalAIAggression_overtaking
+    createDisabledSection(not overrideOriginalAIAggression_overtaking, function()
+        storage.AIAggression_OvertakingWithNoObstacleInFront = renderSlider('Aggression while overtaking (No obstacle in front)', 'The aggression level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe higher this value is, the more aggressive the cars will be while overtaking when there is no obstacle in front of them.', storage.AIAggression_OvertakingWithNoObstacleInFront, StorageManager_options_min[StorageManager_Options.AIAggression_OvertakingWithNoObstacleInFront], StorageManager_options_max[StorageManager_Options.AIAggression_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIAggression_OvertakingWithNoObstacleInFront])
+        storage.AIAggression_OvertakingWithObstacleInFront = renderSlider('Aggression while overtaking (Obstacle in front)', 'The aggression level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe lower this value is, the more cautious the cars will be while overtaking when there is an obstacle in front of them.', storage.AIAggression_OvertakingWithObstacleInFront, StorageManager_options_min[StorageManager_Options.AIAggression_OvertakingWithObstacleInFront], StorageManager_options_max[StorageManager_Options.AIAggression_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIAggression_OvertakingWithObstacleInFront])
+        storage.AIAggression_WhileInCorner = renderSlider('Aggression while overtaking in corner', 'The aggression level used when overtaking another car while in a corner.\n\nThe lower this value is, the more cautious the cars will be while overtaking in corners.', storage.AIAggression_WhileInCorner, StorageManager_options_min[StorageManager_Options.AIAggression_WhileInCorner], StorageManager_options_max[StorageManager_Options.AIAggression_WhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIAggression_WhileInCorner])
+    end)
+
+    if ui_checkbox('Override original aggression when yielding', storage.overrideOriginalAIAggression_yielding) then storage.overrideOriginalAIAggression_yielding = not storage.overrideOriginalAIAggression_yielding end
+    if ui_itemHovered() then ui_setTooltip('If enabled, will override the original aggression value thats is set from the game launcher when the car is yielding (giving way to faster cars).') end
+
+    local overrideOriginalAIAggression_yielding = storage.overrideOriginalAIAggression_yielding
+    createDisabledSection(not overrideOriginalAIAggression_yielding, function()
+        storage.AIAggression_Yielding = renderSlider('Aggression while yielding', 'The aggression level used when yielding (giving way to faster cars).\n\nThe lower this value is, the more cautious the cars will be while yielding.', storage.AIAggression_Yielding, StorageManager_options_min[StorageManager_Options.AIAggression_Yielding], StorageManager_options_max[StorageManager_Options.AIAggression_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.AIAggression_Yielding])
+    end)
 
     ui_columns(1, false)
 end
