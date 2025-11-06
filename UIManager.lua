@@ -115,8 +115,8 @@ local carTableColumns_tooltip = { }
 local carTableColumns_dataBeforeDoD = {
   { name = '#', orderDirection = 0, width = 35, tooltip='Car ID' },
   -- { name = 'Distance (m)', orderDirection = -1, width = 100, tooltip='Distance to player' },
-  { name = 'SplinePosition', orderDirection = 0, width = 70, tooltip='Spline Position' },
-  { name = 'SplineSides', orderDirection = 0, width = 85, tooltip='Spline Sides' },
+  { name = 'SplinePosition', orderDirection = 0, width = 50, tooltip='Spline Position' },
+  { name = 'SplineSides', orderDirection = 0, width = 75, tooltip='Spline Sides' },
   -- { name = 'MaxSpeed', orderDirection = 0, width = 70, tooltip='Max Speed' },
   { name = 'Speed', orderDirection = 0, width = 70, tooltip='Current velocity' },
   { name = 'AvgSpeed', orderDirection = 0, width = 75, tooltip='Average speed' },
@@ -134,8 +134,8 @@ local carTableColumns_dataBeforeDoD = {
   -- { name = 'AIStopCounter', orderDirection = 0, width = 105, tooltip='AI stop counter' },
   -- { name = 'GentleStop', orderDirection = 0, width = 85, tooltip='Gentle stop' },
   { name = 'ClosingSpeed', orderDirection = 0, width = 95, tooltip='Closing speed to car in front' },
-  { name = 'TimeToCollide', orderDirection = 0, width = 75, tooltip='Time to collision to car in front' },
-  { name = 'FrontCarDistance', orderDirection = 0, width = 75, tooltip='The distance to the car in front (m)' },
+  { name = 'TimeToCollide', orderDirection = 0, width = 75, tooltip='Time to collide to car in front' },
+  { name = 'FrontCarDistance', orderDirection = 0, width = 75, tooltip='The distance to the car in front' },
   { name = 'PreviousState', orderDirection = 0, width = 160, tooltip='Previous state' },
   { name = 'CurrentState', orderDirection = 0, width = 160, tooltip='Current state' },
   { name = 'TimeInState', orderDirection = 0, width = 90, tooltip='Time spent in current state' },
@@ -161,6 +161,8 @@ end
 carTableColumns_dataBeforeDoD = nil  -- free memory
 
 local OVERHEAD_TEXT_HEIGHT_ABOVE_CAR = vec3(0, 2.0, 0)
+
+local uiCarListSetDefaultColumnWidths = false
 
 local addTooltipOverLastItem_scrollPosition = vec2(0,0)
 local addTooltipOverLastItem_invisibleButtonPosition = vec2(0,0)
@@ -260,10 +262,15 @@ UIManager.drawUICarList = function()
   local totalColumns = #carTableColumns_name
   ui_columns(totalColumns, true)
   for col = 1, totalColumns do
-    ui_setColumnWidth(col-1, carTableColumns_width[col])
+    if not uiCarListSetDefaultColumnWidths then
+      ui_setColumnWidth(col-1, carTableColumns_width[col])
+    end
+    -- ui.getColumnWidth
     addTooltipOnTableColumnHeader(carTableColumns_tooltip[col], col)
     ui_columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
   end
+
+  uiCarListSetDefaultColumnWidths = true  -- only set the default column widths once
 
   local sortedCarsList = CarManager.currentSortedCarsList
 
