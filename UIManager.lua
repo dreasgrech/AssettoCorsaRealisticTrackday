@@ -160,25 +160,25 @@ carTableColumns_dataBeforeDoD = nil  -- free memory
 
 local overheadTextHeightAboveCar = vec3(0, 2.0, 0)
 
+-- Andreas: This function is needed because ImGui doesn't have built-in support for tooltips on column headers in tables i.e. ui.itemHovered() after a call to ui.columnSortingHeader() doesn't work.
 -- Minimal overlay for column-header tooltips.
 -- Uses the header’s own rect AFTER it’s drawn, so IDs/widths match.
 local function addTooltipOverLastItem(text, _colWidth_unused, idSuffix)
-  if not text or text == '' then return end
+  -- if not text or text == '' then return end
 
   -- Header rect is returned in window space:
-  local min = ui_itemRectMin()
-  local max = ui_itemRectMax()
-  local w = math_max(max.x - min.x, 1)
-  local h = math_max(max.y - min.y, ui_textLineHeightWithSpacing())
+  local itemRectMin = ui_itemRectMin()
+  local itemRectMax = ui_itemRectMax()
+  local w = math_max(itemRectMax.x - itemRectMin.x, 1)
+  local h = math_max(itemRectMax.y - itemRectMin.y, ui_textLineHeightWithSpacing())
 
   -- Place a non-interfering hitbox over that exact rect (screen space):
   local saved = ui_cursorScreenPos()
   ui_setItemAllowOverlap()
-  ui_setCursorScreenPos(ui_windowPos() + min)
-  ui_invisibleButton('##hdrTip'..(idSuffix or ''), vec2(w, h))
+  ui_setCursorScreenPos(ui_windowPos() + itemRectMin)
+  ui_invisibleButton('##carListTableHeaderTip'..(idSuffix or ''), vec2(w, h))
   if ui_itemHovered() then
     ui_setTooltip(text)
-    -- Or: ui.tooltip(function() ui.textWrapped(text) end)
   end
   ui_setCursorScreenPos(saved)
 end
@@ -241,10 +241,8 @@ UIManager.drawUICarList = function()
   ui_columns(totalColumns, true)
   for col = 1, totalColumns do
     ui_setColumnWidth(col-1, carTableColumns_width[col])
+    addTooltipOverLastItem(carTableColumns_tooltip[col], carTableColumns_width[col], col)
     ui_columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
-    -- addTooltipOverLastItem(carTableColumns_tooltip[col], carTableColumns_width[col], col)
-
-    --ui.setColumnWidth(col-1, carTableColumns_width[col])
   end
 
   local sortedCarsList = CarManager.currentSortedCarsList
