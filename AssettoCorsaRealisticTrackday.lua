@@ -291,7 +291,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
 
   AppIconRenderer_draw()
 
-  if ui_button('Modify Settings') then
+  if ui_button('Modify Settings', vec2(120, 40)) then
     UIManager_toggleSettingsWindow()
   end
   ui_newLine(1)
