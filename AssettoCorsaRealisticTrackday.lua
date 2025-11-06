@@ -49,7 +49,7 @@ if anyMissingCSPElements then
   end
   missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. "\nSee the CSP log in \"\\Documents\\Assetto Corsa\\logs\\custom_shaders_patch.log\" for more details."
   missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. "\n\nTo fix the issue, please make sure you're on the latest version of Custom Shaders Patch (https://www.patreon.com/c/x4fab/posts)"
-  missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. string.format("\nYour CSP version is %s", cspVersion)
+  missingCSPElementsErrorMessage = missingCSPElementsErrorMessage .. string.format("\n\nYour CSP version is %s", cspVersion)
 
   -- Log the error to the CSP log as well
   Logger.error(missingCSPElementsErrorMessage)
