@@ -188,38 +188,7 @@ local getSliderColorForAICautionWhenSetToZero = function(aiCautionValue)
     return aiCautionValue < 1 and AICAUTION_SLIDERGRAB_COLOR_WHEN_SET_TO_ZERO or DEFAULT_SLIDERGRAB_STYLECOLOR
 end
 
-SettingsWindow.draw = function()
-    -- Draw the app icon at the top-right of the settings window
-    AppIconRenderer_draw()
-
-    ui_pushDWriteFont('Segoe UI')
-
-    ui_text(string_format('Settings loaded for %s', StorageManager_getPerTrackPerModeStorageKey()))
-    ui_newLine(1)
-
-    -- Draw the Enabled checkbox
-    local appEnabled = storage.enabled
-    local enabledCheckBoxColor = appEnabled and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
-    ui_pushStyleColor(ui_StyleColor.Text, enabledCheckBoxColor)
-    local enabledDisabledText = appEnabled and 'Enabled' or 'Disabled'
-    if ui_checkbox(string_format('Realistic Trackday %s for: %s (Mode: %s)', enabledDisabledText, RaceTrackManager_getTrackName(), RaceTrackManager_getSessionTypeName()), appEnabled) then storage.enabled = not storage.enabled end
-    ui_popStyleColor(1)
-    if ui_itemHovered() then ui_setTooltip('Enable the Realistic Trackday app for this specific track and session mode.\n\nEach track and session mode type use individually saved settings.') end
-
-    ui_newLine(1)
-
-    -- start the global app-enabled disabled section if the app is disabled
-    if not appEnabled then
-        ui_pushDisabled()
-    end
-
-    -- if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
-    -- if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
-
-    -- local comboValueChanged
-    -- storage.yieldSide, comboValueChanged = ui.combo('Yielding Side', storage.yieldSide, ui.ComboFlags.NoPreview, RaceTrackManager.TrackSideStrings)
-    -- if ui.itemHovered() then ui.setTooltip('The track side which AI will yield to when you approach from the rear.') end
-
+local drawCautionAndAggressionSection = function()
     ui_columns(3, false, "cautionAndAggressionSection")
     ui_setColumnWidth(0, 500)
     ui_setColumnWidth(1, 500)
@@ -267,10 +236,9 @@ SettingsWindow.draw = function()
     if ui_itemHovered() then ui_setTooltip('If enabled, will override the original AI aggression value thats is set from the game launcher when the car is overtaking another car.') end
 
     ui_columns(1, false)
+end
 
-    ui_newLine(1)
-    ui_separator()
-
+local drawLateralOffsetsSection = function()
     ui_newLine(1)
     ui_dwriteText('Lateral Offsets (Driving Lanes)', UI_HEADER_TEXT_FONT_SIZE)
     ui_newLine(1)
@@ -304,6 +272,46 @@ SettingsWindow.draw = function()
     UILateralOffsetsImageWidget_draw(storage)
 
     ui_columns(1, false)
+end
+
+SettingsWindow.draw = function()
+    -- Draw the app icon at the top-right of the settings window
+    AppIconRenderer_draw()
+
+    ui_pushDWriteFont('Segoe UI')
+
+    ui_text(string_format('Settings loaded for %s', StorageManager_getPerTrackPerModeStorageKey()))
+    ui_newLine(1)
+
+    -- Draw the Enabled checkbox
+    local appEnabled = storage.enabled
+    local enabledCheckBoxColor = appEnabled and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
+    ui_pushStyleColor(ui_StyleColor.Text, enabledCheckBoxColor)
+    local enabledDisabledText = appEnabled and 'Enabled' or 'Disabled'
+    if ui_checkbox(string_format('Realistic Trackday %s for: %s (Mode: %s)', enabledDisabledText, RaceTrackManager_getTrackName(), RaceTrackManager_getSessionTypeName()), appEnabled) then storage.enabled = not storage.enabled end
+    ui_popStyleColor(1)
+    if ui_itemHovered() then ui_setTooltip('Enable the Realistic Trackday app for this specific track and session mode.\n\nEach track and session mode type use individually saved settings.') end
+
+    ui_newLine(1)
+
+    -- start the global app-enabled disabled section if the app is disabled
+    if not appEnabled then
+        ui_pushDisabled()
+    end
+
+    -- if ui.checkbox('Draw markers on top (no depth test)', storage.drawOnTop) then storage.drawOnTop = not storage.drawOnTop end
+    -- if ui.itemHovered() then ui.setTooltip('If markers are hidden by car bodywork, enable this so text ignores depth testing.') end
+
+    -- local comboValueChanged
+    -- storage.yieldSide, comboValueChanged = ui.combo('Yielding Side', storage.yieldSide, ui.ComboFlags.NoPreview, RaceTrackManager.TrackSideStrings)
+    -- if ui.itemHovered() then ui.setTooltip('The track side which AI will yield to when you approach from the rear.') end
+
+    drawLateralOffsetsSection()
+
+    ui_newLine(1)
+    ui_separator()
+
+    drawCautionAndAggressionSection()
 
     -- storage.maxLateralOffset_normalized =  ui.slider('Max Side offset', storage.maxLateralOffset_normalized, StorageManager_options_min[StorageManager_Options.MaxLateralOffset_normalized], StorageManager_options_max[StorageManager_Options.MaxLateralOffset_normalized])
     -- if ui.itemHovered() then ui.setTooltip('How far to move towards the chosen side when yielding/overtaking(0.1 barely moving to the side, 1.0 moving as much as possible to the side).') end
@@ -311,18 +319,16 @@ SettingsWindow.draw = function()
     ui_newLine(1)
     ui_separator()
 
--- ui.pushDWriteFont('Segoe UI')     -- or a custom TTF; see docs comment
--- ui.dwriteText('Yielding', 12)       -- 24 px size here
--- ui.popDWriteFont()
-
     ui_columns(2, true, "yieldingOvertakingSection")
     ui_setColumnWidth(0, 560)
     --ui.setColumnWidth(1, 260)
 
-
     ui_newLine(1)
     ui_dwriteText('Yielding', UI_HEADER_TEXT_FONT_SIZE)
     ui_newLine(1)
+
+    local handleYielding = storage_Yielding.handleYielding
+    local handleOvertaking = storage_Overtaking.handleOvertaking
 
     local handleYieldingCheckboxColor = handleYielding and ColorManager.RGBM_Colors.LimeGreen or ColorManager.RGBM_Colors.Red
     ui_pushStyleColor(ui_StyleColor.Text, handleYieldingCheckboxColor)
@@ -375,8 +381,6 @@ SettingsWindow.draw = function()
             storage_Yielding.distanceToOvertakingCarToLimitSpeed = renderSlider('Distance to overtaking car to apply speed limiting', 'When yielding, if an overtaking car is within this distance behind us, we will limit our speed to let it pass more easily.', storage_Yielding.distanceToOvertakingCarToLimitSpeed, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed])
         end)
     end)
-
-    --ui.separator()
 
     ui_nextColumn()
 
