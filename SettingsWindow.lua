@@ -541,7 +541,7 @@ SettingsWindow.draw = function()
 --]===]
 
     -- Draw the app name and version at the bottom-right of the settings window
-    UIAppNameVersionWidget_drawBottomRight(15)
+    UIAppNameVersionWidget_drawBottomRight(12)
 
     ui_popDWriteFont()
 

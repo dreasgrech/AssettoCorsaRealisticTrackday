@@ -12,7 +12,7 @@ local ui_windowSize = ui.windowSize
 -- local string = string
 -- local string_format = string.format
 
-local versionText = string.format('%s v%s',Constants.APP_NAME, Constants.APP_VERSION)
+local versionText = string.format('%s v%s by %s',Constants.APP_NAME, Constants.APP_VERSION, Constants.APP_AUTHOR)
 local versionTextColor = ColorManager.RGBM_Colors.Gainsboro
 
 -- UIAppNameVersion.draw = function(absoluteScreenPosition, fontSize)
