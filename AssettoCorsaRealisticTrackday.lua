@@ -274,6 +274,8 @@ ac.onCarJumped(-1, function(carIndex)
 end)
 
 ac.onSessionStart(function()
+  if (not shouldAppRun()) then return end
+
   SessionDetails.informSessionInitiated()
 end)
 
