@@ -206,7 +206,7 @@ local function awake()
     -- Logger.log(string.format('Original #%d AI Aggression: %.3f', i, car.aiAggression))
 
     CarManager.cars_ORIGINAL_AI_DIFFICULTY_LEVEL[carIndex] = originalCarAILevel
-    Logger.log(string.format('Original #%d AI Difficulty Level: %.3f', i, originalCarAILevel))
+    -- Logger.log(string.format('Original #%d AI Difficulty Level: %.3f', i, originalCarAILevel))
   end
 end
 awake()
