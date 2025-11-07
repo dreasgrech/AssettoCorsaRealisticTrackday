@@ -23,6 +23,8 @@ My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm
 
 ## Videos
 
+Assetto Corsa Realistic Trackday v0.9.8 - Full Feldbergring lap: [https://www.youtube.com/watch?v=s0Gfu2ucrX8](https://www.youtube.com/watch?v=FYDH1OwxDWw)
+
 https://github.com/user-attachments/assets/968fa828-86cc-4aba-b6db-5c0471d45557
 
 Full Nordschleife lap on Realistic Trackday v0.9: https://www.youtube.com/watch?v=s0Gfu2ucrX8
