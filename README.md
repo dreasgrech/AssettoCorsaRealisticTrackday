@@ -85,30 +85,30 @@ All three specify the lateral position on the track width where each respective 
 
 Here are some examples of how they can be used:
 
-**Nordschleife Touristenfahrten Trackday where driving normally is mostly done on the racing lane, overtaking happens on the left and yielding takes place on the right**:
-`Default Lateral Offset: 0` (when the lateral offset is 0, the ai use the default racing line which is mostly at the center of the track)
-`Yielding Lateral Offset: 0.7` (we want the cars to yield to the right so an 0.7 will make them yield to the right but not going as far the edge of the track)
-`Overtaking Lateral Offset: -0.8` (we want the cars to overtake on the left so a -0.8 will make them overtake to the left but also not going as far the edge of the track)
+**Nordschleife Touristenfahrten Trackday where driving normally is mostly done on the racing lane, overtaking happens on the left and yielding takes place on the right**:<br/>
+`Default Lateral Offset: 0` (when the lateral offset is 0, the ai use the default racing line which is mostly at the center of the track)<br/>
+`Yielding Lateral Offset: 0.7` (we want the cars to yield to the right so an 0.7 will make them yield to the right but not going as far the edge of the track)<br/>
+`Overtaking Lateral Offset: -0.8` (we want the cars to overtake on the left so a -0.8 will make them overtake to the left but also not going as far the edge of the track)<br/>
 
 <p align="center">
 <img width="948" height="145" alt="image" src="https://github.com/user-attachments/assets/2ab4aafe-baa5-45f1-b10d-3ac9275e5a28" />
 </p>
 <br/><br/>
 
-**A Germany unidirectional two lane road where driving normally is done on the right lane and overtaking is done on the left lane:**
-`Default Lateral Offset: 0.5` (an 0.5 will make the cars drive in the middle of the right lane)
-`Yielding Lateral Offset: 0.5` (since this is a road and not a track and the cars are already driving on the right lane by default, we can use the same value here we used for the Default Lateral Offset)
-`Overtaking Lateral Offset: -0.5` (to make the cars overtake by moving to the middle of the left lane, we can use a -0.5 value)
+**A Germany unidirectional two lane road where driving normally is done on the right lane and overtaking is done on the left lane:**<br/>
+`Default Lateral Offset: 0.5` (an 0.5 will make the cars drive in the middle of the right lane)<br/>
+`Yielding Lateral Offset: 0.5` (since this is a road and not a track and the cars are already driving on the right lane by default, we can use the same value here we used for the Default Lateral Offset)<br/>
+`Overtaking Lateral Offset: -0.5` (to make the cars overtake by moving to the middle of the left lane, we can use a -0.5 value)<br/>
 
 <p align="center">
 <img width="946" height="151" alt="image" src="https://github.com/user-attachments/assets/40dfbf6a-0e34-438e-a383-16e30ec9e7ac" />
 </p>
 <br/><br/>
 
-**A UK unidirectional two lane road where driving normally is done on the left lane and overtaking is done on the right lane:**
-`Default Lateral Offset: -0.5` (a -0.5 value will make the cars drive in the middle of the left lane)
-`Yielding Lateral Offset: -0.5` (since this is a road and not a track and the cars are already driving on the left lane by default, we can use the same value here we used for the Default Lateral Offset)
-`Overtaking Lateral Offset: 0.5` (to make the cars overtake by moving to the middle of the right lane, we can use a 0.5 value)
+**A UK unidirectional two lane road where driving normally is done on the left lane and overtaking is done on the right lane:**<br/>
+`Default Lateral Offset: -0.5` (a -0.5 value will make the cars drive in the middle of the left lane)<br/>
+`Yielding Lateral Offset: -0.5` (since this is a road and not a track and the cars are already driving on the left lane by default, we can use the same value here we used for the Default Lateral Offset)<br/>
+`Overtaking Lateral Offset: 0.5` (to make the cars overtake by moving to the middle of the right lane, we can use a 0.5 value)<br/>
 
 <p align="center">
 <img width="940" height="150" alt="image" src="https://github.com/user-attachments/assets/a5fce98c-8d46-4acd-a4c1-726eeccc8877" />
