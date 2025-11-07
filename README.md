@@ -23,7 +23,10 @@ My main aim with this is to recreate the true <a href="https://youtu.be/nQ9j9Wlm
 
 ## Videos
 
+https://github.com/user-attachments/assets/c273df39-2262-4bcb-a209-35ad9a315a7e
+
 Assetto Corsa Realistic Trackday v0.9.8 - Full Feldbergring lap: [https://www.youtube.com/watch?v=s0Gfu2ucrX8](https://www.youtube.com/watch?v=FYDH1OwxDWw)
+<br/><br/>
 
 https://github.com/user-attachments/assets/968fa828-86cc-4aba-b6db-5c0471d45557
 
