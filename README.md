@@ -32,14 +32,142 @@ Full Nordschleife lap on Realistic Trackday v0.9: https://www.youtube.com/watch?
 </p>
 
 Short video of Realistic Trackday v0.5: https://www.youtube.com/watch?v=v83cmlmwVZs
+<br/><br/>
+## v0.9.8 - Major Update - Improvements across the board!
+
+Realistic Trackday v0.9.8 brings a lot of new features over the previous v0.9.1 version, notably the number of tweakable options now available to the user.
+
+### Per-Track-Per-Mode Settings
+
+One of the first important changes is that the app now saves settings Per-Track-Per-Mode where Mode can be any one of the following values depending on how the game is launched from the Content Manager:
+- Practice
+- Qualify
+- Race
+- Hotlap
+- TimeAttack
+- Drift
+- Drag
+
+<p align="center">
+<img width="495" height="117" alt="image" src="https://github.com/user-attachments/assets/43a000b4-433d-4fcc-88c9-9e550f57ddbe" />
+</p>
+
+This means that you will have separate settings for, for example, running a trackday on the Nordschleife versus launching a race on the same track.
+
+### App now starts disabled until enabled for the current Track-Mode combination
+
+Another important change is that now, unless previously enabled for the current Track-Mode combination, the Realistic Trackday app starts disabled and you have to enable it from the Realistic Trackday Settings.  This change was done so that the app doesn't modify the AI cars' behaviour unexpectedly.
+
+<p align="center">
+<img width="1024" height="235" alt="image" src="https://github.com/user-attachments/assets/b86faa8b-326b-4eaa-8b9f-d29e9ef27c32" />
+</p>
+
+### Separate customizable values for default, yielding and overtaking lanes
+
+The third important change involves the way the yielding and overtaking "lanes" are defined.  In v0.9.1, you could define the yielding lane as either Left or Right and the overtaking lane will then be the other side of the track and how far the ai cars drive to the side of the track for both yielding and overtaking was defined by a single value.  In v0.9.8, there are three slider values which define the default driving position, the yielding position and the overtaking position:
+
+- Default Lateral Offset
+- Yielding Lateral Offset
+- Overtaking Lateral Offset
+
+<p align="center">
+<img width="950" height="159" alt="image" src="https://github.com/user-attachments/assets/8e00ec10-a244-42f2-a112-2b06a9b53d47" />
+</p>
+
+
+These three numbers are all in the range of [-1..1] where -1 represents the left-most side (edge) of the track, 0 is the middle of the track and 1 the right-most side of the track (edge).
+
+All three specify the lateral position on the track width where each respective action should take place.
+
+<p align="center">
+  <img width="566" height="456" alt="image" src="https://github.com/user-attachments/assets/334724a4-fc72-425d-94c4-0807c4da8bf8" />
+</p>
+
+Here are some examples of how they can be used:
+
+**Nordschleife Touristenfahrten Trackday where driving normally is mostly done on the racing lane, overtaking happens on the left and yielding takes place on the right**:
+`Default Lateral Offset: 0` (when the lateral offset is 0, the ai use the default racing line which is mostly at the center of the track)
+`Yielding Lateral Offset: 0.7` (we want the cars to yield to the right so an 0.7 will make them yield to the right but not going as far the edge of the track)
+`Overtaking Lateral Offset: -0.8` (we want the cars to overtake on the left so a -0.8 will make them overtake to the left but also not going as far the edge of the track)
+
+<p align="center">
+<img width="948" height="145" alt="image" src="https://github.com/user-attachments/assets/2ab4aafe-baa5-45f1-b10d-3ac9275e5a28" />
+</p>
+<br/><br/>
+
+**A Germany unidirectional two lane road where driving normally is done on the right lane and overtaking is done on the left lane:**
+`Default Lateral Offset: 0.5` (an 0.5 will make the cars drive in the middle of the right lane)
+`Yielding Lateral Offset: 0.5` (since this is a road and not a track and the cars are already driving on the right lane by default, we can use the same value here we used for the Default Lateral Offset)
+`Overtaking Lateral Offset: -0.5` (to make the cars overtake by moving to the middle of the left lane, we can use a -0.5 value)
+
+<p align="center">
+<img width="946" height="151" alt="image" src="https://github.com/user-attachments/assets/40dfbf6a-0e34-438e-a383-16e30ec9e7ac" />
+</p>
+<br/><br/>
+
+**A UK unidirectional two lane road where driving normally is done on the left lane and overtaking is done on the right lane:**
+`Default Lateral Offset: -0.5` (a -0.5 value will make the cars drive in the middle of the left lane)
+`Yielding Lateral Offset: -0.5` (since this is a road and not a track and the cars are already driving on the left lane by default, we can use the same value here we used for the Default Lateral Offset)
+`Overtaking Lateral Offset: 0.5` (to make the cars overtake by moving to the middle of the right lane, we can use a 0.5 value)
+
+<p align="center">
+<img width="940" height="150" alt="image" src="https://github.com/user-attachments/assets/a5fce98c-8d46-4acd-a4c1-726eeccc8877" />
+</p>
+<br/><br/>
+
+By exposing these three individual values, the app can also be used for simulating road traffic on a street instead of just yielding/overtaking on the track.
+
+### Many customizable options
+
+The fourth important change is the amount of available tweakable values now available to the user.  These tweakable values include dynamic changes to AI Caution, AI Aggression and AI Difficulty level.
+
+<img width="1639" height="292" alt="image" src="https://github.com/user-attachments/assets/3e77dfba-c58b-4f57-943a-73eb925e962a" />
+
+There are also many individual settings for how to handle yielding and overtaking:
+
+<p align="center">
+<img width="1046" height="436" alt="image" src="https://github.com/user-attachments/assets/5a213039-6a5f-4dae-bd7f-05ead63044cc" />
+</p>
+
+
+Hopefully all these tweakable values will better provide the user create the perfect trackday experience.
+
+### Better support for races
+
+Although Realistic Trackday wasn't specifically for races, there are a number of values you can tweak about to make it work in a race.  Follow these tips to get a better racing experience:
+- Very important: Set a value in seconds in the "Defer yielding/overtaking for a while after session start" so that the yielding and overtaking logic doesn't start taking place until after some time so that the cars don't pile up when the race starts.
+- Keep Caution values low so that the AI cars take more risks overall, but careful about dropping the Caution values below 1.
+- Keep Aggression values high so that the AI cars drive more assertively on track.
+- Keep Difficulty values high so that they go through corners faster.
+- Keep the "Detect car behind distance" Yielding value low so that AI cars only yield if the overtaking car is very close to them
+- Keep the "Detect car behind ahead" Overtaking value low so that AI cars only overtake if the yielding car is very close to them
+- Set the top speed limit Yielding value to 1.0 so that no top speed limit is applied when a car is yielding
+- Keep the throttle pedal limit Yielding value high so that yielding cars don't let go of the throttle too much while yielding, or nothing at all.
+- Keep the "distance to overtaking car to apply speed limit" Yielding value low so that the yielding car only slows down, if you want it to slow down, while very close to the overtaking car.
+
+### Checking for required Custom Shaders Patch functionality
+
+In this version I've written better handling for users with outdated CSP versions by trying to identify all the required functions in the app and informing you if any of them are missing due to old CSP versions.
+
+<p align="center">
+<img width="832" height="338" alt="image" src="https://github.com/user-attachments/assets/142da955-5800-4822-a03d-059d8a498de6" />
+</p>
+
+
+
 
 ## Installation
 The app requires <a href="https://acstuff.club/patch/" target="_blank">Custom Shaders Patch</a> (CSP) extension installed and doesn't work online since it can, *obviously*, only control AI cars.
 
-I have been testing the app using <a href="https://www.patreon.com/posts/few-quick-fixes-131261828" target="_blank">CSP v0.2.12-preview1</a>.
+> [!NOTE]
+> The recommended Custom Shaders Patch version as of 07/11/25 is <a href="https://www.patreon.com/posts/quick-fix-for-142367147" target="_blank">CSP v0.3.0-preview140</a>.
+
 
 ### Stable
 Download the zip file from the Releases page: https://github.com/dreasgrech/AssettoCorsaRealisticTrackday/releases
+
+> [!WARNING]
+> When upgrading from an existing version of Realistic trackday, make sure to first delete the `RealisticTrackday` app directory before copying the new one.
 
 Copy the `AssettoCorsaRealisticTrackday` directory to `\steamapps\common\assettocorsa\apps\lua\`
 
