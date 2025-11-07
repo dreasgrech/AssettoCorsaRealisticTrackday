@@ -61,6 +61,7 @@ local OVERTAKING_CAR_FASTER_LEEWAY = 20 -- the leeway given to the yielding car 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
 local storage_Yielding = StorageManager.getStorage_Yielding()
+local storage_AICarBehavior = StorageManager.getStorage_AICarValues()
 
 -- ENTRY FUNCTION
 ---@param carIndex integer
@@ -97,18 +98,18 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
       -- CarManager.cars_reasonWhyCantYield[carIndex] = nil
 
       -- make the yielding car leave more space in between the car in front while driving on the yielding lane
-      local aiCaution_Yielding = storage.AICaution_Yielding
+      local aiCaution_Yielding = storage_AICarBehavior.AICaution_Yielding
       CarOperations_setAICaution(carIndex, aiCaution_Yielding)
-      
-      local overrideAIAggressionWhileYielding = storage.overrideOriginalAIAggression_yielding
+
+      local overrideAIAggressionWhileYielding = storage_AICarBehavior.overrideOriginalAIAggression_yielding
       if overrideAIAggressionWhileYielding then
-        local aiAggression_Yielding = storage.AIAggression_Yielding
+        local aiAggression_Yielding = storage_AICarBehavior.AIAggression_Yielding
         CarOperations_setAIAggression(carIndex, aiAggression_Yielding)
       end
 
-      local overrideAIDifficultyLevelWhileYielding = storage.overrideOriginalAIDifficultyLevel_yielding
+      local overrideAIDifficultyLevelWhileYielding = storage_AICarBehavior.overrideOriginalAIDifficultyLevel_yielding
       if overrideAIDifficultyLevelWhileYielding then
-        local aiDifficultyLevel_Yielding = storage.AIDifficultyLevel_Yielding
+        local aiDifficultyLevel_Yielding = storage_AICarBehavior.AIDifficultyLevel_Yielding
         CarOperations_setAIDifficultyLevel(carIndex, aiDifficultyLevel_Yielding)
       end
 

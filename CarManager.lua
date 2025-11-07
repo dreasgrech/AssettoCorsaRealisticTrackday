@@ -244,18 +244,18 @@ function CarManager.getActualTrackLateralOffset(carPosition)
 end
 
 CarManager.getDefaultAIAggression = function(carIndex)
-  local storage = StorageManager.getStorage()
+  local storage_aiCarValues = StorageManager.getStorage_AICarValues()
   return 
     -- if we're not overriding the original aggression, restore revert back to the original aggression
-    storage.overrideOriginalAIAggression_drivingNormally and storage.defaultAIAggression
+    storage_aiCarValues.overrideOriginalAIAggression_drivingNormally and storage_aiCarValues.defaultAIAggression
     or CarManager.cars_ORIGINAL_AI_AGGRESSION[carIndex]
 end
 
 CarManager.getDefaultAIDifficultyLevel = function(carIndex)
-  local storage = StorageManager.getStorage()
+  local storage_aiCarValues = StorageManager.getStorage_AICarValues()
   return 
     -- if we're not overriding the original difficulty level, restore revert back to the original difficulty level
-    storage.overrideOriginalAIAggression_drivingNormally and storage.defaultAIDifficultyLevel
+    storage_aiCarValues.overrideOriginalAIDifficultyLevel_drivingNormally and storage_aiCarValues.defaultAIDifficultyLevel
     or CarManager.cars_ORIGINAL_AI_DIFFICULTY_LEVEL[carIndex]
 end
 

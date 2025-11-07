@@ -114,6 +114,7 @@ local DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION = 25 -- if an upcoming c
 local storage = StorageManager_getStorage()
 local storage_Overtaking = StorageManager_getStorage_Overtaking()
 local storage_Yielding = StorageManager_getStorage_Yielding()
+local storage_AICarBehavior = StorageManager.getStorage_AICarValues()
 
 --[===[
 https://discord.com/channels/453595061788344330/962668819933982720/1423344738576109741
@@ -228,7 +229,7 @@ end
 ---Removes any AI caution and sets it back to the default value.
 ---@param carIndex integer
 CarOperations.removeAICaution = function(carIndex)
-  CarOperations.setAICaution(carIndex, storage.defaultAICaution)
+  CarOperations.setAICaution(carIndex, storage_AICarBehavior.defaultAICaution)
 end
 
 ---Changes AI aggression.
@@ -601,9 +602,9 @@ CarOperations.calculateAICautionAggressionDifficultyWhileOvertaking = function(o
 
     -- by default we use the lowerered ai caution while overtaking so that the cars speed up a bit
     -- local aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_OBSTACLE_INFRONT
-    local aiCaution = storage.AICaution_OvertakingWithObstacleInFront
-    local aiAggression = storage.AIAggression_OvertakingWithObstacleInFront
-    local aiDifficultyLevel = storage.AIDifficultyLevel_OvertakingWithObstacleInFront
+    local aiCaution = storage_AICarBehavior.AICaution_OvertakingWithObstacleInFront
+    local aiAggression = storage_AICarBehavior.AIAggression_OvertakingWithObstacleInFront
+    local aiDifficultyLevel = storage_AICarBehavior.AIDifficultyLevel_OvertakingWithObstacleInFront
 
     -- Check if it's safe in front of us to drop the caution to 0 so that we can really step on it
     if yieldingCar then
@@ -612,9 +613,9 @@ CarOperations.calculateAICautionAggressionDifficultyWhileOvertaking = function(o
         local lateralOffsetsDelta = math_abs(overtakingCarTrackLateralOffset - yieldingCarTrackLateralOffset)
         if lateralOffsetsDelta > 0.4 then -- if the lateral offset is more than half a lane apart, we can consider it safe
             -- aiCaution = CarManager.AICautionValues.OVERTAKING_WITH_NO_OBSTACLE_INFRONT
-            aiCaution = storage.AICaution_OvertakingWithNoObstacleInFront
-            aiAggression = storage.AIAggression_OvertakingWithNoObstacleInFront
-            aiDifficultyLevel = storage.AIDifficultyLevel_OvertakingWithNoObstacleInFront
+            aiCaution = storage_AICarBehavior.AICaution_OvertakingWithNoObstacleInFront
+            aiAggression = storage_AICarBehavior.AIAggression_OvertakingWithNoObstacleInFront
+            aiDifficultyLevel = storage_AICarBehavior.AIDifficultyLevel_OvertakingWithNoObstacleInFront
         end
     end
 
@@ -622,9 +623,9 @@ CarOperations.calculateAICautionAggressionDifficultyWhileOvertaking = function(o
     local overtakingCarIndex = overtakingCar.index
     local isMidCorner, distanceToUpcomingTurn = CarManager_isCarMidCorner(overtakingCarIndex)
     if isMidCorner or distanceToUpcomingTurn < DISTANCE_TO_UPCOMING_CORNER_TO_INCREASE_AICAUTION then
-        aiCaution = storage.AICaution_OvertakingWhileInCorner
-        aiAggression = storage.AIAggression_WhileInCorner
-        aiDifficultyLevel = storage.AIDifficultyLevel_WhileInCorner
+        aiCaution = storage_AICarBehavior.AICaution_OvertakingWhileInCorner
+        aiAggression = storage_AICarBehavior.AIAggression_WhileInCorner
+        aiDifficultyLevel = storage_AICarBehavior.AIDifficultyLevel_WhileInCorner
     end
 
     return aiCaution, aiAggression, aiDifficultyLevel

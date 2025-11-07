@@ -34,6 +34,8 @@ CarStateMachine.states_minimumTimeInState[STATE] = 0
 
 local StateExitReason = Strings.StringNames[Strings.StringCategories.StateExitReason]
 
+local storage_AICarValues = StorageManager.getStorage_AICarValues()
+
 -- ENTRY FUNCTION
 CarStateMachine.states_entryFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
 
@@ -58,11 +60,11 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
     local aiCaution, aiAggression, aiDifficultyLevel = CarOperations_calculateAICautionAndAggressionWhileOvertaking(car, yieldingCar)
     CarOperations_setAICaution(carIndex, aiCaution)
 
-    if storage.overrideOriginalAIAggression_overtaking then
+    if storage_AICarValues.overrideOriginalAIAggression_overtaking then
         CarOperations_setAIAggression(carIndex, aiAggression)
     end
 
-    if storage.overrideOriginalAIDifficultyLevel_overtaking then
+    if storage_AICarValues.overrideOriginalAIDifficultyLevel_overtaking then
         CarOperations_setAIDifficultyLevel(carIndex, aiDifficultyLevel)
     end
 
