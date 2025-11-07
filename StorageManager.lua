@@ -465,7 +465,9 @@ local storageTable_AICarValues = {
 ---@type StorageTable_Global
 local storageTable_Global = {
     appRanFirstTime = false,
+    usingAppVersion = Constants.APP_VERSION,  -- to determine if the user updated the app version
 }
+
 
 local sim = ac.getSim()
 local raceSessionType = sim.raceSessionType
@@ -482,6 +484,17 @@ local storage_AICarValues = ac.storage(storageTable_AICarValues, getStorageKeyFo
 
 -- DISABLING ACCIDENTS FOR NOW SINCE IT'S STILL WIP
 storage_PerTrackPerMode.handleAccidents = Constants.ENABLE_ACCIDENT_HANDLING_IN_APP -- got this setting here for now since accidents are still wip
+
+-- check if the app version has changed since last run
+local thisAppVersion = Constants.APP_VERSION
+local previousAppVersion = storage_Global.usingAppVersion
+if previousAppVersion ~= thisAppVersion then
+    -- TODO: handle app settings version upgrade here
+    Logger.log(string.format("%s version changed from %s to %s", Constants.APP_NAME, tostring(previousAppVersion), tostring(thisAppVersion)))
+end
+
+-- update the stored app version to the current one
+storage_Global.usingAppVersion = thisAppVersion
 
 ---@return StorageTable storage_PerTrackPerMode
 function StorageManager.getStorage()
