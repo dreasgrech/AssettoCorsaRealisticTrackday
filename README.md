@@ -79,7 +79,7 @@ Here's a typical scenario which can be used:
 ## Settings
 The app offers a number of settings to allow for customizing the experience as much as possible, starting from the general driving of the AI to specific settings regarding yielding and overtaking:
 
-<img width="769" height="678" alt="image" src="https://github.com/user-attachments/assets/76fefa12-afd2-4987-8a74-f5e3fc1d784a" />
+<img width="1672" height="1369" alt="image" src="https://github.com/user-attachments/assets/50ac2c33-77b9-4724-bdae-4a9538091a11" />
 
 
 There are also a number of settings that help with understanding what the app is doing under the hood.  One of the main debugging tools is the custom UI table that shows the full relevent data about the cars:
@@ -184,6 +184,14 @@ When back on the **Easing Out Overtake** state, a car will drive laterally from 
 
   <img width="1529" height="330" alt="image" src="https://github.com/user-attachments/assets/b9c28077-3c33-4143-8849-c07e590b5050" />
 
+- If when using the app in a Race, the cars all start trying to yield and overtake as soon as the race starts causing mayhem, increase the "Defer yielding/overtaking for a while after session start" value which determines the delay before the yielding/overtaking starts working after a session officially starts.
+- If the cars start yielding while the overtaking car is still very far, decrease the "Detect car behind distance" value in the Yielding settings.
+- If the cars start overtaking while the yielding car is still very far, decrease the "Detect car behind ahead" value in the Overtaking settings.
+- If the cars are rear-ending each other frequently, increase the Caution values.  Note that a caution value below 1 causes the cars to drive very assertively irrespective of what's in front of them.
+- If the cars are very hesitant when trying to overtake, decrease the overtaking Caution values, increase Aggression values and increase Difficulty values.  Also make sure that the overtaking lateral offset is far enough from the yielding lateral offset so that cars have enough space on the side to overtake.
+- If the yielding cars are driving way too fast while yielding causing the overtaking cars to not be able to fully overtake them, adjust the speed limiting values in the Yielding section to tell the yielding cars to slow down a bit while yielding so that the overtaking car can overtake safely.
+- If the cars are changing directions while yielding/overtaking too fast with jerky steering pulls, decrease the lateral offset increment/decrement step values in the Yielding and Overtaking sections so that the move to the target lateral offset happens more gradually.
+- If the cars are hitting each other side-to-side when driving laterally to change lanes, make sure that the "Check sides while yielding" and "Check sides while overtaking" in the Yielding and Overtaking sections respectively are enabled.
 
 ## Known Issues
 - Some cars don't use the indicator lights when yielding or overtaking (like the Alfa Mito), and some cars (like the MX5) seem to have invertly-set indicator lights i.e. they turn on the left indicator light when going right and vice versa.  This seems to be an issue either with the CSP API or with the specific individual cars.
