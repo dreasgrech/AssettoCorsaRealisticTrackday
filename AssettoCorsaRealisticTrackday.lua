@@ -273,6 +273,10 @@ ac.onCarJumped(-1, function(carIndex)
     OnCarEventManager.enqueueOnCarEvent(OnCarEventManager.OnCarEventType.Jumped, carIndex)
 end)
 
+ac.onSessionStart(function()
+  SessionDetails.informSessionInitiated()
+end)
+
 ---
 -- Function defined in manifest.ini
 -- wiki: function to be called each frame to draw window content
