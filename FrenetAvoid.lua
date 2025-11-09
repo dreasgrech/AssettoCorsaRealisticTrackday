@@ -26,16 +26,18 @@ local minAheadMetersAtLowSpeed = 6.0
 local maxAheadMetersAtHighSpeed = 45.0
 local nominalTrackLengthMeters = 20000.0
 
+-- car “size” (discs); obstacle clearance is measured using those
 local opponentRadiusMeters = 1.45
 local egoRadiusMeters = 1.45
 local sumRadii = opponentRadiusMeters + egoRadiusMeters
 local sumRadii2 = sumRadii * sumRadii
 
--- allow full [-1..+1] command so lines can reach the full width
+-- allow full [-1..+1] command so lines can reach the full width (used by visualization too)
 local maxAbsOffsetNormalized = 1.0
 local maxOffsetChangePerSecondN = 2.6
 local OUTPUT_IS_NORMALIZED = true
 
+-- costs: clearance dominates; other terms keep motion reasonable
 local costWeight_Clearance = 3.0
 local costWeight_TerminalCenter = 0.7
 local costWeight_JerkComfort = 0.22
@@ -44,7 +46,7 @@ local costWeight_JerkComfort = 0.22
 local densifyOffsetsExtra = { -1.0, -0.8, -0.6, 0.6, 0.8, 1.0 }
 local densifyEndTimesExtra = { 0.6, 1.0 }
 
--- simple TTC gating (no heavy math, just to start planning a bit earlier)
+-- simple TTC gating (to begin planning earlier but cheaply)
 local ttcEarlyPlanStart_s = 3.0
 
 -- debug draw flags (kept)
@@ -58,11 +60,18 @@ local drawReturnedOffsetPole = true
 local drawActualOffsetPole = true
 local auditWarnDeltaN = 0.15
 
+-- extra debug to understand “why straight into obstacle”
+local drawTrackWidthGuides = true       -- two magenta rails at [-1..+1] along horizon
+local drawFreeSideBars = true           -- cyan bars showing instantaneous free corridor left/right
+local drawChosenReasonText = true       -- label near car with “reason” for chosen side
+
 -- colors (kept)
 local colAll     = rgbm(0.3, 0.9, 0.3, 0.15)
 local colChosen  = rgbm(1.0, 0.2, 0.9, 1.0)
 local colPoleCmd = rgbm(0.2, 1.0, 1.0, 0.9)
 local colPoleAct = rgbm(1.0, 1.0, 0.2, 0.9)
+local colRail    = rgbm(1.0, 0.2, 1.0, 0.4)
+local colFree    = rgbm(0.2, 1.0, 1.0, 0.65)
 
 -- helpers (no allocations, hot-path friendly)
 local abs = math.abs
@@ -113,7 +122,7 @@ local function makeLateralQuintic(d0, dDot0, dT, T)
   end
 end
 
--- squared-distance clearance (no sqrt until compare) to opponent discs; negative => overlap
+-- squared-distance clearance to opponent discs; negative => overlap
 local function minClearanceMetersFast(worldPos, opponents, count)
   if count == 0 then return 99.0 end
   local best2 = 1e30
@@ -184,7 +193,12 @@ local function A(ix)
 
     rejectsPos = {}, rejectsCount = 0,
 
-    lastOutN = 0.0, lastActualN = 0.0, lastEgoZ = 0.0
+    lastOutN = 0.0, lastActualN = 0.0, lastEgoZ = 0.0,
+
+    -- debug helpers
+    dbg_leftFree = 0.0,
+    dbg_rightFree = 0.0,
+    dbg_reason = "none"
   }
   __arena[ix] = a
   return a
@@ -203,6 +217,7 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
 
   local arena = A(egoIndex)
   arena.samplesCount, arena.candCount, arena.rejectsCount = 0, 0, 0
+  arena.dbg_leftFree, arena.dbg_rightFree, arena.dbg_reason = 0.0, 0.0, "none"
 
   -- ego in track coords
   local tc = ac.worldCoordinateToTrack(ego.position)
@@ -211,7 +226,7 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
   local egoV = (ego.speedKmh or 0) / 3.6
   arena.lastEgoZ = egoZ
 
-  -- early out: if nobody near ahead/behind windows, just slew slightly to center and keep FPS
+  -- quick check: if nobody nearby, gently slew to center and return
   local count = collectNearbyOpponents(egoIndex, egoZ, allCars, arena.nearby, longitudinalWindowAheadZ, longitudinalWindowBehindZ)
   if count == 0 then
     local step = maxOffsetChangePerSecondN * dt
@@ -220,19 +235,18 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
     return OUTPUT_IS_NORMALIZED and outN or outN
   end
 
-  -- widen window slightly if TTC is low (cheap, avoids late decisions)
+  -- widen window if TTC is low (start earlier)
   local ttc = estimateTTC_s(ego.position, egoV, egoZ, arena.nearby, count, longitudinalWindowAheadZ)
   if ttc and ttc < ttcEarlyPlanStart_s then
     count = collectNearbyOpponents(egoIndex, egoZ, allCars, arena.nearby, longitudinalWindowAheadZ + extraAheadZ_whenEarly, longitudinalWindowBehindZ)
   end
 
-  -- candidate time grid (bug-proof: use densifyEndTimesExtra name)
+  -- grid build
   local candidateEndTimesSeconds = { table.unpack(densifyEndTimesExtra) }
   for i = 1, #candidateEndTimesSecondsBase do
     candidateEndTimesSeconds[#candidateEndTimesSeconds + 1] = candidateEndTimesSecondsBase[i]
   end
 
-  -- candidate lateral terminals; densify if TTC is low
   local candidateTerminalOffsetsN = { table.unpack(candidateTerminalOffsetsNBase) }
   if ttc and ttc < ttcEarlyPlanStart_s then
     for i = 1, #densifyOffsetsExtra do
@@ -240,40 +254,52 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
     end
   end
 
-  -- when an obstacle is ahead and close, force commitment to the free side and with sufficient magnitude
-  local desiredSign = 0
-  local minCommitMag = 0.0
+  -- instantaneous “free corridor” probe: how much lateral room we have right now to each side
+  do
+    local probeT = 0.6
+    local z = progressAt(egoZ, egoV, probeT)
+    local posL = ac.trackCoordinateToWorld(vec3(-1.0, 0.0, z))
+    local posR = ac.trackCoordinateToWorld(vec3( 1.0, 0.0, z))
+    local posC = ac.trackCoordinateToWorld(vec3(egoN, 0.0, z))
+    arena.dbg_leftFree  = minClearanceMetersFast(posL, arena.nearby, count) - minClearanceMetersFast(posC, arena.nearby, count)
+    arena.dbg_rightFree = minClearanceMetersFast(posR, arena.nearby, count) - minClearanceMetersFast(posC, arena.nearby, count)
+  end
+
+  -- if an obstacle is close ahead, force commitment to the freer side and with enough magnitude
+  local desiredSign, minCommitMag = 0, 0.0
   if ttc and ttc < 2.5 then
-    -- pick nearest forward opponent by longitudinal progress and decide to pass on the freer side
-    local nearestOpp, nearestDz = nil, 1e9
-    for i = 1, count do
-      local opp = arena.nearby[i]
-      local otc = ac.worldCoordinateToTrack(opp.position)
-      if otc then
-        local dz = wrap01(otc.z - egoZ)
-        if dz < nearestDz then
-          nearestDz = dz
-          nearestOpp = opp
+    if arena.dbg_rightFree > arena.dbg_leftFree + 0.25 then
+      desiredSign = 1; arena.dbg_reason = "more_free_right"
+    elseif arena.dbg_leftFree > arena.dbg_rightFree + 0.25 then
+      desiredSign = -1; arena.dbg_reason = "more_free_left"
+    else
+      -- pick side away from nearest forward obstacle lateral position
+      local nearestOpp, nearestDz = nil, 1e9
+      for i = 1, count do
+        local opp = arena.nearby[i]
+        local otc = ac.worldCoordinateToTrack(opp.position)
+        if otc then
+          local dz = wrap01(otc.z - egoZ)
+          if dz < nearestDz then nearestDz, nearestOpp = dz, opp end
         end
       end
-    end
-    if nearestOpp then
-      local nOpp = ac.worldCoordinateToTrack(nearestOpp.position).x
-      -- choose the side away from the obstacle center relative to ego
-      if nOpp >= egoN then desiredSign = -1 else desiredSign = 1 end
-      -- require a stronger terminal magnitude as we get closer
-      if ttc <= 1.2 then
-        minCommitMag = 0.8
-      elseif ttc <= 1.8 then
-        minCommitMag = 0.6
-      else
-        minCommitMag = 0.4
+      if nearestOpp then
+        local nOpp = ac.worldCoordinateToTrack(nearestOpp.position).x
+        desiredSign = (nOpp >= egoN) and -1 or 1
+        arena.dbg_reason = "away_from_nearest"
       end
+    end
+
+    if ttc <= 1.2 then
+      minCommitMag = 0.8
+    elseif ttc <= 1.8 then
+      minCommitMag = 0.6
+    else
+      minCommitMag = 0.4
     end
   end
 
   if desiredSign ~= 0 then
-    -- filter candidates to chosen side and magnitude to avoid dithering straight into the car
     local filtered = {}
     for i = 1, #candidateTerminalOffsetsN do
       local nT = candidateTerminalOffsetsN[i]
@@ -284,10 +310,11 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
     if #filtered > 0 then candidateTerminalOffsetsN = filtered end
   end
 
-  Logger.log(string.format("FA in: car=%d z=%.5f xN=%.3f v=%.1f ttc=%.2f near=%d  nT=%d T=%d sign=%d min|n|=%.2f",
-    egoIndex, egoZ, egoN, egoV, ttc or -1, count, #candidateTerminalOffsetsN, #candidateEndTimesSeconds, desiredSign, minCommitMag))
+  Logger.log(string.format("FA in: car=%d z=%.5f xN=%.3f v=%.1f ttc=%.2f near=%d nT=%d T=%d leftFree=%.2f rightFree=%.2f reason=%s",
+    egoIndex, egoZ, egoN, egoV, ttc or -1, count, #candidateTerminalOffsetsN, #candidateEndTimesSeconds,
+    arena.dbg_leftFree, arena.dbg_rightFree, arena.dbg_reason))
 
-  -- anchor: sample[1] at ego pose so lines start at the bumper (avoids “far first node”)
+  -- anchor: sample[1] at ego pose so lines start at the bumper
   arena.samplesCount = 1
   arena.samplesPos[1] = ac.trackCoordinateToWorld(vec3(egoN, 0.0, egoZ))
   arena.samplesN[1] = egoN
@@ -343,12 +370,10 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
         arena.candDT[k]     = nT
         arena.candT[k]      = T
 
-        -- clearance dominates; terminal center and jerk keep solutions comfortable
         local cost = (costWeight_Clearance * (1.0 / (0.5 + minClr)))
                    + (costWeight_TerminalCenter * abs(nT))
                    + (costWeight_JerkComfort * jerkSum)
 
-        -- small penalty to discourage going towards the obstacle when a side was selected
         if desiredSign ~= 0 and (nT * desiredSign) <= 0 then
           cost = cost + 10.0
         end
@@ -368,19 +393,18 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
   -- command: steer toward the chosen path’s next sample (keeps purple command on magenta line)
   local outN
   if bestIdx == 0 then
-    -- safe fallback: slight nudge away from closest opponent horizontally if any, otherwise center
+    -- fallback: steer away from nearest obstacle; prevents straight-line impacts when no survivors
     local desired = 0.0
-    do
-      local nearest, dBest2
-      for i = 1, count do
-        local opp = arena.nearby[i]
-        local d2 = (opp.position - ego.position):lengthSquared()
-        if not dBest2 or d2 < dBest2 then dBest2 = d2; nearest = opp end
-      end
-      if nearest then
-        local nOpp = ac.worldCoordinateToTrack(nearest.position).x
-        if nOpp >= egoN then desired = -0.35 else desired = 0.35 end
-      end
+    local nearest, bestD2
+    for i = 1, count do
+      local opp = arena.nearby[i]
+      local d2 = (opp.position - ego.position):lengthSquared()
+      if not bestD2 or d2 < bestD2 then bestD2, nearest = d2, opp end
+    end
+    if nearest then
+      local nOpp = ac.worldCoordinateToTrack(nearest.position).x
+      desired = (nOpp >= egoN) and -0.5 or 0.5
+      arena.dbg_reason = "fallback_away"
     end
     local stepMax = maxOffsetChangePerSecondN * dt
     outN = clampN(egoN + max(-stepMax, min(stepMax, desired - egoN)))
@@ -391,8 +415,8 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
     local stepMax = maxOffsetChangePerSecondN * dt
     outN = clampN(egoN + max(-stepMax, min(stepMax, nextN - egoN)))
     Logger.log(string.format(
-      "OUT car=%d chosen=%d egoN=%.3f nextN=%.3f outN=%.3f minClr=%.2f dT=%.2f T=%.2f",
-      egoIndex, bestIdx, egoN, nextN, outN, arena.candMinClr[bestIdx], arena.candDT[bestIdx], arena.candT[bestIdx]))
+      "OUT car=%d chosen=%d egoN=%.3f nextN=%.3f outN=%.3f minClr=%.2f dT=%.2f T=%.2f reason=%s",
+      egoIndex, bestIdx, egoN, nextN, outN, arena.candMinClr[bestIdx], arena.candDT[bestIdx], arena.candT[bestIdx], arena.dbg_reason))
   end
 
   arena.lastOutN = outN
@@ -443,6 +467,25 @@ function FrenetAvoid.debugDraw(carIndex)
     if ego then render.debugLine(ego.position, a.samplesPos[1], rgbm(0.3,0.3,1.0,0.7)) end
   end
 
+  -- track width guides to confirm full usable span
+  if drawTrackWidthGuides then
+    local ego = ac.getCar(carIndex)
+    if ego then
+      local tc = ac.worldCoordinateToTrack(ego.position)
+      local baseZ = wrap01(tc.z)
+      local steps = 10
+      local prevL, prevR
+      for i = 0, steps do
+        local z = wrap01(baseZ + (i/steps) * longitudinalWindowAheadZ * 2.0)
+        local pL = ac.trackCoordinateToWorld(vec3(-1.0, 0.0, z))
+        local pR = ac.trackCoordinateToWorld(vec3( 1.0, 0.0, z))
+        if prevL then render.debugLine(prevL, pL, colRail) end
+        if prevR then render.debugLine(prevR, pR, colRail) end
+        prevL, prevR = pL, pR
+      end
+    end
+  end
+
   if a.candCount > 0 then
     local drawn = 0
     for ci = 1, a.candCount do
@@ -459,7 +502,7 @@ function FrenetAvoid.debugDraw(carIndex)
       if drawn >= debugMaxPathsDrawn then break end
     end
 
-    -- draw chosen path thicker (recompute cheapest index here to mirror solver view)
+    -- draw chosen path thicker
     local bestIdx, bestCost = 1, a.candCost[1]
     for ci = 2, a.candCount do
       local c = a.candCost[ci]; if c < bestCost then bestIdx, bestCost = ci, c end
@@ -472,7 +515,24 @@ function FrenetAvoid.debugDraw(carIndex)
     end
   end
 
-  -- audit: commanded vs applied (helps confirm spline offset is fed correctly)
+  -- free-side bars and reason text
+  if drawFreeSideBars then
+    local ego = ac.getCar(carIndex)
+    if ego then
+      local base = ego.position + vec3(0, 0.05, 0)
+      render.debugLine(base + vec3(0,0,0), base + vec3(a.dbg_leftFree * -0.2, 0, 0), colFree)
+      render.debugLine(base + vec3(0,0,0), base + vec3(a.dbg_rightFree * 0.2, 0, 0), colFree)
+    end
+  end
+  if drawChosenReasonText then
+    local ego = ac.getCar(carIndex)
+    if ego then
+      -- render.debugTextAtWorldPos(ego.position + vec3(0,0.8,0), string.format("freeL=%.2f freeR=%.2f %s", a.dbg_leftFree, a.dbg_rightFree, a.dbg_reason), 1.0, rgbm(1,1,1,1))
+      render.debugText(ego.position + vec3(0,0.8,0), string.format("freeL=%.2f freeR=%.2f %s", a.dbg_leftFree, a.dbg_rightFree, a.dbg_reason), rgbm(1,1,1,1), 1.0)
+    end
+  end
+
+  -- audit: commanded vs applied
   local ego = ac.getCar(carIndex)
   if ego then
     local tc = ac.worldCoordinateToTrack(ego.position)
