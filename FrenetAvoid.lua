@@ -13,8 +13,9 @@ local sampleTimeStepSeconds = 0.08
 local firstSampleSeconds = 0.03
 local startMetersAhead = 0.0
 
+-- include full track span up to kerbs; ±1.0 helps visualization reach edges when trackCoordinateToWorld supports it
 local candidateEndTimesSecondsBase = { 0.8, 1.2, 1.6 }
-local candidateTerminalOffsetsNBase = { -0.9,-0.7,-0.5,-0.3, 0.0, 0.3, 0.5, 0.7, 0.9 }
+local candidateTerminalOffsetsNBase = { -1.0,-0.9,-0.7,-0.5,-0.3, 0.0, 0.3, 0.5, 0.7, 0.9, 1.0 }
 
 local longitudinalWindowAheadZ = 0.020
 local longitudinalWindowBehindZ = 0.006
@@ -30,7 +31,8 @@ local egoRadiusMeters = 1.45
 local sumRadii = opponentRadiusMeters + egoRadiusMeters
 local sumRadii2 = sumRadii * sumRadii
 
-local maxAbsOffsetNormalized = 0.95
+-- allow full [-1..+1] command so lines can reach the full width
+local maxAbsOffsetNormalized = 1.0
 local maxOffsetChangePerSecondN = 2.6
 local OUTPUT_IS_NORMALIZED = true
 
@@ -66,6 +68,7 @@ local colPoleAct = rgbm(1.0, 1.0, 0.2, 0.9)
 local abs = math.abs
 local min = math.min
 local max = math.max
+local sqrt = math.sqrt
 
 local function clampN(n)
   if n < -maxAbsOffsetNormalized then return -maxAbsOffsetNormalized end
@@ -123,8 +126,7 @@ local function minClearanceMetersFast(worldPos, opponents, count)
     local d2 = dx*dx + dy*dy + dz*dz
     if d2 < best2 then best2 = d2 end
   end
-  -- translate squared distance to signed clearance in meters once
-  return math.sqrt(best2) - sumRadii
+  return sqrt(best2) - sumRadii
 end
 
 -- wrap-aware opponent collection; skips ego
@@ -238,8 +240,52 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
     end
   end
 
-  Logger.log(string.format("FA in: car=%d z=%.5f xN=%.3f v=%.1f ttc=%.2f near=%d  nT=%d T=%d",
-    egoIndex, egoZ, egoN, egoV, ttc or -1, count, #candidateTerminalOffsetsN, #candidateEndTimesSeconds))
+  -- when an obstacle is ahead and close, force commitment to the free side and with sufficient magnitude
+  local desiredSign = 0
+  local minCommitMag = 0.0
+  if ttc and ttc < 2.5 then
+    -- pick nearest forward opponent by longitudinal progress and decide to pass on the freer side
+    local nearestOpp, nearestDz = nil, 1e9
+    for i = 1, count do
+      local opp = arena.nearby[i]
+      local otc = ac.worldCoordinateToTrack(opp.position)
+      if otc then
+        local dz = wrap01(otc.z - egoZ)
+        if dz < nearestDz then
+          nearestDz = dz
+          nearestOpp = opp
+        end
+      end
+    end
+    if nearestOpp then
+      local nOpp = ac.worldCoordinateToTrack(nearestOpp.position).x
+      -- choose the side away from the obstacle center relative to ego
+      if nOpp >= egoN then desiredSign = -1 else desiredSign = 1 end
+      -- require a stronger terminal magnitude as we get closer
+      if ttc <= 1.2 then
+        minCommitMag = 0.8
+      elseif ttc <= 1.8 then
+        minCommitMag = 0.6
+      else
+        minCommitMag = 0.4
+      end
+    end
+  end
+
+  if desiredSign ~= 0 then
+    -- filter candidates to chosen side and magnitude to avoid dithering straight into the car
+    local filtered = {}
+    for i = 1, #candidateTerminalOffsetsN do
+      local nT = candidateTerminalOffsetsN[i]
+      if (nT * desiredSign) > 0 and abs(nT) >= minCommitMag then
+        filtered[#filtered + 1] = nT
+      end
+    end
+    if #filtered > 0 then candidateTerminalOffsetsN = filtered end
+  end
+
+  Logger.log(string.format("FA in: car=%d z=%.5f xN=%.3f v=%.1f ttc=%.2f near=%d  nT=%d T=%d sign=%d min|n|=%.2f",
+    egoIndex, egoZ, egoN, egoV, ttc or -1, count, #candidateTerminalOffsetsN, #candidateEndTimesSeconds, desiredSign, minCommitMag))
 
   -- anchor: sample[1] at ego pose so lines start at the bumper (avoids “far first node”)
   arena.samplesCount = 1
@@ -301,6 +347,12 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
         local cost = (costWeight_Clearance * (1.0 / (0.5 + minClr)))
                    + (costWeight_TerminalCenter * abs(nT))
                    + (costWeight_JerkComfort * jerkSum)
+
+        -- small penalty to discourage going towards the obstacle when a side was selected
+        if desiredSign ~= 0 and (nT * desiredSign) <= 0 then
+          cost = cost + 10.0
+        end
+
         arena.candCost[k] = cost
         if cost < bestCost then bestCost, bestIdx = cost, k end
 
@@ -316,9 +368,22 @@ function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
   -- command: steer toward the chosen path’s next sample (keeps purple command on magenta line)
   local outN
   if bestIdx == 0 then
-    -- safe fallback: slight nudge to center; keeps slew bounded
+    -- safe fallback: slight nudge away from closest opponent horizontally if any, otherwise center
+    local desired = 0.0
+    do
+      local nearest, dBest2
+      for i = 1, count do
+        local opp = arena.nearby[i]
+        local d2 = (opp.position - ego.position):lengthSquared()
+        if not dBest2 or d2 < dBest2 then dBest2 = d2; nearest = opp end
+      end
+      if nearest then
+        local nOpp = ac.worldCoordinateToTrack(nearest.position).x
+        if nOpp >= egoN then desired = -0.35 else desired = 0.35 end
+      end
+    end
     local stepMax = maxOffsetChangePerSecondN * dt
-    outN = clampN(egoN + max(-stepMax, min(stepMax, 0.0 - egoN)))
+    outN = clampN(egoN + max(-stepMax, min(stepMax, desired - egoN)))
   else
     local sIdx = arena.candStart[bestIdx]
     local eIdx = arena.candEnd[bestIdx]
