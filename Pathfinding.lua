@@ -23,9 +23,10 @@ local anchorAheadMeters       = 1.5      -- where the “fan” originates: a bi
 local numberOfPathSamples     = 12       -- samples per path for drawing
 local maxAbsOffsetNormalized  = 1.0      -- clamp to track lateral limits for endpoints
 
--- NEW (minimal) — make paths spread left/right much earlier without changing length:
--- exponent > 1.0 → fast early split (ease-out), =1.0 → linear, <1.0 → late split.
-local lateralSplitExponent    = 2.2
+-- Make paths split to the sides much earlier (for tight manoeuvres) without changing length:
+-- We reach full lateral target by this forward distance (meters), with an ease-out power curve.
+local splitReachMeters        = 12.0     -- distance at which lateral offset reaches 100%
+local lateralSplitExponent    = 2.2      -- >1: earlier split; =1: linear; <1: later split
 
 -- Very small and cheap collider model:
 -- treat each car as a disc with this radius (meters), add a bit of margin.
@@ -138,7 +139,11 @@ function Pathfinding.calculatePath(carIndex)
   -- Precompute step sizes.
   local totalForwardProgress = metersToProgress(forwardDistanceMeters)
   local stepCount = math.max(2, numberOfPathSamples)
-  local stepZ = totalForwardProgress / (stepCount - 1)
+  local stepZ = local_stepZ or (totalForwardProgress / (stepCount - 1))  -- keep identical behaviour
+
+  -- Precompute inverse of progress needed to reach full lateral offset by splitReachMeters.
+  local splitReachProgress = metersToProgress(splitReachMeters)
+  local invSplitReachProgress = (splitReachProgress > 0.0) and (1.0 / splitReachProgress) or 1e9
 
   -- Generate the five paths.
   for p = 1, #store.paths do
@@ -153,14 +158,17 @@ function Pathfinding.calculatePath(carIndex)
     path.hitWorld = nil
     path.hitOpponentIndex = nil
 
-    -- Sample along the road: linearly progress forward, but move laterally with an
-    -- ease-out curve so paths spread to the sides much earlier (tLat uses exponent).
+    -- Sample along the road: linearly progress forward, but move laterally so that
+    -- we hit the target offset by `splitReachMeters` (using an ease-out curve).
     path.count = 1
     path.worldPoints[1] = anchorWorld
 
     for i = 2, stepCount do
-      local t01 = (i - 1) / (stepCount - 1)                  -- longitudinal 0 → 1
-      local tLat = easeOutPow01(t01, lateralSplitExponent)   -- lateral easing (earlier split)
+      local tLong = (i - 1) / (stepCount - 1)                  -- longitudinal 0 → 1 (for Z)
+      local progressDelta = (i - 1) * stepZ                    -- how far in progress units
+      local tLatLinear = math.min(1.0, progressDelta * invSplitReachProgress)
+      local tLat = easeOutPow01(tLatLinear, lateralSplitExponent)
+
       local sampleZ = wrap01(anchorZ + (i - 1) * stepZ)
       local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
       local world   = ac.trackCoordinateToWorld(vec3(sampleN, 0.0, sampleZ))
