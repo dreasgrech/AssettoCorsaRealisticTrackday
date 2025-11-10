@@ -135,7 +135,7 @@ end
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
 -- NOTE: We no longer gather opponents ourselves. Pass in the globally prepared sorted list.
 --       The list is sorted so that index-1 is the car in front, index+1 is behind.
-function Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
+local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local car = sortedCarsList[sortedCarsListIndex]
   if not car then return end
 
@@ -313,9 +313,7 @@ end
 -- “Best” here = first clear path by preference (center-most first, then bias to right on ties).
 -- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
 -- If all paths are blocked, returns the one that gets the furthest before the first hit.
-function Pathfinding.getBestLateralOffset(carIndex)
-  ensureCarArrays(carIndex)
-
+local getBestLateralOffset = function(carIndex)
   local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
@@ -390,6 +388,17 @@ function Pathfinding.getBestLateralOffset(carIndex)
 
   -- No data yet (calculatePath likely not called).
   return nil
+end
+
+-- Convenience: build paths and immediately choose the best lateral offset in one call.
+-- This avoids calling two public functions from the caller each frame and keeps state consistent.
+-- Returns normalized lateral offset or nil if data is not ready.
+function Pathfinding.calculatePathAndGetBestLateralOffset(sortedCarsList, sortedCarsListIndex)
+  local car = sortedCarsList and sortedCarsList[sortedCarsListIndex]
+  if not car then return nil end
+
+  calculatePath(sortedCarsList, sortedCarsListIndex)
+  return getBestLateralOffset(car.index)
 end
 
 return Pathfinding
