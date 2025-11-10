@@ -249,4 +249,47 @@ function Pathfinding.drawPaths(carIndex)
   end
 end
 
+-- Public: return the lateral offset (normalized) associated with the “best” path for a car.
+-- “Best” here = first clear path by simple preference order (0, +0.5, -0.5, +1, -1).
+-- If all five are blocked, returns the one that gets the furthest before the first hit.
+function Pathfinding.getBestLateralOffset(carIndex)
+  local store = perCar[carIndex]
+  if not store then return nil end
+
+  -- Preference over the five stored paths (indices correspond to paths order above):
+  -- paths = { -1.0, -0.5, 0.0, +0.5, +1.0 }
+  -- prefer center, then slight right, slight left, full right, full left
+  local preference = { 3, 4, 2, 5, 1 }
+
+  -- 1) First, try to pick the first CLEAR path by preference.
+  for _, idx in ipairs(preference) do
+    local p = store.paths[idx]
+    if p and p.count > 0 and not p.blocked then
+      log("[PF] bestOffset car=%d clear path idx=%d -> n=%.2f", carIndex, idx, p.offsetN)
+      return p.offsetN
+    end
+  end
+
+  -- 2) If everything is blocked, pick the path that goes furthest before the first hit.
+  local bestIdx, bestSafeSamples = nil, -1
+  for i = 1, #store.paths do
+    local p = store.paths[i]
+    if p and p.count > 0 then
+      local safe = p.blocked and (p.hitIndex or 2) or p.count
+      if safe > bestSafeSamples then
+        bestSafeSamples = safe
+        bestIdx = i
+      end
+    end
+  end
+  if bestIdx then
+    log("[PF] bestOffset car=%d fallback idx=%d (safeSamples=%d) -> n=%.2f",
+      carIndex, bestIdx, bestSafeSamples, store.paths[bestIdx].offsetN)
+    return store.paths[bestIdx].offsetN
+  end
+
+  -- No data yet (calculatePath likely not called).
+  return nil
+end
+
 return Pathfinding
