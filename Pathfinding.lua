@@ -23,6 +23,10 @@ local anchorAheadMeters       = 1.5      -- where the “fan” originates: a bi
 local numberOfPathSamples     = 12       -- samples per path for drawing
 local maxAbsOffsetNormalized  = 1.0      -- clamp to track lateral limits for endpoints
 
+-- NEW (minimal) — make paths spread left/right much earlier without changing length:
+-- exponent > 1.0 → fast early split (ease-out), =1.0 → linear, <1.0 → late split.
+local lateralSplitExponent    = 2.2
+
 -- Very small and cheap collider model:
 -- treat each car as a disc with this radius (meters), add a bit of margin.
 local approxCarRadiusMeters   = 1.6
@@ -44,6 +48,13 @@ local function wrap01(z)
   z = z % 1.0
   if z < 0.0 then z = z + 1.0 end
   return z
+end
+
+-- Minimal easing to split earlier: ease-out by power.
+local function easeOutPow01(t, power)
+  if power == 1.0 then return t end
+  local inv = 1.0 - t
+  return 1.0 - (inv ^ power)
 end
 
 -- Helper: meters → approximate progress fraction (fallback length).
@@ -142,23 +153,22 @@ function Pathfinding.calculatePath(carIndex)
     path.hitWorld = nil
     path.hitOpponentIndex = nil
 
-    -- Sample along the road: linearly move lateral offset from current → target while progressing forward.
-    -- Sample 0 is the anchor itself.
+    -- Sample along the road: linearly progress forward, but move laterally with an
+    -- ease-out curve so paths spread to the sides much earlier (tLat uses exponent).
     path.count = 1
     path.worldPoints[1] = anchorWorld
 
     for i = 2, stepCount do
-      local t01 = (i - 1) / (stepCount - 1)         -- goes 0 → 1
+      local t01 = (i - 1) / (stepCount - 1)                  -- longitudinal 0 → 1
+      local tLat = easeOutPow01(t01, lateralSplitExponent)   -- lateral easing (earlier split)
       local sampleZ = wrap01(anchorZ + (i - 1) * stepZ)
-      local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * t01
+      local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
       local world   = ac.trackCoordinateToWorld(vec3(sampleN, 0.0, sampleZ))
 
       path.count = path.count + 1
       path.worldPoints[path.count] = world
 
       -- --- Minimal collider detection (only what’s needed) -------------------
-      -- Check this sample against cached opponents; if any is within the
-      -- combinedCollisionRadius, mark the path as blocked and store where it happened.
       if (not path.blocked) and store.opponentsCount > 0 then
         local wx, wy, wz = world.x, world.y, world.z
         for oi = 1, store.opponentsCount do
