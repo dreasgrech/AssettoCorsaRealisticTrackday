@@ -84,7 +84,9 @@ local function getCarStore(carIndex)
     anchorWorld = nil,  -- vec3 where the “fan” originates (a bit in front of car)
     anchorText  = "",   -- short label with current info
     opponents   = {},   -- small cache of opponent positions (table of {index=int, pos=vec3})
-    opponentsCount = 0
+    opponentsCount = 0,
+    -- Sticky choice to avoid wobbling between equivalent “good” paths.
+    lastChosenPathIndex = nil
   }
   perCar[carIndex] = s
   return s
@@ -139,7 +141,7 @@ function Pathfinding.calculatePath(carIndex)
   -- Precompute step sizes.
   local totalForwardProgress = metersToProgress(forwardDistanceMeters)
   local stepCount = math.max(2, numberOfPathSamples)
-  local stepZ = local_stepZ or (totalForwardProgress / (stepCount - 1))  -- keep identical behaviour
+  local stepZ = totalForwardProgress / (stepCount - 1)
 
   -- Precompute inverse of progress needed to reach full lateral offset by splitReachMeters.
   local splitReachProgress = metersToProgress(splitReachMeters)
@@ -164,7 +166,6 @@ function Pathfinding.calculatePath(carIndex)
     path.worldPoints[1] = anchorWorld
 
     for i = 2, stepCount do
-      local tLong = (i - 1) / (stepCount - 1)                  -- longitudinal 0 → 1 (for Z)
       local progressDelta = (i - 1) * stepZ                    -- how far in progress units
       local tLatLinear = math.min(1.0, progressDelta * invSplitReachProgress)
       local tLat = easeOutPow01(tLatLinear, lateralSplitExponent)
@@ -269,10 +270,21 @@ end
 
 -- Public: return the lateral offset (normalized) associated with the “best” path for a car.
 -- “Best” here = first clear path by simple preference order (0, +0.5, -0.5, +1, -1).
+-- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
 -- If all five are blocked, returns the one that gets the furthest before the first hit.
 function Pathfinding.getBestLateralOffset(carIndex)
   local store = perCar[carIndex]
   if not store then return nil end
+
+  -- 0) Sticky choice: if last chosen path still exists and is not blocked, keep it.
+  local lastIdx = store.lastChosenPathIndex
+  if lastIdx then
+    local lp = store.paths[lastIdx]
+    if lp and lp.count > 0 and not lp.blocked then
+      log("[PF] bestOffset car=%d STICK idx=%d -> n=%.2f", carIndex, lastIdx, lp.offsetN)
+      return lp.offsetN
+    end
+  end
 
   -- Preference over the five stored paths (indices correspond to paths order above):
   -- paths = { -1.0, -0.5, 0.0, +0.5, +1.0 }
@@ -283,6 +295,7 @@ function Pathfinding.getBestLateralOffset(carIndex)
   for _, idx in ipairs(preference) do
     local p = store.paths[idx]
     if p and p.count > 0 and not p.blocked then
+      store.lastChosenPathIndex = idx
       log("[PF] bestOffset car=%d clear path idx=%d -> n=%.2f", carIndex, idx, p.offsetN)
       return p.offsetN
     end
@@ -301,6 +314,7 @@ function Pathfinding.getBestLateralOffset(carIndex)
     end
   end
   if bestIdx then
+    store.lastChosenPathIndex = bestIdx
     log("[PF] bestOffset car=%d fallback idx=%d (safeSamples=%d) -> n=%.2f",
       carIndex, bestIdx, bestSafeSamples, store.paths[bestIdx].offsetN)
     return store.paths[bestIdx].offsetN
