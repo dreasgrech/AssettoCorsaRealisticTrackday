@@ -60,6 +60,10 @@ local StorageManager_options_AICarValues_default = StorageManager.options_AICarV
 local StorageManager_options_AICarValues_min = StorageManager.options_AICarValues_min
 local StorageManager_options_AICarValues_max = StorageManager.options_AICarValues_max
 
+local StorageManager_options_Debugging_default = StorageManager.options_Debugging_default
+local StorageManager_options_Debugging_min = StorageManager.options_Debugging_min
+local StorageManager_options_Debugging_max = StorageManager.options_Debugging_max
+
 local StorageManager_Options = StorageManager.Options
 local StorageManager_Options_Debugging = StorageManager.Options_Debugging
 local StorageManager_Options_Yielding = StorageManager.Options_Yielding
@@ -157,7 +161,7 @@ local renderDebuggingSection = function(storage_Debugging)
     if ui_checkbox('Show car state overhead text', storage_Debugging.debugShowCarStateOverheadText) then storage_Debugging.debugShowCarStateOverheadText = not storage_Debugging.debugShowCarStateOverheadText end
     if ui_itemHovered() then ui_setTooltip("Shows the car's current state as text over the car") end
 
-    storage_Debugging.debugCarGizmosDrawistance = renderSliderWithInnerText('##debugCarStateOverheadShowDistance', 'Car gizmos draw distance: %.0fm', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage_Debugging.debugCarGizmosDrawistance, StorageManager_options_min[StorageManager_Options_Debugging.DebugCarGizmosDrawistance], StorageManager_options_max[StorageManager_Options_Debugging.DebugCarGizmosDrawistance], DEFAULT_SLIDER_WIDTH)
+    storage_Debugging.debugCarGizmosDrawistance = renderSliderWithInnerText('##debugCarStateOverheadShowDistance', 'Car gizmos draw distance: %.0fm', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage_Debugging.debugCarGizmosDrawistance, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugCarGizmosDrawistance], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugCarGizmosDrawistance], DEFAULT_SLIDER_WIDTH)
 
     if ui_checkbox('Show raycasts when driving laterally', storage_Debugging.debugShowRaycastsWhileDrivingLaterally) then storage_Debugging.debugShowRaycastsWhileDrivingLaterally = not storage_Debugging.debugShowRaycastsWhileDrivingLaterally end
     if ui_itemHovered() then ui_setTooltip('Shows the raycasts used to check for side clearance when driving checking for cars on the side') end
@@ -175,6 +179,11 @@ local renderDebuggingSection = function(storage_Debugging)
 
     if ui_checkbox('Log car overtaking', storage_Debugging.debugLogCarOvertaking) then storage_Debugging.debugLogCarOvertaking = not storage_Debugging.debugLogCarOvertaking end
     if ui_itemHovered() then ui_setTooltip('If enabled, will write to the CSP log if an ai car is overtaking another car') end
+
+    if ui_checkbox('Override player car lateral offset', storage_Debugging.debugOverridePlayerCarLateralOffset) then storage_Debugging.debugOverridePlayerCarLateralOffset = not storage_Debugging.debugOverridePlayerCarLateralOffset end
+    if ui_itemHovered() then ui_setTooltip('If enabled, will force the player car to use a specific lateral offset value.') end
+
+    storage_Debugging.debugOverridePlayerCarLateralOffsetValue = renderSliderWithInnerText('##debugOverridePlayerCarLateralOffsetValue', 'Player car lateral offset override value: %.2f m', 'The lateral offset value to force the player car to use when the override is enabled.', storage_Debugging.debugOverridePlayerCarLateralOffsetValue, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugOverridePlayerCarLateralOffsetValue], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugOverridePlayerCarLateralOffsetValue], DEFAULT_SLIDER_WIDTH)
 
     ui_nextColumn()
 

@@ -89,6 +89,8 @@ StorageManager.Options_Debugging = {
     DebugLogFastStateChanges = 6,
     DebugLogCarYielding = 7,
     DebugLogCarOvertaking = 8,
+    DebugOverridePlayerCarLateralOffset = 9,
+    DebugOverridePlayerCarLateralOffsetValue = 10,
 }
 
 ---@enum StorageManager.Options_Yielding
@@ -130,6 +132,8 @@ local optionsCollection_Debugging_beforeDoD = {
     { name = StorageManager.Options_Debugging.DebugLogFastStateChanges, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugLogCarYielding, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugLogCarOvertaking, default=false, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DebugOverridePlayerCarLateralOffset, default=false, min=nil, max=nil },
+    { name = StorageManager.Options_Debugging.DebugOverridePlayerCarLateralOffsetValue, default=0.0, min=-1.0, max=1.0 },
 }
 
 -- local MIN_AI_CAUTION_VALUE = 3
@@ -340,6 +344,8 @@ local storageTable = {
 ---@field debugLogFastStateChanges boolean
 ---@field debugLogCarYielding boolean
 ---@field debugLogCarOvertaking boolean
+---@field debugOverridePlayerCarLateralOffset boolean
+---@field debugOverridePlayerCarLateralOffsetValue number
 
 ---@type StorageTable_Debugging
 local storageTable_Debugging = {
@@ -351,6 +357,8 @@ local storageTable_Debugging = {
     debugLogFastStateChanges = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugLogFastStateChanges],
     debugLogCarYielding = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugLogCarYielding],
     debugLogCarOvertaking = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugLogCarOvertaking],
+    debugOverridePlayerCarLateralOffset = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugOverridePlayerCarLateralOffset],
+    debugOverridePlayerCarLateralOffsetValue = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugOverridePlayerCarLateralOffsetValue],
 }
 
 ---@class StorageTable_Yielding
