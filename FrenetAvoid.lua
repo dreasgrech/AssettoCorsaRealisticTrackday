@@ -6,14 +6,17 @@
 -- "FrenetAvoid: ego#<i> z=<progress> x=<offset> dt=<Δt> v=<speed> m/s" – initial state per car (track progress, lateral offset, timestep, speed).
 -- "Nearby opponents: <N>" – number of opponent cars within the considered forward/backward windows.
 -- "TTC=<t>s -> emergency densify" – triggered when time-to-collision falls below emergency threshold (densifies candidate grid).
+-- "SidePref: pref=<LEFT/RIGHT> sign=<±1> penaltyW=<w> active=<yes/no>" – overtaking-side preference used for this frame.
 -- "OK car=<i> targetN=<offset> T=<time> samples=<count> minClr=<clearance> cost=<value>" – candidate path accepted: target lateral offset (normalized), duration (s), number of sample points, minimum clearance (m), and total cost.
 -- "DROP car=<i> targetN=<offset> T=<time> collided=<bool>" – candidate path rejected: `collided=true` indicates a collision (clearance < 0) during sampling.
 -- "Survivors=<count> bestIdx=<index>" – number of viable candidate paths and the index of the best (lowest-cost) path.
--- "OUT car=<i> chosen=<idx> egoN=<currentOffset> nextN=<targetOffset> outN=<outputOffset> minClr=<clearance> targetN=<offset> T=<time>" – output decision: chosen path index, current offset, next path point offset, output offset after slew limiting, chosen path min clearance (m), path terminal offset (normalized), and path duration (s).
+-- "OUT car=<i> chosen=<idx> egoN=<currentOffset> nextN=<targetOffset> outN=<outputOffset> minClr=<clearance> targetN=<offset> T=<time>" – output decision: chosen path index, current offset, next sample offset, output after slew limiting, chosen path min clearance (m), path terminal offset, and path duration (s).
 -- "CHOSEN car=<i> idx=<idx> cost=<value> minClr=<clearance> m  targetN=<offset>  T=<time>s" – debug label for chosen path showing index, total cost, min clearance (m), terminal offset, and duration.
--- "[AUDIT] car=<i> outN(cmd)=<commandedOffset> actN=<actualOffset> Δ=<difference> ..." – compares commanded vs actual applied offset; warns if difference exceeds threshold (AI override or insufficient slew rate).
+-- "[AUDIT] car=<i> outN(cmd)=<commandedOffset> actN=<actualOffset> Δ=<difference> ..." – compares commanded vs actual applied offset; warns if difference exceeds threshold.
 
 local FrenetAvoid = {}
+
+local LOG_MESSAGE = false
 
 ---------------------------------------------------------------------------------------------------
 -- Tunables (adjust from your settings UI if desired)
@@ -38,8 +41,8 @@ local extraAheadZ_whenEarly          = 0.020
 local firstSampleSeconds             = 0.03    -- time of first forward sample (just beyond the car’s front bumper)
 local startMetersAhead               = 0.0
 local useSpeedAwareLookahead         = true
-local minAheadMetersAtLowSpeed       = 6.0
-local maxAheadMetersAtHighSpeed      = 45.0
+local minAheadMetersAtLowSpeed       = 12.0
+local maxAheadMetersAtHighSpeed      = 140.0   -- ↑ important: let planner “see” far enough at 200+ km/h
 local nominalTrackLengthMeters       = 20000.0 -- fallback track length for progress fraction → distance conversion
 
 -- Collision model: simple disc footprints (fast). Accounts for car sizes via radii.
@@ -51,190 +54,134 @@ local maxAbsOffsetNormalized         = 0.95
 local maxOffsetChangePerSecondN      = 2.6
 
 -- Cost function weights
-local costWeight_Clearance           = 3.0   -- weight for safety (clearance)
-local costWeight_TerminalCenter      = 0.7   -- weight for ending near track center
-local costWeight_JerkComfort         = 0.22  -- weight for smoothness (integral of jerk)
+local costWeight_Clearance           = 3.0   -- safety (clearance)
+local costWeight_TerminalCenter      = 0.7   -- bias to end near center (keeps AI tidy)
+local costWeight_JerkComfort         = 0.22  -- smoothness
+
+-- NEW: overtaking-side preference weight (applied only when a blocker ahead exists)
+-- If RIGHT is preferred and TTC is low, any terminal on the LEFT gets this *added* to cost (and vice versa).
+local costWeight_SidePreference      = 5.0   -- strong bias so we don’t pick the wrong side under pressure
 
 -- Emergency densification thresholds
 local minClrTight_m                  = 1.2   -- if min clearance < this (m), space is considered "tight"
 local densifyOffsetsExtra            = { -1.0, -0.8, -0.6, 0.6, 0.8, 1.0 }  -- additional offsets to test in emergencies
-local densifyEndTimesExtra           = { 0.6, 1.0 }                         -- additional shorter time horizons for quick maneuvers
+local densifyEndTimesExtra           = { 0.6, 1.0 }                         -- additional shorter horizons for quick moves
 
 -- Output normalization (required by physics.setAISplineOffset)
 local OUTPUT_IS_NORMALIZED           = true
 
 -- Debug drawing toggles
-local debugMaxPathsDrawn             = 24    -- max number of candidate paths to draw (to avoid clutter)
-local drawSamplesAsSpheres           = true  -- draw sampled path points as small spheres (colored by clearance)
-local drawOpponentDiscs              = true  -- draw opponent car footprints (red spheres) and clearance zones
-local drawRejectionMarkers           = true  -- mark rejection points (red X where collisions occurred)
-local drawEgoFootprint               = true  -- draw ego car footprint (green sphere)
-local drawAnchorLink                 = true  -- draw line from ego to first path sample (steering target)
+local debugMaxPathsDrawn             = 24
+local drawSamplesAsSpheres           = true
+local drawOpponentDiscs              = true
+local drawRejectionMarkers           = true
+local drawEgoFootprint               = true
+local drawAnchorLink                 = true
 
 -- Round-trip audit: show commanded vs applied offsets in world
-local drawReturnedOffsetPole         = true   -- draw magenta/cyan pole at commanded offset
-local drawActualOffsetPole           = true   -- draw yellow pole at actual offset (after physics applied)
-local auditWarnDeltaN                = 0.15   -- log a warning if |actual - commanded| exceeds this (possible override or slow response)
+local drawReturnedOffsetPole         = true
+local drawActualOffsetPole           = true
+local auditWarnDeltaN                = 0.15
 
 -- Debug draw colors
-local colAll     = rgbm(0.3, 0.9, 0.3, 0.15)  -- thin green for all candidate paths
-local colChosen  = rgbm(1.0, 0.2, 0.9, 1.0)   -- bright purple for chosen path (thick)
-local colPoleCmd = rgbm(0.2, 1.0, 1.0, 0.9)   -- cyan for commanded offset pole
-local colPoleAct = rgbm(1.0, 1.0, 0.2, 0.9)   -- yellow for actual offset pole
+local colAll     = rgbm(0.3, 0.9, 0.3, 0.15)
+local colChosen  = rgbm(1.0, 0.2, 0.9, 1.0)
+local colPoleCmd = rgbm(0.2, 1.0, 1.0, 0.9)
+local colPoleAct = rgbm(1.0, 1.0, 0.2, 0.9)
 
 ---------------------------------------------------------------------------------------------------
 -- Small helper functions
 ---------------------------------------------------------------------------------------------------
 
--- Clamp a normalized lateral offset to the valid range [-maxAbsOffsetNormalized, +maxAbsOffsetNormalized]
-local function clampOffsetNormalized(n) 
-  return math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, n)) 
+local function clampOffsetNormalized(n)
+  return math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, n))
 end
 
--- Wrap a track progress value to [0,1) (handles track lap wrap-around)
-local function wrap01(z) 
-  z = z % 1.0 
-  if z < 0 then z = z + 1 end 
-  return z 
+local function wrap01(z)
+  z = z % 1.0
+  if z < 0 then z = z + 1 end
+  return z
 end
 
--- Compute minimum clearance (in meters) from a world position to a list of opponents.
--- Each opponent is treated as a disc of radius opponentRadiusMeters; ego as disc of radius egoRadiusMeters.
--- Returns the smallest distance between the ego position and any opponent, minus the sum of radii (negative if overlapping).
+-- Minimum distance from point to set of opponent centers, minus radii sum → clearance in meters (negative means overlap).
 local function computeMinimumClearanceToOpponentsMeters(worldPos, opponentList)
-  local minClearance = 1e9  -- start with a very large clearance
-  local combinedRadii = opponentRadiusMeters + egoRadiusMeters  -- sum of radii for clearance calculation
+  local minClearanceSq = 1e18
   for i = 1, opponentList.count do
-    local oppCar = opponentList[i]
-    -- Compute squared distance (avoid sqrt until end for performance)
-    local dx = oppCar.position.x - worldPos.x
-    local dy = oppCar.position.y - worldPos.y
-    local dz = oppCar.position.z - worldPos.z
-    local distSquared = dx*dx + dy*dy + dz*dz
-    if distSquared < minClearance then 
-      minClearance = distSquared 
-    end
+    local opp = opponentList[i]
+    local dx = opp.position.x - worldPos.x
+    local dy = opp.position.y - worldPos.y
+    local dz = opp.position.z - worldPos.z
+    local d2 = dx*dx + dy*dy + dz*dz
+    if d2 < minClearanceSq then minClearanceSq = d2 end
   end
-  -- Convert min distance squared back to distance and subtract combined radii
-  minClearance = math.sqrt(minClearance) - combinedRadii
-  return minClearance
+  return math.sqrt(minClearanceSq) - (opponentRadiusMeters + egoRadiusMeters)
 end
 
--- Collect nearby opponent cars within a given forward/ahead window and behind window (progress fractions).
--- Skips the ego car itself. Uses track progress difference (wrap-aware) to decide if a car is within range.
--- Populates outList with opponent car objects and returns the count.
+-- Populate `outList` with cars within [aheadWindow, behindWindow] of ego’s progress (wrap-aware).
 local function findNearbyOpponentsInProgressWindow(egoIndex, egoProgress, allCars, outList, aheadWindow, behindWindow)
   local count = 0
   for i = 1, #allCars do
-    local car = allCars[i]
-    if car and car.index ~= egoIndex then
-      local trackCoord = ac.worldCoordinateToTrack(car.position)  -- track coordinate: x = lateral offset, z = progress (0..1)
-      if trackCoord then
-        local dzAhead  = wrap01(trackCoord.z - egoProgress)
-        local dzBehind = wrap01(egoProgress - trackCoord.z)
+    local c = allCars[i]
+    if c and c.index ~= egoIndex then
+      local tc = ac.worldCoordinateToTrack(c.position)
+      if tc then
+        local dzAhead  = wrap01(tc.z - egoProgress)
+        local dzBehind = wrap01(egoProgress - tc.z)
         if dzAhead <= aheadWindow or dzBehind <= behindWindow then
           count = count + 1
-          outList[count] = car
+          outList[count] = c
         end
       end
     end
   end
   outList.count = count
-  -- Clear any leftover entries in outList (if list was longer in previous frame)
-  for j = count + 1, #outList do 
-    outList[j] = nil 
-  end
+  for j = count + 1, #outList do outList[j] = nil end
   return count
 end
 
--- Generate quintic polynomial trajectory for lateral offset, ensuring smooth start/end conditions.
--- Returns two functions: 
---   1) computeOffsetAtTime(t): returns lateral offset at time t (clamped between 0 and T),
---   2) computeAbsoluteJerkAtTime(t): returns an absolute "jerk" value at time t (proxy for comfort).
+-- Quintic lateral x(t) with x(0)=x0, x'(0)=v0, x''(0)=0 and x(T)=x1, x'(T)=0, x''(T)=0.
 local function planQuinticLateralTrajectory(x0, v0, x1, T)
-  -- Solve coefficients a0..a5 for a quintic polynomial x(t) with:
-  -- x(0)=x0, x'(0)=v0, x''(0)=0;  and  x(T)=x1, x'(T)=0, x''(T)=0.
   local T2, T3, T4, T5 = T*T, T*T*T, T*T*T*T, T*T*T*T*T
-  local a0 = x0
-  local a1 = v0
-  local a2 = 0
+  local a0, a1, a2 = x0, v0, 0
   local a3 = (10*(x1 - x0) - (6*v0)*T) / T3
   local a4 = (-15*(x1 - x0) + (8*v0)*T) / T4
-  local a5 = (6*(x1 - x0) - (3*v0)*T) / T5
-
-  return 
-    -- Lateral offset as a function of time t
+  local a5 = (6*(x1 - x0)  - (3*v0)*T) / T5
+  return
     function(t)
-      if t < 0 then 
-        t = 0 
-      elseif t > T then 
-        t = T 
-      end
+      if t < 0 then t = 0 elseif t > T then t = T end
       return a0 + a1*t + a2*t*t + a3*t*t*t + a4*t*t*t*t + a5*t*t*t*t*t
     end,
-
-    -- Absolute jerk (rate of change of acceleration) as a function of time t
     function(t)
-      local tt = math.max(0, math.min(T, t))
-      local jerk = 6*a3 + 24*a4*tt + 60*a5*tt*tt
-      return math.abs(jerk)
+      local tt = (t < 0 and 0) or (t > T and T) or t
+      local j = 6*a3 + 24*a4*tt + 60*a5*tt*tt
+      return math.abs(j)
     end
 end
 
--- Calculate track progress fraction at time t ahead, based on ego speed (for speed-aware lookahead).
--- This returns egoProgress + Δz corresponding to how far the car will travel in time t (capped by min/max distances).
+-- Speed-aware progress: how far (Δz) we’ll be at time t.
 local function computeTrackProgressAtTime(egoProgress, egoSpeedMps, t)
-  -- Determine a distance ahead for the full planning horizon based on current speed (clamped between min and max)
-  local horizonDistance = math.max(minAheadMetersAtLowSpeed,
-                             math.min(maxAheadMetersAtHighSpeed, egoSpeedMps * planningHorizonSeconds))
-  -- Linearly interpolate the distance for time t within the horizon, plus any starting offset in meters
-  local distanceAtTime = (t / planningHorizonSeconds) * horizonDistance + startMetersAhead
-  local dz = distanceAtTime / nominalTrackLengthMeters  -- convert distance to track progress fraction
-  return wrap01(egoProgress + dz)
+  local horizonMeters = math.max(minAheadMetersAtLowSpeed, math.min(maxAheadMetersAtHighSpeed, egoSpeedMps * planningHorizonSeconds))
+  local meters = (t / planningHorizonSeconds) * horizonMeters + startMetersAhead
+  return wrap01(egoProgress + (meters / nominalTrackLengthMeters))
 end
 
 ---------------------------------------------------------------------------------------------------
--- Per-car scratchpad (arena) for reusing data structures (no allocations per frame)
+-- Per-car scratchpad (arena) for reusing data (no per-frame allocs)
 ---------------------------------------------------------------------------------------------------
 local __carPlanningDataMap = {}
 local function getOrCreateCarPlanningData(carIndex)
-  local data = __carPlanningDataMap[carIndex]
-  if data then 
-    return data 
-  end
-  -- Initialize a new scratch data table for this car
-  data = {
-    -- Nearby opponents data
-    nearbyOpponentCars   = {}, 
-    nearbyOpponentCount  = 0,
-
-    -- Sampled path points (world positions, clearance values, lateral offsets)
-    sampleWorldPositions = {}, 
-    sampleClearances     = {}, 
-    sampleLateralOffsets = {}, 
-    sampleCount          = 0,
-
-    -- Candidate path info: start/end sample indices, cost, min clearance, terminal offset, duration
-    candidateStartIndices      = {}, 
-    candidateEndIndices        = {}, 
-    candidateCosts             = {}, 
-    candidateMinClearances     = {}, 
-    candidateTerminalOffsetsN  = {}, 
-    candidateDurationsSeconds  = {}, 
-    candidateCount             = 0,
-
-    -- Rejection markers (collision sample points and their clearance)
-    rejectionSamplePositions = {}, 
-    rejectionCount           = 0,
-    rejectionClearances      = {},
-
-    -- Last output command and last actual offset (for audit)
-    lastOutputOffsetNormalized = 0.0, 
-    lastActualOffsetNormalized = 0.0, 
-    lastEgoTrackProgress       = 0.0
+  local d = __carPlanningDataMap[carIndex]
+  if d then return d end
+  d = {
+    nearbyOpponentCars   = {}, nearbyOpponentCount  = 0,
+    sampleWorldPositions = {}, sampleClearances     = {}, sampleLateralOffsets = {}, sampleCount = 0,
+    candidateStartIndices = {}, candidateEndIndices = {}, candidateCosts = {},
+    candidateMinClearances = {}, candidateTerminalOffsetsN = {}, candidateDurationsSeconds = {}, candidateCount = 0,
+    rejectionSamplePositions = {}, rejectionClearances = {}, rejectionCount = 0,
+    lastOutputOffsetNormalized = 0.0, lastActualOffsetNormalized = 0.0, lastEgoTrackProgress = 0.0
   }
-  __carPlanningDataMap[carIndex] = data
-  return data
+  __carPlanningDataMap[carIndex] = d
+  return d
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -245,258 +192,183 @@ end
 ---@param dt number
 ---@return number  -- normalized lateral offset [-1 .. +1]
 function FrenetAvoid.computeOffsetForCar(allCars, egoIndex, dt)
-  local egoCarState = ac.getCar(egoIndex)
-  if not egoCarState or not ac.hasTrackSpline() then
-    Logger.warn("FrenetAvoid: no ego car or missing AI spline data")
+  local ego = ac.getCar(egoIndex)
+  if not ego or not ac.hasTrackSpline() then
+    Logger.warn("FrenetAvoid: no ego car or missing AI spline")
     return 0.0
   end
 
-  -- Retrieve or initialize this car's planning data scratchpad
-  local carPlanningData = getOrCreateCarPlanningData(egoIndex)
+  local safeDt = math.max(0.016, dt or 0.016)  -- protect slew limiter at very small dt
 
-  -- Ego state in Frenet (track) coordinates:
-  -- x = normalized lateral offset (-1..+1), z = track progress (0..1, wraps around)
-  local egoTrackCoord = ac.worldCoordinateToTrack(egoCarState.position)
-  local egoTrackProgress = wrap01(egoTrackCoord.z)
-  local egoLateralOffsetNormalized = clampOffsetNormalized(egoTrackCoord.x)
-  local initialLateralVelocity = 0.0  -- assume starting lateral velocity is zero (smooth transition)
-  local egoSpeedMetersPerSecond = (egoCarState.speedKmh or 0) / 3.6
+  local data = getOrCreateCarPlanningData(egoIndex)
 
-  Logger.log(string.format(
-    "FrenetAvoid: ego#%d z=%.4f x=%.3f dt=%.3f v=%.1f m/s",
-    egoIndex, egoTrackProgress, egoLateralOffsetNormalized, dt or -1, egoSpeedMetersPerSecond
-  ))
+  -- Ego state in Frenet
+  local tc = ac.worldCoordinateToTrack(ego.position)
+  local egoZ = wrap01(tc.z)
+  local egoN = clampOffsetNormalized(tc.x)
+  local egoV = (ego.speedKmh or 0) / 3.6
+  local vLat0 = 0.0
 
-  -----------------------------------------------------------------------------------------------
-  -- Identify opponents near the ego (expand search window early if time-to-collision is short)
-  -----------------------------------------------------------------------------------------------
-  -- Start with base forward/behind progress windows
-  local progressWindowAhead = longitudinalWindowAheadZ
-  local progressWindowBehind = longitudinalWindowBehindZ
+  if LOG_MESSAGE then Logger.log(string.format("FrenetAvoid: ego#%d z=%.4f x=%.3f dt=%.3f v=%.1f m/s", egoIndex, egoZ, egoN, dt or -1, egoV)) end
 
-  -- Quick time-to-collision estimation: find nearest car directly ahead (within a small margin ahead)
-  local nearestAheadCar = nil
-  local nearestAheadDistance = 1e9
+  -- Nearest ahead car & TTC
+  local progressAhead = longitudinalWindowAheadZ
+  local nearestAhead, nearestAheadDist = nil, 1e9
   for i = 1, #allCars do
-    local otherCar = allCars[i]
-    if otherCar and otherCar.index ~= egoIndex then
-      local dzAhead = wrap01(ac.worldCoordinateToTrack(otherCar.position).z - egoTrackProgress)
-      if dzAhead <= progressWindowAhead + 0.02 then  -- consider cars slightly beyond the normal ahead window for TTC
-        local distance = (otherCar.position - egoCarState.position):length()
-        if distance < nearestAheadDistance then
-          nearestAheadDistance = distance
-          nearestAheadCar = otherCar
-        end
+    local c = allCars[i]
+    if c and c.index ~= egoIndex then
+      local dzAhead = wrap01(ac.worldCoordinateToTrack(c.position).z - egoZ)
+      if dzAhead <= progressAhead + 0.02 then
+        local d = (c.position - ego.position):length()
+        if d < nearestAheadDist then nearestAheadDist, nearestAhead = d, c end
       end
     end
   end
-  if nearestAheadCar then
-    -- Relative speed (ego minus opponent). If opponent is faster or equal speed, use a small positive value to avoid division by zero.
-    local relativeClosingSpeed = math.max(0.1, egoSpeedMetersPerSecond - (nearestAheadCar.speedKmh or 0) / 3.6)
-    local timeToCollision = nearestAheadDistance / relativeClosingSpeed
-    if timeToCollision < ttcEarlyPlanStart_s then
-      -- If a potential collision is a few seconds away, widen the forward search window to include more distant opponents
-      progressWindowAhead = progressWindowAhead + extraAheadZ_whenEarly
-    end
-    if timeToCollision < ttcEmergency_s then
-      -- Very close to collision: we will add extra candidate offsets and shorter end times (emergency paths)
-      Logger.warn(string.format("TTC=%.2fs -> emergency densify", timeToCollision))
+  if nearestAhead then
+    local relV = math.max(0.1, egoV - (nearestAhead.speedKmh or 0)/3.6)
+    local ttc = nearestAheadDist / relV
+    if ttc < ttcEarlyPlanStart_s then progressAhead = progressAhead + extraAheadZ_whenEarly end
+    if ttc < ttcEmergency_s then 
+      if LOG_MESSAGE then Logger.warn(string.format("TTC=%.2fs -> emergency densify", ttc)) end
     end
   end
 
-  -- Collect all opponent cars within the adjusted forward (ahead) and behind windows
-  carPlanningData.nearbyOpponentCount = findNearbyOpponentsInProgressWindow(
-    egoIndex, egoTrackProgress, allCars, carPlanningData.nearbyOpponentCars, progressWindowAhead, progressWindowBehind)
-  Logger.log("Nearby opponents: " .. tostring(carPlanningData.nearbyOpponentCount))
+  -- Gather opponents in window
+  data.nearbyOpponentCount = findNearbyOpponentsInProgressWindow(egoIndex, egoZ, allCars, data.nearbyOpponentCars, progressAhead, longitudinalWindowBehindZ)
+  if LOG_MESSAGE then Logger.log("Nearby opponents: " .. tostring(data.nearbyOpponentCount)) end
 
-  -----------------------------------------------------------------------------------------------
-  -- Build candidate path grid (time horizons and terminal offsets), densifying if needed
-  -----------------------------------------------------------------------------------------------
-  -- Start with base candidate durations and lateral offsets
+  -- Build candidate grids (densify under pressure)
   local candidateDurations = { table.unpack(candidateEndTimesSecondsBase) }
-  local candidateTerminalOffsets = { table.unpack(candidateTerminalOffsetsNBase) }
-  if nearestAheadCar then
-    -- If an opponent is relatively close ahead, add extra shorter durations and more extreme offsets for finer avoidance
-    for _, extraT in ipairs(densifyEndTimesExtra) do 
-      candidateDurations[#candidateDurations + 1] = extraT 
-    end
-    for _, extraOffset in ipairs(densifyOffsetsExtra) do 
-      candidateTerminalOffsets[#candidateTerminalOffsets + 1] = extraOffset 
+  local candidateOffsets   = { table.unpack(candidateTerminalOffsetsNBase) }
+  if nearestAhead then
+    for _, t in ipairs(densifyEndTimesExtra) do candidateDurations[#candidateDurations+1] = t end
+    for _, n in ipairs(densifyOffsetsExtra)   do candidateOffsets[#candidateOffsets+1]   = n end
+  end
+
+  -- Determine preferred overtaking side from your track manager (RIGHT or LEFT).
+  -- We translate that to a sign: RIGHT → +1, LEFT → -1. If unavailable, default to RIGHT.
+  local preferredSideSign = 1
+  local preferredSideName = "RIGHT"
+  if RaceTrackManager and RaceTrackManager.TrackSide and RaceTrackManager.getOvertakingSide then
+    local side = RaceTrackManager.getOvertakingSide()
+    if side == RaceTrackManager.TrackSide.LEFT then
+      preferredSideSign = -1
+      preferredSideName = "LEFT"
+    else
+      preferredSideSign = 1
+      preferredSideName = "RIGHT"
     end
   end
 
-  -----------------------------------------------------------------------------------------------
-  -- Evaluate each candidate path (anchor at ego position and sample forward points to check clearance)
-  -----------------------------------------------------------------------------------------------
-  -- Reset counts for candidates, samples, and rejections this frame
-  carPlanningData.candidateCount = 0
-  carPlanningData.sampleCount = 0
-  carPlanningData.rejectionCount = 0
+  local sidePreferenceActive = nearestAhead ~= nil  -- only bias when an actual blocker exists ahead
+  if LOG_MESSAGE then Logger.log(string.format("SidePref: pref=%s sign=%+d penaltyW=%.2f active=%s", preferredSideName, preferredSideSign, costWeight_SidePreference, tostring(sidePreferenceActive))) end
 
-  -- Anchor the first sample at the ego's current position (ensures path continuity from current state)
-  carPlanningData.sampleCount = 1
-  carPlanningData.sampleWorldPositions[1] = egoCarState.position  -- world position of ego (anchor point)
-  carPlanningData.sampleLateralOffsets[1] = egoLateralOffsetNormalized
-  carPlanningData.sampleClearances[1] = 99.0  -- use a special high clearance marker for the anchor (not used in cost)
+  -- Reset per-frame buffers
+  data.candidateCount, data.sampleCount, data.rejectionCount = 0, 0, 0
 
-  local bestCost = 1e9
-  local bestIndex = 0
+  -- Anchor at ego
+  data.sampleCount = 1
+  data.sampleWorldPositions[1] = ego.position
+  data.sampleLateralOffsets[1] = egoN
+  data.sampleClearances[1] = 99.0
 
-  -- Iterate over each terminal offset and each time horizon to create candidate trajectories
-  for _, terminalOffsetRaw in ipairs(candidateTerminalOffsets) do
-    local terminalOffsetN = clampOffsetNormalized(terminalOffsetRaw)
-    for _, duration in ipairs(candidateDurations) do
-      -- Plan a smooth quintic trajectory from current lateral offset to the terminal offset in given time
-      local computeOffsetAtTime, computeAbsoluteJerkAtTime = planQuinticLateralTrajectory(
-        egoLateralOffsetNormalized, initialLateralVelocity, terminalOffsetN, duration)
+  local bestIdx, bestCost = 0, 1e9
 
-      -- Record the starting index of samples for this candidate (the anchor sample index)
-      local startIndex = carPlanningData.sampleCount + 1
+  for _, terminalNraw in ipairs(candidateOffsets) do
+    local terminalN = clampOffsetNormalized(terminalNraw)
+    for _, T in ipairs(candidateDurations) do
+      local xOfT, jerkAbs = planQuinticLateralTrajectory(egoN, vLat0, terminalN, T)
 
+      local startIdx = data.sampleCount + 1
       local collided = false
-      local minClearance = 1e9
-      local cumulativeJerkCost = 0.0
-      local sampleCountForPath = 1  -- include anchor as count 1
+      local minClr, jerkSum = 1e9, 0.0
+      local haveForward = false
 
-      -- Take the first forward sample almost immediately after the car's front (small time step)
       local t = firstSampleSeconds
+      while t <= math.min(T, planningHorizonSeconds) do
+        haveForward = true
+        local n = clampOffsetNormalized(xOfT(t))
+        local z = useSpeedAwareLookahead and computeTrackProgressAtTime(egoZ, egoV, t)
+                                           or wrap01(egoZ + (t / planningHorizonSeconds) * longitudinalWindowAheadZ)
+        local p = ac.trackCoordinateToWorld(vec3(n, 0, z))
 
-      -- Sample points along the trajectory until the lesser of the candidate duration or the planning horizon
-      while t <= math.min(duration, planningHorizonSeconds) do
-        sampleCountForPath = sampleCountForPath + 1
-        -- Compute lateral offset at time t along this trajectory, clamp within bounds
-        local offsetN = clampOffsetNormalized(computeOffsetAtTime(t))
-        -- Compute corresponding track progress at time t (either speed-aware or evenly along the base ahead window fraction)
-        local progress = useSpeedAwareLookahead 
-                         and computeTrackProgressAtTime(egoTrackProgress, egoSpeedMetersPerSecond, t) 
-                         or wrap01(egoTrackProgress + (t / planningHorizonSeconds) * longitudinalWindowAheadZ)
-        local worldPos = ac.trackCoordinateToWorld(vec3(offsetN, 0.0, progress))  -- convert Frenet (offset,progress) back to world position
-
-        -- Calculate clearance to all nearby opponents at this sample point
-        local clearance = computeMinimumClearanceToOpponentsMeters(worldPos, carPlanningData.nearbyOpponentCars)
-        if clearance < 0.0 then
-          -- This sample point is in collision with an opponent (negative clearance means overlap)
+        local clr = computeMinimumClearanceToOpponentsMeters(p, data.nearbyOpponentCars)
+        if clr < 0.0 then
           collided = true
-          carPlanningData.rejectionCount = carPlanningData.rejectionCount + 1
-          carPlanningData.rejectionSamplePositions[carPlanningData.rejectionCount] = worldPos
-          carPlanningData.rejectionClearances[carPlanningData.rejectionCount] = clearance
-          -- Mark the rejection and stop sampling further points for this candidate (path is invalid)
+          data.rejectionCount = data.rejectionCount + 1
+          data.rejectionSamplePositions[data.rejectionCount] = p
+          data.rejectionClearances[data.rejectionCount] = clr
           break
         end
-        -- Track the minimum clearance along this path
-        if clearance < minClearance then 
-          minClearance = clearance 
-        end
-        -- Accumulate jerk (comfort) cost
-        cumulativeJerkCost = cumulativeJerkCost + computeAbsoluteJerkAtTime(t)
+        if clr < minClr then minClr = clr end
+        jerkSum = jerkSum + jerkAbs(t)
 
-        -- Add this sample to the lists
-        carPlanningData.sampleCount = carPlanningData.sampleCount + 1
-        local sampleIndex = carPlanningData.sampleCount
-        carPlanningData.sampleWorldPositions[sampleIndex] = worldPos
-        carPlanningData.sampleLateralOffsets[sampleIndex] = offsetN
-        carPlanningData.sampleClearances[sampleIndex] = clearance
+        data.sampleCount = data.sampleCount + 1
+        local si = data.sampleCount
+        data.sampleWorldPositions[si] = p
+        data.sampleLateralOffsets[si] = n
+        data.sampleClearances[si]     = clr
 
-        t = t + sampleTimeStepSeconds  -- advance time by fixed step and sample again
+        t = t + sampleTimeStepSeconds
       end
 
-      if (not collided) and (sampleCountForPath > 1) then
-        -- The candidate path survived (no collision) and has at least one forward sample beyond the anchor
-        carPlanningData.candidateCount = carPlanningData.candidateCount + 1
-        local candIndex = carPlanningData.candidateCount
-        -- Record start and end sample indices for this path (including the anchor at startIndex-1)
-        carPlanningData.candidateStartIndices[candIndex] = startIndex - 1
-        carPlanningData.candidateEndIndices[candIndex]   = carPlanningData.sampleCount
-        carPlanningData.candidateMinClearances[candIndex] = minClearance
-        carPlanningData.candidateTerminalOffsetsN[candIndex] = terminalOffsetN
-        carPlanningData.candidateDurationsSeconds[candIndex] = duration
+      if (not collided) and haveForward then
+        data.candidateCount = data.candidateCount + 1
+        local ci = data.candidateCount
+        data.candidateStartIndices[ci]      = startIdx - 1
+        data.candidateEndIndices[ci]        = data.sampleCount
+        data.candidateMinClearances[ci]     = minClr
+        data.candidateTerminalOffsetsN[ci]  = terminalN
+        data.candidateDurationsSeconds[ci]  = T
 
-        -- Compute path cost: lower is better
-        -- Safety term: higher cost for lower minimum clearance (uses 1/(0.5 + clearance) to avoid singularity at 0)
-        -- Centering term: slight cost for ending far from track center (offset magnitude)
-        -- Comfort term: cost for total lateral jerk (higher jerk = less comfortable)
-        local cost = costWeight_Clearance * (1.0 / (0.5 + minClearance))
-                   + costWeight_TerminalCenter * math.abs(terminalOffsetN)
-                   + costWeight_JerkComfort * cumulativeJerkCost
-        carPlanningData.candidateCosts[candIndex] = cost
-        if cost < bestCost then 
-          bestCost = cost 
-          bestIndex = candIndex 
+        -- Base cost: safety + centering + comfort
+        local cost = costWeight_Clearance      * (1.0 / (0.5 + minClr))
+                   + costWeight_TerminalCenter * math.abs(terminalN)
+                   + costWeight_JerkComfort    * jerkSum
+
+        -- Side preference penalty: if there is a blocker ahead, penalize terminal offsets on the non-preferred side.
+        if sidePreferenceActive then
+          -- Preferred side sign is +1 for RIGHT, -1 for LEFT.
+          -- If terminalN has opposite sign, add penalty.
+          if terminalN * preferredSideSign < 0 then
+            cost = cost + costWeight_SidePreference
+          end
         end
 
-        Logger.log(string.format(
-          "OK car=%d targetN=%.2f T=%.2f samples=%d minClr=%.2f cost=%.3f",
-          egoIndex, terminalOffsetN, duration, (carPlanningData.candidateEndIndices[candIndex] - carPlanningData.candidateStartIndices[candIndex] + 1), 
-          minClearance, cost
-        ))
+        data.candidateCosts[ci] = cost
+        if cost < bestCost then bestCost, bestIdx = cost, ci end
+
+        if LOG_MESSAGE then Logger.log(string.format( "OK car=%d targetN=%.2f T=%.2f samples=%d minClr=%.2f cost=%.3f", egoIndex, terminalN, T, (data.candidateEndIndices[ci] - data.candidateStartIndices[ci] + 1), minClr, cost)) end
       else
-        -- Candidate was dropped due to a collision or having no forward movement
-        Logger.log(string.format(
-          "DROP car=%d targetN=%.2f T=%.2f collided=%s",
-          egoIndex, terminalOffsetN, duration, tostring(collided)
-        ))
+        if LOG_MESSAGE then Logger.log(string.format("DROP car=%d targetN=%.2f T=%.2f collided=%s", egoIndex, terminalN, T, tostring(collided))) end
       end
     end
   end
 
-  Logger.log(string.format("Survivors=%d bestIdx=%d", carPlanningData.candidateCount, bestIndex))
+  if LOG_MESSAGE then Logger.log(string.format("Survivors=%d bestIdx=%d", data.candidateCount, bestIdx)) end
 
-  -----------------------------------------------------------------------------------------------
-  -- Choose the best path and produce the lateral offset output (with slew rate limiting)
-  -----------------------------------------------------------------------------------------------
-  local outputOffsetN
-  if bestIndex == 0 then
-    -- No viable path found: fall back safely by drifting towards track center or away from nearest car
-    Logger.warn("FrenetAvoid: no surviving candidates; using safe fallback")
-    local desiredOffsetN = 0.0  -- start with a bias towards track center
-    local nearestCar, nearestDistance = nil, 1e9
-    -- Find the closest nearby opponent (actual distance)
-    for i = 1, carPlanningData.nearbyOpponentCount do
-      local opp = carPlanningData.nearbyOpponentCars[i]
-      local dist = (opp.position - egoCarState.position):length()
-      if dist < nearestDistance then 
-        nearestDistance = dist 
-        nearestCar = opp 
-      end
-    end
-    if nearestCar then
-      -- If an opponent is very close, nudge away from it laterally by 0.25 (to left or right)
-      local nearestOpponentOffsetN = ac.worldCoordinateToTrack(nearestCar.position).x
-      if nearestOpponentOffsetN >= 0 then 
-        -- opponent is on the right side -> move left
-        desiredOffsetN = clampOffsetNormalized(desiredOffsetN - 0.25) 
-      else 
-        -- opponent on the left side -> move right
-        desiredOffsetN = clampOffsetNormalized(desiredOffsetN + 0.25) 
-      end
-    end
-    -- Apply a slew-rate limit to avoid instant large changes
-    local maxChange = maxOffsetChangePerSecondN * dt
-    outputOffsetN = clampOffsetNormalized(
-                      egoLateralOffsetNormalized + math.max(-maxChange, math.min(maxChange, (desiredOffsetN - egoLateralOffsetNormalized))))
+  -- Output with slew limiting toward next sample on chosen candidate
+  local outN
+  if bestIdx == 0 then
+    -- Fallback: drift slightly toward preferred side if totally blocked (keeps us from sitting behind)
+    local desired = 0.15 * preferredSideSign
+    local stepMax = maxOffsetChangePerSecondN * safeDt
+    outN = clampOffsetNormalized(egoN + math.max(-stepMax, math.min(stepMax, desired - egoN)))
   else
-    -- Follow the chosen best path: set steering target to the second sample of that path (just ahead of ego)
-    local startIdx = carPlanningData.candidateStartIndices[bestIndex]
-    local endIdx = carPlanningData.candidateEndIndices[bestIndex]
-    local nextOffsetN = carPlanningData.sampleLateralOffsets[ math.min(startIdx + 1, endIdx) ]
-    -- Slew-limit the change from current offset to the target offset for this frame
-    local maxChange = maxOffsetChangePerSecondN * dt
-    outputOffsetN = clampOffsetNormalized(
-                      egoLateralOffsetNormalized + math.max(-maxChange, math.min(maxChange, (nextOffsetN - egoLateralOffsetNormalized))))
-    Logger.log(string.format(
-      "OUT car=%d chosen=%d egoN=%.3f nextN=%.3f outN=%.3f minClr=%.2f targetN=%.2f T=%.2f",
-      egoIndex, bestIndex, egoLateralOffsetNormalized, nextOffsetN, outputOffsetN, 
-      carPlanningData.candidateMinClearances[bestIndex], carPlanningData.candidateTerminalOffsetsN[bestIndex], carPlanningData.candidateDurationsSeconds[bestIndex]
-    ))
+    local sIdx = data.candidateStartIndices[bestIdx]
+    local eIdx = data.candidateEndIndices[bestIdx]
+    local nextN = data.sampleLateralOffsets[math.min(sIdx + 1, eIdx)]
+    local stepMax = maxOffsetChangePerSecondN * safeDt
+    outN = clampOffsetNormalized(egoN + math.max(-stepMax, math.min(stepMax, nextN - egoN)))
+
+    if LOG_MESSAGE then Logger.log(string.format( "OUT car=%d chosen=%d egoN=%.3f nextN=%.3f outN=%.3f minClr=%.2f targetN=%.2f T=%.2f", egoIndex, bestIdx, egoN, nextN, outN, data.candidateMinClearances[bestIdx], data.candidateTerminalOffsetsN[bestIdx], data.candidateDurationsSeconds[bestIdx])) end
   end
 
-  -- Store output and current actual values for later audit (actual applied offset updated in debugDraw after physics applies it)
-  carPlanningData.lastOutputOffsetNormalized = outputOffsetN
-  carPlanningData.lastActualOffsetNormalized = egoLateralOffsetNormalized
-  carPlanningData.lastEgoTrackProgress = egoTrackProgress
+  data.lastOutputOffsetNormalized = outN
+  data.lastActualOffsetNormalized = egoN
+  data.lastEgoTrackProgress       = egoZ
 
-  -- Return the final lateral offset command (normalized, as required by physics.setAISplineOffset)
-  return outputOffsetN
+  return outN
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -509,166 +381,115 @@ end
 function FrenetAvoid.computeOffsetsForAll(allCars, dt, outOffsets)
   for i = 1, #allCars do
     local car = allCars[i]
-    if car then 
-      outOffsets[car.index + 1] = FrenetAvoid.computeOffsetForCar(allCars, car.index, dt) 
+    if car then
+      outOffsets[car.index + 1] = FrenetAvoid.computeOffsetForCar(allCars, car.index, dt)
     end
   end
   return outOffsets
 end
 
 ---------------------------------------------------------------------------------------------------
--- Debug draw: visualize planning data and perform round-trip audit for a given car index
+-- Debug draw: visualize planning data and audit command vs actual
 ---------------------------------------------------------------------------------------------------
 ---@param carIndex integer
 function FrenetAvoid.debugDraw(carIndex)
-  local data = __carPlanningDataMap[carIndex]
-  if not data then 
-    return  -- nothing to draw if this car has no planning data (likely not processed yet)
-  end
+  local d = __carPlanningDataMap[carIndex]
+  if not d then return end
 
-  -- Draw opponent footprints and clearance zones, and ego footprint
   if drawOpponentDiscs then
-    for i = 1, data.nearbyOpponentCount do
-      local oppCar = data.nearbyOpponentCars[i]
-      if oppCar then 
-        -- Draw opponent footprint (red sphere) and clearance zone (white translucent sphere of radius opponent+ego radii + safety margin)
-        render.debugSphere(oppCar.position, opponentRadiusMeters + egoRadiusMeters + minClrTight_m, rgbm(1, 1, 1, 0.10))
-        render.debugSphere(oppCar.position, opponentRadiusMeters, rgbm(1, 0, 0, 0.25))
+    for i = 1, d.nearbyOpponentCount do
+      local opp = d.nearbyOpponentCars[i]
+      if opp then
+        render.debugSphere(opp.position, opponentRadiusMeters + egoRadiusMeters + minClrTight_m, rgbm(1, 1, 1, 0.10))
+        render.debugSphere(opp.position, opponentRadiusMeters, rgbm(1, 0, 0, 0.25))
       end
     end
   end
   if drawEgoFootprint then
-    local egoCar = ac.getCar(carIndex)
-    if egoCar then 
-      render.debugSphere(egoCar.position, egoRadiusMeters, rgbm(0, 1, 0, 0.25)) 
-    end
+    local ego = ac.getCar(carIndex)
+    if ego then render.debugSphere(ego.position, egoRadiusMeters, rgbm(0, 1, 0, 0.25)) end
   end
 
-  -- Mark rejection points (red X at each sample where a collision occurred)
   if drawRejectionMarkers then
-    for i = 1, data.rejectionCount do
-      local p = data.rejectionSamplePositions[i]
-      local d = 0.6
-      -- Draw an 'X' at the sample position
-      render.debugLine(p + vec3(-d, 0, -d), p + vec3(d, 0, d), rgbm(1, 0, 0, 1))
-      render.debugLine(p + vec3(-d, 0, d),  p + vec3(d, 0, -d), rgbm(1, 0, 0, 1))
-      -- Annotate the rejection with clearance info (negative clearance indicates overlap depth)
-      local clr = data.rejectionClearances[i]
+    for i = 1, d.rejectionCount do
+      local p = d.rejectionSamplePositions[i]
+      local s = 0.6
+      render.debugLine(p + vec3(-s,0,-s), p + vec3(s,0,s), rgbm(1,0,0,1))
+      render.debugLine(p + vec3(-s,0, s), p + vec3(s,0,-s), rgbm(1,0,0,1))
+      local clr = d.rejectionClearances[i]
       if clr then
-        local txt = (clr < 0) 
-                    and string.format("Collision (%.2fm overlap)", -clr) 
-                    or string.format("clearance %.2f m", clr)
-        render.debugText(p + vec3(0, 0.3, 0), txt)
+        render.debugText(p + vec3(0,0.3,0), clr < 0 and string.format("Collision (%.2fm overlap)", -clr) or string.format("clearance %.2f m", clr))
       end
     end
   end
 
-  -- Draw all candidate paths (thin green lines and sample points)
-  if data.candidateCount > 0 then
-    local drawnCount = 0
-    for ci = 1, data.candidateCount do
-      local sIdx = data.candidateStartIndices[ci]
-      local eIdx = data.candidateEndIndices[ci]
-      -- Draw line segments connecting successive sample points along this candidate path
+  if d.candidateCount > 0 then
+    local drawn = 0
+    for ci = 1, d.candidateCount do
+      local sIdx, eIdx = d.candidateStartIndices[ci], d.candidateEndIndices[ci]
       for j = sIdx, eIdx - 1 do
-        render.debugLine(data.sampleWorldPositions[j], data.sampleWorldPositions[j + 1], colAll)
+        render.debugLine(d.sampleWorldPositions[j], d.sampleWorldPositions[j + 1], colAll)
       end
       if drawSamplesAsSpheres then
-        -- Draw each sample point as a small sphere colored by clearance (red = very close, orange = moderately close, green = safe)
         for j = sIdx, eIdx do
-          local clr = data.sampleClearances[j]
-          local color = (clr <= 0.5) and rgbm(1, 0.1, 0.1, 0.9)        -- clearance <= 0.5m: red (high danger)
-                       or (clr <= 2.0) and rgbm(1, 0.8, 0.1, 0.9)     -- clearance <= 2m: orange (moderate)
-                       or rgbm(0.2, 1.0, 0.2, 0.9)                    -- clearance > 2m: green (safe)
-          render.debugSphere(data.sampleWorldPositions[j], 0.12, color)
+          local clr = d.sampleClearances[j]
+          local c = (clr <= 0.5 and rgbm(1,0.1,0.1,0.9)) or (clr <= 2.0 and rgbm(1,0.8,0.1,0.9)) or rgbm(0.2,1.0,0.2,0.9)
+          render.debugSphere(d.sampleWorldPositions[j], 0.12, c)
         end
       end
-      drawnCount = drawnCount + 1
-      if drawnCount >= debugMaxPathsDrawn then 
-        break  -- stop drawing if too many paths
-      end
+      drawn = drawn + 1
+      if drawn >= debugMaxPathsDrawn then break end
     end
 
-    -- Determine which candidate was chosen as best (same logic as in the solver)
-    local bestIdx = 1
-    local bestCost = data.candidateCosts[1]
-    for ci = 2, data.candidateCount do
-      local cost = data.candidateCosts[ci]
-      if cost < bestCost then 
-        bestIdx = ci 
-        bestCost = cost 
-      end
+    local bestIdx, bestCost = 1, d.candidateCosts[1]
+    for ci = 2, d.candidateCount do
+      local c = d.candidateCosts[ci]; if c < bestCost then bestIdx, bestCost = ci, c end
     end
 
-    -- Draw the chosen path in a thicker highlighted style (triple purple lines)
-    local bestStart = data.candidateStartIndices[bestIdx]
-    local bestEnd = data.candidateEndIndices[bestIdx]
-    for j = bestStart, bestEnd - 1 do
-      render.debugLine(data.sampleWorldPositions[j],     data.sampleWorldPositions[j + 1],     colChosen)
-      render.debugLine(data.sampleWorldPositions[j] + vec3(0, 0.01, 0), data.sampleWorldPositions[j + 1] + vec3(0, 0.01, 0), colChosen)
-      render.debugLine(data.sampleWorldPositions[j] + vec3(0, 0.02, 0), data.sampleWorldPositions[j + 1] + vec3(0, 0.02, 0), colChosen)
+    local sIdx, eIdx = d.candidateStartIndices[bestIdx], d.candidateEndIndices[bestIdx]
+    for j = sIdx, eIdx - 1 do
+      render.debugLine(d.sampleWorldPositions[j], d.sampleWorldPositions[j+1], colChosen)
+      render.debugLine(d.sampleWorldPositions[j]+vec3(0,0.01,0), d.sampleWorldPositions[j+1]+vec3(0,0.01,0), colChosen)
+      render.debugLine(d.sampleWorldPositions[j]+vec3(0,0.02,0), d.sampleWorldPositions[j+1]+vec3(0,0.02,0), colChosen)
     end
 
-    -- Highlight the second sample of the chosen path (the immediate steering target) with a larger sphere
-    local headIndex = data.sampleWorldPositions[ math.min(bestStart + 2, bestEnd) ]
-    if headIndex then 
-      render.debugSphere(headIndex, 0.20, colChosen) 
+    local head = d.sampleWorldPositions[math.min(sIdx + 2, eIdx)]
+    if head then render.debugSphere(head, 0.20, colChosen) end
+
+    local mid = d.sampleWorldPositions[math.floor((sIdx + eIdx) * 0.5)]
+    if mid then
+      local label = string.format("CHOSEN car=%d idx=%d  cost=%.2f  minClr=%.2f m  targetN=%.2f  T=%.2fs",
+        carIndex, bestIdx, d.candidateCosts[bestIdx], d.candidateMinClearances[bestIdx],
+        d.candidateTerminalOffsetsN[bestIdx], d.candidateDurationsSeconds[bestIdx])
+      render.debugText(mid + vec3(0,0.4,0), label)
     end
 
-    -- Label the chosen path with its index, cost, minimum clearance, terminal offset, and duration
-    local midIndex = data.sampleWorldPositions[ math.floor((bestStart + bestEnd) * 0.5) ]
-    if midIndex then
-      local label = string.format(
-        "CHOSEN car=%d idx=%d  cost=%.2f  minClr=%.2f m  targetN=%.2f  T=%.2fs",
-        carIndex, bestIdx, data.candidateCosts[bestIdx], data.candidateMinClearances[bestIdx],
-        data.candidateTerminalOffsetsN[bestIdx], data.candidateDurationsSeconds[bestIdx]
-      )
-      render.debugText(midIndex + vec3(0, 0.4, 0), label)
-    end
-
-    -- Draw a line from the ego car to the first forward sample of the chosen path (visualize steering direction)
     if drawAnchorLink then
-      local egoCar = ac.getCar(carIndex)
-      if egoCar and (bestStart + 1) <= bestEnd then
-        render.debugLine(egoCar.position, data.sampleWorldPositions[bestStart + 1], rgbm(1, 1, 1, 0.9))
+      local ego = ac.getCar(carIndex)
+      if ego and (sIdx + 1) <= eIdx then
+        render.debugLine(ego.position, d.sampleWorldPositions[sIdx + 1], rgbm(1,1,1,0.9))
       end
     end
   end
 
-  -- Draw vertical poles indicating the last commanded offset vs the car's actual offset (after physics applied)
-  local egoCar = ac.getCar(carIndex)
-  if egoCar then
-    local trackCoord = ac.worldCoordinateToTrack(egoCar.position)
-    data.lastActualOffsetNormalized = trackCoord.x
-    data.lastEgoTrackProgress = trackCoord.z
+  local ego = ac.getCar(carIndex)
+  if ego then
+    local tc = ac.worldCoordinateToTrack(ego.position)
+    d.lastActualOffsetNormalized = tc.x
+    d.lastEgoTrackProgress = tc.z
 
     if drawReturnedOffsetPole then
-      -- Magenta/cyan pole for commanded offset (the output we gave to the physics engine)
-      local commandedPos = ac.trackCoordinateToWorld(vec3(data.lastOutputOffsetNormalized, 0.0, data.lastEgoTrackProgress))
-      render.debugLine(commandedPos + vec3(0, 0.00, 0), commandedPos + vec3(0, 1.2, 0), colPoleCmd)
-      render.debugSphere(commandedPos + vec3(0, 1.2, 0), 0.10, colPoleCmd)
-      render.debugText(commandedPos + vec3(0, 1.35, 0), string.format("cmd outN=%.3f", data.lastOutputOffsetNormalized))
+      local cmdPos = ac.trackCoordinateToWorld(vec3(d.lastOutputOffsetNormalized, 0.0, d.lastEgoTrackProgress))
+      render.debugLine(ego.position, cmdPos, colPoleCmd)
     end
-
     if drawActualOffsetPole then
-      -- Yellow pole for actual offset (what the physics actually applied, may differ due to AI control limits)
-      local actualPos = ac.trackCoordinateToWorld(vec3(data.lastActualOffsetNormalized, 0.0, data.lastEgoTrackProgress))
-      render.debugLine(actualPos + vec3(0, 0.00, 0), actualPos + vec3(0, 1.2, 0), colPoleAct)
-      render.debugSphere(actualPos + vec3(0, 1.2, 0), 0.10, colPoleAct)
-      render.debugText(actualPos + vec3(0, 1.35, 0), string.format("act xN=%.3f", data.lastActualOffsetNormalized))
-
-      -- Log a warning if there's a significant discrepancy between commanded and actual (e.g., controller override or too low slew rate)
-      local dN = math.abs(data.lastOutputOffsetNormalized - data.lastActualOffsetNormalized)
+      local actPos = ac.trackCoordinateToWorld(vec3(d.lastActualOffsetNormalized, 0.0, d.lastEgoTrackProgress))
+      render.debugLine(ego.position, actPos, colPoleAct)
+      local dN = math.abs(d.lastOutputOffsetNormalized - d.lastActualOffsetNormalized)
       if dN > auditWarnDeltaN then
-        Logger.warn(string.format(
-          "[AUDIT] car=%d  outN(cmd)=%.3f  actN=%.3f  Δ=%.3f  (controller overriding? slew too low?)",
-          carIndex, data.lastOutputOffsetNormalized, data.lastActualOffsetNormalized, dN
-        ))
+        if LOG_MESSAGE then Logger.warn(string.format("[AUDIT] car=%d  outN(cmd)=%.3f  actN=%.3f  Δ=%.3f", carIndex, d.lastOutputOffsetNormalized, d.lastActualOffsetNormalized, dN)) end
       else
-        Logger.log(string.format(
-          "[AUDIT] car=%d  outN≈actN  cmd=%.3f act=%.3f Δ=%.3f",
-          carIndex, data.lastOutputOffsetNormalized, data.lastActualOffsetNormalized, dN
-        ))
+        if LOG_MESSAGE then Logger.log(string.format("[AUDIT] car=%d  outN≈actN  cmd=%.3f act=%.3f Δ=%.3f", carIndex, d.lastOutputOffsetNormalized, d.lastActualOffsetNormalized, dN)) end
       end
     end
   end
