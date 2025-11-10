@@ -86,43 +86,62 @@ local navigation_opponentsIndex = {}
 ---@type table<integer,table<integer,vec3>>     -- per-car array of opponent positions
 local navigation_opponentsPos = {}
 
----@type table<integer,table<integer,number>>   -- per-car array of 5 offsets
-local navigation_pathOffsetN = {}
+-- OFFSETS ARE MODULE-WIDE (not per-car) so you can expand/reduce them without extra memory per car.
+-- Modify this list to add/remove paths. All code below adapts automatically.
+---@type table<integer,number>
+local navigation_pathOffsetN = { -1.0, -0.5, 0.0, 0.5, 1.0 }
 
----@type table<integer,table<integer,integer>>  -- per-car array of 5 counts
+---@type table<integer,table<integer,integer>>  -- per-car array of counts per path
 local navigation_pathCount = {}
 
----@type table<integer,table<integer,boolean>>  -- per-car array of 5 blocked flags
+---@type table<integer,table<integer,boolean>>  -- per-car array of blocked flags per path
 local navigation_pathBlocked = {}
 
----@type table<integer,table<integer,integer|nil>> -- per-car array of 5 hit sample indices
+---@type table<integer,table<integer,integer|nil>> -- per-car array of hit sample indices per path
 local navigation_pathHitIndex = {}
 
----@type table<integer,table<integer,integer|nil>> -- per-car array of 5 hit opponent indices
+---@type table<integer,table<integer,integer|nil>> -- per-car array of hit opponent indices per path
 local navigation_pathHitOpponentIndex = {}
 
----@type table<integer,table<integer,vec3|nil>> -- per-car array of 5 hit world positions
+---@type table<integer,table<integer,vec3|nil>> -- per-car array of hit world positions per path
 local navigation_pathHitWorld = {}
 
----@type table<integer,table<integer,table>>    -- per-car array of 5 lists of sampled points
+---@type table<integer,table<integer,table>>    -- per-car array of lists of sampled points per path
 local navigation_pathPoints = {}
 
--- Ensure per-car arrays exist (no allocations in hot loops besides point lists reuse).
+-- Ensure per-car arrays exist and match the number of configured paths.
 local function ensureCarArrays(carIndex)
-  if navigation_pathOffsetN[carIndex] then return end
-  navigation_pathOffsetN[carIndex] = { -1.0, -0.5, 0.0, 0.5, 1.0 }
-  navigation_pathCount[carIndex] = { 0, 0, 0, 0, 0 }
-  navigation_pathBlocked[carIndex] = { false, false, false, false, false }
-  navigation_pathHitIndex[carIndex] = { nil, nil, nil, nil, nil }
-  navigation_pathHitOpponentIndex[carIndex] = { nil, nil, nil, nil, nil }
-  navigation_pathHitWorld[carIndex] = { nil, nil, nil, nil, nil }
-  navigation_pathPoints[carIndex] = { {}, {}, {}, {}, {} }
+  local needed = #navigation_pathOffsetN
+
+  local counts = navigation_pathCount[carIndex]
+  if not counts or #counts ~= needed then
+    counts = {}
+    local blocked, hitIdx, hitOpp, hitPos, points = {}, {}, {}, {}, {}
+    for i = 1, needed do
+      counts[i] = 0
+      blocked[i] = false
+      hitIdx[i] = nil
+      hitOpp[i] = nil
+      hitPos[i] = nil
+      points[i] = {}
+    end
+    navigation_pathCount[carIndex] = counts
+    navigation_pathBlocked[carIndex] = blocked
+    navigation_pathHitIndex[carIndex] = hitIdx
+    navigation_pathHitOpponentIndex[carIndex] = hitOpp
+    navigation_pathHitWorld[carIndex] = hitPos
+    navigation_pathPoints[carIndex] = points
+  end
 
   navigation_anchorText[carIndex] = navigation_anchorText[carIndex] or ""
   navigation_opponentsIndex[carIndex] = navigation_opponentsIndex[carIndex] or {}
   navigation_opponentsPos[carIndex] = navigation_opponentsPos[carIndex] or {}
-  navigation_opponentsCount[carIndex] = 0
-  navigation_lastChosenPathIndex[carIndex] = navigation_lastChosenPathIndex[carIndex] or nil
+  navigation_opponentsCount[carIndex] = navigation_opponentsCount[carIndex] or 0
+  -- keep sticky index if present; if it exceeds path count after a config change, drop it
+  local lastIdx = navigation_lastChosenPathIndex[carIndex]
+  if lastIdx and (lastIdx < 1 or lastIdx > needed) then
+    navigation_lastChosenPathIndex[carIndex] = nil
+  end
 end
 
 -- Small utility: build a tiny list of opponent positions for cheap checks this frame.
@@ -145,7 +164,7 @@ local function collectOpponents(carIndex)
   return count
 end
 
--- Public: build five simple paths radiating from the front of the car to lateral targets.
+-- Public: build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
 function Pathfinding.calculatePath(carIndex)
   local car = ac.getCar(carIndex)
@@ -181,8 +200,8 @@ function Pathfinding.calculatePath(carIndex)
   local splitReachProgress = metersToProgress(splitReachMeters)
   local invSplitReachProgress = (splitReachProgress > 0.0) and (1.0 / splitReachProgress) or 1e9
 
-  -- Generate the five paths.
-  local offsets = navigation_pathOffsetN[carIndex]
+  -- Generate paths (count adapts to navigation_pathOffsetN length).
+  local offsets = navigation_pathOffsetN
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   local hitIdx  = navigation_pathHitIndex[carIndex]
@@ -249,7 +268,7 @@ function Pathfinding.calculatePath(carIndex)
   end
 end
 
--- Public: draw the five paths like in the sketch: a fan from the car front with labels.
+-- Public: draw the paths like in the sketch: a fan from the car front with labels.
 function Pathfinding.drawPaths(carIndex)
   local anchorWorld = navigation_anchorWorld[carIndex]
   if not anchorWorld then return end
@@ -270,7 +289,7 @@ function Pathfinding.drawPaths(carIndex)
   -- Draw each path:
   --   • Clear path → thin green polyline.
   --   • Blocked path → red polyline and a highlighted sphere at the first hit sample.
-  local offsets = navigation_pathOffsetN[carIndex]
+  local offsets = navigation_pathOffsetN
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   local hitIdx  = navigation_pathHitIndex[carIndex]
@@ -298,7 +317,7 @@ function Pathfinding.drawPaths(carIndex)
       -- End label with the associated normalized offset value (+ blocked flag)
       local endPos = pts[cnt]
       if endPos then
-        local label = string.format("%.1f", offsets[p])
+        local label = string.format("%.2f", offsets[p])
         if blocked[p] then label = label .. " (blocked)" end
         render.debugText(endPos + vec3(0, 0.30, 0), label, colLabel)
 
@@ -325,17 +344,26 @@ function Pathfinding.drawPaths(carIndex)
 end
 
 -- Public: return the lateral offset (normalized) associated with the “best” path for a car.
--- “Best” here = first clear path by simple preference order (0, +0.5, -0.5, +1, -1).
+-- “Best” here = first clear path by preference (center-most first, then bias to right on ties).
 -- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
--- If all five are blocked, returns the one that gets the furthest before the first hit.
+-- If all paths are blocked, returns the one that gets the furthest before the first hit.
 function Pathfinding.getBestLateralOffset(carIndex)
   ensureCarArrays(carIndex)
 
-  local offsets = navigation_pathOffsetN[carIndex]
+  local offsets = navigation_pathOffsetN
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
 
-  -- If all paths are present and NONE are blocked, default to center (offset 0).
+  -- Compute dynamic “center” index (closest to 0, prefer positive on tie).
+  local centerIdx, minAbs = 1, math.huge
+  for i = 1, #offsets do
+    local a = math.abs(offsets[i])
+    if a < minAbs or (a == minAbs and offsets[i] > offsets[centerIdx]) then
+      centerIdx, minAbs = i, a
+    end
+  end
+
+  -- If all paths are present and NONE are blocked, default to center path.
   do
     local haveAll, allClear = true, true
     for i = 1, #offsets do
@@ -343,9 +371,9 @@ function Pathfinding.getBestLateralOffset(carIndex)
       if blocked[i] then allClear = false break end
     end
     if haveAll and allClear then
-      navigation_lastChosenPathIndex[carIndex] = 3  -- center path index
-      log("[PF] bestOffset car=%d all-clear -> center n=%.2f", carIndex, offsets[3])
-      return offsets[3]
+      navigation_lastChosenPathIndex[carIndex] = centerIdx
+      log("[PF] bestOffset car=%d all-clear -> center idx=%d n=%.2f", carIndex, centerIdx, offsets[centerIdx])
+      return offsets[centerIdx]
     end
   end
 
@@ -356,13 +384,17 @@ function Pathfinding.getBestLateralOffset(carIndex)
     return offsets[lastIdx]
   end
 
-  -- Preference over the five stored paths:
-  -- offsets = { -1.0, -0.5, 0.0, +0.5, +1.0 }
-  -- prefer center, then slight right, slight left, full right, full left
-  local preference = { 3, 4, 2, 5, 1 }
+  -- Build dynamic preference order:
+  -- sort indices by |offset| ascending, and for equal |offset| prefer positive over negative.
+  local pref = {}
+  for i = 1, #offsets do pref[i] = i end
+  table.sort(pref, function(a, b)
+    local aa, bb = math.abs(offsets[a]), math.abs(offsets[b])
+    if aa == bb then return offsets[a] > offsets[b] else return aa < bb end
+  end)
 
   -- First, try to pick the first CLEAR path by preference.
-  for _, idx in ipairs(preference) do
+  for _, idx in ipairs(pref) do
     if counts[idx] and counts[idx] > 0 and not blocked[idx] then
       navigation_lastChosenPathIndex[carIndex] = idx
       log("[PF] bestOffset car=%d clear path idx=%d -> n=%.2f", carIndex, idx, offsets[idx])
