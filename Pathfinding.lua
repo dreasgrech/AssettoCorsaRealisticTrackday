@@ -1,9 +1,9 @@
 -- Pathfinding.lua
 -- Minimal, easy-to-read path sketcher.
--- It builds five simple “fan” paths from the front of a car to target lateral offsets
--- normalized to the track width: {-1, -0.5, 0, +0.5, +1}.
--- Now with a very lightweight collider check against other cars:
---   • Each sampled point along a path is checked against cached opponent positions.
+-- It builds simple “fan” paths from the front of a car to target lateral offsets
+-- normalized to the track width (configured below).
+-- Lightweight collider check against other cars:
+--   • Each sampled point along a path is checked against cars AHEAD from a sorted list you pass in.
 --   • If any sample comes closer than a simple combined radius, the path is marked “blocked”.
 -- Visualization reflects this state (green = clear, red = blocked).
 --
@@ -42,7 +42,6 @@ local colPoint       = rgbm(0.35, 1.00, 0.35, 0.95)   -- green spheres on sample
 local colPointHit    = rgbm(1.00, 0.40, 0.20, 1.00)   -- orange/red sphere to mark the hit sample
 local colLabel       = rgbm(1.00, 1.00, 1.00, 0.95)   -- white text
 local colAnchor      = rgbm(0.10, 0.90, 1.00, 0.95)   -- cyan anchor marker
-local colOpponent    = rgbm(1.00, 0.30, 0.30, 0.55)   -- faint red disc for opponent markers
 
 -- Helper: wrap track progress into [0..1].
 local function wrap01(z)
@@ -77,19 +76,10 @@ local navigation_anchorWorld = {}
 ---@type table<integer,integer|nil>
 local navigation_lastChosenPathIndex = {}
 
----@type table<integer,integer>
-local navigation_opponentsCount = {}
-
----@type table<integer,table<integer,integer>>  -- per-car array of opponent indices
-local navigation_opponentsIndex = {}
-
----@type table<integer,table<integer,vec3>>     -- per-car array of opponent positions
-local navigation_opponentsPos = {}
-
 -- OFFSETS ARE MODULE-WIDE (not per-car) so you can expand/reduce them without extra memory per car.
 -- Modify this list to add/remove paths. All code below adapts automatically.
 ---@type table<integer,number>
-local navigation_pathOffsetN = { -1.0, -0.5, 0.0, 0.5, 1.0 }
+local navigation_pathOffsetN = { -1.0, -0.75, -0.5, 0.0, 0.5, 0.75, 1.0 }
 
 ---@type table<integer,table<integer,integer>>  -- per-car array of counts per path
 local navigation_pathCount = {}
@@ -134,9 +124,6 @@ local function ensureCarArrays(carIndex)
   end
 
   navigation_anchorText[carIndex] = navigation_anchorText[carIndex] or ""
-  navigation_opponentsIndex[carIndex] = navigation_opponentsIndex[carIndex] or {}
-  navigation_opponentsPos[carIndex] = navigation_opponentsPos[carIndex] or {}
-  navigation_opponentsCount[carIndex] = navigation_opponentsCount[carIndex] or 0
   -- keep sticky index if present; if it exceeds path count after a config change, drop it
   local lastIdx = navigation_lastChosenPathIndex[carIndex]
   if lastIdx and (lastIdx < 1 or lastIdx > needed) then
@@ -144,32 +131,15 @@ local function ensureCarArrays(carIndex)
   end
 end
 
--- Small utility: build a tiny list of opponent positions for cheap checks this frame.
--- We only cache the world position and index; nothing else is needed for this step.
-local function collectOpponents(carIndex)
-  local idxList = navigation_opponentsIndex[carIndex]
-  local posList = navigation_opponentsPos[carIndex]
-  local count = 0
-  for _, c in ac.iterateCars() do
-    if c and c.index ~= carIndex then
-      count = count + 1
-      idxList[count] = c.index
-      posList[count] = c.position
-    end
-  end
-  -- trim leftovers
-  for i = count + 1, #idxList do idxList[i] = nil end
-  for i = count + 1, #posList do posList[i] = nil end
-  navigation_opponentsCount[carIndex] = count
-  return count
-end
-
 -- Public: build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
-function Pathfinding.calculatePath(carIndex)
-  local car = ac.getCar(carIndex)
-  if not car or not ac.hasTrackSpline() then return end
+-- NOTE: We no longer gather opponents ourselves. Pass in the globally prepared sorted list.
+--       The list is sorted so that index-1 is the car in front, index+1 is behind.
+function Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
+  local car = sortedCarsList[sortedCarsListIndex]
+  if not car then return end
 
+  local carIndex = car.index
   ensureCarArrays(carIndex)
 
   -- Project car to track space once.
@@ -187,9 +157,6 @@ function Pathfinding.calculatePath(carIndex)
 
   navigation_anchorWorld[carIndex] = anchorWorld
   navigation_anchorText[carIndex]  = string.format("z=%.4f  n=%.3f  v=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
-
-  -- Cache opponents for this frame once (positions only).
-  collectOpponents(carIndex)
 
   -- Precompute step sizes.
   local totalForwardProgress = metersToProgress(forwardDistanceMeters)
@@ -209,9 +176,9 @@ function Pathfinding.calculatePath(carIndex)
   local hitPos  = navigation_pathHitWorld[carIndex]
   local points  = navigation_pathPoints[carIndex]
 
-  local oppCount = navigation_opponentsCount[carIndex]
-  local oppPos   = navigation_opponentsPos[carIndex]
-  local oppIdx   = navigation_opponentsIndex[carIndex]
+  -- For minimal work, only consider cars AHEAD of the current one in the sorted list.
+  -- (sortedCarsListIndex-1 down to 1). Cars behind can’t block our forward samples.
+  local firstAheadIndex = (sortedCarsListIndex or 2) - 1
 
   for p = 1, #offsets do
     local targetOffsetN = math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, offsets[p]))
@@ -243,20 +210,28 @@ function Pathfinding.calculatePath(carIndex)
       pts[counts[p]] = world
 
       -- --- Minimal collider detection (only what’s needed) -------------------
-      if (not blocked[p]) and oppCount > 0 then
+      if not blocked[p] and firstAheadIndex >= 1 then
         local wx, wy, wz = world.x, world.y, world.z
-        for oi = 1, oppCount do
-          local op = oppPos[oi]
-          local dx = op.x - wx
-          local dy = op.y - wy
-          local dz = op.z - wz
-          local d2 = dx*dx + dy*dy + dz*dz
-          if d2 <= combinedCollisionRadius2 then
-            blocked[p] = true
-            hitIdx[p] = i
-            hitPos[p] = world
-            hitOpp[p] = oppIdx[oi]
-            break
+
+        -- Check cars in front only; early-exit on first hit.
+        for idx = firstAheadIndex, 1, -1 do
+          local opp = sortedCarsList[idx]
+          -- Defensive: ensure object exists and is not self.
+          if opp and opp.index ~= carIndex then
+            local op = opp.position
+            -- Quick distance gate to skip far-away cars (using world space).
+            -- We don’t need a super-precise gate here; this is just to avoid most checks.
+            local dx = op.x - wx
+            local dy = op.y - wy
+            local dz = op.z - wz
+            local d2 = dx*dx + dy*dy + dz*dz
+            if d2 <= combinedCollisionRadius2 then
+              blocked[p] = true
+              hitIdx[p] = i
+              hitPos[p] = world
+              hitOpp[p] = opp.index
+              break
+            end
           end
         end
       end
@@ -276,15 +251,6 @@ function Pathfinding.drawPaths(carIndex)
   -- Draw anchor (small pole and label).
   render.debugSphere(anchorWorld, 0.12, colAnchor)
   render.debugText(anchorWorld + vec3(0, 0.35, 0), navigation_anchorText[carIndex])
-
-  -- Optionally show opponent discs we cached (very faint; helps to reason about hits).
-  local oppCount = navigation_opponentsCount[carIndex] or 0
-  local oppPos   = navigation_opponentsPos[carIndex]
-  if oppCount > 0 and oppPos then
-    for i = 1, oppCount do
-      render.debugSphere(oppPos[i], approxCarRadiusMeters, colOpponent)
-    end
-  end
 
   -- Draw each path:
   --   • Clear path → thin green polyline.
