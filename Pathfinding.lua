@@ -67,6 +67,11 @@ end
 -- Data-oriented containers
 -- =========================
 
+-- PATHS ARE MODULE-WIDE (not per-car) so you can expand/reduce them without extra memory per car.
+-- Modify this list to add/remove paths. All code below adapts automatically.
+---@type table<integer,number>
+local PATHS = { -1.0, -0.75, -0.5, 0.0, 0.5, 0.75, 1.0 }
+
 ---@type table<integer,string>
 local navigation_anchorText = {}
 
@@ -75,11 +80,6 @@ local navigation_anchorWorld = {}
 
 ---@type table<integer,integer|nil>
 local navigation_lastChosenPathIndex = {}
-
--- OFFSETS ARE MODULE-WIDE (not per-car) so you can expand/reduce them without extra memory per car.
--- Modify this list to add/remove paths. All code below adapts automatically.
----@type table<integer,number>
-local navigation_pathOffsetN = { -1.0, -0.75, -0.5, 0.0, 0.5, 0.75, 1.0 }
 
 ---@type table<integer,table<integer,integer>>  -- per-car array of counts per path
 local navigation_pathCount = {}
@@ -101,7 +101,7 @@ local navigation_pathPoints = {}
 
 -- Ensure per-car arrays exist and match the number of configured paths.
 local function ensureCarArrays(carIndex)
-  local needed = #navigation_pathOffsetN
+  local needed = #PATHS
 
   local counts = navigation_pathCount[carIndex]
   if not counts or #counts ~= needed then
@@ -168,7 +168,7 @@ function Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
   local invSplitReachProgress = (splitReachProgress > 0.0) and (1.0 / splitReachProgress) or 1e9
 
   -- Generate paths (count adapts to navigation_pathOffsetN length).
-  local offsets = navigation_pathOffsetN
+  local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   local hitIdx  = navigation_pathHitIndex[carIndex]
@@ -255,7 +255,7 @@ function Pathfinding.drawPaths(carIndex)
   -- Draw each path:
   --   • Clear path → thin green polyline.
   --   • Blocked path → red polyline and a highlighted sphere at the first hit sample.
-  local offsets = navigation_pathOffsetN
+  local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   local hitIdx  = navigation_pathHitIndex[carIndex]
@@ -316,7 +316,7 @@ end
 function Pathfinding.getBestLateralOffset(carIndex)
   ensureCarArrays(carIndex)
 
-  local offsets = navigation_pathOffsetN
+  local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
 
