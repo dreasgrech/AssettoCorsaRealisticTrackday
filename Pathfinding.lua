@@ -33,7 +33,7 @@ end
 
 -- Helper: meters → approximate progress fraction (fallback constant length).
 -- If you have your real track length handy, you can set it here from outside later.
-local nominalTrackLengthMeters = 20000.0
+local nominalTrackLengthMeters = RaceTrackManager.getTrackLengthMeters()
 local function metersToProgress(meters)
   return meters / nominalTrackLengthMeters
 end
