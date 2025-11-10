@@ -276,6 +276,22 @@ function Pathfinding.getBestLateralOffset(carIndex)
   local store = perCar[carIndex]
   if not store then return nil end
 
+  -- NEW: if all paths are present and NONE are blocked, default to center (offset 0).
+  do
+    local haveAll, allClear = true, true
+    for i = 1, #store.paths do
+      local p = store.paths[i]
+      if not (p and p.count > 0) then haveAll = false break end
+      if p.blocked then allClear = false break end
+    end
+    if haveAll and allClear then
+      store.lastChosenPathIndex = 3  -- center path index
+      local center = store.paths[3]
+      log("[PF] bestOffset car=%d all-clear -> center n=%.2f", carIndex, center.offsetN)
+      return center.offsetN
+    end
+  end
+
   -- 0) Sticky choice: if last chosen path still exists and is not blocked, keep it.
   local lastIdx = store.lastChosenPathIndex
   if lastIdx then
