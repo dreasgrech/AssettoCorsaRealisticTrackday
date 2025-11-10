@@ -40,6 +40,13 @@ local combinedCollisionRadius2 = combinedCollisionRadius * combinedCollisionRadi
 local extraPathSafetyMeters   = 1.0
 local combinedCollisionRadius2Planar = (combinedCollisionRadius + extraPathSafetyMeters) ^ 2
 
+-- Tiny temporal hysteresis to avoid frame-to-frame flicker:
+-- accumulate a score per path that rises fast on hit and decays slowly when clear.
+-- A path is considered blocked while score ≥ blockedThreshold.
+local blockedRisePerFrame     = 0.60   -- how much to add when a hit is detected this frame
+local blockedFallPerFrame     = 0.20   -- how much to subtract when this frame is clear
+local blockedThreshold        = 0.60   -- visualization/selection uses this threshold
+
 -- Colors for drawing.
 local colLineClear   = rgbm(0.30, 0.95, 0.30, 0.35)   -- light green for clear paths
 local colLineBlocked = rgbm(1.00, 0.20, 0.20, 0.55)   -- red for blocked paths
@@ -89,7 +96,7 @@ local navigation_lastChosenPathIndex = {}
 ---@type table<integer,table<integer,integer>>  -- per-car array of counts per path
 local navigation_pathCount = {}
 
----@type table<integer,table<integer,boolean>>  -- per-car array of blocked flags per path
+---@type table<integer,table<integer,boolean>>  -- per-car array of blocked flags per path (derived from score)
 local navigation_pathBlocked = {}
 
 ---@type table<integer,table<integer,integer|nil>> -- per-car array of hit sample indices per path
@@ -104,6 +111,10 @@ local navigation_pathHitWorld = {}
 ---@type table<integer,table<integer,table>>    -- per-car array of lists of sampled points per path
 local navigation_pathPoints = {}
 
+-- New: per-car per-path accumulated block score to reduce flicker.
+---@type table<integer,table<integer,number>>
+local navigation_pathBlockedScore = {}
+
 -- Ensure per-car arrays exist and match the number of configured paths.
 local function ensureCarArrays(carIndex)
   local needed = #PATHS
@@ -111,7 +122,7 @@ local function ensureCarArrays(carIndex)
   local counts = navigation_pathCount[carIndex]
   if not counts or #counts ~= needed then
     counts = {}
-    local blocked, hitIdx, hitOpp, hitPos, points = {}, {}, {}, {}, {}
+    local blocked, hitIdx, hitOpp, hitPos, points, score = {}, {}, {}, {}, {}, {}
     for i = 1, needed do
       counts[i] = 0
       blocked[i] = false
@@ -119,6 +130,7 @@ local function ensureCarArrays(carIndex)
       hitOpp[i] = nil
       hitPos[i] = nil
       points[i] = {}
+      score[i] = 0.0
     end
     navigation_pathCount[carIndex] = counts
     navigation_pathBlocked[carIndex] = blocked
@@ -126,6 +138,7 @@ local function ensureCarArrays(carIndex)
     navigation_pathHitOpponentIndex[carIndex] = hitOpp
     navigation_pathHitWorld[carIndex] = hitPos
     navigation_pathPoints[carIndex] = points
+    navigation_pathBlockedScore[carIndex] = score
   end
 
   navigation_anchorText[carIndex] = navigation_anchorText[carIndex] or ""
@@ -206,6 +219,7 @@ function Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
   local hitOpp  = navigation_pathHitOpponentIndex[carIndex]
   local hitPos  = navigation_pathHitWorld[carIndex]
   local points  = navigation_pathPoints[carIndex]
+  local score   = navigation_pathBlockedScore[carIndex]
 
   for p = 1, #offsets do
     local targetOffsetN = math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, offsets[p]))
@@ -223,6 +237,8 @@ function Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
     -- we hit the target offset by `splitReachMeters` (using an ease-out curve).
     counts[p] = 1
     pts[1] = anchorWorld
+
+    local hitThisFrame = false
 
     for i = 2, stepCount do
       local progressDelta = (i - 1) * stepZ
@@ -253,6 +269,7 @@ function Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
             local d2 = dx*dx + dz*dz
             if d2 <= combinedCollisionRadius2Planar then
               blocked[p] = true
+              hitThisFrame = true
               hitIdx[p] = i
               hitPos[p] = world
               hitOpp[p] = aheadOpp[oi].index
@@ -262,10 +279,23 @@ function Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
         end
       end
       -- ----------------------------------------------------------------------
+
+      -- Small optimization: once blocked, further samples are not needed for this path.
+      if blocked[p] then break end
     end
 
-    log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s",
-      carIndex, p, targetOffsetN, counts[p], tostring(blocked[p]))
+    -- Update temporal hysteresis score and derive final blocked flag.
+    local s = score[p] or 0.0
+    if hitThisFrame then
+      s = math.min(1.0, s + blockedRisePerFrame)
+    else
+      s = math.max(0.0, s - blockedFallPerFrame)
+    end
+    score[p] = s
+    blocked[p] = (s >= blockedThreshold)
+
+    log("[PF] car=%d path[%d] targetN=%.2f samples=%d blockedNow=%s score=%.2f",
+      carIndex, p, targetOffsetN, counts[p], tostring(blocked[p]), s)
   end
 end
 
@@ -288,6 +318,7 @@ function Pathfinding.drawPaths(carIndex)
   local hitOpp  = navigation_pathHitOpponentIndex[carIndex]
   local hitPos  = navigation_pathHitWorld[carIndex]
   local points  = navigation_pathPoints[carIndex]
+  local score   = navigation_pathBlockedScore[carIndex]
 
   for p = 1, #offsets do
     local cnt = counts[p]
@@ -310,7 +341,12 @@ function Pathfinding.drawPaths(carIndex)
       local endPos = pts[cnt]
       if endPos then
         local label = string.format("%.2f", offsets[p])
-        if blocked[p] then label = label .. " (blocked)" end
+        if blocked[p] then
+          label = label .. " (blocked)"
+        else
+          -- show score lightly to help debugging flicker sources without log spam
+          label = label .. string.format(" s=%.2f", score and score[p] or 0)
+        end
         render.debugText(endPos + vec3(0, 0.30, 0), label, colLabel)
 
         -- Small “arrowhead” cross near the end to make direction obvious
@@ -345,6 +381,7 @@ function Pathfinding.getBestLateralOffset(carIndex)
   local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
+  local score   = navigation_pathBlockedScore[carIndex]
 
   -- Compute dynamic “center” index (closest to 0, prefer positive on tie).
   local centerIdx, minAbs = 1, math.huge
@@ -394,23 +431,24 @@ function Pathfinding.getBestLateralOffset(carIndex)
     end
   end
 
-  -- If everything is blocked, pick the path that goes furthest before the first hit.
+  -- If everything is blocked, pick the path whose score is the smallest (least “confidently” blocked),
+  -- and for equal scores choose the one with the largest number of safe samples.
   local hitIdx  = navigation_pathHitIndex[carIndex]
-  local bestIdx, bestSafeSamples = nil, -1
+  local bestIdx, bestScore, bestSafe = nil, 1e9, -1
   for i = 1, #offsets do
     local cnt = counts[i]
     if cnt and cnt > 0 then
-      local safe = blocked[i] and (hitIdx[i] or 2) or cnt
-      if safe > bestSafeSamples then
-        bestSafeSamples = safe
-        bestIdx = i
+      local s = (score and score[i]) or 1.0
+      local safe = hitIdx[i] and hitIdx[i] or cnt
+      if s < bestScore or (s == bestScore and safe > bestSafe) then
+        bestScore, bestSafe, bestIdx = s, safe, i
       end
     end
   end
   if bestIdx then
     navigation_lastChosenPathIndex[carIndex] = bestIdx
-    log("[PF] bestOffset car=%d fallback idx=%d (safeSamples=%d) -> n=%.2f",
-      carIndex, bestIdx, bestSafeSamples, offsets[bestIdx])
+    log("[PF] bestOffset car=%d fallback idx=%d (score=%.2f safeSamples=%d) -> n=%.2f",
+      carIndex, bestIdx, bestScore, bestSafe, offsets[bestIdx])
     return offsets[bestIdx]
   end
 
