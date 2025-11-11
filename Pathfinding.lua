@@ -99,11 +99,6 @@ local navigation_pathHitWorld = {}
 ---@type table<integer,table<integer,table>>    -- per-car array of lists of sampled points per path
 local navigation_pathPoints = {}
 
--- Minimal addition: avoid rapid switching on one-frame blocking
-local blockedSwitchThresholdFrames = 2
----@type table<integer,integer>
-local navigation_lastIdxBlockedFrames = {}
-
 -- Ensure per-car arrays exist and match the number of configured paths.
 local function ensureCarArrays(carIndex)
   local needed = #PATHS
@@ -134,16 +129,13 @@ local function ensureCarArrays(carIndex)
   if lastIdx and (lastIdx < 1 or lastIdx > needed) then
     navigation_lastChosenPathIndex[carIndex] = nil
   end
-  if navigation_lastIdxBlockedFrames[carIndex] == nil then
-    navigation_lastIdxBlockedFrames[carIndex] = 0
-  end
 end
 
 -- Public: build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
 -- NOTE: We no longer gather opponents ourselves. Pass in the globally prepared sorted list.
 --       The list is sorted so that index-1 is the car in front, index+1 is behind.
-function Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
+local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local car = sortedCarsList[sortedCarsListIndex]
   if not car then return end
 
@@ -321,9 +313,7 @@ end
 -- “Best” here = first clear path by preference (center-most first, then bias to right on ties).
 -- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
 -- If all paths are blocked, returns the one that gets the furthest before the first hit.
-function Pathfinding.getBestLateralOffset(carIndex)
-  ensureCarArrays(carIndex)
-
+local getBestLateralOffset = function(carIndex)
   local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
@@ -346,30 +336,16 @@ function Pathfinding.getBestLateralOffset(carIndex)
     end
     if haveAll and allClear then
       navigation_lastChosenPathIndex[carIndex] = centerIdx
-      navigation_lastIdxBlockedFrames[carIndex] = 0
       log("[PF] bestOffset car=%d all-clear -> center idx=%d n=%.2f", carIndex, centerIdx, offsets[centerIdx])
       return offsets[centerIdx]
     end
   end
 
-  -- Sticky choice with minimal hysteresis:
+  -- Sticky choice: if last chosen path still exists and is not blocked, keep it.
   local lastIdx = navigation_lastChosenPathIndex[carIndex]
-  if lastIdx and counts[lastIdx] and counts[lastIdx] > 0 then
-    local bcf = navigation_lastIdxBlockedFrames[carIndex] or 0
-    if blocked[lastIdx] then
-      bcf = bcf + 1
-    else
-      bcf = 0
-    end
-    navigation_lastIdxBlockedFrames[carIndex] = bcf
-
-    if (not blocked[lastIdx]) or (bcf < blockedSwitchThresholdFrames) then
-      log("[PF] bestOffset car=%d STICK idx=%d (bcf=%d) -> n=%.2f", carIndex, lastIdx, bcf, offsets[lastIdx])
-      return offsets[lastIdx]
-    end
-    -- otherwise fall through and consider switching
-  else
-    navigation_lastIdxBlockedFrames[carIndex] = 0
+  if lastIdx and counts[lastIdx] and counts[lastIdx] > 0 and not blocked[lastIdx] then
+    log("[PF] bestOffset car=%d STICK idx=%d -> n=%.2f", carIndex, lastIdx, offsets[lastIdx])
+    return offsets[lastIdx]
   end
 
   -- Build dynamic preference order:
@@ -385,7 +361,6 @@ function Pathfinding.getBestLateralOffset(carIndex)
   for _, idx in ipairs(pref) do
     if counts[idx] and counts[idx] > 0 and not blocked[idx] then
       navigation_lastChosenPathIndex[carIndex] = idx
-      navigation_lastIdxBlockedFrames[carIndex] = 0
       log("[PF] bestOffset car=%d clear path idx=%d -> n=%.2f", carIndex, idx, offsets[idx])
       return offsets[idx]
     end
@@ -406,7 +381,6 @@ function Pathfinding.getBestLateralOffset(carIndex)
   end
   if bestIdx then
     navigation_lastChosenPathIndex[carIndex] = bestIdx
-    navigation_lastIdxBlockedFrames[carIndex] = 0
     log("[PF] bestOffset car=%d fallback idx=%d (safeSamples=%d) -> n=%.2f",
       carIndex, bestIdx, bestSafeSamples, offsets[bestIdx])
     return offsets[bestIdx]
@@ -422,8 +396,9 @@ end
 function Pathfinding.calculatePathAndGetBestLateralOffset(sortedCarsList, sortedCarsListIndex)
   local car = sortedCarsList and sortedCarsList[sortedCarsListIndex]
   if not car then return nil end
-  Pathfinding.calculatePath(sortedCarsList, sortedCarsListIndex)
-  return Pathfinding.getBestLateralOffset(car.index)
+
+  calculatePath(sortedCarsList, sortedCarsListIndex)
+  return getBestLateralOffset(car.index)
 end
 
 return Pathfinding
