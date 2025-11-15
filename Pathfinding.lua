@@ -218,9 +218,8 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
           local opp = sortedCarsList[idx]
           -- Defensive: ensure object exists and is not self.
           if opp and opp.index ~= carIndex then
+            -- Keep original quick gate (sphere) for speed; early exit on first overlap:
             local op = opp.position
-            -- Quick distance gate to skip far-away cars (using world space).
-            -- We don’t need a super-precise gate here; this is just to avoid most checks.
             local dx = op.x - wx
             local dy = op.y - wy
             local dz = op.z - wz
@@ -309,14 +308,45 @@ function Pathfinding.drawPaths(carIndex)
   end
 end
 
+-- --- Decision trace (ADDED, minimal) ----------------------------------------
+local DECISION_TRACE_ENABLED = true
+local function traceDecision(lines)
+  if LOG_ENABLED and DECISION_TRACE_ENABLED and lines and #lines > 0 then
+    Logger.log(table.concat(lines, "\n"))
+  end
+end
+-- ----------------------------------------------------------------------------
+
 -- Public: return the lateral offset (normalized) associated with the “best” path for a car.
 -- “Best” here = first clear path by preference (center-most first, then bias to right on ties).
 -- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
 -- If all paths are blocked, returns the one that gets the furthest before the first hit.
-local getBestLateralOffset = function(carIndex)
+local function getBestLateralOffset(carIndex)
   local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
+  if not counts then return nil end
+
+  -- Build a compact decision sheet we’ll log at the end.
+  local lines = {}
+  lines[#lines+1] = string.format("[PF_DECISION] car=%d", carIndex)
+
+  -- Helper: append per-path status for diagnostics
+  local function appendPathStatus()
+    for i = 1, #offsets do
+      local cnt  = counts[i] or 0
+      local stat = (blocked[i] and "BLOCKED") or "CLEAR"
+      local hitI = navigation_pathHitIndex[carIndex] and navigation_pathHitIndex[carIndex][i]
+      local hitO = navigation_pathHitOpponentIndex[carIndex] and navigation_pathHitOpponentIndex[carIndex][i]
+      if blocked[i] and hitI and hitO then
+        lines[#lines+1] = string.format("  path[%d] n=% .2f samples=%d -> %s @sample=%d by car#%d",
+          i, offsets[i], cnt, stat, hitI, hitO)
+      else
+        lines[#lines+1] = string.format("  path[%d] n=% .2f samples=%d -> %s",
+          i, offsets[i], cnt, stat)
+      end
+    end
+  end
 
   -- Compute dynamic “center” index (closest to 0, prefer positive on tie).
   local centerIdx, minAbs = 1, math.huge
@@ -336,32 +366,47 @@ local getBestLateralOffset = function(carIndex)
     end
     if haveAll and allClear then
       navigation_lastChosenPathIndex[carIndex] = centerIdx
-      log("[PF] bestOffset car=%d all-clear -> center idx=%d n=%.2f", carIndex, centerIdx, offsets[centerIdx])
+      appendPathStatus()
+      lines[#lines+1] = string.format("  order: center-only (all clear)")
+      lines[#lines+1] = string.format("  chosen: idx=%d n=% .2f (reason: all-clear center)", centerIdx, offsets[centerIdx])
+      traceDecision(lines)
       return offsets[centerIdx]
     end
   end
 
-  -- Sticky choice: if last chosen path still exists and is not blocked, keep it.
+  -- Sticky choice: keep last if still clear.
   local lastIdx = navigation_lastChosenPathIndex[carIndex]
   if lastIdx and counts[lastIdx] and counts[lastIdx] > 0 and not blocked[lastIdx] then
-    log("[PF] bestOffset car=%d STICK idx=%d -> n=%.2f", carIndex, lastIdx, offsets[lastIdx])
+    appendPathStatus()
+    lines[#lines+1] = string.format("  order: (sticky short-circuit)")
+    lines[#lines+1] = string.format("  chosen: idx=%d n=% .2f (reason: sticky last still clear)", lastIdx, offsets[lastIdx])
+    traceDecision(lines)
     return offsets[lastIdx]
   end
 
-  -- Build dynamic preference order:
-  -- sort indices by |offset| ascending, and for equal |offset| prefer positive over negative.
-  local pref = {}
-  for i = 1, #offsets do pref[i] = i end
-  table.sort(pref, function(a, b)
-    local aa, bb = math.abs(offsets[a]), math.abs(offsets[b])
-    if aa == bb then return offsets[a] > offsets[b] else return aa < bb end
-  end)
+  -- Preference order: center, then ±0.5, ±0.75, ±1.0 (right on ties).
+  local order = {}
+  local function pushIfExists(val)
+    for i = 1, #offsets do if offsets[i] == val then table.insert(order, i) return end end
+  end
+  pushIfExists(0.0)
+  pushIfExists(0.5);  pushIfExists(-0.5)
+  pushIfExists(0.75); pushIfExists(-0.75)
+  pushIfExists(1.0);  pushIfExists(-1.0)
+
+  appendPathStatus()
+  do
+    local buf = {}
+    for k = 1, #order do buf[k] = string.format("%d(n=% .2f)", order[k], offsets[order[k]]) end
+    lines[#lines+1] = "  order: " .. table.concat(buf, " → ")
+  end
 
   -- First, try to pick the first CLEAR path by preference.
-  for _, idx in ipairs(pref) do
+  for _, idx in ipairs(order) do
     if counts[idx] and counts[idx] > 0 and not blocked[idx] then
       navigation_lastChosenPathIndex[carIndex] = idx
-      log("[PF] bestOffset car=%d clear path idx=%d -> n=%.2f", carIndex, idx, offsets[idx])
+      lines[#lines+1] = string.format("  chosen: idx=%d n=% .2f (reason: first clear by preference)", idx, offsets[idx])
+      traceDecision(lines)
       return offsets[idx]
     end
   end
@@ -381,12 +426,15 @@ local getBestLateralOffset = function(carIndex)
   end
   if bestIdx then
     navigation_lastChosenPathIndex[carIndex] = bestIdx
-    log("[PF] bestOffset car=%d fallback idx=%d (safeSamples=%d) -> n=%.2f",
-      carIndex, bestIdx, bestSafeSamples, offsets[bestIdx])
+    lines[#lines+1] = string.format("  chosen: idx=%d n=% .2f (reason: fallback, furthest safe samples = %d)",
+      bestIdx, offsets[bestIdx], bestSafeSamples)
+    traceDecision(lines)
     return offsets[bestIdx]
   end
 
   -- No data yet (calculatePath likely not called).
+  lines[#lines+1] = "  chosen: none (reason: no counts yet)"
+  traceDecision(lines)
   return nil
 end
 
