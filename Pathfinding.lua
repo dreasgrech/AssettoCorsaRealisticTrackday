@@ -42,7 +42,6 @@ local colPoint       = rgbm(0.35, 1.00, 0.35, 0.95)   -- green spheres on sample
 local colPointHit    = rgbm(1.00, 0.40, 0.20, 1.00)   -- orange/red sphere to mark the hit sample
 local colLabel       = rgbm(1.00, 1.00, 1.00, 0.95)   -- white text
 local colAnchor      = rgbm(0.10, 0.90, 1.00, 0.95)   -- cyan anchor marker
-local colAABB        = rgbm(1.00, 0.15, 0.15, 0.22)   -- light red translucent (debug AABB)
 
 -- Helper: wrap track progress into [0..1].
 local function wrap01(z)
@@ -132,22 +131,6 @@ local function ensureCarArrays(carIndex)
   end
 end
 
--- === Minimal helper for AABB check (ADDED) =================================
--- Test a world-space point against opponent’s car-local AABB (XZ only), inflated by safetyMarginMeters.
--- Uses opp.worldToLocal and opp.aabbCenter/opp.aabbSize (available in ac.StateCar). :contentReference[oaicite:2]{index=2}
-local function pointInsideCarAABB2D(worldPoint, opp)
-  local w2l = opp and opp.worldToLocal
-  local c, s = opp and opp.aabbCenter, opp and opp.aabbSize
-  if not (w2l and c and s) then return false end
-  local lp = w2l:transformPoint(worldPoint)
-  local hx = (s.x * 0.5) + safetyMarginMeters
-  local hz = (s.z * 0.5) + safetyMarginMeters
-  local dx = lp.x - c.x
-  local dz = lp.z - c.z
-  return math.abs(dx) <= hx and math.abs(dz) <= hz
-end
--- ===========================================================================
-
 -- Public: build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
 -- NOTE: We no longer gather opponents ourselves. Pass in the globally prepared sorted list.
@@ -235,8 +218,14 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
           local opp = sortedCarsList[idx]
           -- Defensive: ensure object exists and is not self.
           if opp and opp.index ~= carIndex then
-            -- REPLACED: spherical gate → AABB-in-car-space test (XZ only, inflated by safetyMarginMeters).
-            if pointInsideCarAABB2D(world, opp) then
+            local op = opp.position
+            -- Quick distance gate to skip far-away cars (using world space).
+            -- We don’t need a super-precise gate here; this is just to avoid most checks.
+            local dx = op.x - wx
+            local dy = op.y - wy
+            local dz = op.z - wz
+            local d2 = dx*dx + dy*dy + dz*dz
+            if d2 <= combinedCollisionRadius2 then
               blocked[p] = true
               hitIdx[p] = i
               hitPos[p] = world
@@ -295,63 +284,81 @@ function Pathfinding.drawPaths(carIndex)
       local endPos = pts[cnt]
       if endPos then
         local label = string.format("%.2f", offsets[p])
-        if blocked[p] then label = label .." (blocked)" end
+        if blocked[p] then label = label .. " (blocked)" end
         render.debugText(endPos + vec3(0, 0.30, 0), label, colLabel)
 
         -- Small “arrowhead” cross near the end to make direction obvious
         local a = endPos + vec3(0.20, 0, 0.20)
         local b = endPos + vec3(-0.20, 0, -0.20)
-        render.debugLine(a, b, colLine)
-        render.debugLine(vec3(a.x, a.y, b.z), vec3(b.x, b.y, a.z), colLine)
+        local c = endPos + vec3(0.20, 0, -0.20)
+        local d = endPos + vec3(-0.20, 0, 0.20)
+        render.debugLine(a, b, colLabel)
+        render.debugLine(c, d, colLabel)
+      end
 
-        -- If blocked, mark the first hit sample.
-        if blocked[p] and hitIdx[p] and hitPos[p] then
-          render.debugSphere(hitPos[p], 0.22, colPointHit)
+      -- If blocked, mark the first colliding sample with a bigger orange sphere,
+      -- and show which opponent index caused it (helps with auditing).
+      if blocked[p] and hitPos[p] then
+        render.debugSphere(hitPos[p], 0.28, colPointHit)
+        if hitOpp[p] ~= nil then
+          render.debugText(hitPos[p] + vec3(0, 0.45, 0),
+            string.format("car#%d", hitOpp[p]), colLabel)
         end
       end
     end
   end
 end
 
--- Public: deterministically pick the best clear path with a sticky winner if still valid.
-local function getBestLateralOffset(carIndex)
+-- Public: return the lateral offset (normalized) associated with the “best” path for a car.
+-- “Best” here = first clear path by preference (center-most first, then bias to right on ties).
+-- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
+-- If all paths are blocked, returns the one that gets the furthest before the first hit.
+local getBestLateralOffset = function(carIndex)
   local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
-  if not counts then return nil end
 
-  -- Keep previous choice if it’s still clear this frame.
-  local last = navigation_lastChosenPathIndex[carIndex]
-  if last and counts[last] and counts[last] > 0 and not blocked[last] then
-    return offsets[last]
-  end
-
-  -- Deterministic preference order: center first, then growing |offset| preferring right side.
-  local pref = {}
-  local centerIdx = nil
-  for i = 1, #offsets do if offsets[i] == 0.0 then centerIdx = i break end end
-  if centerIdx then table.insert(pref, centerIdx) end
-  local pairsCount = math.floor(#offsets / 2)
-  for p = 1, pairsCount do
-    local left, right = nil, nil
-    for i = 1, #offsets do
-      if offsets[i] == -(PATHS[#PATHS - i + 1]) and offsets[i] < 0 and math.abs(offsets[i]) == PATHS[#PATHS - centerIdx + 1] then left = i end
+  -- Compute dynamic “center” index (closest to 0, prefer positive on tie).
+  local centerIdx, minAbs = 1, math.huge
+  for i = 1, #offsets do
+    local a = math.abs(offsets[i])
+    if a < minAbs or (a == minAbs and offsets[i] > offsets[centerIdx]) then
+      centerIdx, minAbs = i, a
     end
   end
-  -- Simpler, explicit enumeration to avoid complexity at runtime:
-  local order = {}
-  -- center, then ±0.5, ±0.75, ±1.0 (matches PATHS above)
-  for i = 1, #offsets do
-    if offsets[i] == 0.0 then table.insert(order, i) end
-  end
-  local function pushIfExists(val)
-    for i = 1, #offsets do if offsets[i] == val then table.insert(order, i) return end end
-  end
-  pushIfExists(0.5);  pushIfExists(-0.5)
-  pushIfExists(0.75); pushIfExists(-0.75)
-  pushIfExists(1.0);  pushIfExists(-1.0)
 
-  for _, idx in ipairs(order) do
+  -- If all paths are present and NONE are blocked, default to center path.
+  do
+    local haveAll, allClear = true, true
+    for i = 1, #offsets do
+      if not (counts[i] and counts[i] > 0) then haveAll = false break end
+      if blocked[i] then allClear = false break end
+    end
+    if haveAll and allClear then
+      navigation_lastChosenPathIndex[carIndex] = centerIdx
+      log("[PF] bestOffset car=%d all-clear -> center idx=%d n=%.2f", carIndex, centerIdx, offsets[centerIdx])
+      return offsets[centerIdx]
+    end
+  end
+
+  -- Sticky choice: if last chosen path still exists and is not blocked, keep it.
+  local lastIdx = navigation_lastChosenPathIndex[carIndex]
+  if lastIdx and counts[lastIdx] and counts[lastIdx] > 0 and not blocked[lastIdx] then
+    log("[PF] bestOffset car=%d STICK idx=%d -> n=%.2f", carIndex, lastIdx, offsets[lastIdx])
+    return offsets[lastIdx]
+  end
+
+  -- Build dynamic preference order:
+  -- sort indices by |offset| ascending, and for equal |offset| prefer positive over negative.
+  local pref = {}
+  for i = 1, #offsets do pref[i] = i end
+  table.sort(pref, function(a, b)
+    local aa, bb = math.abs(offsets[a]), math.abs(offsets[b])
+    if aa == bb then return offsets[a] > offsets[b] else return aa < bb end
+  end)
+
+  -- First, try to pick the first CLEAR path by preference.
+  for _, idx in ipairs(pref) do
     if counts[idx] and counts[idx] > 0 and not blocked[idx] then
       navigation_lastChosenPathIndex[carIndex] = idx
       log("[PF] bestOffset car=%d clear path idx=%d -> n=%.2f", carIndex, idx, offsets[idx])
@@ -392,36 +399,6 @@ function Pathfinding.calculatePathAndGetBestLateralOffset(sortedCarsList, sorted
 
   calculatePath(sortedCarsList, sortedCarsListIndex)
   return getBestLateralOffset(car.index)
-end
-
--- Public (ADDED): draw AABBs for obstacles that actually blocked paths last frame.
--- Uses center in world and size from car state; simple axis-aligned debug box + a small label. :contentReference[oaicite:3]{index=3}
-function Pathfinding.drawObstacleAABBsForHits(carIndex, sortedCarsList)
-  local hitOpp = navigation_pathHitOpponentIndex[carIndex]
-  if not hitOpp then return end
-  local drawn = {}
-  for p = 1, #PATHS do
-    local oppIndex = hitOpp[p]
-    if oppIndex and not drawn[oppIndex] then
-      drawn[oppIndex] = true
-      local opp = nil
-      -- try to pull from provided list first
-      if sortedCarsList then
-        for i = 1, #sortedCarsList do
-          if sortedCarsList[i] and sortedCarsList[i].index == oppIndex then opp = sortedCarsList[i]; break end
-        end
-      end
-      -- fallback to direct query
-      opp = opp or ac.getCar(oppIndex)
-      if opp and opp.aabbCenter and opp.aabbSize then
-        local centerWorld = (opp.bodyTransform and opp.bodyTransform:transformPoint(opp.aabbCenter)) or opp.position
-        local sizeInflated = vec3(opp.aabbSize.x + safetyMarginMeters * 2.0, opp.aabbSize.y, opp.aabbSize.z + safetyMarginMeters * 2.0)
-        render.debugBox(centerWorld, sizeInflated, colAABB)
-        render.debugText(centerWorld + vec3(0, sizeInflated.y * 0.5 + 0.35, 0),
-          string.format("car #%d  AABB x=%.2f z=%.2f", oppIndex, opp.aabbSize.x, opp.aabbSize.z), colLabel)
-      end
-    end
-  end
 end
 
 return Pathfinding
