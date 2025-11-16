@@ -308,8 +308,8 @@ end
 -- end
 
 ---Sorts the given car list by track position, with the car furthest ahead first
----@param carList table<integer,ac.StateCar>
----@return table<integer,ac.StateCar> carList 
+---@param carList SortedCarsList
+---@return SortedCarsList carList 
 function CarManager.sortCarListByTrackPosition(carList)
   table.sort(carList, isFirstCarSplinePositionGreater)
   return carList

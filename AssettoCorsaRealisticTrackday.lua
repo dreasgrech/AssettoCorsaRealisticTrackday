@@ -174,6 +174,10 @@ local storage_Debugging = StorageManager.getStorage_Debugging()
 
 local math_huge = math.huge
 
+
+-- A 1-based index collection of all the cars sorted by their spline position
+---@alias SortedCarsList table<integer,ac.StateCar>
+
 ---
 -- Andreas: I tried making this a self-invoked anonymous function but the interpreter didn’t like it
 ---
@@ -342,7 +346,7 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
   -- Profiler.endFrame()
 end
 
-local frenetOffsets = {}
+-- local frenetOffsets = {}
 
 ---
 -- wiki: called after a whole simulation update
@@ -397,7 +401,8 @@ function script.MANIFEST__UPDATE(dt)
   -- end
 
   -- build the sorted car list and do any per-car operations that doesn't require the sorted list
-  ---@type table<integer,ac.StateCar>
+
+  ---@type SortedCarsList
   local carList = {}
   for i, car in ac_iterateCars() do
     carList[i] = car
