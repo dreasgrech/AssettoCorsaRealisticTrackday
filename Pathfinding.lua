@@ -208,7 +208,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
   -- For minimal work, only consider cars AHEAD of the current one in the sorted list.
   -- (sortedCarsListIndex-1 down to 1). Cars behind can’t block our forward samples.
-  local firstAheadIndex = (sortedCarsListIndex or 2) - 1
+  local firstAheadSortedCarListIndex = (sortedCarsListIndex or 2) - 1
 
   local approxCarRadiusMeters   = storage_PathFinding.approxCarRadiusMeters
   local safetyMarginMeters      = storage_PathFinding.safetyMarginMeters
@@ -217,21 +217,23 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
   local lateralSplitExponent = storage_PathFinding.lateralSplitExponent
 
-  for p = 1, TOTAL_PATH_LATERAL_OFFSETS do
-    local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, PATH_LATERAL_OFFSETS[p]))
+  for pathLateralOffsetIndex = 1, TOTAL_PATH_LATERAL_OFFSETS do
+    local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, PATH_LATERAL_OFFSETS[pathLateralOffsetIndex]))
 
     -- Clear previous samples/meta (reuse tables).
-    local pts = pathPoints[p]
-    for i = 1, #pts do pts[i] = nil end
-    counts[p] = 0
-    blocked[p] = false
-    hitIdx[p] = nil
-    hitPos[p] = nil
-    hitOpp[p] = nil
+    local pts = pathPoints[pathLateralOffsetIndex]
+    for i = 1, #pts do
+      pts[i] = nil
+    end
+    counts[pathLateralOffsetIndex] = 0
+    blocked[pathLateralOffsetIndex] = false
+    hitIdx[pathLateralOffsetIndex] = nil
+    hitPos[pathLateralOffsetIndex] = nil
+    hitOpp[pathLateralOffsetIndex] = nil
 
     -- Sample along the road: linearly progress forward, but move laterally so that
     -- we hit the target offset by `splitReachMeters` (using an ease-out curve).
-    counts[p] = 1
+    counts[pathLateralOffsetIndex] = 1
     pts[1] = anchorWorldPosition
 
     for i = 2, stepCount do
@@ -243,29 +245,29 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
       local worldPosition   = ac_trackCoordinateToWorld(vec3(sampleN, 0.0, sampleZ))
 
-      counts[p] = counts[p] + 1
-      pts[counts[p]] = worldPosition
+      counts[pathLateralOffsetIndex] = counts[pathLateralOffsetIndex] + 1
+      pts[counts[pathLateralOffsetIndex]] = worldPosition
 
       -- --- Minimal collider detection (only what’s needed) -------------------
-      if not blocked[p] and firstAheadIndex >= 1 then
-        local wx, wy, wz = worldPosition.x, worldPosition.y, worldPosition.z
+      if not blocked[pathLateralOffsetIndex] and firstAheadSortedCarListIndex >= 1 then
+        local worldPositionX, worldPositionY, worldPositionZ = worldPosition.x, worldPosition.y, worldPosition.z
 
         -- Check cars in front only; early-exit on first hit.
-        for idx = firstAheadIndex, 1, -1 do
+        for idx = firstAheadSortedCarListIndex, 1, -1 do
           local otherCar = sortedCarsList[idx]
           -- Defensive: ensure object exists and is not self.
           if otherCar and otherCar.index ~= carIndex then
             -- Keep original quick gate (sphere) for speed; early exit on first overlap:
             local otherCarPosition = otherCar.position
-            local dx = otherCarPosition.x - wx
-            local dy = otherCarPosition.y - wy
-            local dz = otherCarPosition.z - wz
+            local dx = otherCarPosition.x - worldPositionX
+            local dy = otherCarPosition.y - worldPositionY
+            local dz = otherCarPosition.z - worldPositionZ
             local d2 = dx*dx + dy*dy + dz*dz
             if d2 <= combinedCollisionRadius2 then
-              blocked[p] = true
-              hitIdx[p] = i
-              hitPos[p] = worldPosition
-              hitOpp[p] = otherCar.index
+              blocked[pathLateralOffsetIndex] = true
+              hitIdx[pathLateralOffsetIndex] = i
+              hitPos[pathLateralOffsetIndex] = worldPosition
+              hitOpp[pathLateralOffsetIndex] = otherCar.index
               break
             end
           end
@@ -274,7 +276,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       -- ----------------------------------------------------------------------
     end
 
-    log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s", carIndex, p, targetOffsetN, counts[p], tostring(blocked[p]))
+    log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s", carIndex, pathLateralOffsetIndex, targetOffsetN, counts[pathLateralOffsetIndex], tostring(blocked[pathLateralOffsetIndex]))
   end
 end
 
