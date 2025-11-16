@@ -94,7 +94,8 @@ end
 -- PATHS ARE MODULE-WIDE (not per-car) so you can expand/reduce them without extra memory per car.
 -- Modify this list to add/remove paths. All code below adapts automatically.
 ---@type table<integer,number>
-local PATHS = { -1.0, -0.75, -0.5, 0.0, 0.5, 0.75, 1.0 }
+local PATH_LATERAL_OFFSETS = { -1.0, -0.75, -0.5, 0.0, 0.5, 0.75, 1.0 }
+local TOTAL_PATH_LATERAL_OFFSETS = #PATH_LATERAL_OFFSETS
 
 ---@type table<integer,string>
 local navigation_anchorText = {}
@@ -125,13 +126,11 @@ local navigation_pathPoints = {}
 
 -- Ensure per-car arrays exist and match the number of configured paths.
 local function ensureCarArrays(carIndex)
-  local needed = #PATHS
-
   local counts = navigation_pathCount[carIndex]
-  if not counts or #counts ~= needed then
+  if not counts or #counts ~= TOTAL_PATH_LATERAL_OFFSETS then
     counts = {}
     local blocked, hitIdx, hitOpp, hitPos, points = {}, {}, {}, {}, {}
-    for i = 1, needed do
+    for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
       counts[i] = 0
       blocked[i] = false
       hitIdx[i] = nil
@@ -150,7 +149,7 @@ local function ensureCarArrays(carIndex)
   navigation_anchorText[carIndex] = navigation_anchorText[carIndex] or ""
   -- keep sticky index if present; if it exceeds path count after a config change, drop it
   local lastIdx = navigation_lastChosenPathIndex[carIndex]
-  if lastIdx and (lastIdx < 1 or lastIdx > needed) then
+  if lastIdx and (lastIdx < 1 or lastIdx > TOTAL_PATH_LATERAL_OFFSETS) then
     navigation_lastChosenPathIndex[carIndex] = nil
   end
 end
@@ -195,7 +194,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local invSplitReachProgress = (splitReachProgress > 0.0) and (1.0 / splitReachProgress) or 1e9
 
   -- Generate paths (count adapts to navigation_pathOffsetN length).
-  local offsets = PATHS
+  local offsets = PATH_LATERAL_OFFSETS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   local hitIdx  = navigation_pathHitIndex[carIndex]
@@ -287,7 +286,7 @@ function Pathfinding.drawPaths(carIndex)
   -- Draw each path:
   --   • Clear path → thin green polyline.
   --   • Blocked path → red polyline and a highlighted sphere at the first hit sample.
-  local offsets = PATHS
+  local offsets = PATH_LATERAL_OFFSETS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   -- local hitIdx  = navigation_pathHitIndex[carIndex]
@@ -354,7 +353,7 @@ end
 -- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
 -- If all paths are blocked, returns the one that gets the furthest before the first hit.
 local function getBestLateralOffset(carIndex)
-  local offsets = PATHS
+  local offsets = PATH_LATERAL_OFFSETS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   if not counts then return nil end
