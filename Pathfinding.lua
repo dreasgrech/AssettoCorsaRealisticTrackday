@@ -110,7 +110,7 @@ local navigation_lastChosenPathIndex = {}
 
 -- per-car array of counts per path
 ---@type table<integer,table<integer,integer>>
-local navigation_pathsSampleCount = {}
+local navigation_pathsTotalSamples = {}
 
 -- per-car array of blocked flags per path
 ---@type table<integer,table<integer,boolean>>
@@ -130,11 +130,11 @@ local navigation_pathsHitSampleWorldPosition = {}
 
 -- per-car array of lists of sampled points per path
 ---@type table<integer,table<integer,table<integer,vec3>>>
-local navigation_pathsPoints = {}
+local navigation_pathsSamplesWorldPositions = {}
 
 -- Ensure per-car arrays exist and match the number of configured paths.
 local function ensureCarArrays(carIndex)
-  local counts = navigation_pathsSampleCount[carIndex]
+  local counts = navigation_pathsTotalSamples[carIndex]
   if not counts or #counts ~= TOTAL_PATH_LATERAL_OFFSETS then
     counts = {}
     local blocked, hitIdx, hitOpp, hitPos, points = {}, {}, {}, {}, {}
@@ -146,12 +146,12 @@ local function ensureCarArrays(carIndex)
       hitPos[i] = nil
       points[i] = {}
     end
-    navigation_pathsSampleCount[carIndex] = counts
+    navigation_pathsTotalSamples[carIndex] = counts
     navigation_pathsBlocked[carIndex] = blocked
     navigation_pathsHitSampleIndex[carIndex] = hitIdx
     navigation_pathsHitsOtherCarsIndex[carIndex] = hitOpp
     navigation_pathsHitSampleWorldPosition[carIndex] = hitPos
-    navigation_pathsPoints[carIndex] = points
+    navigation_pathsSamplesWorldPositions[carIndex] = points
   end
 
   navigation_anchorText[carIndex] = navigation_anchorText[carIndex] or ""
@@ -165,10 +165,10 @@ end
 
 -- local calculatePath_
 
--- Public: build simple paths radiating from the front of the car to lateral targets.
+-- Build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
----@param sortedCarsList SortedCarsList
----@param sortedCarsListIndex integer
+---@param sortedCarsList SortedCarsList @The list of cars sorted by track position (furthest ahead first)
+---@param sortedCarsListIndex integer @The SortedCarsList index of the car to calculate the path for
 local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local car = sortedCarsList[sortedCarsListIndex]
   if not car then return end
@@ -208,12 +208,12 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local invSplitReachProgress = (splitReachProgress > 0.0) and (1.0 / splitReachProgress) or 1e9
 
   -- Generate paths (count adapts to navigation_pathOffsetN length).
-  local pathsSampleCount  = navigation_pathsSampleCount[carIndex]
+  local pathsTotalSamples  = navigation_pathsTotalSamples[carIndex]
   local pathsBlocked = navigation_pathsBlocked[carIndex]
   local pathsHitSampleIndex  = navigation_pathsHitSampleIndex[carIndex]
   local pathsHitsOtherCarsIndex  = navigation_pathsHitsOtherCarsIndex[carIndex]
   local pathsHitSampleWorldPosition  = navigation_pathsHitSampleWorldPosition[carIndex]
-  local pathsPoints  = navigation_pathsPoints[carIndex]
+  local pathsSamplesWorldPositions  = navigation_pathsSamplesWorldPositions[carIndex]
 
   -- For minimal work, only consider cars AHEAD of the current one in the sorted list.
   -- (sortedCarsListIndex-1 down to 1). Cars behind can’t block our forward samples.
@@ -231,11 +231,11 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
     local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, PATH_LATERAL_OFFSETS[pathIndex]))
 
     -- Clear previous samples/meta (reuse tables).
-    local pathPoints = pathsPoints[pathIndex]
-    for i = 1, #pathPoints do
-      pathPoints[i] = nil
+    local pathSamplesWorldPositions = pathsSamplesWorldPositions[pathIndex]
+    for i = 1, #pathSamplesWorldPositions do
+      pathSamplesWorldPositions[i] = nil
     end
-    pathsSampleCount[pathIndex] = 0
+    pathsTotalSamples[pathIndex] = 0
     pathsBlocked[pathIndex] = false
     pathsHitSampleIndex[pathIndex] = nil
     pathsHitSampleWorldPosition[pathIndex] = nil
@@ -244,10 +244,10 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
     -- Sample along the road: linearly progress forward, but move laterally so that we hit the target offset by `splitReachMeters` (using an ease-out curve).
 
     -- Initialize the sample count (first point is anchor).
-    pathsSampleCount[pathIndex] = 1
+    pathsTotalSamples[pathIndex] = 1
 
     -- First sample is always the anchor.
-    pathPoints[1] = anchorWorldPosition
+    pathSamplesWorldPositions[1] = anchorWorldPosition
 
     -- for each step along the path, create a sample point and check for collisions.
     for currentSampleIndex = 2, numberOfPathSamples do
@@ -260,10 +260,10 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       local sampleWorldPosition   = ac_trackCoordinateToWorld(VecPool_getTempVec3(sampleN, 0.0, sampleZ))
 
       -- increase the sample count since we have a new sample
-      pathsSampleCount[pathIndex] = pathsSampleCount[pathIndex] + 1
+      pathsTotalSamples[pathIndex] = pathsTotalSamples[pathIndex] + 1
       
-      -- save the sample point
-      pathPoints[pathsSampleCount[pathIndex]] = sampleWorldPosition
+      -- save the sample world position
+      pathSamplesWorldPositions[pathsTotalSamples[pathIndex]] = sampleWorldPosition
 
       -- --- Minimal collider detection (only what’s needed) -------------------
       if not pathsBlocked[pathIndex] and firstAheadSortedCarListIndex >= 1 then
@@ -297,68 +297,70 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       -- ----------------------------------------------------------------------
     end
 
-    log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s", carIndex, pathIndex, targetOffsetN, pathsSampleCount[pathIndex], tostring(pathsBlocked[pathIndex]))
+    log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s", carIndex, pathIndex, targetOffsetN, pathsTotalSamples[pathIndex], tostring(pathsBlocked[pathIndex]))
   end
 end
 
 -- Public: draw the paths like in the sketch: a fan from the car front with labels.
 function Pathfinding.drawPaths(carIndex)
-  local anchorWorld = navigation_anchorWorldPosition[carIndex]
-  if not anchorWorld then return end
+  local anchorWorldPosition = navigation_anchorWorldPosition[carIndex]
+  if not anchorWorldPosition then return end
 
   -- Draw anchor (small pole and label).
-  render_debugSphere(anchorWorld, 0.12, colAnchor)
-  render_debugText(anchorWorld + VecPool_getTempVec3(0, 0.35, 0), navigation_anchorText[carIndex])
+  render_debugSphere(anchorWorldPosition, 0.12, colAnchor)
+  render_debugText(anchorWorldPosition + VecPool_getTempVec3(0, 0.35, 0), navigation_anchorText[carIndex])
 
   -- Draw each path:
   --   • Clear path → thin green polyline.
   --   • Blocked path → red polyline and a highlighted sphere at the first hit sample.
-  local counts  = navigation_pathsSampleCount[carIndex]
-  local blocked = navigation_pathsBlocked[carIndex]
-  -- local hitIdx  = navigation_pathHitIndex[carIndex]
-  local hitOpp  = navigation_pathsHitsOtherCarsIndex[carIndex]
-  local hitPos  = navigation_pathsHitSampleWorldPosition[carIndex]
-  local points  = navigation_pathsPoints[carIndex]
+  local pathsTotalSamples  = navigation_pathsTotalSamples[carIndex]
+  local pathsBlocked = navigation_pathsBlocked[carIndex]
+  local pathsHitsOtherCarsIndex  = navigation_pathsHitsOtherCarsIndex[carIndex]
+  local pathsHitSampleWorldPosition  = navigation_pathsHitSampleWorldPosition[carIndex]
+  local pathsSamplesWorldPositions  = navigation_pathsSamplesWorldPositions[carIndex]
 
-  for p = 1, TOTAL_PATH_LATERAL_OFFSETS do
-    local cnt = counts[p]
-    if cnt and cnt >= 2 then
-      local colLine = blocked[p] and colLineBlocked or colLineClear
-      local pts = points[p]
+  for pathIndex = 1, TOTAL_PATH_LATERAL_OFFSETS do
+    local pathTotalSamples = pathsTotalSamples[pathIndex]
+    if pathTotalSamples and pathTotalSamples >= 2 then
+      local colLine = pathsBlocked[pathIndex] and colLineBlocked or colLineClear
+      local pathSamplesWorldPositions = pathsSamplesWorldPositions[pathIndex]
 
       -- Polyline
-      for i = 1, cnt - 1 do
-        render_debugLine(pts[i], pts[i + 1], colLine)
+      for sampleIndex = 1, pathTotalSamples - 1 do
+        render_debugLine(pathSamplesWorldPositions[sampleIndex], pathSamplesWorldPositions[sampleIndex + 1], colLine)
       end
 
       -- Sample markers
-      for i = 1, cnt do
-        local r = (i == 2) and 0.16 or 0.10
-        render_debugSphere(pts[i], r, colPoint)
+      for sampleIndex = 1, pathTotalSamples do
+        local r = (sampleIndex == 2) and 0.16 or 0.10
+        render_debugSphere(pathSamplesWorldPositions[sampleIndex], r, colPoint)
       end
 
       -- End label with the associated normalized offset value (+ blocked flag)
-      local endPos = pts[cnt]
-      if endPos then
-        local label = string_format("%.2f", PATH_LATERAL_OFFSETS[p])
-        if blocked[p] then label = label .. " (blocked)" end
-        render_debugText(endPos + VecPool_getTempVec3(0, 0.30, 0), label, colLabel)
+      local lastPathSampleWorldPosition = pathSamplesWorldPositions[pathTotalSamples]
+      if lastPathSampleWorldPosition then
+        local label = string_format("%.2f", PATH_LATERAL_OFFSETS[pathIndex])
+        if pathsBlocked[pathIndex] then
+          label = label .. " (blocked)"
+        end
+
+        render_debugText(lastPathSampleWorldPosition + VecPool_getTempVec3(0, 0.30, 0), label, colLabel)
 
         -- Small “arrowhead” cross near the end to make direction obvious
-        local a = endPos + VecPool_getTempVec3(0.20, 0, 0.20)
-        local b = endPos + VecPool_getTempVec3(-0.20, 0, -0.20)
-        local c = endPos + VecPool_getTempVec3(0.20, 0, -0.20)
-        local d = endPos + VecPool_getTempVec3(-0.20, 0, 0.20)
+        local a = lastPathSampleWorldPosition + VecPool_getTempVec3(0.20, 0, 0.20)
+        local b = lastPathSampleWorldPosition + VecPool_getTempVec3(-0.20, 0, -0.20)
+        local c = lastPathSampleWorldPosition + VecPool_getTempVec3(0.20, 0, -0.20)
+        local d = lastPathSampleWorldPosition + VecPool_getTempVec3(-0.20, 0, 0.20)
         render_debugLine(a, b, colLabel)
         render_debugLine(c, d, colLabel)
       end
 
       -- If blocked, mark the first colliding sample with a bigger orange sphere,
       -- and show which opponent index caused it (helps with auditing).
-      if blocked[p] and hitPos[p] then
-        render_debugSphere(hitPos[p], 0.28, colPointHit)
-        if hitOpp[p] ~= nil then
-          render_debugText(hitPos[p] + VecPool_getTempVec3(0, 0.45, 0), string_format("car#%d", hitOpp[p]), colLabel)
+      if pathsBlocked[pathIndex] and pathsHitSampleWorldPosition[pathIndex] then
+        render_debugSphere(pathsHitSampleWorldPosition[pathIndex], 0.28, colPointHit)
+        if pathsHitsOtherCarsIndex[pathIndex] ~= nil then
+          render_debugText(pathsHitSampleWorldPosition[pathIndex] + VecPool_getTempVec3(0, 0.45, 0), string_format("car#%d", pathsHitsOtherCarsIndex[pathIndex]), colLabel)
         end
       end
     end
@@ -380,7 +382,7 @@ end
 -- If all paths are blocked, returns the one that gets the furthest before the first hit.
 local function getBestLateralOffset(carIndex)
   -- local PATH_LATERAL_OFFSETS = PATH_LATERAL_OFFSETS
-  local counts  = navigation_pathsSampleCount[carIndex]
+  local counts  = navigation_pathsTotalSamples[carIndex]
   local blocked = navigation_pathsBlocked[carIndex]
   if not counts then return nil end
 
