@@ -25,7 +25,6 @@ local physics_setAIThrottleLimit = physics.setAIThrottleLimit
 local physics_setAITopSpeed = physics.setAITopSpeed
 local physics_setExtraAIGrip = physics.setExtraAIGrip
 local physics_setGentleStop = physics.setGentleStop
-local vec3 = vec3
 local MathHelpers_approach = MathHelpers.approach
 local MathHelpers_vsub = MathHelpers.vsub
 local MathHelpers_dot = MathHelpers.dot
@@ -54,6 +53,7 @@ local render = render
 local render_createRay = render.createRay
 local render_debugBox = render.debugBox
 local render_debugLine = render.debugLine
+local VecPool_getTempVec3 = VecPool.getTempVec3
 
 ---@enum CarOperations.CarDirections
 CarOperations.CarDirections = {
@@ -986,7 +986,7 @@ CarOperations.renderCarSideOffTrack = function(carIndex)
     local wheelPosition = wheel.position
     local tyreWidth = wheel.tyreWidth
     local tyreRadius = wheel.tyreRadius
-    local debugBoxSize = vec3(tyreWidth, tyreRadius, tyreRadius)-- * 0.5
+    local debugBoxSize = VecPool_getTempVec3(tyreWidth, tyreRadius, tyreRadius)-- * 0.5
     -- local color
     -- if w == 0 then
       -- color = ColorManager.RGBM_Colors.Red

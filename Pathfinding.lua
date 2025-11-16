@@ -31,6 +31,8 @@ local table_concat = table.concat
 local table_insert = table.insert
 local Logger = Logger
 local Logger_log = Logger.log
+local VecPool = VecPool
+local VecPool_getTempVec3 = VecPool.getTempVec3
 
 
 -- Toggle logs without changing call sites (leave here so it can be switched off easily).
@@ -147,6 +149,7 @@ local function ensureCarArrays(carIndex)
   end
 
   navigation_anchorText[carIndex] = navigation_anchorText[carIndex] or ""
+
   -- keep sticky index if present; if it exceeds path count after a config change, drop it
   local lastIdx = navigation_lastChosenPathIndex[carIndex]
   if lastIdx and (lastIdx < 1 or lastIdx > TOTAL_PATH_LATERAL_OFFSETS) then
@@ -180,7 +183,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   -- Using the spline keeps the fan aligned with the road.
   local anchorAheadMeters = storage_PathFinding.anchorAheadMeters
   local anchorZ = wrap01(currentProgressZ + RaceTrackManager_metersToSplineSpan(anchorAheadMeters))
-  local anchorWorldPosition = ac_trackCoordinateToWorld(vec3(currentOffsetN, 0.0, anchorZ))
+  local anchorWorldPosition = ac_trackCoordinateToWorld(VecPool_getTempVec3(currentOffsetN, 0.0, anchorZ))
 
   navigation_anchorWorldPosition[carIndex] = anchorWorldPosition
   navigation_anchorText[carIndex]  = string_format("spline=%.4f  n=%.3f  speed=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
@@ -243,7 +246,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
       local sampleZ = wrap01(anchorZ + (i - 1) * stepZ)
       local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
-      local worldPosition   = ac_trackCoordinateToWorld(vec3(sampleN, 0.0, sampleZ))
+      local worldPosition   = ac_trackCoordinateToWorld(VecPool_getTempVec3(sampleN, 0.0, sampleZ))
 
       counts[pathLateralOffsetIndex] = counts[pathLateralOffsetIndex] + 1
       pts[counts[pathLateralOffsetIndex]] = worldPosition
@@ -287,7 +290,7 @@ function Pathfinding.drawPaths(carIndex)
 
   -- Draw anchor (small pole and label).
   render_debugSphere(anchorWorld, 0.12, colAnchor)
-  render_debugText(anchorWorld + vec3(0, 0.35, 0), navigation_anchorText[carIndex])
+  render_debugText(anchorWorld + VecPool_getTempVec3(0, 0.35, 0), navigation_anchorText[carIndex])
 
   -- Draw each path:
   --   • Clear path → thin green polyline.
@@ -322,13 +325,13 @@ function Pathfinding.drawPaths(carIndex)
       if endPos then
         local label = string_format("%.2f", PATH_LATERAL_OFFSETS[p])
         if blocked[p] then label = label .. " (blocked)" end
-        render_debugText(endPos + vec3(0, 0.30, 0), label, colLabel)
+        render_debugText(endPos + VecPool_getTempVec3(0, 0.30, 0), label, colLabel)
 
         -- Small “arrowhead” cross near the end to make direction obvious
-        local a = endPos + vec3(0.20, 0, 0.20)
-        local b = endPos + vec3(-0.20, 0, -0.20)
-        local c = endPos + vec3(0.20, 0, -0.20)
-        local d = endPos + vec3(-0.20, 0, 0.20)
+        local a = endPos + VecPool_getTempVec3(0.20, 0, 0.20)
+        local b = endPos + VecPool_getTempVec3(-0.20, 0, -0.20)
+        local c = endPos + VecPool_getTempVec3(0.20, 0, -0.20)
+        local d = endPos + VecPool_getTempVec3(-0.20, 0, 0.20)
         render_debugLine(a, b, colLabel)
         render_debugLine(c, d, colLabel)
       end
@@ -338,7 +341,7 @@ function Pathfinding.drawPaths(carIndex)
       if blocked[p] and hitPos[p] then
         render_debugSphere(hitPos[p], 0.28, colPointHit)
         if hitOpp[p] ~= nil then
-          render_debugText(hitPos[p] + vec3(0, 0.45, 0), string_format("car#%d", hitOpp[p]), colLabel)
+          render_debugText(hitPos[p] + VecPool_getTempVec3(0, 0.45, 0), string_format("car#%d", hitOpp[p]), colLabel)
         end
       end
     end

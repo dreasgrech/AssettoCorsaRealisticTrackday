@@ -58,6 +58,8 @@ if anyMissingCSPElements then
   showMissingCSPElementsErrorModalDialog(missingCSPElementsErrorMessage)
 end
 
+VecPool = require("VecPool")
+
 DequeManager = require("DataStructures.DequeManager")
 StackManager = require("DataStructures.StackManager")
 QueueManager = require("DataStructures.QueueManager")
