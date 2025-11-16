@@ -29,6 +29,8 @@ AccidentManager.cars_culpritInAccidentIndex = {}
 ---@type table<integer,integer>
 AccidentManager.cars_victimInAccidentIndex = {}
 
+local storage_Debugging = StorageManager.getStorage_Debugging()
+
 ---Marks the given accident as resolved and done
 ---@param accidentIndex integer
 local setAccidentAsResolved = function(accidentIndex)
@@ -346,7 +348,6 @@ function AccidentManager.simulateAccident()
 end
 
 function AccidentManager.simulateAccident_manual()
-    local storage_Debugging = StorageManager.getStorage_Debugging()
     local baseSplinePosition = storage_Debugging.debugSimulateAccidentSplinePosition
     local debugSimulateAccidentCarsGapMeters = storage_Debugging.debugSimulateAccidentCarsGapMeters
 
