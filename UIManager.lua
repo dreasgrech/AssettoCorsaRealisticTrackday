@@ -9,8 +9,6 @@ local ac_isWindowOpen = ac.isWindowOpen
 local ac_overrideCarControls = ac.overrideCarControls
 local ac_getTrackAISplineSides = ac.getTrackAISplineSides
 local ui = ui
-local ui_itemHovered = ui.itemHovered
-local ui_setTooltip = ui.setTooltip
 local ui_columns = ui.columns
 local ui_setColumnWidth = ui.setColumnWidth
 local ui_nextColumn = ui.nextColumn
@@ -20,14 +18,9 @@ local ui_separator = ui.separator
 local ui_textColored = ui.textColored
 local ui_pushStyleColor = ui.pushStyleColor
 local ui_popStyleColor = ui.popStyleColor
-local ui_itemRectMin = ui.itemRectMin
-local ui_itemRectMax = ui.itemRectMax
 local ui_textLineHeightWithSpacing = ui.textLineHeightWithSpacing
 local ui_cursorScreenPos = ui.cursorScreenPos
-local ui_setItemAllowOverlap = ui.setItemAllowOverlap
 local ui_setCursorScreenPos = ui.setCursorScreenPos
-local ui_invisibleButton = ui.invisibleButton
-local ui_windowPos = ui.windowPos
 local ui_columnSortingHeader = ui.columnSortingHeader
 local ui_pushColumnsBackground = ui.pushColumnsBackground
 local ui_popColumnsBackground = ui.popColumnsBackground
@@ -36,13 +29,9 @@ local ui_popID = ui.popID
 local ui_selectable = ui.selectable
 local ui_itemClicked = ui.itemClicked
 local ui_sameLine = ui.sameLine
-local ui_getScrollMaxY = ui.getScrollMaxY
-local ui_getScrollX = ui.getScrollX
-local ui_getScrollY = ui.getScrollY
 local render = render
 local render_debugText = render.debugText
 local math = math
-local math_max = math.max
 local math_floor = math.floor
 local string = string
 local string_format = string.format
@@ -70,6 +59,8 @@ local StringsManager = StringsManager
 local StringsManager_resolveStringValue = StringsManager.resolveStringValue
 local Logger = Logger
 local Logger_error = Logger.error
+local UIOperations = UIOperations
+local UIOperations_addTooltipOnTableColumnHeader = UIOperations.addTooltipOnTableColumnHeader
 
 
 -- These are the window IDs as defined in the manifest.ini
@@ -165,52 +156,6 @@ local OVERHEAD_TEXT_HEIGHT_ABOVE_CAR = vec3(0, 2.0, 0)
 
 local uiCarListSetDefaultColumnWidths = false
 
-local addTooltipOverLastItem_scrollPosition = vec2(0,0)
-local addTooltipOverLastItem_invisibleButtonPosition = vec2(0,0)
-local addTooltipOverLastItem_invisibleButtonSize = vec2(0,0)
-
--- Andreas: This function is needed because ImGui doesn't have built-in support for tooltips on column headers in tables i.e. ui.itemHovered() after a call to ui.columnSortingHeader() doesn't work.
--- Minimal overlay for column-header tooltips.
--- Uses the header’s own rect AFTER it’s drawn, so IDs/widths match.
-local function addTooltipOnTableColumnHeader(text, idSuffix)
-  -- Header rect is returned in window space:
-  local itemRectMin = ui_itemRectMin()
-  local itemRectMax = ui_itemRectMax()
-  local w = math_max(itemRectMax.x - itemRectMin.x, 1)
-  local h = math_max(itemRectMax.y - itemRectMin.y, ui_textLineHeightWithSpacing())
-  addTooltipOverLastItem_invisibleButtonSize:set(w, h)
-
-  -- capture the current cursor screen position to restore it later, since we're going to move it to draw an invisible button which will capture the hover state
-  local previousCursorScreenPosition = ui_cursorScreenPos()
-
-  -- allow the invisible button to be drawn outside the normal item rect so that it can cover the entire column header area
-  ui_setItemAllowOverlap()
-
-  -- determine the position of where to place the invisible button which will capture the hover for the tooltip
-  local scrollX = ui_getScrollX()
-  local scrollY = ui_getScrollY()
-  local windowPosition = ui_windowPos()
-  addTooltipOverLastItem_scrollPosition:set(scrollX, scrollY)
-  addTooltipOverLastItem_invisibleButtonPosition:set(windowPosition):sub(addTooltipOverLastItem_scrollPosition):add(itemRectMin)
-  ui_setCursorScreenPos(addTooltipOverLastItem_invisibleButtonPosition)
-
-  -- draw the invisible button over the column header
-  ui_invisibleButton('##carListTableHeaderTip'..idSuffix, addTooltipOverLastItem_invisibleButtonSize)
-
-  -- show the tooltip if hovered over the invisible button
-  if ui_itemHovered() then
-    ui_setTooltip(text)
-  end
-
-  -- restore previous cursor screen position before we added the invisible button
-  ui_setCursorScreenPos(previousCursorScreenPosition)
-end
-
-UIManager.isVerticalScrollVisible = function()
-  local scrollMaxY = ui_getScrollMaxY()
-  return scrollMaxY > 0
-end
-
 UIManager.drawUICarList = function()
 
   --[====[
@@ -266,8 +211,7 @@ UIManager.drawUICarList = function()
     if not uiCarListSetDefaultColumnWidths then
       ui_setColumnWidth(col-1, carTableColumns_width[col])
     end
-    -- ui.getColumnWidth
-    addTooltipOnTableColumnHeader(carTableColumns_tooltip[col], col)
+    UIOperations_addTooltipOnTableColumnHeader(carTableColumns_tooltip[col], '##carListTableHeaderTip', col)
     ui_columnSortingHeader(carTableColumns_name[col], carTableColumns_orderDirection[col])
   end
 

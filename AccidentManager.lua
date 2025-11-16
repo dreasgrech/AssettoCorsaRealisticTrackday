@@ -347,9 +347,14 @@ end
 
 function AccidentManager.simulateAccident_manual()
     local storage_Debugging = StorageManager.getStorage_Debugging()
-    local baseSplinePosition = storage_Debugging.debugSimulateAccidentSplinePosition 
+    local baseSplinePosition = storage_Debugging.debugSimulateAccidentSplinePosition
+    local debugSimulateAccidentCarsGapMeters = storage_Debugging.debugSimulateAccidentCarsGapMeters
+
     -- local baseSplinePositionGap = 0.0006
-    local baseSplinePositionGap = 0.001
+    -- local baseSplinePositionGap = 0.001
+    local shiftCarsToSideOffset = 2.0
+
+    local baseSplinePositionGap = RaceTrackManager.metersToSplineSpan(debugSimulateAccidentCarsGapMeters)
 
     local accidentsInfo = {
         {
@@ -439,10 +444,7 @@ function AccidentManager.simulateAccident_manual()
         local accidentInfoCulpritCarWorldPosition = ac.trackProgressToWorldCoordinate(accidentInfoCulpritCarSplinePosition, false)
         local accidentInfoVictimCarWorldPosition = ac.trackProgressToWorldCoordinate(accidentInfoVictimCarSplinePosition, false)
 
-        accidentInfoCulpritCarWorldPosition = accidentInfoCulpritCarWorldPosition + culpritCar.side * 2.0
-
-        CarManager.cars_doNoResetAfterNextCarJump[accidentInfoCulpritCarIndex] = true
-        CarManager.cars_doNoResetAfterNextCarJump[accidentInfoVictimCarIndex] = true
+        accidentInfoCulpritCarWorldPosition = accidentInfoCulpritCarWorldPosition + culpritCar.side * shiftCarsToSideOffset
 
         Logger.log(string.format("Teleporting culprit car #%d to %.2f and victim car #%d to %.2f", 
             accidentInfoCulpritCarIndex, 
@@ -450,15 +452,17 @@ function AccidentManager.simulateAccident_manual()
             accidentInfoVictimCarIndex, 
             accidentInfoVictimCarSplinePosition))
 
-        physics.setCarPosition(accidentInfoCulpritCarIndex, accidentInfoCulpritCarWorldPosition, accidentInfoCulpritCarDirection)
-        physics.setCarPosition(accidentInfoVictimCarIndex, accidentInfoVictimCarWorldPosition, accidentInfoVictimCarDirection)
+        -- teleport the culprit and victim cars to their positions
+        CarOperations.teleportCarToWorldPosition(accidentInfoCulpritCarIndex, accidentInfoCulpritCarWorldPosition, accidentInfoCulpritCarDirection, true)
+        CarOperations.teleportCarToWorldPosition(accidentInfoVictimCarIndex, accidentInfoVictimCarWorldPosition, accidentInfoVictimCarDirection, true)
 
-        CarOperations.stopCarAfterAccident(accidentInfoCulpritCarIndex)
-        CarOperations.stopCarAfterAccident(accidentInfoVictimCarIndex)
+        -- CarOperations.stopCarAfterAccident(accidentInfoCulpritCarIndex)
+        -- CarOperations.stopCarAfterAccident(accidentInfoVictimCarIndex)
 
         -- local collisionPosition = accidentInfoCulpritCarSplinePosition
         local collisionWorldPosition = accidentInfoCulpritCarWorldPosition
 
+        -- register the accident
         AccidentManager.registerCollision(
             accidentInfoCulpritCarIndex,
             collisionWorldPosition,
@@ -467,6 +471,7 @@ function AccidentManager.simulateAccident_manual()
 
         -- move player car
         physics.setCarPosition(0, ac.trackProgressToWorldCoordinate(baseSplinePosition - 0.005, false), nil)
+        CarOperations.teleportCarToWorldPosition(0, ac.trackProgressToWorldCoordinate(baseSplinePosition - 0.005, false), nil, false)
 
     end
 

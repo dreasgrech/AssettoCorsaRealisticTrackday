@@ -91,7 +91,8 @@ StorageManager.Options_Debugging = {
     DebugLogCarOvertaking = 8,
     DebugOverridePlayerCarLateralOffset = 9,
     DebugOverridePlayerCarLateralOffsetValue = 10,
-    DebugSimulateAccidentSplinePosition = 11
+    DebugSimulateAccidentSplinePosition = 11,
+    DebugSimulateAccidentCarsGapMeters = 12,
 }
 
 ---@enum StorageManager.Options_Yielding
@@ -136,6 +137,7 @@ local optionsCollection_Debugging_beforeDoD = {
     { name = StorageManager.Options_Debugging.DebugOverridePlayerCarLateralOffset, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugOverridePlayerCarLateralOffsetValue, default=0.0, min=-1.0, max=1.0 },
     { name = StorageManager.Options_Debugging.DebugSimulateAccidentSplinePosition, default=0.001, min=0, max=1 },
+    { name = StorageManager.Options_Debugging.DebugSimulateAccidentCarsGapMeters, default=20, min=5, max=100 },
 }
 
 -- local MIN_AI_CAUTION_VALUE = 3
@@ -349,6 +351,7 @@ local storageTable = {
 ---@field debugOverridePlayerCarLateralOffset boolean
 ---@field debugOverridePlayerCarLateralOffsetValue number
 ---@field debugSimulateAccidentSplinePosition number
+---@field debugSimulateAccidentCarsGapMeters number
 
 ---@type StorageTable_Debugging
 local storageTable_Debugging = {
@@ -363,6 +366,7 @@ local storageTable_Debugging = {
     debugOverridePlayerCarLateralOffset = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugOverridePlayerCarLateralOffset],
     debugOverridePlayerCarLateralOffsetValue = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugOverridePlayerCarLateralOffsetValue],
     debugSimulateAccidentSplinePosition = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugSimulateAccidentSplinePosition],
+    debugSimulateAccidentCarsGapMeters = StorageManager.options_Debugging_default[StorageManager.Options_Debugging.DebugSimulateAccidentCarsGapMeters],
 }
 
 ---@class StorageTable_Yielding

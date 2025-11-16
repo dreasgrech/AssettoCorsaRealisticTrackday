@@ -2,9 +2,6 @@ local SettingsWindow = {}
 
 -- bindings
 local ui = ui
-local ui_pushItemWidth = ui.pushItemWidth
-local ui_popItemWidth =  ui.popItemWidth
-local ui_slider = ui.slider
 local ui_itemHovered = ui.itemHovered
 local ui_setTooltip = ui.setTooltip
 local ui_pushDisabled = ui.pushDisabled
@@ -23,8 +20,6 @@ local ui_dwriteText = ui.dwriteText
 local ui_checkbox = ui.checkbox
 local ui_pushDWriteFont = ui.pushDWriteFont
 local ui_popDWriteFont = ui.popDWriteFont
-local ui_MouseButton = ui.MouseButton
-local ui_mouseClicked = ui.mouseClicked
 local ui_StyleColor = ui.StyleColor
 local string = string
 local string_format = string.format
@@ -40,6 +35,9 @@ local UILateralOffsetsImageWidget = UILateralOffsetsImageWidget
 local UILateralOffsetsImageWidget_draw = UILateralOffsetsImageWidget.draw
 local UIAppNameVersionWidget = UIAppNameVersionWidget
 local UIAppNameVersionWidget_drawBottomRight = UIAppNameVersionWidget.drawBottomRight
+local UIOperations = UIOperations
+local UIOperations_createDisabledSection = UIOperations.createDisabledSection
+local UIOperations_renderSlider = UIOperations.renderSlider
 
 local StorageManager = StorageManager
 local StorageManager_getPerTrackPerModeStorageKey = StorageManager.getPerTrackPerModeStorageKey
@@ -86,65 +84,6 @@ local storage_Overtaking = StorageManager.getStorage_Overtaking()
 local storage_Debugging = StorageManager.getStorage_Debugging()
 local storage_AICarValues = StorageManager.getStorage_AICarValues()
 
----Renders a slider with a tooltip
----@param label string @Slider label.
----@param tooltip string
----@param value refnumber|number @Current slider value.
----@param minValue number? @Default value: 0.
----@param maxValue number? @Default value: 1.
----@param sliderWidth number
----@param labelFormat string|'%.3f'|nil @C-style format string. Default value: `'%.3f'`.
----@param defaultValue number @The default value to reset to on right-click and is shown in the tooltip.
----@return number @Possibly updated slider value.
-local renderSlider = function(label, tooltip, value, minValue, maxValue, sliderWidth, labelFormat, defaultValue)
-    -- set the width of the slider
-    ui_pushItemWidth(sliderWidth)
-
-    -- render the slider
-    local newValue = ui_slider(label, value, minValue, maxValue, labelFormat)
-
-    -- reset the item width
-    ui_popItemWidth()
-
-    tooltip = string_format('%s\n\nDefault: %.2f', tooltip, defaultValue)
-
-    if ui_itemHovered() then
-        -- render the tooltip
-        ui_setTooltip(tooltip)
-
-        -- reset the slider to default value on right-click
-        if ui_mouseClicked(ui_MouseButton.Right) then
-            -- Logger.log(string.format('Resetting slider "%s" to default value: %.2f', label, defaultValue))
-            newValue = defaultValue
-        end
-    end
-
-    return newValue
-end
-
-local renderSliderWithInnerText = function(sliderID, labelFormat, tooltip, value, min, max, sliderWidth)
-    ui_pushItemWidth(sliderWidth)
-    local newValue = ui_slider(sliderID, value, min, max, labelFormat)
-    ui_popItemWidth()
-    if ui_itemHovered() then ui_setTooltip(tooltip) end
-    return newValue
-end
-
---- Creates a disabled section in the UI.
----@param createSection boolean @If true, will create a disabled section.
----@param callback function @Function to call to render the contents of the section.
-local createDisabledSection = function(createSection, callback)
-    if createSection then
-        ui_pushDisabled()
-    end
-
-    callback()
-
-    if createSection then
-        ui_popDisabled()
-    end
-end
-
 
 ---@param storage_Debugging StorageTable_Debugging
 local renderDebuggingSection = function(storage_Debugging)
@@ -161,7 +100,7 @@ local renderDebuggingSection = function(storage_Debugging)
     if ui_checkbox('Show car state overhead text', storage_Debugging.debugShowCarStateOverheadText) then storage_Debugging.debugShowCarStateOverheadText = not storage_Debugging.debugShowCarStateOverheadText end
     if ui_itemHovered() then ui_setTooltip("Shows the car's current state as text over the car") end
 
-    storage_Debugging.debugCarGizmosDrawistance = renderSliderWithInnerText('##debugCarStateOverheadShowDistance', 'Car gizmos draw distance: %.0fm', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage_Debugging.debugCarGizmosDrawistance, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugCarGizmosDrawistance], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugCarGizmosDrawistance], DEFAULT_SLIDER_WIDTH)
+    storage_Debugging.debugCarGizmosDrawistance = UIOperations_renderSlider('##debugCarStateOverheadShowDistance', 'The maximum distance from the camera focused car at which to show the car state overhead text.', storage_Debugging.debugCarGizmosDrawistance, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugCarGizmosDrawistance], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugCarGizmosDrawistance], DEFAULT_SLIDER_WIDTH, 'Car gizmos draw distance: %.0fm', StorageManager_options_Debugging_default[StorageManager_Options_Debugging.DebugCarGizmosDrawistance])
 
     if ui_checkbox('Show raycasts when driving laterally', storage_Debugging.debugShowRaycastsWhileDrivingLaterally) then storage_Debugging.debugShowRaycastsWhileDrivingLaterally = not storage_Debugging.debugShowRaycastsWhileDrivingLaterally end
     if ui_itemHovered() then ui_setTooltip('Shows the raycasts used to check for side clearance when driving checking for cars on the side') end
@@ -183,16 +122,16 @@ local renderDebuggingSection = function(storage_Debugging)
     if ui_checkbox('Override player car lateral offset', storage_Debugging.debugOverridePlayerCarLateralOffset) then storage_Debugging.debugOverridePlayerCarLateralOffset = not storage_Debugging.debugOverridePlayerCarLateralOffset end
     if ui_itemHovered() then ui_setTooltip('If enabled, will force the player car to use a specific lateral offset value.') end
 
-    storage_Debugging.debugOverridePlayerCarLateralOffsetValue = renderSliderWithInnerText('##debugOverridePlayerCarLateralOffsetValue', 'Player car lateral offset override value: %.2f m', 'The lateral offset value to force the player car to use when the override is enabled.', storage_Debugging.debugOverridePlayerCarLateralOffsetValue, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugOverridePlayerCarLateralOffsetValue], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugOverridePlayerCarLateralOffsetValue], DEFAULT_SLIDER_WIDTH)
+    storage_Debugging.debugOverridePlayerCarLateralOffsetValue = UIOperations_renderSlider('##debugOverridePlayerCarLateralOffsetValue', 'The lateral offset value to force the player car to use when the override is enabled.', storage_Debugging.debugOverridePlayerCarLateralOffsetValue, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugOverridePlayerCarLateralOffsetValue], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugOverridePlayerCarLateralOffsetValue], 300, 'Player car lateral offset override value: %.2f', StorageManager_options_Debugging_default[StorageManager_Options_Debugging.DebugOverridePlayerCarLateralOffsetValue])
 
     ui_nextColumn()
 
-    createDisabledSection(not Constants.ENABLE_ACCIDENT_HANDLING_IN_APP, function()
+    UIOperations_createDisabledSection(not Constants.ENABLE_ACCIDENT_HANDLING_IN_APP, function()
         -- if ui_button('Simulate accident', ui.ButtonFlags.None) then
             -- AccidentManager.simulateAccident()
         -- end
 
-        storage_Debugging.debugSimulateAccidentSplinePosition = renderSliderWithInnerText('##debugSimulateAccidentSplinePosition', 'Accident spline position: %.3f', 'The spline position to use when simulating an accident.', storage_Debugging.debugSimulateAccidentSplinePosition, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugSimulateAccidentSplinePosition], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugSimulateAccidentSplinePosition], DEFAULT_SLIDER_WIDTH)
+        storage_Debugging.debugSimulateAccidentSplinePosition = UIOperations_renderSlider('##debugSimulateAccidentSplinePosition', 'The spline position to use when simulating an accident.', storage_Debugging.debugSimulateAccidentSplinePosition, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugSimulateAccidentSplinePosition], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugSimulateAccidentSplinePosition], DEFAULT_SLIDER_WIDTH, 'Accident spline position: %.3f', StorageManager_options_Debugging_default[StorageManager_Options_Debugging.DebugSimulateAccidentSplinePosition])
 
         if ui_button('Simulate accident (manual)', ui.ButtonFlags.None) then
             AccidentManager.simulateAccident_manual()
@@ -223,21 +162,21 @@ local drawAICarValuesSection = function()
     ui_newLine(1)
 
     ui_pushStyleColor(ui_StyleColor.SliderGrab, getSliderColorForAICautionWhenSetToZero(storage_AICarValues.defaultAICaution))
-    storage_AICarValues.defaultAICaution =  renderSlider('Caution while driving normally', 'The default gap cars keep between each other while driving on the default driving lane.\n\nThe higher this value is, the more cautious the cars will be by keeping a larger gap between each other, which can provide a more relaxed trackday experience.', storage_AICarValues.defaultAICaution, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.DefaultAICaution], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.DefaultAICaution], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.DefaultAICaution]) -- do not drop the minimum below 2 because 1 is used while overtaking
+    storage_AICarValues.defaultAICaution =  UIOperations_renderSlider('Caution while driving normally', 'The default gap cars keep between each other while driving on the default driving lane.\n\nThe higher this value is, the more cautious the cars will be by keeping a larger gap between each other, which can provide a more relaxed trackday experience.', storage_AICarValues.defaultAICaution, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.DefaultAICaution], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.DefaultAICaution], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.DefaultAICaution]) -- do not drop the minimum below 2 because 1 is used while overtaking
     ui_popStyleColor()
 
-    storage_AICarValues.AICaution_OvertakingWithNoObstacleInFront =  renderSlider('Caution while overtaking (No obstacle in front)', 'The caution level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe lower this value is, the more aggressive the cars will be while overtaking when there is no obstacle in front of them.', storage_AICarValues.AICaution_OvertakingWithNoObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AICaution_OvertakingWithNoObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AICaution_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AICaution_OvertakingWithNoObstacleInFront])
+    storage_AICarValues.AICaution_OvertakingWithNoObstacleInFront =  UIOperations_renderSlider('Caution while overtaking (No obstacle in front)', 'The caution level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe lower this value is, the more aggressive the cars will be while overtaking when there is no obstacle in front of them.', storage_AICarValues.AICaution_OvertakingWithNoObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AICaution_OvertakingWithNoObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AICaution_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AICaution_OvertakingWithNoObstacleInFront])
 
     ui_pushStyleColor(ui_StyleColor.SliderGrab, getSliderColorForAICautionWhenSetToZero(storage_AICarValues.AICaution_OvertakingWithObstacleInFront))
-    storage_AICarValues.AICaution_OvertakingWithObstacleInFront =  renderSlider('Caution while overtaking (Obstacle in front)', 'The caution level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe higher this value is, the more cautious the cars will be while overtaking when there is an obstacle in front of them.', storage_AICarValues.AICaution_OvertakingWithObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AICaution_OvertakingWithObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AICaution_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AICaution_OvertakingWithObstacleInFront])
+    storage_AICarValues.AICaution_OvertakingWithObstacleInFront =  UIOperations_renderSlider('Caution while overtaking (Obstacle in front)', 'The caution level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe higher this value is, the more cautious the cars will be while overtaking when there is an obstacle in front of them.', storage_AICarValues.AICaution_OvertakingWithObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AICaution_OvertakingWithObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AICaution_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AICaution_OvertakingWithObstacleInFront])
     ui_popStyleColor()
 
     ui_pushStyleColor(ui_StyleColor.SliderGrab, getSliderColorForAICautionWhenSetToZero(storage_AICarValues.AICaution_OvertakingWhileInCorner))
-    storage_AICarValues.AICaution_OvertakingWhileInCorner =  renderSlider('Caution while overtaking in corner', 'The caution level used when overtaking another car while in a corner.\n\nThe higher this value is, the more cautious the cars will be while overtaking in corners.', storage_AICarValues.AICaution_OvertakingWhileInCorner, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AICaution_OvertakingWhileInCorner], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AICaution_OvertakingWhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AICaution_OvertakingWhileInCorner])
+    storage_AICarValues.AICaution_OvertakingWhileInCorner =  UIOperations_renderSlider('Caution while overtaking in corner', 'The caution level used when overtaking another car while in a corner.\n\nThe higher this value is, the more cautious the cars will be while overtaking in corners.', storage_AICarValues.AICaution_OvertakingWhileInCorner, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AICaution_OvertakingWhileInCorner], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AICaution_OvertakingWhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AICaution_OvertakingWhileInCorner])
     ui_popStyleColor()
 
     ui_pushStyleColor(ui_StyleColor.SliderGrab, getSliderColorForAICautionWhenSetToZero(storage_AICarValues.AICaution_Yielding))
-    storage_AICarValues.AICaution_Yielding =  renderSlider('Caution while yielding', 'The caution level used when yielding (giving way to faster cars).\n\nThe higher this value is, the more cautious the cars will be while yielding.', storage_AICarValues.AICaution_Yielding, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AICaution_Yielding], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AICaution_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AICaution_Yielding])
+    storage_AICarValues.AICaution_Yielding =  UIOperations_renderSlider('Caution while yielding', 'The caution level used when yielding (giving way to faster cars).\n\nThe higher this value is, the more cautious the cars will be while yielding.', storage_AICarValues.AICaution_Yielding, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AICaution_Yielding], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AICaution_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AICaution_Yielding])
     ui_popStyleColor()
 
     ui_nextColumn()
@@ -252,26 +191,26 @@ local drawAICarValuesSection = function()
     if ui_itemHovered() then ui_setTooltip('If enabled, will override the original aggression value thats is set from the game launcher when the car is driving normally.') end
 
     local overrideOriginalAIAggression_drivingNormally = storage_AICarValues.overrideOriginalAIAggression_drivingNormally
-    createDisabledSection(not overrideOriginalAIAggression_drivingNormally, function()
-        storage_AICarValues.defaultAIAggression =  renderSlider('Aggression while driving normally', 'The default aggression level cars exhibit when driving on the default driving lane.\n\nThe higher this value is, the more aggressive the cars will be (although the exact definition of aggression is still a bit unclear at the moment).', storage_AICarValues.defaultAIAggression, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.DefaultAIAggression], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.DefaultAIAggression], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.DefaultAIAggression]) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
+    UIOperations_createDisabledSection(not overrideOriginalAIAggression_drivingNormally, function()
+        storage_AICarValues.defaultAIAggression =  UIOperations_renderSlider('Aggression while driving normally', 'The default aggression level cars exhibit when driving on the default driving lane.\n\nThe higher this value is, the more aggressive the cars will be (although the exact definition of aggression is still a bit unclear at the moment).', storage_AICarValues.defaultAIAggression, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.DefaultAIAggression], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.DefaultAIAggression], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.DefaultAIAggression]) -- do not set above 0.95 because 1.0 is reserved for overtaking with no obstacles
     end)
 
     if ui_checkbox('Override original aggression when overtaking', storage_AICarValues.overrideOriginalAIAggression_overtaking) then storage_AICarValues.overrideOriginalAIAggression_overtaking = not storage_AICarValues.overrideOriginalAIAggression_overtaking end
     if ui_itemHovered() then ui_setTooltip('If enabled, will override the original aggression value thats is set from the game launcher when the car is overtaking another car.') end
 
     local overrideOriginalAIAggression_overtaking = storage_AICarValues.overrideOriginalAIAggression_overtaking
-    createDisabledSection(not overrideOriginalAIAggression_overtaking, function()
-        storage_AICarValues.AIAggression_OvertakingWithNoObstacleInFront = renderSlider('Aggression while overtaking (No obstacle in front)', 'The aggression level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe higher this value is, the more aggressive the cars will be while overtaking when there is no obstacle in front of them.', storage_AICarValues.AIAggression_OvertakingWithNoObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIAggression_OvertakingWithNoObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIAggression_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIAggression_OvertakingWithNoObstacleInFront])
-        storage_AICarValues.AIAggression_OvertakingWithObstacleInFront = renderSlider('Aggression while overtaking (Obstacle in front)', 'The aggression level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe lower this value is, the more cautious the cars will be while overtaking when there is an obstacle in front of them.', storage_AICarValues.AIAggression_OvertakingWithObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIAggression_OvertakingWithObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIAggression_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIAggression_OvertakingWithObstacleInFront])
-        storage_AICarValues.AIAggression_WhileInCorner = renderSlider('Aggression while overtaking in corner', 'The aggression level used when overtaking another car while in a corner.\n\nThe lower this value is, the more cautious the cars will be while overtaking in corners.', storage_AICarValues.AIAggression_WhileInCorner, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIAggression_WhileInCorner], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIAggression_WhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIAggression_WhileInCorner])
+    UIOperations_createDisabledSection(not overrideOriginalAIAggression_overtaking, function()
+        storage_AICarValues.AIAggression_OvertakingWithNoObstacleInFront = UIOperations_renderSlider('Aggression while overtaking (No obstacle in front)', 'The aggression level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe higher this value is, the more aggressive the cars will be while overtaking when there is no obstacle in front of them.', storage_AICarValues.AIAggression_OvertakingWithNoObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIAggression_OvertakingWithNoObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIAggression_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIAggression_OvertakingWithNoObstacleInFront])
+        storage_AICarValues.AIAggression_OvertakingWithObstacleInFront = UIOperations_renderSlider('Aggression while overtaking (Obstacle in front)', 'The aggression level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe lower this value is, the more cautious the cars will be while overtaking when there is an obstacle in front of them.', storage_AICarValues.AIAggression_OvertakingWithObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIAggression_OvertakingWithObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIAggression_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIAggression_OvertakingWithObstacleInFront])
+        storage_AICarValues.AIAggression_WhileInCorner = UIOperations_renderSlider('Aggression while overtaking in corner', 'The aggression level used when overtaking another car while in a corner.\n\nThe lower this value is, the more cautious the cars will be while overtaking in corners.', storage_AICarValues.AIAggression_WhileInCorner, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIAggression_WhileInCorner], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIAggression_WhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIAggression_WhileInCorner])
     end)
 
     if ui_checkbox('Override original aggression when yielding', storage_AICarValues.overrideOriginalAIAggression_yielding) then storage_AICarValues.overrideOriginalAIAggression_yielding = not storage_AICarValues.overrideOriginalAIAggression_yielding end
     if ui_itemHovered() then ui_setTooltip('If enabled, will override the original aggression value thats is set from the game launcher when the car is yielding (giving way to faster cars).') end
 
     local overrideOriginalAIAggression_yielding = storage_AICarValues.overrideOriginalAIAggression_yielding
-    createDisabledSection(not overrideOriginalAIAggression_yielding, function()
-        storage_AICarValues.AIAggression_Yielding = renderSlider('Aggression while yielding', 'The aggression level used when yielding (giving way to faster cars).\n\nThe lower this value is, the more cautious the cars will be while yielding.', storage_AICarValues.AIAggression_Yielding, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIAggression_Yielding], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIAggression_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIAggression_Yielding])
+    UIOperations_createDisabledSection(not overrideOriginalAIAggression_yielding, function()
+        storage_AICarValues.AIAggression_Yielding = UIOperations_renderSlider('Aggression while yielding', 'The aggression level used when yielding (giving way to faster cars).\n\nThe lower this value is, the more cautious the cars will be while yielding.', storage_AICarValues.AIAggression_Yielding, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIAggression_Yielding], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIAggression_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIAggression_Yielding])
     end)
 
     ui_nextColumn()
@@ -286,26 +225,26 @@ local drawAICarValuesSection = function()
     if ui_itemHovered() then ui_setTooltip('If enabled, will override the original difficulty level thats is set from the game launcher when the car is driving normally.') end
 
     local overrideOriginalAIDifficultyLevel_drivingNormally = storage_AICarValues.overrideOriginalAIDifficultyLevel_drivingNormally
-    createDisabledSection(not overrideOriginalAIDifficultyLevel_drivingNormally, function()
-        storage_AICarValues.defaultAIDifficultyLevel =  renderSlider('Difficulty Level while driving normally', 'The default difficulty level cars exhibit when driving on the default driving lane.\n\nThe higher this value is, the more effective the cars will be with the pedals and how fast they can handle corners.', storage_AICarValues.defaultAIDifficultyLevel, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.DefaultAIDifficultyLevel], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.DefaultAIDifficultyLevel], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.DefaultAIDifficultyLevel])
+    UIOperations_createDisabledSection(not overrideOriginalAIDifficultyLevel_drivingNormally, function()
+        storage_AICarValues.defaultAIDifficultyLevel =  UIOperations_renderSlider('Difficulty Level while driving normally', 'The default difficulty level cars exhibit when driving on the default driving lane.\n\nThe higher this value is, the more effective the cars will be with the pedals and how fast they can handle corners.', storage_AICarValues.defaultAIDifficultyLevel, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.DefaultAIDifficultyLevel], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.DefaultAIDifficultyLevel], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.DefaultAIDifficultyLevel])
     end)
 
     if ui_checkbox('Override original Difficulty Level when overtaking', storage_AICarValues.overrideOriginalAIDifficultyLevel_overtaking) then storage_AICarValues.overrideOriginalAIDifficultyLevel_overtaking = not storage_AICarValues.overrideOriginalAIDifficultyLevel_overtaking end
     if ui_itemHovered() then ui_setTooltip('If enabled, will override the original difficulty level thats is set from the game launcher when the car is overtaking another car.') end
 
     local overrideOriginalAIDifficultyLevel_overtaking = storage_AICarValues.overrideOriginalAIDifficultyLevel_overtaking
-    createDisabledSection(not overrideOriginalAIDifficultyLevel_overtaking, function()
-        storage_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront = renderSlider('Difficulty Level while overtaking (No obstacle in front)', 'The difficulty level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe higher this value is, the more effective the cars will be with the pedals and how fast they can handle corners while overtaking when there is no obstacle in front of them.', storage_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront])
-        storage_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront = renderSlider('Difficulty Level while overtaking (Obstacle in front)', 'The difficulty level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while overtaking when there is an obstacle in front of them.', storage_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront])
-        storage_AICarValues.AIDifficultyLevel_WhileInCorner = renderSlider('Difficulty Level while overtaking in corner', 'The difficulty level used when overtaking another car while in a corner.\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while overtaking in corners.', storage_AICarValues.AIDifficultyLevel_WhileInCorner, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIDifficultyLevel_WhileInCorner], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIDifficultyLevel_WhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIDifficultyLevel_WhileInCorner])
+    UIOperations_createDisabledSection(not overrideOriginalAIDifficultyLevel_overtaking, function()
+        storage_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront = UIOperations_renderSlider('Difficulty Level while overtaking (No obstacle in front)', 'The difficulty level used when overtaking another car if there is no obstacle in front of the overtaking car.\n\nThe higher this value is, the more effective the cars will be with the pedals and how fast they can handle corners while overtaking when there is no obstacle in front of them.', storage_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithNoObstacleInFront])
+        storage_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront = UIOperations_renderSlider('Difficulty Level while overtaking (Obstacle in front)', 'The difficulty level used when overtaking another car if there is an obstacle in front of the overtaking car.\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while overtaking when there is an obstacle in front of them.', storage_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIDifficultyLevel_OvertakingWithObstacleInFront])
+        storage_AICarValues.AIDifficultyLevel_WhileInCorner = UIOperations_renderSlider('Difficulty Level while overtaking in corner', 'The difficulty level used when overtaking another car while in a corner.\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while overtaking in corners.', storage_AICarValues.AIDifficultyLevel_WhileInCorner, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIDifficultyLevel_WhileInCorner], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIDifficultyLevel_WhileInCorner], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIDifficultyLevel_WhileInCorner])
     end)
 
     if ui_checkbox('Override original Difficulty Level when yielding', storage_AICarValues.overrideOriginalAIDifficultyLevel_yielding) then storage_AICarValues.overrideOriginalAIDifficultyLevel_yielding = not storage_AICarValues.overrideOriginalAIDifficultyLevel_yielding end
     if ui_itemHovered() then ui_setTooltip('If enabled, will override the original difficulty level thats is set from the game launcher when the car is yielding (giving way to faster cars).') end
 
     local overrideOriginalAIDifficultyLevel_yielding = storage_AICarValues.overrideOriginalAIDifficultyLevel_yielding
-    createDisabledSection(not overrideOriginalAIDifficultyLevel_yielding, function()
-        storage_AICarValues.AIDifficultyLevel_Yielding = renderSlider('Difficulty Level while yielding', 'The difficulty level used when yielding (giving way to faster cars).\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while yielding.', storage_AICarValues.AIDifficultyLevel_Yielding, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIDifficultyLevel_Yielding], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIDifficultyLevel_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIDifficultyLevel_Yielding])
+    UIOperations_createDisabledSection(not overrideOriginalAIDifficultyLevel_yielding, function()
+        storage_AICarValues.AIDifficultyLevel_Yielding = UIOperations_renderSlider('Difficulty Level while yielding', 'The difficulty level used when yielding (giving way to faster cars).\n\nThe lower this value is, the less effective the cars will be with the pedals and how fast they can handle corners while yielding.', storage_AICarValues.AIDifficultyLevel_Yielding, StorageManager_options_AICarValues_min[StorageManager_Options_AICarValues.AIDifficultyLevel_Yielding], StorageManager_options_AICarValues_max[StorageManager_Options_AICarValues.AIDifficultyLevel_Yielding], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_AICarValues_default[StorageManager_Options_AICarValues.AIDifficultyLevel_Yielding])
     end)
 
     ui_columns(1, false)
@@ -323,15 +262,15 @@ local drawLateralOffsetsSection = function()
     local handleOvertaking = storage_Overtaking.handleOvertaking
 
     local overtakingSide = RaceTrackManager_getOvertakingSide()
-    createDisabledSection(not handleOvertaking, function()
-        storage.overtakingLateralOffset =  renderSlider(string_format('Overtaking Lateral Offset [-1..1] -> Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.overtakingLateralOffset, StorageManager_options_min[StorageManager_Options.OvertakingLateralOffset], StorageManager_options_max[StorageManager_Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.OvertakingLateralOffset])
+    UIOperations_createDisabledSection(not handleOvertaking, function()
+        storage.overtakingLateralOffset =  UIOperations_renderSlider(string_format('Overtaking Lateral Offset [-1..1] -> Overtaking side: %s', RaceTrackManager.TrackSideStrings[overtakingSide]), 'The lateral offset from the centerline that AI cars will drive to when overtaking another car.\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.overtakingLateralOffset, StorageManager_options_min[StorageManager_Options.OvertakingLateralOffset], StorageManager_options_max[StorageManager_Options.OvertakingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.OvertakingLateralOffset])
     end)
 
-    storage.defaultLateralOffset =  renderSlider('Default Lateral Offset [-1..1]', 'The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.\n-1 = fully to the left\n0 = center of the track (racing line)\n1 = fully to the right', storage.defaultLateralOffset, StorageManager_options_min[StorageManager_Options.DefaultLateralOffset], StorageManager_options_max[StorageManager_Options.DefaultLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.DefaultLateralOffset])
+    storage.defaultLateralOffset =  UIOperations_renderSlider('Default Lateral Offset [-1..1]', 'The default lateral offset from the centerline that AI cars will try to maintain when not yielding or overtaking.\n-1 = fully to the left\n0 = center of the track (racing line)\n1 = fully to the right', storage.defaultLateralOffset, StorageManager_options_min[StorageManager_Options.DefaultLateralOffset], StorageManager_options_max[StorageManager_Options.DefaultLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.DefaultLateralOffset])
 
     local yieldingSide = RaceTrackManager_getYieldingSide()
-    createDisabledSection(not handleYielding, function()
-        storage.yieldingLateralOffset =  renderSlider(string_format('Yielding Lateral Offset [-1..1] -> Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), 'The lateral offset from the centerline that AI cars will drive to when yielding (giving way to faster cars).\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.yieldingLateralOffset, StorageManager_options_min[StorageManager_Options.YieldingLateralOffset], StorageManager_options_max[StorageManager_Options.YieldingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.YieldingLateralOffset])
+    UIOperations_createDisabledSection(not handleYielding, function()
+        storage.yieldingLateralOffset =  UIOperations_renderSlider(string_format('Yielding Lateral Offset [-1..1] -> Yielding side: %s', RaceTrackManager.TrackSideStrings[yieldingSide]), 'The lateral offset from the centerline that AI cars will drive to when yielding (giving way to faster cars).\n-1 = fully to the left\n0 = center of the track\n1 = fully to the right', storage.yieldingLateralOffset, StorageManager_options_min[StorageManager_Options.YieldingLateralOffset], StorageManager_options_max[StorageManager_Options.YieldingLateralOffset], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_default[StorageManager_Options.YieldingLateralOffset])
     end)
 
     -- ui.newLine(1)
@@ -409,7 +348,7 @@ SettingsWindow.draw = function()
     ui_popStyleColor(1)
     if ui_itemHovered() then ui_setTooltip('If enabled, AI cars will attempt to yield to the specified Yielding Lateral Offset side of the track') end
 
-    createDisabledSection(not handleYielding, function()
+    UIOperations_createDisabledSection(not handleYielding, function()
         if ui_checkbox('Check sides while yielding', storage_Yielding.handleSideCheckingWhenYielding) then storage_Yielding.handleSideCheckingWhenYielding = not storage_Yielding.handleSideCheckingWhenYielding end
         if ui_itemHovered() then ui_setTooltip("If enabled, cars will check for other cars on the side when yielding so they don't crash into them.") end
 
@@ -429,29 +368,29 @@ SettingsWindow.draw = function()
 
         ui_newLine(1)
 
-        storage_Yielding.detectCarBehind_meters =  renderSlider('Detect car behind distance', 'Start yielding if the overtaking car behind is within this distance', storage_Yielding.detectCarBehind_meters, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.DetectCarBehind_meters], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.DetectCarBehind_meters])
+        storage_Yielding.detectCarBehind_meters =  UIOperations_renderSlider('Detect car behind distance', 'Start yielding if the overtaking car behind is within this distance', storage_Yielding.detectCarBehind_meters, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.DetectCarBehind_meters], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.DetectCarBehind_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.DetectCarBehind_meters])
 
-        storage_Yielding.rampSpeed_mps =  renderSlider('Yielding Lateral Offset increment step', 'How quickly the lateral offset ramps up when yielding to an overtaking car.\nThe higher it is, the more quickly cars will change lanes when moving to the yielding side.', storage_Yielding.rampSpeed_mps, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.RampSpeed_mps], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.RampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.RampSpeed_mps])
+        storage_Yielding.rampSpeed_mps =  UIOperations_renderSlider('Yielding Lateral Offset increment step', 'How quickly the lateral offset ramps up when yielding to an overtaking car.\nThe higher it is, the more quickly cars will change lanes when moving to the yielding side.', storage_Yielding.rampSpeed_mps, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.RampSpeed_mps], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.RampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.RampSpeed_mps])
 
-        storage_Yielding.rampRelease_mps =  renderSlider('Yielding Lateral Offset decrement step', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the yielding car.\nThe higher it is, the more quickly cars will change lanes moving back to the default lateral offset after finishing yielding.', storage_Yielding.rampRelease_mps, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.RampRelease_mps], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.RampRelease_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.RampRelease_mps])
+        storage_Yielding.rampRelease_mps =  UIOperations_renderSlider('Yielding Lateral Offset decrement step', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the yielding car.\nThe higher it is, the more quickly cars will change lanes moving back to the default lateral offset after finishing yielding.', storage_Yielding.rampRelease_mps, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.RampRelease_mps], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.RampRelease_mps], DEFAULT_SLIDER_WIDTH, '%.2f m/s', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.RampRelease_mps])
 
         ui_newLine(1)
 
-        storage_Yielding.speedLimitValueToOvertakingCar = renderSlider('Top speed limit value to overtaking car [0..1]', "When yielding, the yielding car's top speed will be limited to this fraction of the overtaking car's current speed to let it pass more easily.\n1.0 = no top speed limiting\n0.5 = limit top speed to half the current speed of the overtaking car.\n0.0 = make the car grind to a halt", storage_Yielding.speedLimitValueToOvertakingCar, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.SpeedLimitValueToOvertakingCar], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.SpeedLimitValueToOvertakingCar], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_Yielding_default[StorageManager_Options_Yielding.SpeedLimitValueToOvertakingCar])
+        storage_Yielding.speedLimitValueToOvertakingCar = UIOperations_renderSlider('Top speed limit value to overtaking car [0..1]', "When yielding, the yielding car's top speed will be limited to this fraction of the overtaking car's current speed to let it pass more easily.\n1.0 = no top speed limiting\n0.5 = limit top speed to half the current speed of the overtaking car.\n0.0 = make the car grind to a halt", storage_Yielding.speedLimitValueToOvertakingCar, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.SpeedLimitValueToOvertakingCar], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.SpeedLimitValueToOvertakingCar], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_Yielding_default[StorageManager_Options_Yielding.SpeedLimitValueToOvertakingCar])
         local speedLimitValueToOvertakingCar  = storage_Yielding.speedLimitValueToOvertakingCar
-        createDisabledSection(speedLimitValueToOvertakingCar >= 1.0, function()
-            storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar = renderSlider('Minimum top speed to limit to overtaking car', "When yielding, the yielding car's top speed will not be limited below this speed even if the overtaking car is very slow.\n0.0 = no minimum top speed limit while yielding", storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar, StorageManager_options_Yielding_min[StorageManager_options_Yielding_min.MinimumSpeedLimitKmhToLimitToOvertakingCar], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar], DEFAULT_SLIDER_WIDTH, '%.2f km/h', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar])
+        UIOperations_createDisabledSection(speedLimitValueToOvertakingCar >= 1.0, function()
+            storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar = UIOperations_renderSlider('Minimum top speed to limit to overtaking car', "When yielding, the yielding car's top speed will not be limited below this speed even if the overtaking car is very slow.\n0.0 = no minimum top speed limit while yielding", storage_Yielding.minimumSpeedLimitKmhToLimitToOvertakingCar, StorageManager_options_Yielding_min[StorageManager_options_Yielding_min.MinimumSpeedLimitKmhToLimitToOvertakingCar], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar], DEFAULT_SLIDER_WIDTH, '%.2f km/h', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.MinimumSpeedLimitKmhToLimitToOvertakingCar])
 
         end)
 
-        storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar = renderSlider('Throttle pedal limit when yielding to overtaking car [0..1]', "When yielding, the yielding car's throttle pedal input will be limited to this fraction to let the overtaking car pass more easily.\n1.0 = no throttle pedal limiting\n0.5 = limit throttle pedal input to half\n0.0 = completely let go of the throttle pedal", storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_Yielding_default[StorageManager_Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar])
+        storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar = UIOperations_renderSlider('Throttle pedal limit when yielding to overtaking car [0..1]', "When yielding, the yielding car's throttle pedal input will be limited to this fraction to let the overtaking car pass more easily.\n1.0 = no throttle pedal limiting\n0.5 = limit throttle pedal input to half\n0.0 = completely let go of the throttle pedal", storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar], DEFAULT_SLIDER_WIDTH, DEFAULT_SLIDER_FORMAT, StorageManager_options_Yielding_default[StorageManager_Options_Yielding.ThrottlePedalLimitWhenYieldingToOvertakingCar])
 
         local anySpeedLimitingWhileYieldingApplied = 
             speedLimitValueToOvertakingCar < 1.0 or 
             storage_Yielding.throttlePedalLimitWhenYieldingToOvertakingCar < 1.0
 
-        createDisabledSection(not anySpeedLimitingWhileYieldingApplied, function()
-            storage_Yielding.distanceToOvertakingCarToLimitSpeed = renderSlider('Distance to overtaking car to apply speed limiting', 'When yielding, if an overtaking car is within this distance behind us, we will limit our speed to let it pass more easily.', storage_Yielding.distanceToOvertakingCarToLimitSpeed, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed])
+        UIOperations_createDisabledSection(not anySpeedLimitingWhileYieldingApplied, function()
+            storage_Yielding.distanceToOvertakingCarToLimitSpeed = UIOperations_renderSlider('Distance to overtaking car to apply speed limiting', 'When yielding, if an overtaking car is within this distance behind us, we will limit our speed to let it pass more easily.', storage_Yielding.distanceToOvertakingCarToLimitSpeed, StorageManager_options_Yielding_min[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed], StorageManager_options_Yielding_max[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Yielding_default[StorageManager_Options_Yielding.DistanceToOvertakingCarToLimitSpeed])
         end)
     end)
 
@@ -467,7 +406,7 @@ SettingsWindow.draw = function()
     ui_popStyleColor(1)
     if ui_itemHovered() then ui_setTooltip('If enabled, AI cars will attempt to overtake to the specified Overtaking Lateral Offset side of the track') end
     
-    createDisabledSection(not handleOvertaking, function()
+    UIOperations_createDisabledSection(not handleOvertaking, function()
         if ui_checkbox('Check sides while overtaking', storage_Overtaking.handleSideCheckingWhenOvertaking) then storage_Overtaking.handleSideCheckingWhenOvertaking = not storage_Overtaking.handleSideCheckingWhenOvertaking end
         if ui_itemHovered() then ui_setTooltip("If enabled, cars will check for other cars on the side when overtaking so they don't crash into them.") end
 
@@ -487,11 +426,11 @@ SettingsWindow.draw = function()
 
         ui_newLine(1)
 
-        storage_Overtaking.detectCarAhead_meters =  renderSlider('Detect car ahead distance', 'Start overtaking if the car in front is within this distance', storage_Overtaking.detectCarAhead_meters, StorageManager_options_Overtaking_min[StorageManager_Options_Overtaking.DetectCarAhead_meters], StorageManager_options_Overtaking_max[StorageManager_Options_Overtaking.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Overtaking_default[StorageManager_Options_Overtaking.DetectCarAhead_meters])
+        storage_Overtaking.detectCarAhead_meters =  UIOperations_renderSlider('Detect car ahead distance', 'Start overtaking if the car in front is within this distance', storage_Overtaking.detectCarAhead_meters, StorageManager_options_Overtaking_min[StorageManager_Options_Overtaking.DetectCarAhead_meters], StorageManager_options_Overtaking_max[StorageManager_Options_Overtaking.DetectCarAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_Overtaking_default[StorageManager_Options_Overtaking.DetectCarAhead_meters])
 
-        storage_Overtaking.overtakeRampSpeed_mps =  renderSlider('Overtaking Lateral Offset increment step', 'How quickly the lateral offset ramps up when overtaking another car.\nThe higher it is, the more quickly cars will change lanes when moving to the overtaking side', storage_Overtaking.overtakeRampSpeed_mps, StorageManager_options_Overtaking_min[StorageManager_Options_Overtaking.OvertakeRampSpeed_mps], StorageManager_options_Overtaking_max[StorageManager_Options_Overtaking.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s', StorageManager_options_Overtaking_default[StorageManager_Options_Overtaking.OvertakeRampSpeed_mps])
+        storage_Overtaking.overtakeRampSpeed_mps =  UIOperations_renderSlider('Overtaking Lateral Offset increment step', 'How quickly the lateral offset ramps up when overtaking another car.\nThe higher it is, the more quickly cars will change lanes when moving to the overtaking side', storage_Overtaking.overtakeRampSpeed_mps, StorageManager_options_Overtaking_min[StorageManager_Options_Overtaking.OvertakeRampSpeed_mps], StorageManager_options_Overtaking_max[StorageManager_Options_Overtaking.OvertakeRampSpeed_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s', StorageManager_options_Overtaking_default[StorageManager_Options_Overtaking.OvertakeRampSpeed_mps])
 
-        storage_Overtaking.overtakeRampRelease_mps =  renderSlider('Overtaking Lateral Offset decrement step', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the overtaken car.\nThe higher it is, the more quickly cars will change lanes moving back to the default lateral offset after finishing overtaking.', storage_Overtaking.overtakeRampRelease_mps, StorageManager_options_Overtaking_min[StorageManager_Options_Overtaking.OvertakeRampRelease_mps], StorageManager_options_Overtaking_max[StorageManager_Options_Overtaking.OvertakeRampRelease_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s', StorageManager_options_Overtaking_default[StorageManager_Options_Overtaking.OvertakeRampRelease_mps])
+        storage_Overtaking.overtakeRampRelease_mps =  UIOperations_renderSlider('Overtaking Lateral Offset decrement step', 'How quickly the lateral offset returns to normal once an overtaking car has fully driven past the overtaken car.\nThe higher it is, the more quickly cars will change lanes moving back to the default lateral offset after finishing overtaking.', storage_Overtaking.overtakeRampRelease_mps, StorageManager_options_Overtaking_min[StorageManager_Options_Overtaking.OvertakeRampRelease_mps], StorageManager_options_Overtaking_max[StorageManager_Options_Overtaking.OvertakeRampRelease_mps], DEFAULT_SLIDER_WIDTH, '%.3f m/s', StorageManager_options_Overtaking_default[StorageManager_Options_Overtaking.OvertakeRampRelease_mps])
     end)
 
     -- finish two columns
@@ -500,7 +439,7 @@ SettingsWindow.draw = function()
     ui_newLine(1)
     ui_separator()
 
-    createDisabledSection(not Constants.ENABLE_ACCIDENT_HANDLING_IN_APP, function()
+    UIOperations_createDisabledSection(not Constants.ENABLE_ACCIDENT_HANDLING_IN_APP, function()
         ui_newLine(1)
         ui_dwriteText('Accidents', UI_HEADER_TEXT_FONT_SIZE)
         ui_newLine(1)
@@ -509,10 +448,10 @@ SettingsWindow.draw = function()
         if ui_itemHovered() then ui_setTooltip('If enabled, AI will stop and remain stopped after an accident until the other cars pass.') end
 
         local handleAccidents = storage.handleAccidents
-        createDisabledSection(not handleAccidents, function()
-            storage.distanceFromAccidentToSeeYellowFlag_meters =  renderSlider('Distance from accident to see yellow flag (m)', 'Distance from accident at which AI will see the yellow flag and start slowing down.', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500, DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_default[StorageManager_Options.DistanceFromAccidentToSeeYellowFlag_meters])
+        UIOperations_createDisabledSection(not handleAccidents, function()
+            storage.distanceFromAccidentToSeeYellowFlag_meters =  UIOperations_renderSlider('Distance from accident to see yellow flag (m)', 'Distance from accident at which AI will see the yellow flag and start slowing down.', storage.distanceFromAccidentToSeeYellowFlag_meters, 50, 500, DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_default[StorageManager_Options.DistanceFromAccidentToSeeYellowFlag_meters])
 
-            storage.distanceToStartNavigatingAroundCarInAccident_meters =  renderSlider('Distance to start navigating around car in accident (m)', 'Distance from accident at which AI will start navigating around the car in accident.', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100, DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_default[StorageManager_Options.DistanceToStartNavigatingAroundCarInAccident_meters])
+            storage.distanceToStartNavigatingAroundCarInAccident_meters =  UIOperations_renderSlider('Distance to start navigating around car in accident (m)', 'Distance from accident at which AI will start navigating around the car in accident.', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100, DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_default[StorageManager_Options.DistanceToStartNavigatingAroundCarInAccident_meters])
         end)
     end)
 
@@ -527,11 +466,11 @@ SettingsWindow.draw = function()
     if ui_checkbox('Override AI awareness', storage.overrideAiAwareness) then storage.overrideAiAwareness = not storage.overrideAiAwareness end
     if ui_itemHovered() then ui_setTooltip('If enabled, our computed lateral offset will override the value from Kunos, otherwise our computed lateral offset adds to it. (EXPERIMENTAL)') end
 
-    storage.globalTopSpeedLimitKmh = renderSlider('Global top speed limit', 'A global top speed limit applied to all AI cars.\n0  = no global top speed limit.', storage.globalTopSpeedLimitKmh, StorageManager_options_min[StorageManager_Options.GlobalTopSpeedLimitKmh], StorageManager_options_max[StorageManager_Options.GlobalTopSpeedLimitKmh], DEFAULT_SLIDER_WIDTH, '%.2f km/h', StorageManager_options_default[StorageManager_Options.GlobalTopSpeedLimitKmh])
+    storage.globalTopSpeedLimitKmh = UIOperations_renderSlider('Global top speed limit', 'A global top speed limit applied to all AI cars.\n0  = no global top speed limit.', storage.globalTopSpeedLimitKmh, StorageManager_options_min[StorageManager_Options.GlobalTopSpeedLimitKmh], StorageManager_options_max[StorageManager_Options.GlobalTopSpeedLimitKmh], DEFAULT_SLIDER_WIDTH, '%.2f km/h', StorageManager_options_default[StorageManager_Options.GlobalTopSpeedLimitKmh])
 
-    storage.clearAhead_meters = renderSlider('The distance which determines whether a car is far enough ahead of another car', 'When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.', storage.clearAhead_meters, StorageManager_options_min[StorageManager_Options.ClearAhead_meters], StorageManager_options_max[StorageManager_Options.ClearAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_default[StorageManager_Options.ClearAhead_meters])
+    storage.clearAhead_meters = UIOperations_renderSlider('The distance which determines whether a car is far enough ahead of another car', 'When checking if a car is clear ahead of another car, this is the distance used to determine if it is clear.', storage.clearAhead_meters, StorageManager_options_min[StorageManager_Options.ClearAhead_meters], StorageManager_options_max[StorageManager_Options.ClearAhead_meters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_default[StorageManager_Options.ClearAhead_meters])
 
-    storage.deferTimeAfterSessionStart = renderSlider('Defer yielding/overtaking for a while after session start', "The time after the session starts during which no yielding or overtaking will be performed by AI cars.\n\nUsually only applicable for race scenarios where you don't want the cars to try and yield immediately after start because it creates chaos.", storage.deferTimeAfterSessionStart, StorageManager_options_min[StorageManager_Options.DeferTimeAfterSessionStart], StorageManager_options_max[StorageManager_Options.DeferTimeAfterSessionStart], DEFAULT_SLIDER_WIDTH, '%.2f seconds', StorageManager_options_default[StorageManager_Options.DeferTimeAfterSessionStart])
+    storage.deferTimeAfterSessionStart = UIOperations_renderSlider('Defer yielding/overtaking for a while after session start', "The time after the session starts during which no yielding or overtaking will be performed by AI cars.\n\nUsually only applicable for race scenarios where you don't want the cars to try and yield immediately after start because it creates chaos.", storage.deferTimeAfterSessionStart, StorageManager_options_min[StorageManager_Options.DeferTimeAfterSessionStart], StorageManager_options_max[StorageManager_Options.DeferTimeAfterSessionStart], DEFAULT_SLIDER_WIDTH, '%.2f seconds', StorageManager_options_default[StorageManager_Options.DeferTimeAfterSessionStart])
 
     ui_separator()
 

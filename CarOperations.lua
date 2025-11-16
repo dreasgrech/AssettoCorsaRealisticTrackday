@@ -401,6 +401,19 @@ function CarOperations.preventAIFromRetiring(carIndex)
     physics_preventAIFromRetiring(carIndex)
 end
 
+---Teleports the car to the specified world position.
+---@param carIndex integer
+---@param worldPosition vec3
+---@param worldDirection vec3|nil
+---@param doNotResetCarAfterTeleport boolean @If true, the car will not be reset after teleporting.
+CarOperations.teleportCarToWorldPosition = function(carIndex, worldPosition, worldDirection, doNotResetCarAfterTeleport)
+    physics.setCarPosition(carIndex, worldPosition, worldDirection)
+
+    if doNotResetCarAfterTeleport then
+      CarManager.cars_doNoResetAfterNextCarJump[carIndex] = true
+    end
+end
+
 ---@param turningLights ac.TurningLights
 function CarOperations.toggleTurningLights(carIndex, turningLights)
     -- local c = ac.getCar(carIndex)
