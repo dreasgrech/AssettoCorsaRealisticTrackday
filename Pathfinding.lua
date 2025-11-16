@@ -101,7 +101,7 @@ local TOTAL_PATH_LATERAL_OFFSETS = #PATH_LATERAL_OFFSETS
 local navigation_anchorText = {}
 
 ---@type table<integer,vec3>
-local navigation_anchorWorld = {}
+local navigation_anchorWorldPosition = {}
 
 ---@type table<integer,integer|nil>
 local navigation_lastChosenPathIndex = {}
@@ -154,8 +154,12 @@ local function ensureCarArrays(carIndex)
   end
 end
 
+-- local calculatePath_
+
 -- Public: build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
+---@param sortedCarsList table<integer,ac.StateCar>
+---@param sortedCarsListIndex integer
 local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local car = sortedCarsList[sortedCarsListIndex]
   if not car then return end
@@ -176,9 +180,9 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   -- Using the spline keeps the fan aligned with the road.
   local anchorAheadMeters = storage_PathFinding.anchorAheadMeters
   local anchorZ = wrap01(currentProgressZ + RaceTrackManager_metersToSplineSpan(anchorAheadMeters))
-  local anchorWorld = ac_trackCoordinateToWorld(vec3(currentOffsetN, 0.0, anchorZ))
+  local anchorWorldPosition = ac_trackCoordinateToWorld(vec3(currentOffsetN, 0.0, anchorZ))
 
-  navigation_anchorWorld[carIndex] = anchorWorld
+  navigation_anchorWorldPosition[carIndex] = anchorWorldPosition
   navigation_anchorText[carIndex]  = string_format("spline=%.4f  n=%.3f  speed=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
 
   -- Precompute step sizes.
@@ -200,24 +204,24 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local hitIdx  = navigation_pathHitIndex[carIndex]
   local hitOpp  = navigation_pathHitOpponentIndex[carIndex]
   local hitPos  = navigation_pathHitWorld[carIndex]
-  local points  = navigation_pathPoints[carIndex]
+  local pathPoints  = navigation_pathPoints[carIndex]
 
   -- For minimal work, only consider cars AHEAD of the current one in the sorted list.
   -- (sortedCarsListIndex-1 down to 1). Cars behind can’t block our forward samples.
   local firstAheadIndex = (sortedCarsListIndex or 2) - 1
-
-  local lateralSplitExponent = storage_PathFinding.lateralSplitExponent
 
   local approxCarRadiusMeters   = storage_PathFinding.approxCarRadiusMeters
   local safetyMarginMeters      = storage_PathFinding.safetyMarginMeters
   local combinedCollisionRadius = (approxCarRadiusMeters * 2.0) + safetyMarginMeters
   local combinedCollisionRadius2 = combinedCollisionRadius * combinedCollisionRadius
 
+  local lateralSplitExponent = storage_PathFinding.lateralSplitExponent
+
   for p = 1, TOTAL_PATH_LATERAL_OFFSETS do
     local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, PATH_LATERAL_OFFSETS[p]))
 
     -- Clear previous samples/meta (reuse tables).
-    local pts = points[p]
+    local pts = pathPoints[p]
     for i = 1, #pts do pts[i] = nil end
     counts[p] = 0
     blocked[p] = false
@@ -228,7 +232,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
     -- Sample along the road: linearly progress forward, but move laterally so that
     -- we hit the target offset by `splitReachMeters` (using an ease-out curve).
     counts[p] = 1
-    pts[1] = anchorWorld
+    pts[1] = anchorWorldPosition
 
     for i = 2, stepCount do
       local progressDelta = (i - 1) * stepZ
@@ -237,31 +241,31 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
       local sampleZ = wrap01(anchorZ + (i - 1) * stepZ)
       local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
-      local world   = ac_trackCoordinateToWorld(vec3(sampleN, 0.0, sampleZ))
+      local worldPosition   = ac_trackCoordinateToWorld(vec3(sampleN, 0.0, sampleZ))
 
       counts[p] = counts[p] + 1
-      pts[counts[p]] = world
+      pts[counts[p]] = worldPosition
 
       -- --- Minimal collider detection (only what’s needed) -------------------
       if not blocked[p] and firstAheadIndex >= 1 then
-        local wx, wy, wz = world.x, world.y, world.z
+        local wx, wy, wz = worldPosition.x, worldPosition.y, worldPosition.z
 
         -- Check cars in front only; early-exit on first hit.
         for idx = firstAheadIndex, 1, -1 do
-          local opp = sortedCarsList[idx]
+          local otherCar = sortedCarsList[idx]
           -- Defensive: ensure object exists and is not self.
-          if opp and opp.index ~= carIndex then
+          if otherCar and otherCar.index ~= carIndex then
             -- Keep original quick gate (sphere) for speed; early exit on first overlap:
-            local op = opp.position
-            local dx = op.x - wx
-            local dy = op.y - wy
-            local dz = op.z - wz
+            local otherCarPosition = otherCar.position
+            local dx = otherCarPosition.x - wx
+            local dy = otherCarPosition.y - wy
+            local dz = otherCarPosition.z - wz
             local d2 = dx*dx + dy*dy + dz*dz
             if d2 <= combinedCollisionRadius2 then
               blocked[p] = true
               hitIdx[p] = i
-              hitPos[p] = world
-              hitOpp[p] = opp.index
+              hitPos[p] = worldPosition
+              hitOpp[p] = otherCar.index
               break
             end
           end
@@ -276,7 +280,7 @@ end
 
 -- Public: draw the paths like in the sketch: a fan from the car front with labels.
 function Pathfinding.drawPaths(carIndex)
-  local anchorWorld = navigation_anchorWorld[carIndex]
+  local anchorWorld = navigation_anchorWorldPosition[carIndex]
   if not anchorWorld then return end
 
   -- Draw anchor (small pole and label).
@@ -473,7 +477,7 @@ end
 -- This avoids calling two public functions from the caller each frame and keeps state consistent.
 -- Returns normalized lateral offset or nil if data is not ready.
 function Pathfinding.calculatePathAndGetBestLateralOffset(sortedCarsList, sortedCarsListIndex)
-  local car = sortedCarsList and sortedCarsList[sortedCarsListIndex]
+  local car = sortedCarsList[sortedCarsListIndex]
   if not car then return nil end
 
   calculatePath(sortedCarsList, sortedCarsListIndex)
