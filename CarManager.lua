@@ -86,7 +86,7 @@ CarManager.cars_navigatingAroundAccidentIndex = {}
 CarManager.cars_navigatingAroundCarIndex = {}
 
 ---@type table<integer,boolean>
-CarManager.cars_justTeleportedDueToCustomAIFlood = {}
+CarManager.cars_doNoResetAfterNextCarJump = {}
 
 ---@type table<integer,number>
 CarManager.cars_grip = {}
@@ -173,7 +173,7 @@ CarManager.setInitializedDefaults = function(carIndex)
   -- CarManager.cars_navigatingAroundAccidentIndex[carIndex] = nil
   -- CarManager.cars_navigatingAroundCarIndex[carIndex] = nil
   CarManager.sortedCarList_carIndexToSortedIndex[carIndex] = nil
-  CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] = false
+  CarManager.cars_doNoResetAfterNextCarJump[carIndex] = false
   AccidentManager.setCarNavigatingAroundAccident(carIndex, nil, nil)
   CarStateMachine.initializeCarInStateMachine(carIndex)
 

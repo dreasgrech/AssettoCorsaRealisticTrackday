@@ -1,3 +1,4 @@
+--[======[
 local CollisionAvoidanceManager = {}
 
 -- ============================== Internal state ==============================
@@ -348,3 +349,4 @@ function CollisionAvoidanceManager.debugDraw(carIndex)
 end
 
 return CollisionAvoidanceManager
+--]======]

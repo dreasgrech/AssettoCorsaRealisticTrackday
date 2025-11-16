@@ -3,6 +3,9 @@ local AccidentManager = {}
 -- local lastAccidentIndexCreated = 0
 -- local firstNonResolvedAccidentIndex = 1
 
+-- local RESET_ACCIDENTS_ON_CAR_RESET = true
+local RESET_ACCIDENTS_ON_CAR_RESET = false -- Andreas: setting to false while working on frenet avoidance because of simualte_accident_manual which teleports the cars
+
 local accidentCompletableIndex = CompletableIndexCollectionManager.createNewIndex()
 
 ---@type table<integer,integer>
@@ -71,6 +74,11 @@ end
 ---Resolve any accident the given car is a culprit in
 ---@param carIndex number
 AccidentManager.informAboutCarReset = function(carIndex)
+    if not RESET_ACCIDENTS_ON_CAR_RESET then
+        Logger.warn("[AccidentManager] informAboutCarReset called but RESET_ACCIDENTS_ON_CAR_RESET is false so not resetting any accidents")
+        return
+    end
+
     local accidentIndexAsCulprit = AccidentManager.cars_culpritInAccidentIndex[carIndex]
     -- Logger.log(string.format("[AccidentManager] informAboutCarReset called for car #%d. culpritInAccident #%d.  Total accidents: %d", carIndex, accidentIndexAsCulprit, #AccidentManager.accidents_carIndex))
     if accidentIndexAsCulprit and accidentIndexAsCulprit > 0 then
@@ -188,7 +196,14 @@ AccidentManager.registerCollision = function(culpritCarIndex, collisionLocalPosi
     end
     -----------------------------
 
-    Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", culpritCarIndex, collisionLocalPosition.x, collisionLocalPosition.y, collisionLocalPosition.z, collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), accidentIndex, #AccidentManager.accidents_carIndex))
+    Logger.log(string.format("Car #%02d COLLISION at (%.1f, %.1f, %.1f) with %s.  Total accidents: %d", 
+        culpritCarIndex, 
+        collisionLocalPosition.x, 
+        collisionLocalPosition.y, 
+        collisionLocalPosition.z,
+        collidedWithTrack and "track" or ("car #" .. tostring(collidedWith)), 
+        accidentIndex, 
+        #AccidentManager.accidents_carIndex))
 
     -- Inform the Car State Machine about the new accident so that it puts the cars in their new states
     CarStateMachine.informAboutAccident(accidentIndex)
@@ -328,6 +343,133 @@ function AccidentManager.simulateAccident()
     local collisionLocalPosition = culpritCar.position
 
     AccidentManager.registerCollision(culpritCarIndex, collisionLocalPosition, collidedWith)
+end
+
+function AccidentManager.simulateAccident_manual()
+    local storage_Debugging = StorageManager.getStorage_Debugging()
+    local baseSplinePosition = storage_Debugging.debugSimulateAccidentSplinePosition 
+    -- local baseSplinePositionGap = 0.0006
+    local baseSplinePositionGap = 0.001
+
+    local accidentsInfo = {
+        {
+            culprit = {
+                index = 1,
+                splinePosition = baseSplinePosition,
+                direction = vec3(0,0,0)
+            },
+            victim = {
+                index = 2,
+                splinePosition = baseSplinePosition + baseSplinePositionGap,
+                direction = vec3(0,0,90)
+            }
+        },
+        {
+            culprit = {
+                index = 3,
+                splinePosition = baseSplinePosition + baseSplinePositionGap*2, 
+                direction = vec3(0,0,-90)
+            },
+            victim = {
+                index = 4,
+                splinePosition = baseSplinePosition + baseSplinePositionGap*3,
+                direction = vec3(0,0,270)
+            }
+        },
+        {
+            culprit = {
+                index = 5,
+                splinePosition = baseSplinePosition + baseSplinePositionGap*4, 
+                direction = vec3(0,0,-90)
+            },
+            victim = {
+                index = 6,
+                splinePosition = baseSplinePosition + baseSplinePositionGap*5,
+                direction = vec3(0,0,270)
+            }
+        },
+        {
+            culprit = {
+                index = 7,
+                splinePosition = baseSplinePosition + baseSplinePositionGap*6, 
+                direction = vec3(0,0,-90)
+            },
+            victim = {
+                index = 8,
+                splinePosition = baseSplinePosition + baseSplinePositionGap*7,
+                direction = vec3(0,0,270)
+            }
+        },
+        {
+            culprit = {
+                index = 9,
+                splinePosition = baseSplinePosition + baseSplinePositionGap*8, 
+                direction = vec3(0,0,-90)
+            },
+            victim = {
+                index = 10,
+                splinePosition = baseSplinePosition + baseSplinePositionGap*9,
+                direction = vec3(0,0,270)
+            }
+        },
+    }
+
+    for i = 1, #accidentsInfo do
+        Logger.log(string.format("AccidentManager.simulateAccident_manual: Simulating accident #%d", i))
+        local accidentInfo = accidentsInfo[i]
+        
+        local accidentInfoCulprit = accidentInfo.culprit
+        local accidentInfoVictim = accidentInfo.victim
+
+        local accidentInfoCulpritCarIndex = accidentInfoCulprit.index
+        local accidentInfoCulpritCarSplinePosition = accidentInfoCulprit.splinePosition
+        local accidentInfoCulpritCarDirection = accidentInfoCulprit.direction
+
+        local accidentInfoVictimCarIndex = accidentInfoVictim.index
+        local accidentInfoVictimCarSplinePosition = accidentInfoVictim.splinePosition
+        local accidentInfoVictimCarDirection = accidentInfoVictim.direction
+
+        local culpritCar = ac.getCar(accidentInfoCulpritCarIndex)
+        local victimCar = ac.getCar(accidentInfoVictimCarIndex)
+        if not (culpritCar and victimCar) then
+            Logger.error("AccidentManager.simulateAccident_manual: culprit or victim car not found")
+            return
+        end
+
+        local accidentInfoCulpritCarWorldPosition = ac.trackProgressToWorldCoordinate(accidentInfoCulpritCarSplinePosition, false)
+        local accidentInfoVictimCarWorldPosition = ac.trackProgressToWorldCoordinate(accidentInfoVictimCarSplinePosition, false)
+
+        accidentInfoCulpritCarWorldPosition = accidentInfoCulpritCarWorldPosition + culpritCar.side * 2.0
+
+        CarManager.cars_doNoResetAfterNextCarJump[accidentInfoCulpritCarIndex] = true
+        CarManager.cars_doNoResetAfterNextCarJump[accidentInfoVictimCarIndex] = true
+
+        Logger.log(string.format("Teleporting culprit car #%d to %.2f and victim car #%d to %.2f", 
+            accidentInfoCulpritCarIndex, 
+            accidentInfoCulpritCarSplinePosition, 
+            accidentInfoVictimCarIndex, 
+            accidentInfoVictimCarSplinePosition))
+
+        physics.setCarPosition(accidentInfoCulpritCarIndex, accidentInfoCulpritCarWorldPosition, accidentInfoCulpritCarDirection)
+        physics.setCarPosition(accidentInfoVictimCarIndex, accidentInfoVictimCarWorldPosition, accidentInfoVictimCarDirection)
+
+        CarOperations.stopCarAfterAccident(accidentInfoCulpritCarIndex)
+        CarOperations.stopCarAfterAccident(accidentInfoVictimCarIndex)
+
+        -- local collisionPosition = accidentInfoCulpritCarSplinePosition
+        local collisionWorldPosition = accidentInfoCulpritCarWorldPosition
+
+        AccidentManager.registerCollision(
+            accidentInfoCulpritCarIndex,
+            collisionWorldPosition,
+            accidentInfoVictimCarIndex + 1 -- +1 because 0 is track
+        )
+
+        -- move player car
+        physics.setCarPosition(0, ac.trackProgressToWorldCoordinate(baseSplinePosition - 0.005, false), nil)
+
+    end
+
 end
 
 return AccidentManager

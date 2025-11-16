@@ -54,5 +54,5 @@ CarStateMachine.states_exitFunctions[STATE] = function (carIndex, dt, sortedCars
       physics.setAICaution(carIndex, 1)
       CarOperations.resetPedalPosition(carIndex, CarOperations.CarPedals.Gas)
 
-      CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] = false
+      CarManager.cars_doNoResetAfterNextCarJump[carIndex] = false
 end

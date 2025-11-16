@@ -1,3 +1,4 @@
+--[======[
 -- FrenetAvoid.lua
 -- Extremely small and readable “from-scratch” Frenet avoidance.
 -- Goal for this version: prove that the car follows ONE planned path.
@@ -311,3 +312,4 @@ function FrenetAvoid.debugDraw(carIndex)
 end
 
 return FrenetAvoid
+--]======]

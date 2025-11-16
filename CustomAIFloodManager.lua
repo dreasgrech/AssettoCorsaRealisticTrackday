@@ -97,7 +97,7 @@ CustomAIFloodManager.teleportCar = function(car, newSplinePosition)
       local direction = GetDirFromSplinePos(newSplinePosition, 1)
       -- Logger.log(string.format("[CustomAIFloodManager] Moving #%d from spline position %.6f to %.6f behind main car #%d at %.3f.  car splineDistanceAhead: %.3f", carIndex, carSplinePosition, newSplinePosition, mainCar.index, mainCarSplinePosition, splineDistanceAhead))
       -- physics.setCarPosition(car.index, worldPosition, direction)
-      CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] = true
+      CarManager.cars_doNoResetAfterNextCarJump[carIndex] = true
       -- physics.setAICarPosition(carIndex, worldPosition, direction)
       physics.setEngineStallEnabled(carIndex, false)
       physics.setCarPosition(carIndex, worldPosition, direction)

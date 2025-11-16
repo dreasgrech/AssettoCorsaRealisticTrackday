@@ -103,7 +103,9 @@ SessionDetails = require("SessionDetails")
 -- CarSpeedLimiter = require("CarSpeedLimiter")
 -- CustomAIFloodManager = require("CustomAIFloodManager")
 -- CollisionAvoidanceManager = require("CollisionAvoidanceManager")
-FrenetAvoid = require("FrenetAvoid")
+-- FrenetAvoid = require("FrenetAvoid")
+-- Profiler = require("Profiler")
+Pathfinding = require("Pathfinding")
 
 SettingsWindow = require("SettingsWindow")
 
@@ -160,9 +162,6 @@ local SettingsWindow_draw = SettingsWindow.draw
 
 
 -- local ENABLE_CUSTOM_AI_FLOOD_MANAGER = false
-
-local FRENET_DEBUGGING = false
-local FRENET_DEBUGGING_CAR_INDEX = 0
 
 local CAN_APP_RUN = Constants.CAN_APP_RUN
 
@@ -249,10 +248,22 @@ OnCarEventManager.OnCarEventExecutions[OnCarEventManager.OnCarEventType.Jumped] 
   -- Inform the accident manager about the car reset
   AccidentManager_informAboutCarReset(carIndex)
 
-  -- finally reset all our car data
-  if not CarManager.cars_justTeleportedDueToCustomAIFlood[carIndex] then
-    CarManager.setInitializedDefaults(carIndex)
+  -- local setInitializedDefaults = not (CarManager.cars_doNoResetAfterNextCarJump[carIndex] or CarManager.cars_justTeleportedDueToManualAccidentSimulation[carIndex])
+  local doNoResetAfterNextCarJump = CarManager.cars_doNoResetAfterNextCarJump[carIndex]
+  if doNoResetAfterNextCarJump then
+    Logger.log(string_format("Not resetting car #%d data after jump due to doNoResetAfterNextCarJump flag being set.  Removing flag now", carIndex))
+    CarManager.cars_doNoResetAfterNextCarJump[carIndex] = false
+    return
   end
+
+  -- finally reset all our car data
+  -- if setInitializedDefaults then
+    -- Logger.log(string_format("Resetting car #%d data.  Teleported due to custom AI Flood: %s, Teleported due to manual accident simulation: %s", carIndex, tostring(CarManager.cars_doNoResetAfterNextCarJump[carIndex]), tostring(CarManager.cars_justTeleportedDueToManualAccidentSimulation[carIndex])))
+    Logger.log(string_format("Resetting car #%d data.", carIndex))
+    CarManager.setInitializedDefaults(carIndex)
+  -- else
+    -- Logger.warn(string_format("Not resetting car #%d data.  Teleported due to custom AI Flood: %s, Teleported due to manual accident simulation: %s", carIndex, tostring(CarManager.cars_doNoResetAfterNextCarJump[carIndex]), tostring(CarManager.cars_justTeleportedDueToManualAccidentSimulation[carIndex])))
+  -- end
 end
 
 -- Monitor car collisions so we can register an accident
@@ -308,14 +319,24 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
     return
   end
 
+  -- Profiler.beginFrame()
+
   -- ui.text(string.format('AI cars yielding to the %s', RaceTrackManager.TrackSideStrings[RaceTrackManager.getYieldingSide()]))
   -- ui.newLine(1)
 
+  -- Profiler.begin('UIManager_drawMainWindowLateralOffsetsSection')
   UIManager_drawMainWindowLateralOffsetsSection()
+  -- Profiler["end"]('UIManager_drawMainWindowLateralOffsetsSection')
 
   ui_newLine(1)
 
+  -- Profiler.begin('UIManager_drawUICarList')
   UIManager_drawUICarList()
+  -- Profiler["end"]('UIManager_drawUICarList')
+
+  -- Profiler.drawUI()
+
+  -- Profiler.endFrame()
 end
 
 local frenetOffsets = {}
@@ -433,16 +454,63 @@ function script.MANIFEST__UPDATE(dt)
 
   RaceTrackManager_updateYellowFlagZones()
 
-  if FRENET_DEBUGGING then
-    frenetOffsets = FrenetAvoid.computeOffsetsForAll(sortedCars, dt, frenetOffsets)
+  if storage_Debugging.debugOverridePlayerCarLateralOffset then
+      local debugOverridePlayerCarLateralOffsetValue = storage_Debugging.debugOverridePlayerCarLateralOffsetValue
+      local playerCar = ac_getCar(0)
+      if playerCar then
+        CarOperations.driveSafelyToSide(0, dt, playerCar, debugOverridePlayerCarLateralOffsetValue, 500, true, false, false)  -- empty storage since we don't need to save anything for the player car
+      end
+  end
 
-    local playerCar = ac_getCar(FRENET_DEBUGGING_CAR_INDEX)
-    if playerCar then -- if-block only to satisfty the linter because player 0 car always exists
-      --local offset = FrenetAvoid.computeOffset(sortedCars, playerCar, dt)
-      local offset = frenetOffsets[FRENET_DEBUGGING_CAR_INDEX+1]
-      Logger.log(string_format("Setting player car frenet offset to %.2f", offset))
-      CarOperations.driveSafelyToSide(FRENET_DEBUGGING_CAR_INDEX, dt, playerCar, offset, 500, true, false, false)  -- empty storage since we don't need to save anything for the player car
-      Logger.log(string_format("Player car frenet offset set to %.2f", offset))
+  if not storage_Debugging.debugOverridePlayerCarLateralOffset then
+    -- if Constants.FRENET_DEBUGGING then
+      -- frenetOffsets = FrenetAvoid.computeOffsetsForAll(sortedCars, dt, frenetOffsets)
+
+      -- local playerCar = ac_getCar(Constants.FRENET_DEBUGGING_CAR_INDEX)
+      -- if playerCar then -- if-block only to satisfty the linter because player 0 car always exists
+        -- --local offset = FrenetAvoid.computeOffset(sortedCars, playerCar, dt)
+        -- local offset = frenetOffsets[Constants.FRENET_DEBUGGING_CAR_INDEX+1]
+        -- -- Logger.log(string_format("Setting player car frenet offset to %.2f", offset))
+        -- local sideCheck = false
+        -- CarOperations.driveSafelyToSide(Constants.FRENET_DEBUGGING_CAR_INDEX, dt, playerCar, offset, 500, true, sideCheck, false)  -- empty storage since we don't need to save anything for the player car
+        -- -- Logger.log(string_format("Player car frenet offset set to %.2f", offset))
+      -- end
+    -- end
+
+    if Constants.PATHFINDING_DEBUGGING then
+      -- Pathfinding.calculatePath(Constants.FRENET_DEBUGGING_CAR_INDEX)
+      -- Pathfinding.calculatePath(Constants.FRENET_DEBUGGING_CAR_INDEX)
+
+      -- for i = 1, totalCars do
+        -- local car = sortedCars[i]
+        -- local carIndex = car.index
+        -- if carIndex == Constants.FRENET_DEBUGGING_CAR_INDEX then
+          -- Pathfinding.calculatePath(sortedCars, i)
+          -- break
+        -- end
+      -- end
+
+      for i = 1, totalCars do
+        local car = sortedCars[i]
+        local carIndex = car.index
+        if carIndex == Constants.PATHFINDING_DEBUGGING_CAR_INDEX then
+            local offset = Pathfinding.calculatePathAndGetBestLateralOffset(sortedCars, i)
+            local carForNavigation = ac_getCar(Constants.PATHFINDING_DEBUGGING_CAR_INDEX)
+            if carForNavigation and offset then
+              local sideCheck = false
+              CarOperations.driveSafelyToSide(Constants.PATHFINDING_DEBUGGING_CAR_INDEX, dt, carForNavigation, offset, 500, true, sideCheck, false)  -- empty storage since we don't need to save anything for the player car
+            end
+          break
+        end
+      end
+
+      -- -- local offset = Pathfinding.getBestLateralOffset(Constants.FRENET_DEBUGGING_CAR_INDEX)
+      -- local offset = Pathfinding.calculatePathAndGetBestLateralOffset(Constants.FRENET_DEBUGGING_CAR_INDEX)
+      -- local playerCar = ac_getCar(Constants.FRENET_DEBUGGING_CAR_INDEX)
+      -- if playerCar then
+        -- local sideCheck = false
+        -- CarOperations.driveSafelyToSide(Constants.FRENET_DEBUGGING_CAR_INDEX, dt, playerCar, offset, 500, true, sideCheck, false)  -- empty storage since we don't need to save anything for the player car
+      -- end
     end
   end
 
@@ -588,10 +656,14 @@ function script.MANIFEST__TRANSPARENT(dt)
     end
   end
 
-  if FRENET_DEBUGGING then
-    FrenetAvoid.debugDraw(FRENET_DEBUGGING_CAR_INDEX)
-  end
+  -- if Constants.FRENET_DEBUGGING then
+    -- FrenetAvoid.debugDraw(Constants.FRENET_DEBUGGING_CAR_INDEX)
+  -- end
 
+  if Constants.PATHFINDING_DEBUGGING then
+    Pathfinding.drawPaths(Constants.PATHFINDING_DEBUGGING_CAR_INDEX)
+    -- Pathfinding.drawObstacleAABBsForHits(Constants.PATHFINDING_DEBUGGING_CAR_INDEX, CarManager.currentSortedCarsList)
+  end
 
   -- render.setDepthMode(render.DepthMode.Normal)
 end
@@ -600,7 +672,7 @@ end
 -- wiki: function to be called to draw content of corresponding settings window (only with “SETTINGS” flag)
 ---
 function script.MANIFEST__FUNCTION_SETTINGS()
-  if (not CAN_APP_RUN) then return end
+  -- if (not CAN_APP_RUN) then return end
 
   SettingsWindow_draw()
 end

@@ -86,8 +86,15 @@ CarStateMachine.states_updateFunctions[STATE] = function (carIndex, dt, sortedCa
 
       local car = sortedCarsList[sortedCarsListIndex]
 
-      -- Keep driving towards the default lateral offset to try and keep the lane as much as possible
-      CarOperations_driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true, false)
+      -- local driveToDefaultLateralOffset = true
+      -- if carIndex == 0 and Constants.FRENET_DEBUGGING then
+        -- driveToDefaultLateralOffset = false
+      -- end
+
+      -- if driveToDefaultLateralOffset then
+        -- Keep driving towards the default lateral offset to try and keep the lane as much as possible
+        CarOperations_driveSafelyToSide(carIndex, dt, car, targetOffset, rampSpeed_mps, storage.overrideAiAwareness, true, false)
+      -- end
 end
 
 -- TRANSITION FUNCTION
@@ -97,6 +104,20 @@ end
 ---@param sortedCarsListIndex integer
 ---@param storage StorageTable
 CarStateMachine.states_transitionFunctions[STATE] = function (carIndex, dt, sortedCarsList, sortedCarsListIndex, storage)
+
+  --[====[
+  local runTransitionChecks = true
+  if carIndex == 0 and Constants.FRENET_DEBUGGING then
+    runTransitionChecks = false
+  end
+
+  if not runTransitionChecks then
+    return
+  end
+  --]====]
+
+
+
       -- render.debugSphere(ac.getCar(carIndex).position, 1, rgbm(0.2, 0.2, 1.0, 1))
 
       -- DEBUG DEBUG DEBUG

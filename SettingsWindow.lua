@@ -188,8 +188,14 @@ local renderDebuggingSection = function(storage_Debugging)
     ui_nextColumn()
 
     createDisabledSection(not Constants.ENABLE_ACCIDENT_HANDLING_IN_APP, function()
-        if ui_button('Simulate accident', ui.ButtonFlags.None) then
-            AccidentManager.simulateAccident()
+        -- if ui_button('Simulate accident', ui.ButtonFlags.None) then
+            -- AccidentManager.simulateAccident()
+        -- end
+
+        storage_Debugging.debugSimulateAccidentSplinePosition = renderSliderWithInnerText('##debugSimulateAccidentSplinePosition', 'Accident spline position: %.3f', 'The spline position to use when simulating an accident.', storage_Debugging.debugSimulateAccidentSplinePosition, StorageManager_options_Debugging_min[StorageManager_Options_Debugging.DebugSimulateAccidentSplinePosition], StorageManager_options_Debugging_max[StorageManager_Options_Debugging.DebugSimulateAccidentSplinePosition], DEFAULT_SLIDER_WIDTH)
+
+        if ui_button('Simulate accident (manual)', ui.ButtonFlags.None) then
+            AccidentManager.simulateAccident_manual()
         end
     end)
 
