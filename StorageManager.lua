@@ -249,9 +249,9 @@ local optionsCollection_beforeDoD = {
 }
 
 local optionsCollection_PathFinding_beforeDoD = {
-    { name = StorageManager.Options_PathFinding.ForwardDistanceMeters, default=60.0, min=10.0, max=200.0 },
-    { name = StorageManager.Options_PathFinding.AnchorAheadMeters, default=1.5, min=0.0, max=10.0 },
-    { name = StorageManager.Options_PathFinding.NumberOfPathSamples, default=12, min=4, max=64 },
+    { name = StorageManager.Options_PathFinding.ForwardDistanceMeters, default=60.0, min=10.0, max=500.0 },
+    { name = StorageManager.Options_PathFinding.AnchorAheadMeters, default=1.5, min=0.0, max=30.0 },
+    { name = StorageManager.Options_PathFinding.NumberOfPathSamples, default=12, min=2, max=64 }, -- must have a minimum of two samples
     { name = StorageManager.Options_PathFinding.MaxAbsOffsetNormalized, default=1.0, min=0.1, max=1.0 },
     { name = StorageManager.Options_PathFinding.SplitReachMeters, default=12.0, min=1.0, max=50.0 },
     { name = StorageManager.Options_PathFinding.LateralSplitExponent, default=2.2, min=1.0, max=5.0 },
