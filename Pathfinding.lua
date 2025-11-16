@@ -194,7 +194,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local invSplitReachProgress = (splitReachProgress > 0.0) and (1.0 / splitReachProgress) or 1e9
 
   -- Generate paths (count adapts to navigation_pathOffsetN length).
-  local offsets = PATH_LATERAL_OFFSETS
+  -- local PATH_LATERAL_OFFSETS = PATH_LATERAL_OFFSETS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   local hitIdx  = navigation_pathHitIndex[carIndex]
@@ -213,8 +213,8 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local combinedCollisionRadius = (approxCarRadiusMeters * 2.0) + safetyMarginMeters
   local combinedCollisionRadius2 = combinedCollisionRadius * combinedCollisionRadius
 
-  for p = 1, #offsets do
-    local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, offsets[p]))
+  for p = 1, TOTAL_PATH_LATERAL_OFFSETS do
+    local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, PATH_LATERAL_OFFSETS[p]))
 
     -- Clear previous samples/meta (reuse tables).
     local pts = points[p]
@@ -286,7 +286,7 @@ function Pathfinding.drawPaths(carIndex)
   -- Draw each path:
   --   • Clear path → thin green polyline.
   --   • Blocked path → red polyline and a highlighted sphere at the first hit sample.
-  local offsets = PATH_LATERAL_OFFSETS
+  -- local PATH_LATERAL_OFFSETS = PATH_LATERAL_OFFSETS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   -- local hitIdx  = navigation_pathHitIndex[carIndex]
@@ -294,7 +294,7 @@ function Pathfinding.drawPaths(carIndex)
   local hitPos  = navigation_pathHitWorld[carIndex]
   local points  = navigation_pathPoints[carIndex]
 
-  for p = 1, #offsets do
+  for p = 1, TOTAL_PATH_LATERAL_OFFSETS do
     local cnt = counts[p]
     if cnt and cnt >= 2 then
       local colLine = blocked[p] and colLineBlocked or colLineClear
@@ -314,7 +314,7 @@ function Pathfinding.drawPaths(carIndex)
       -- End label with the associated normalized offset value (+ blocked flag)
       local endPos = pts[cnt]
       if endPos then
-        local label = string_format("%.2f", offsets[p])
+        local label = string_format("%.2f", PATH_LATERAL_OFFSETS[p])
         if blocked[p] then label = label .. " (blocked)" end
         render_debugText(endPos + vec3(0, 0.30, 0), label, colLabel)
 
@@ -353,7 +353,7 @@ end
 -- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
 -- If all paths are blocked, returns the one that gets the furthest before the first hit.
 local function getBestLateralOffset(carIndex)
-  local offsets = PATH_LATERAL_OFFSETS
+  -- local PATH_LATERAL_OFFSETS = PATH_LATERAL_OFFSETS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
   if not counts then return nil end
@@ -364,24 +364,24 @@ local function getBestLateralOffset(carIndex)
 
   -- Helper: append per-path status for diagnostics
   local function appendPathStatus()
-    for i = 1, #offsets do
+    for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
       local cnt  = counts[i] or 0
       local stat = (blocked[i] and "BLOCKED") or "CLEAR"
       local hitI = navigation_pathHitIndex[carIndex] and navigation_pathHitIndex[carIndex][i]
       local hitO = navigation_pathHitOpponentIndex[carIndex] and navigation_pathHitOpponentIndex[carIndex][i]
       if blocked[i] and hitI and hitO then
-        lines[#lines+1] = string_format("  path[%d] n=% .2f samples=%d -> %s @sample=%d by car#%d", i, offsets[i], cnt, stat, hitI, hitO)
+        lines[#lines+1] = string_format("  path[%d] n=% .2f samples=%d -> %s @sample=%d by car#%d", i, PATH_LATERAL_OFFSETS[i], cnt, stat, hitI, hitO)
       else
-        lines[#lines+1] = string_format("  path[%d] n=% .2f samples=%d -> %s", i, offsets[i], cnt, stat)
+        lines[#lines+1] = string_format("  path[%d] n=% .2f samples=%d -> %s", i, PATH_LATERAL_OFFSETS[i], cnt, stat)
       end
     end
   end
 
   -- Compute dynamic “center” index (closest to 0, prefer positive on tie).
   local centerIdx, minAbs = 1, math.huge
-  for i = 1, #offsets do
-    local a = math_abs(offsets[i])
-    if a < minAbs or (a == minAbs and offsets[i] > offsets[centerIdx]) then
+  for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
+    local a = math_abs(PATH_LATERAL_OFFSETS[i])
+    if a < minAbs or (a == minAbs and PATH_LATERAL_OFFSETS[i] > PATH_LATERAL_OFFSETS[centerIdx]) then
       centerIdx, minAbs = i, a
     end
   end
@@ -389,7 +389,7 @@ local function getBestLateralOffset(carIndex)
   -- If all paths are present and NONE are blocked, default to center path.
   do
     local haveAll, allClear = true, true
-    for i = 1, #offsets do
+    for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
       if not (counts[i] and counts[i] > 0) then haveAll = false break end
       if blocked[i] then allClear = false break end
     end
@@ -397,9 +397,9 @@ local function getBestLateralOffset(carIndex)
       navigation_lastChosenPathIndex[carIndex] = centerIdx
       appendPathStatus()
       lines[#lines+1] = string_format("  order: center-only (all clear)")
-      lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: all-clear center)", centerIdx, offsets[centerIdx])
+      lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: all-clear center)", centerIdx, PATH_LATERAL_OFFSETS[centerIdx])
       traceDecision(lines)
-      return offsets[centerIdx]
+      return PATH_LATERAL_OFFSETS[centerIdx]
     end
   end
 
@@ -408,15 +408,15 @@ local function getBestLateralOffset(carIndex)
   if lastIdx and counts[lastIdx] and counts[lastIdx] > 0 and not blocked[lastIdx] then
     appendPathStatus()
     lines[#lines+1] = string_format("  order: (sticky short-circuit)")
-    lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: sticky last still clear)", lastIdx, offsets[lastIdx])
+    lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: sticky last still clear)", lastIdx, PATH_LATERAL_OFFSETS[lastIdx])
     traceDecision(lines)
-    return offsets[lastIdx]
+    return PATH_LATERAL_OFFSETS[lastIdx]
   end
 
   -- Preference order: center, then ±0.5, ±0.75, ±1.0 (right on ties).
   local order = {}
   local function pushIfExists(val)
-    for i = 1, #offsets do if offsets[i] == val then table_insert(order, i) return end end
+    for i = 1, TOTAL_PATH_LATERAL_OFFSETS do if PATH_LATERAL_OFFSETS[i] == val then table_insert(order, i) return end end
   end
   pushIfExists(0.0)
   pushIfExists(0.5)
@@ -429,7 +429,7 @@ local function getBestLateralOffset(carIndex)
   appendPathStatus()
   do
     local buf = {}
-    for k = 1, #order do buf[k] = string_format("%d(n=% .2f)", order[k], offsets[order[k]]) end
+    for k = 1, #order do buf[k] = string_format("%d(n=% .2f)", order[k], PATH_LATERAL_OFFSETS[order[k]]) end
     lines[#lines+1] = "  order: " .. table_concat(buf, " → ")
   end
 
@@ -437,16 +437,16 @@ local function getBestLateralOffset(carIndex)
   for _, idx in ipairs(order) do
     if counts[idx] and counts[idx] > 0 and not blocked[idx] then
       navigation_lastChosenPathIndex[carIndex] = idx
-      lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: first clear by preference)", idx, offsets[idx])
+      lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: first clear by preference)", idx, PATH_LATERAL_OFFSETS[idx])
       traceDecision(lines)
-      return offsets[idx]
+      return PATH_LATERAL_OFFSETS[idx]
     end
   end
 
   -- If everything is blocked, pick the path that goes furthest before the first hit.
   local hitIdx  = navigation_pathHitIndex[carIndex]
   local bestIdx, bestSafeSamples = nil, -1
-  for i = 1, #offsets do
+  for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
     local cnt = counts[i]
     if cnt and cnt > 0 then
       local safe = blocked[i] and (hitIdx[i] or 2) or cnt
@@ -458,9 +458,9 @@ local function getBestLateralOffset(carIndex)
   end
   if bestIdx then
     navigation_lastChosenPathIndex[carIndex] = bestIdx
-    lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: fallback, furthest safe samples = %d)", bestIdx, offsets[bestIdx], bestSafeSamples)
+    lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: fallback, furthest safe samples = %d)", bestIdx, PATH_LATERAL_OFFSETS[bestIdx], bestSafeSamples)
     traceDecision(lines)
-    return offsets[bestIdx]
+    return PATH_LATERAL_OFFSETS[bestIdx]
   end
 
   -- No data yet (calculatePath likely not called).
