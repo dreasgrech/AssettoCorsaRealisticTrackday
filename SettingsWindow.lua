@@ -62,11 +62,16 @@ local StorageManager_options_Debugging_default = StorageManager.options_Debuggin
 local StorageManager_options_Debugging_min = StorageManager.options_Debugging_min
 local StorageManager_options_Debugging_max = StorageManager.options_Debugging_max
 
+local StorageManager_options_PathFinding_default = StorageManager.options_PathFinding_default
+local StorageManager_options_PathFinding_min = StorageManager.options_PathFinding_min
+local StorageManager_options_PathFinding_max = StorageManager.options_PathFinding_max
+
 local StorageManager_Options = StorageManager.Options
 local StorageManager_Options_Debugging = StorageManager.Options_Debugging
 local StorageManager_Options_Yielding = StorageManager.Options_Yielding
 local StorageManager_Options_Overtaking = StorageManager.Options_Overtaking
 local StorageManager_Options_AICarValues = StorageManager.Options_AICarValues
+local StorageManager_Options_PathFinding = StorageManager.Options_PathFinding
 
 
 
@@ -83,6 +88,7 @@ local storage_Yielding = StorageManager.getStorage_Yielding()
 local storage_Overtaking = StorageManager.getStorage_Overtaking()
 local storage_Debugging = StorageManager.getStorage_Debugging()
 local storage_AICarValues = StorageManager.getStorage_AICarValues()
+local storage_PathFinding = StorageManager.getStorage_PathFinding()
 
 
 ---@param storage_Debugging StorageTable_Debugging
@@ -331,6 +337,7 @@ SettingsWindow.draw = function()
     ui_newLine(1)
     ui_separator()
 
+    -- Create the Yielding and Overtaking table with 2 columns
     ui_columns(2, true, "yieldingOvertakingSection")
     ui_setColumnWidth(0, 560)
     --ui.setColumnWidth(1, 260)
@@ -440,6 +447,9 @@ SettingsWindow.draw = function()
     ui_separator()
 
     UIOperations_createDisabledSection(not Constants.ENABLE_ACCIDENT_HANDLING_IN_APP, function()
+        ui_columns(2, true, "accidentsSection")
+        ui_setColumnWidth(0, 560)
+
         ui_newLine(1)
         ui_dwriteText('Accidents', UI_HEADER_TEXT_FONT_SIZE)
         ui_newLine(1)
@@ -453,6 +463,25 @@ SettingsWindow.draw = function()
 
             storage.distanceToStartNavigatingAroundCarInAccident_meters =  UIOperations_renderSlider('Distance to start navigating around car in accident (m)', 'Distance from accident at which AI will start navigating around the car in accident.', storage.distanceToStartNavigatingAroundCarInAccident_meters, 5, 100, DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_default[StorageManager_Options.DistanceToStartNavigatingAroundCarInAccident_meters])
         end)
+
+        ui_nextColumn()
+
+        ui_newLine(1)
+        ui_dwriteText('Pathfinding', UI_HEADER_TEXT_FONT_SIZE)
+        ui_newLine(1)
+
+        storage_PathFinding.forwardDistanceMeters =  UIOperations_renderSlider('Forward distance', 'The distance ahead of the car that the pathfinding system will consider when calculating paths around obstacles.', storage_PathFinding.forwardDistanceMeters, StorageManager_options_PathFinding_min[StorageManager_Options_PathFinding.ForwardDistanceMeters], StorageManager_options_PathFinding_max[StorageManager_Options_PathFinding.ForwardDistanceMeters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_PathFinding_default[StorageManager_Options_PathFinding.ForwardDistanceMeters])
+        storage_PathFinding.anchorAheadMeters = UIOperations_renderSlider('Anchor ahead distance', 'The distance ahead of the car where the pathfinding system will place an anchor point to help guide the car around obstacles.', storage_PathFinding.anchorAheadMeters, StorageManager_options_PathFinding_min[StorageManager_Options_PathFinding.AnchorAheadMeters], StorageManager_options_PathFinding_max[StorageManager_Options_PathFinding.AnchorAheadMeters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_PathFinding_default[StorageManager_Options_PathFinding.AnchorAheadMeters])
+        storage_PathFinding.numberOfPathSamples = UIOperations_renderSlider('Number of path samples', 'The number of path samples the pathfinding system will use to evaluate possible paths around obstacles.', storage_PathFinding.numberOfPathSamples, StorageManager_options_PathFinding_min[StorageManager_Options_PathFinding.NumberOfPathSamples], StorageManager_options_PathFinding_max[StorageManager_Options_PathFinding.NumberOfPathSamples], DEFAULT_SLIDER_WIDTH, '%.0f', StorageManager_options_PathFinding_default[StorageManager_Options_PathFinding.NumberOfPathSamples])
+        storage_PathFinding.maxAbsOffsetNormalized = UIOperations_renderSlider('Max absolute offset normalized', 'The maximum absolute lateral offset (normalized) that the pathfinding system will allow when calculating paths around obstacles.', storage_PathFinding.maxAbsOffsetNormalized, StorageManager_options_PathFinding_min[StorageManager_Options_PathFinding.MaxAbsOffsetNormalized], StorageManager_options_PathFinding_max[StorageManager_Options_PathFinding.MaxAbsOffsetNormalized], DEFAULT_SLIDER_WIDTH, '%.2f', StorageManager_options_PathFinding_default[StorageManager_Options_PathFinding.MaxAbsOffsetNormalized])
+        storage_PathFinding.splitReachMeters = UIOperations_renderSlider('Split reach distance', 'The distance at which the pathfinding system will split its path calculations to explore different routes around obstacles.', storage_PathFinding.splitReachMeters, StorageManager_options_PathFinding_min[StorageManager_Options_PathFinding.SplitReachMeters], StorageManager_options_PathFinding_max[StorageManager_Options_PathFinding.SplitReachMeters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_PathFinding_default[StorageManager_Options_PathFinding.SplitReachMeters])
+        storage_PathFinding.lateralSplitExponent = UIOperations_renderSlider('Lateral split exponent', 'The exponent used to weight lateral splits in the pathfinding calculations.', storage_PathFinding.lateralSplitExponent, StorageManager_options_PathFinding_min[StorageManager_Options_PathFinding.LateralSplitExponent], StorageManager_options_PathFinding_max[StorageManager_Options_PathFinding.LateralSplitExponent], DEFAULT_SLIDER_WIDTH, '%.2f', StorageManager_options_PathFinding_default[StorageManager_Options_PathFinding.LateralSplitExponent])
+        storage_PathFinding.approxCarRadiusMeters = UIOperations_renderSlider('Approx car radius', 'The approximate radius of the car used by the pathfinding system for collision avoidance.', storage_PathFinding.approxCarRadiusMeters, StorageManager_options_PathFinding_min[StorageManager_Options_PathFinding.ApproxCarRadiusMeters], StorageManager_options_PathFinding_max[StorageManager_Options_PathFinding.ApproxCarRadiusMeters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_PathFinding_default[StorageManager_Options_PathFinding.ApproxCarRadiusMeters])
+        storage_PathFinding.safetyMarginMeters = UIOperations_renderSlider('Safety margin', 'The safety margin added around obstacles by the pathfinding system to prevent collisions.', storage_PathFinding.safetyMarginMeters, StorageManager_options_PathFinding_min[StorageManager_Options_PathFinding.SafetyMarginMeters], StorageManager_options_PathFinding_max[StorageManager_Options_PathFinding.SafetyMarginMeters], DEFAULT_SLIDER_WIDTH, '%.2f m', StorageManager_options_PathFinding_default[StorageManager_Options_PathFinding.SafetyMarginMeters])
+
+        -- finish two columns
+        ui_columns(1, false)
+
     end)
 
 

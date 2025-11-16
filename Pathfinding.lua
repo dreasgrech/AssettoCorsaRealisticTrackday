@@ -17,23 +17,25 @@ local function log(fmt, ...)
   if LOG_ENABLED then Logger.log(string.format(fmt, ...)) end
 end
 
+local storage_PathFinding = StorageManager.getStorage_PathFinding()
+
 -- Tunables kept tiny on purpose. All distances are “roughly forward along the spline”.
-local forwardDistanceMeters   = 60.0     -- how far forward the paths extend
-local anchorAheadMeters       = 1.5      -- where the “fan” originates: a bit in front of the car
-local numberOfPathSamples     = 12       -- samples per path for drawing
-local maxAbsOffsetNormalized  = 1.0      -- clamp to track lateral limits for endpoints
+-- local forwardDistanceMeters   = 60.0     -- how far forward the paths extend
+-- local anchorAheadMeters       = 1.5      -- where the “fan” originates: a bit in front of the car
+-- local numberOfPathSamples     = 12       -- samples per path for drawing
+-- local maxAbsOffsetNormalized  = 1.0      -- clamp to track lateral limits for endpoints
 
 -- Make paths split to the sides much earlier (for tight manoeuvres) without changing length:
 -- We reach full lateral target by this forward distance (meters), with an ease-out power curve.
-local splitReachMeters        = 12.0     -- distance at which lateral offset reaches 100%
-local lateralSplitExponent    = 2.2      -- >1: earlier split; =1: linear; <1: later split
+-- local splitReachMeters        = 12.0     -- distance at which lateral offset reaches 100%
+-- local lateralSplitExponent    = 2.2      -- >1: earlier split; =1: linear; <1: later split
 
 -- Very small and cheap collider model:
 -- treat each car as a disc with this radius (meters), add a bit of margin.
-local approxCarRadiusMeters   = 1.6
-local safetyMarginMeters      = 0.5
-local combinedCollisionRadius = (approxCarRadiusMeters * 2.0) + safetyMarginMeters
-local combinedCollisionRadius2 = combinedCollisionRadius * combinedCollisionRadius
+-- local approxCarRadiusMeters   = 1.6
+-- local safetyMarginMeters      = 0.5
+-- local combinedCollisionRadius = (approxCarRadiusMeters * 2.0) + safetyMarginMeters
+-- local combinedCollisionRadius2 = combinedCollisionRadius * combinedCollisionRadius
 
 -- Colors for drawing.
 local colLineClear   = rgbm(0.30, 0.95, 0.30, 0.35)   -- light green for clear paths
@@ -58,10 +60,10 @@ local function easeOutPow01(t, power)
 end
 
 -- Helper: meters → approximate progress fraction (fallback length).
-local nominalTrackLengthMeters = RaceTrackManager.getTrackLengthMeters()
-local function metersToProgress(meters)
-  return meters / nominalTrackLengthMeters
-end
+-- local nominalTrackLengthMeters = RaceTrackManager.getTrackLengthMeters()
+-- local function metersToProgress(meters)
+  -- return meters / nominalTrackLengthMeters
+-- end
 
 -- =========================
 -- Data-oriented containers
@@ -133,8 +135,6 @@ end
 
 -- Public: build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
--- NOTE: We no longer gather opponents ourselves. Pass in the globally prepared sorted list.
---       The list is sorted so that index-1 is the car in front, index+1 is behind.
 local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local car = sortedCarsList[sortedCarsListIndex]
   if not car then return end
@@ -147,24 +147,29 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   if not carTrack then return end
 
   local currentProgressZ  = wrap01(carTrack.z)
+  local maxAbsOffsetNormalized = storage_PathFinding.maxAbsOffsetNormalized
   local currentOffsetN    = math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, carTrack.x))
   local carSpeedMps       = (car.speedKmh or 0) / 3.6
 
   -- Where paths originate: a small step ahead along the spline at the *current* lateral offset.
   -- Using the spline keeps the fan aligned with the road.
-  local anchorZ = wrap01(currentProgressZ + metersToProgress(anchorAheadMeters))
+  local anchorAheadMeters = storage_PathFinding.anchorAheadMeters
+  local anchorZ = wrap01(currentProgressZ + RaceTrackManager.metersToSplineSpan(anchorAheadMeters))
   local anchorWorld = ac.trackCoordinateToWorld(vec3(currentOffsetN, 0.0, anchorZ))
 
   navigation_anchorWorld[carIndex] = anchorWorld
-  navigation_anchorText[carIndex]  = string.format("z=%.4f  n=%.3f  v=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
+  navigation_anchorText[carIndex]  = string.format("spline=%.4f  n=%.3f  speed=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
 
   -- Precompute step sizes.
-  local totalForwardProgress = metersToProgress(forwardDistanceMeters)
+  local forwardDistanceMeters = storage_PathFinding.forwardDistanceMeters
+  local totalForwardProgress = RaceTrackManager.metersToSplineSpan(forwardDistanceMeters)
+  local numberOfPathSamples = storage_PathFinding.numberOfPathSamples
   local stepCount = math.max(2, numberOfPathSamples)
   local stepZ = totalForwardProgress / (stepCount - 1)
 
   -- Precompute inverse of progress needed to reach full lateral offset by splitReachMeters.
-  local splitReachProgress = metersToProgress(splitReachMeters)
+  local splitReachMeters = storage_PathFinding.splitReachMeters
+  local splitReachProgress = RaceTrackManager.metersToSplineSpan(splitReachMeters)
   local invSplitReachProgress = (splitReachProgress > 0.0) and (1.0 / splitReachProgress) or 1e9
 
   -- Generate paths (count adapts to navigation_pathOffsetN length).
@@ -179,6 +184,13 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   -- For minimal work, only consider cars AHEAD of the current one in the sorted list.
   -- (sortedCarsListIndex-1 down to 1). Cars behind can’t block our forward samples.
   local firstAheadIndex = (sortedCarsListIndex or 2) - 1
+
+  local lateralSplitExponent = storage_PathFinding.lateralSplitExponent
+
+  local approxCarRadiusMeters   = storage_PathFinding.approxCarRadiusMeters
+  local safetyMarginMeters      = storage_PathFinding.safetyMarginMeters
+  local combinedCollisionRadius = (approxCarRadiusMeters * 2.0) + safetyMarginMeters
+  local combinedCollisionRadius2 = combinedCollisionRadius * combinedCollisionRadius
 
   for p = 1, #offsets do
     local targetOffsetN = math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, offsets[p]))
@@ -339,11 +351,9 @@ local function getBestLateralOffset(carIndex)
       local hitI = navigation_pathHitIndex[carIndex] and navigation_pathHitIndex[carIndex][i]
       local hitO = navigation_pathHitOpponentIndex[carIndex] and navigation_pathHitOpponentIndex[carIndex][i]
       if blocked[i] and hitI and hitO then
-        lines[#lines+1] = string.format("  path[%d] n=% .2f samples=%d -> %s @sample=%d by car#%d",
-          i, offsets[i], cnt, stat, hitI, hitO)
+        lines[#lines+1] = string.format("  path[%d] n=% .2f samples=%d -> %s @sample=%d by car#%d", i, offsets[i], cnt, stat, hitI, hitO)
       else
-        lines[#lines+1] = string.format("  path[%d] n=% .2f samples=%d -> %s",
-          i, offsets[i], cnt, stat)
+        lines[#lines+1] = string.format("  path[%d] n=% .2f samples=%d -> %s", i, offsets[i], cnt, stat)
       end
     end
   end

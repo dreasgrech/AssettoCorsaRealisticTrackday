@@ -125,6 +125,18 @@ StorageManager.Options_Overtaking = {
     UseIndicatorLightsWhenDrivingOnOvertakingLane = 9,
 }
 
+---@enum StorageManager.Options_PathFinding
+StorageManager.Options_PathFinding = {
+    ForwardDistanceMeters = 1,
+    AnchorAheadMeters = 2,
+    NumberOfPathSamples = 3,
+    MaxAbsOffsetNormalized = 4,
+    SplitReachMeters = 5,
+    LateralSplitExponent = 6,
+    ApproxCarRadiusMeters = 7,
+    SafetyMarginMeters = 8,
+}
+
 local optionsCollection_Debugging_beforeDoD = {
     { name = StorageManager.Options_Debugging.DebugShowCarStateOverheadText, default=false, min=nil, max=nil },
     { name = StorageManager.Options_Debugging.DebugCarGizmosDrawistance, default=125.0, min=10.0, max=500.0 },
@@ -236,6 +248,17 @@ local optionsCollection_beforeDoD = {
     { name = StorageManager.Options.DistanceToStartNavigatingAroundCarInAccident_meters, default=30.0, min=10.0, max=100.0 },
 }
 
+local optionsCollection_PathFinding_beforeDoD = {
+    { name = StorageManager.Options_PathFinding.ForwardDistanceMeters, default=60.0, min=10.0, max=200.0 },
+    { name = StorageManager.Options_PathFinding.AnchorAheadMeters, default=1.5, min=0.0, max=10.0 },
+    { name = StorageManager.Options_PathFinding.NumberOfPathSamples, default=12, min=4, max=64 },
+    { name = StorageManager.Options_PathFinding.MaxAbsOffsetNormalized, default=1.0, min=0.1, max=1.0 },
+    { name = StorageManager.Options_PathFinding.SplitReachMeters, default=12.0, min=1.0, max=50.0 },
+    { name = StorageManager.Options_PathFinding.LateralSplitExponent, default=2.2, min=1.0, max=5.0 },
+    { name = StorageManager.Options_PathFinding.ApproxCarRadiusMeters, default=1.6, min=0.5, max=5.0 },
+    { name = StorageManager.Options_PathFinding.SafetyMarginMeters, default=0.5, min=0.0, max=2.0 },
+}
+
 --[====[
 StorageManager.options_default = {}
 StorageManager.options_min = {}
@@ -298,6 +321,16 @@ StorageManager.options_AICarValues_max = fillInDoDTables(
     StorageManager.options_AICarValues_max
 )
 optionsCollection_AICarValues_beforeDoD = nil  -- free memory
+
+StorageManager.options_PathFinding_default,
+StorageManager.options_PathFinding_min,
+StorageManager.options_PathFinding_max = fillInDoDTables(
+    optionsCollection_PathFinding_beforeDoD,
+    StorageManager.options_PathFinding_default,
+    StorageManager.options_PathFinding_min,
+    StorageManager.options_PathFinding_max
+)
+optionsCollection_PathFinding_beforeDoD = nil  -- free memory
 
 
 ---@class StorageTable
@@ -475,6 +508,28 @@ local storageTable_AICarValues = {
     AIDifficultyLevel_Yielding = StorageManager.options_AICarValues_default[StorageManager.Options_AICarValues.AIDifficultyLevel_Yielding],
 }
 
+---@class StorageTable_PathFinding
+---@field forwardDistanceMeters number @How far forward the paths extend
+---@field anchorAheadMeters number @Where the "fan" originates: a bit in front of the car
+---@field numberOfPathSamples integer @Samples per path for drawing
+---@field maxAbsOffsetNormalized number @Clamp to track lateral limits for endpoints
+---@field splitReachMeters number @Distance at which lateral offset reaches 100%
+---@field lateralSplitExponent number @>1: earlier split; =1: linear; <1: later split
+---@field approxCarRadiusMeters number @Treat each car as a disc with this radius (meters), add a bit of margin
+---@field safetyMarginMeters number @Additional safety margin around each car
+
+---@type StorageTable_PathFinding
+local storageTable_PathFinding = {
+    forwardDistanceMeters = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.ForwardDistanceMeters],
+    anchorAheadMeters = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.AnchorAheadMeters],
+    numberOfPathSamples = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.NumberOfPathSamples],
+    maxAbsOffsetNormalized = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.MaxAbsOffsetNormalized],
+    splitReachMeters = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.SplitReachMeters],
+    lateralSplitExponent = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.LateralSplitExponent],
+    approxCarRadiusMeters = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.ApproxCarRadiusMeters],
+    safetyMarginMeters = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.SafetyMarginMeters],
+}
+
 ---@class StorageTable_Global
 ---@field appRanFirstTime boolean
 
@@ -497,6 +552,7 @@ local storage_Debugging = ac.storage(storageTable_Debugging, getStorageKeyForTra
 local storage_Yielding = ac.storage(storageTable_Yielding, getStorageKeyForTrackAndMode("yielding", fullTrackID, raceSessionType))
 local storage_Overtaking = ac.storage(storageTable_Overtaking, getStorageKeyForTrackAndMode("overtaking", fullTrackID, raceSessionType))
 local storage_AICarValues = ac.storage(storageTable_AICarValues, getStorageKeyForTrackAndMode("aicarvalues", fullTrackID, raceSessionType))
+local storage_PathFinding = ac.storage(storageTable_PathFinding, getStorageKeyForTrackAndMode("pathfinding", fullTrackID, raceSessionType))
 
 -- DISABLING ACCIDENTS FOR NOW SINCE IT'S STILL WIP
 storage_PerTrackPerMode.handleAccidents = Constants.ENABLE_ACCIDENT_HANDLING_IN_APP -- got this setting here for now since accidents are still wip
@@ -540,6 +596,10 @@ end
 ---@return StorageTable_AICarValues storage_AICarValues
 function StorageManager.getStorage_AICarValues()
     return storage_AICarValues
+end
+
+function StorageManager.getStorage_PathFinding()
+    return storage_PathFinding
 end
 
 function StorageManager.getPerTrackPerModeStorageKey()
