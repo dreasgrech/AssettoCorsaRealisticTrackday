@@ -11,10 +11,32 @@
 
 local Pathfinding = {}
 
+local ac = ac
+local ac_worldCoordinateToTrack = ac.worldCoordinateToTrack
+local ac_trackCoordinateToWorld = ac.trackCoordinateToWorld
+local render = render
+local render_debugSphere = render.debugSphere
+local render_debugLine = render.debugLine
+local render_debugText = render.debugText
+local math = math
+local math_min = math.min
+local math_max = math.max
+local math_abs = math.abs
+local string = string
+local string_format = string.format
+local RaceTrackManager = RaceTrackManager
+local RaceTrackManager_metersToSplineSpan = RaceTrackManager.metersToSplineSpan
+local table = table
+local table_concat = table.concat
+local table_insert = table.insert
+local Logger = Logger
+local Logger_log = Logger.log
+
+
 -- Toggle logs without changing call sites (leave here so it can be switched off easily).
 local LOG_ENABLED = true
 local function log(fmt, ...)
-  if LOG_ENABLED then Logger.log(string.format(fmt, ...)) end
+  if LOG_ENABLED then Logger_log(string.format(fmt, ...)) end
 end
 
 local storage_PathFinding = StorageManager.getStorage_PathFinding()
@@ -143,33 +165,33 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   ensureCarArrays(carIndex)
 
   -- Project car to track space once.
-  local carTrack = ac.worldCoordinateToTrack(car.position)
+  local carTrack = ac_worldCoordinateToTrack(car.position)
   if not carTrack then return end
 
   local currentProgressZ  = wrap01(carTrack.z)
   local maxAbsOffsetNormalized = storage_PathFinding.maxAbsOffsetNormalized
-  local currentOffsetN    = math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, carTrack.x))
+  local currentOffsetN    = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, carTrack.x))
   local carSpeedMps       = (car.speedKmh or 0) / 3.6
 
   -- Where paths originate: a small step ahead along the spline at the *current* lateral offset.
   -- Using the spline keeps the fan aligned with the road.
   local anchorAheadMeters = storage_PathFinding.anchorAheadMeters
-  local anchorZ = wrap01(currentProgressZ + RaceTrackManager.metersToSplineSpan(anchorAheadMeters))
-  local anchorWorld = ac.trackCoordinateToWorld(vec3(currentOffsetN, 0.0, anchorZ))
+  local anchorZ = wrap01(currentProgressZ + RaceTrackManager_metersToSplineSpan(anchorAheadMeters))
+  local anchorWorld = ac_trackCoordinateToWorld(vec3(currentOffsetN, 0.0, anchorZ))
 
   navigation_anchorWorld[carIndex] = anchorWorld
-  navigation_anchorText[carIndex]  = string.format("spline=%.4f  n=%.3f  speed=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
+  navigation_anchorText[carIndex]  = string_format("spline=%.4f  n=%.3f  speed=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
 
   -- Precompute step sizes.
   local forwardDistanceMeters = storage_PathFinding.forwardDistanceMeters
-  local totalForwardProgress = RaceTrackManager.metersToSplineSpan(forwardDistanceMeters)
+  local totalForwardProgress = RaceTrackManager_metersToSplineSpan(forwardDistanceMeters)
   local numberOfPathSamples = storage_PathFinding.numberOfPathSamples
-  local stepCount = math.max(2, numberOfPathSamples)
+  local stepCount = math_max(2, numberOfPathSamples)
   local stepZ = totalForwardProgress / (stepCount - 1)
 
   -- Precompute inverse of progress needed to reach full lateral offset by splitReachMeters.
   local splitReachMeters = storage_PathFinding.splitReachMeters
-  local splitReachProgress = RaceTrackManager.metersToSplineSpan(splitReachMeters)
+  local splitReachProgress = RaceTrackManager_metersToSplineSpan(splitReachMeters)
   local invSplitReachProgress = (splitReachProgress > 0.0) and (1.0 / splitReachProgress) or 1e9
 
   -- Generate paths (count adapts to navigation_pathOffsetN length).
@@ -193,7 +215,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local combinedCollisionRadius2 = combinedCollisionRadius * combinedCollisionRadius
 
   for p = 1, #offsets do
-    local targetOffsetN = math.max(-maxAbsOffsetNormalized, math.min(maxAbsOffsetNormalized, offsets[p]))
+    local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, offsets[p]))
 
     -- Clear previous samples/meta (reuse tables).
     local pts = points[p]
@@ -211,12 +233,12 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
     for i = 2, stepCount do
       local progressDelta = (i - 1) * stepZ
-      local tLatLinear = math.min(1.0, progressDelta * invSplitReachProgress)
+      local tLatLinear = math_min(1.0, progressDelta * invSplitReachProgress)
       local tLat = easeOutPow01(tLatLinear, lateralSplitExponent)
 
       local sampleZ = wrap01(anchorZ + (i - 1) * stepZ)
       local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
-      local world   = ac.trackCoordinateToWorld(vec3(sampleN, 0.0, sampleZ))
+      local world   = ac_trackCoordinateToWorld(vec3(sampleN, 0.0, sampleZ))
 
       counts[p] = counts[p] + 1
       pts[counts[p]] = world
@@ -249,8 +271,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       -- ----------------------------------------------------------------------
     end
 
-    log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s",
-      carIndex, p, targetOffsetN, counts[p], tostring(blocked[p]))
+    log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s", carIndex, p, targetOffsetN, counts[p], tostring(blocked[p]))
   end
 end
 
@@ -260,8 +281,8 @@ function Pathfinding.drawPaths(carIndex)
   if not anchorWorld then return end
 
   -- Draw anchor (small pole and label).
-  render.debugSphere(anchorWorld, 0.12, colAnchor)
-  render.debugText(anchorWorld + vec3(0, 0.35, 0), navigation_anchorText[carIndex])
+  render_debugSphere(anchorWorld, 0.12, colAnchor)
+  render_debugText(anchorWorld + vec3(0, 0.35, 0), navigation_anchorText[carIndex])
 
   -- Draw each path:
   --   • Clear path → thin green polyline.
@@ -269,7 +290,7 @@ function Pathfinding.drawPaths(carIndex)
   local offsets = PATHS
   local counts  = navigation_pathCount[carIndex]
   local blocked = navigation_pathBlocked[carIndex]
-  local hitIdx  = navigation_pathHitIndex[carIndex]
+  -- local hitIdx  = navigation_pathHitIndex[carIndex]
   local hitOpp  = navigation_pathHitOpponentIndex[carIndex]
   local hitPos  = navigation_pathHitWorld[carIndex]
   local points  = navigation_pathPoints[carIndex]
@@ -282,38 +303,37 @@ function Pathfinding.drawPaths(carIndex)
 
       -- Polyline
       for i = 1, cnt - 1 do
-        render.debugLine(pts[i], pts[i + 1], colLine)
+        render_debugLine(pts[i], pts[i + 1], colLine)
       end
 
       -- Sample markers
       for i = 1, cnt do
         local r = (i == 2) and 0.16 or 0.10
-        render.debugSphere(pts[i], r, colPoint)
+        render_debugSphere(pts[i], r, colPoint)
       end
 
       -- End label with the associated normalized offset value (+ blocked flag)
       local endPos = pts[cnt]
       if endPos then
-        local label = string.format("%.2f", offsets[p])
+        local label = string_format("%.2f", offsets[p])
         if blocked[p] then label = label .. " (blocked)" end
-        render.debugText(endPos + vec3(0, 0.30, 0), label, colLabel)
+        render_debugText(endPos + vec3(0, 0.30, 0), label, colLabel)
 
         -- Small “arrowhead” cross near the end to make direction obvious
         local a = endPos + vec3(0.20, 0, 0.20)
         local b = endPos + vec3(-0.20, 0, -0.20)
         local c = endPos + vec3(0.20, 0, -0.20)
         local d = endPos + vec3(-0.20, 0, 0.20)
-        render.debugLine(a, b, colLabel)
-        render.debugLine(c, d, colLabel)
+        render_debugLine(a, b, colLabel)
+        render_debugLine(c, d, colLabel)
       end
 
       -- If blocked, mark the first colliding sample with a bigger orange sphere,
       -- and show which opponent index caused it (helps with auditing).
       if blocked[p] and hitPos[p] then
-        render.debugSphere(hitPos[p], 0.28, colPointHit)
+        render_debugSphere(hitPos[p], 0.28, colPointHit)
         if hitOpp[p] ~= nil then
-          render.debugText(hitPos[p] + vec3(0, 0.45, 0),
-            string.format("car#%d", hitOpp[p]), colLabel)
+          render_debugText(hitPos[p] + vec3(0, 0.45, 0), string_format("car#%d", hitOpp[p]), colLabel)
         end
       end
     end
@@ -324,7 +344,7 @@ end
 local DECISION_TRACE_ENABLED = true
 local function traceDecision(lines)
   if LOG_ENABLED and DECISION_TRACE_ENABLED and lines and #lines > 0 then
-    Logger.log(table.concat(lines, "\n"))
+    Logger_log(table_concat(lines, "\n"))
   end
 end
 -- ----------------------------------------------------------------------------
@@ -341,7 +361,7 @@ local function getBestLateralOffset(carIndex)
 
   -- Build a compact decision sheet we’ll log at the end.
   local lines = {}
-  lines[#lines+1] = string.format("[PF_DECISION] car=%d", carIndex)
+  lines[#lines+1] = string_format("[PF_DECISION] car=%d", carIndex)
 
   -- Helper: append per-path status for diagnostics
   local function appendPathStatus()
@@ -351,9 +371,9 @@ local function getBestLateralOffset(carIndex)
       local hitI = navigation_pathHitIndex[carIndex] and navigation_pathHitIndex[carIndex][i]
       local hitO = navigation_pathHitOpponentIndex[carIndex] and navigation_pathHitOpponentIndex[carIndex][i]
       if blocked[i] and hitI and hitO then
-        lines[#lines+1] = string.format("  path[%d] n=% .2f samples=%d -> %s @sample=%d by car#%d", i, offsets[i], cnt, stat, hitI, hitO)
+        lines[#lines+1] = string_format("  path[%d] n=% .2f samples=%d -> %s @sample=%d by car#%d", i, offsets[i], cnt, stat, hitI, hitO)
       else
-        lines[#lines+1] = string.format("  path[%d] n=% .2f samples=%d -> %s", i, offsets[i], cnt, stat)
+        lines[#lines+1] = string_format("  path[%d] n=% .2f samples=%d -> %s", i, offsets[i], cnt, stat)
       end
     end
   end
@@ -361,7 +381,7 @@ local function getBestLateralOffset(carIndex)
   -- Compute dynamic “center” index (closest to 0, prefer positive on tie).
   local centerIdx, minAbs = 1, math.huge
   for i = 1, #offsets do
-    local a = math.abs(offsets[i])
+    local a = math_abs(offsets[i])
     if a < minAbs or (a == minAbs and offsets[i] > offsets[centerIdx]) then
       centerIdx, minAbs = i, a
     end
@@ -377,8 +397,8 @@ local function getBestLateralOffset(carIndex)
     if haveAll and allClear then
       navigation_lastChosenPathIndex[carIndex] = centerIdx
       appendPathStatus()
-      lines[#lines+1] = string.format("  order: center-only (all clear)")
-      lines[#lines+1] = string.format("  chosen: idx=%d n=% .2f (reason: all-clear center)", centerIdx, offsets[centerIdx])
+      lines[#lines+1] = string_format("  order: center-only (all clear)")
+      lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: all-clear center)", centerIdx, offsets[centerIdx])
       traceDecision(lines)
       return offsets[centerIdx]
     end
@@ -388,8 +408,8 @@ local function getBestLateralOffset(carIndex)
   local lastIdx = navigation_lastChosenPathIndex[carIndex]
   if lastIdx and counts[lastIdx] and counts[lastIdx] > 0 and not blocked[lastIdx] then
     appendPathStatus()
-    lines[#lines+1] = string.format("  order: (sticky short-circuit)")
-    lines[#lines+1] = string.format("  chosen: idx=%d n=% .2f (reason: sticky last still clear)", lastIdx, offsets[lastIdx])
+    lines[#lines+1] = string_format("  order: (sticky short-circuit)")
+    lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: sticky last still clear)", lastIdx, offsets[lastIdx])
     traceDecision(lines)
     return offsets[lastIdx]
   end
@@ -397,25 +417,28 @@ local function getBestLateralOffset(carIndex)
   -- Preference order: center, then ±0.5, ±0.75, ±1.0 (right on ties).
   local order = {}
   local function pushIfExists(val)
-    for i = 1, #offsets do if offsets[i] == val then table.insert(order, i) return end end
+    for i = 1, #offsets do if offsets[i] == val then table_insert(order, i) return end end
   end
   pushIfExists(0.0)
-  pushIfExists(0.5);  pushIfExists(-0.5)
-  pushIfExists(0.75); pushIfExists(-0.75)
-  pushIfExists(1.0);  pushIfExists(-1.0)
+  pushIfExists(0.5)
+  pushIfExists(-0.5)
+  pushIfExists(0.75)
+  pushIfExists(-0.75)
+  pushIfExists(1.0)
+  pushIfExists(-1.0)
 
   appendPathStatus()
   do
     local buf = {}
-    for k = 1, #order do buf[k] = string.format("%d(n=% .2f)", order[k], offsets[order[k]]) end
-    lines[#lines+1] = "  order: " .. table.concat(buf, " → ")
+    for k = 1, #order do buf[k] = string_format("%d(n=% .2f)", order[k], offsets[order[k]]) end
+    lines[#lines+1] = "  order: " .. table_concat(buf, " → ")
   end
 
   -- First, try to pick the first CLEAR path by preference.
   for _, idx in ipairs(order) do
     if counts[idx] and counts[idx] > 0 and not blocked[idx] then
       navigation_lastChosenPathIndex[carIndex] = idx
-      lines[#lines+1] = string.format("  chosen: idx=%d n=% .2f (reason: first clear by preference)", idx, offsets[idx])
+      lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: first clear by preference)", idx, offsets[idx])
       traceDecision(lines)
       return offsets[idx]
     end
@@ -436,8 +459,7 @@ local function getBestLateralOffset(carIndex)
   end
   if bestIdx then
     navigation_lastChosenPathIndex[carIndex] = bestIdx
-    lines[#lines+1] = string.format("  chosen: idx=%d n=% .2f (reason: fallback, furthest safe samples = %d)",
-      bestIdx, offsets[bestIdx], bestSafeSamples)
+    lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: fallback, furthest safe samples = %d)", bestIdx, offsets[bestIdx], bestSafeSamples)
     traceDecision(lines)
     return offsets[bestIdx]
   end
