@@ -124,7 +124,7 @@ local navigation_pathHitOpponentIndex = {}
 local navigation_pathHitWorld = {}
 
 ---@type table<integer,table<integer,table>>    -- per-car array of lists of sampled points per path
-local navigation_pathPoints = {}
+local navigation_pathsPoints = {}
 
 -- Ensure per-car arrays exist and match the number of configured paths.
 local function ensureCarArrays(carIndex)
@@ -145,7 +145,7 @@ local function ensureCarArrays(carIndex)
     navigation_pathHitIndex[carIndex] = hitIdx
     navigation_pathHitOpponentIndex[carIndex] = hitOpp
     navigation_pathHitWorld[carIndex] = hitPos
-    navigation_pathPoints[carIndex] = points
+    navigation_pathsPoints[carIndex] = points
   end
 
   navigation_anchorText[carIndex] = navigation_anchorText[carIndex] or ""
@@ -177,7 +177,8 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local currentProgressZ  = wrap01(carTrack.z)
   local maxAbsOffsetNormalized = storage_PathFinding.maxAbsOffsetNormalized
   local currentOffsetN    = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, carTrack.x))
-  local carSpeedMps       = (car.speedKmh or 0) / 3.6
+  -- local carSpeedMps       = (car.speedKmh or 0) / 3.6
+  local carSpeedKmh       = car.speedKmh
 
   -- Where paths originate: a small step ahead along the spline at the *current* lateral offset.
   -- Using the spline keeps the fan aligned with the road.
@@ -186,7 +187,8 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local anchorWorldPosition = ac_trackCoordinateToWorld(VecPool_getTempVec3(currentOffsetN, 0.0, anchorZ))
 
   navigation_anchorWorldPosition[carIndex] = anchorWorldPosition
-  navigation_anchorText[carIndex]  = string_format("spline=%.4f  n=%.3f  speed=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
+  -- navigation_anchorText[carIndex]  = string_format("spline=%.4f  n=%.3f  speed=%.1f m/s", currentProgressZ, currentOffsetN, carSpeedMps)
+  navigation_anchorText[carIndex]  = string_format("spline=%.4f  n=%.3f  speed=%.1f km/h", currentProgressZ, currentOffsetN, carSpeedKmh)
 
   -- Precompute step sizes.
   local forwardDistanceMeters = storage_PathFinding.forwardDistanceMeters
@@ -207,7 +209,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local hitIdx  = navigation_pathHitIndex[carIndex]
   local hitOpp  = navigation_pathHitOpponentIndex[carIndex]
   local hitPos  = navigation_pathHitWorld[carIndex]
-  local pathPoints  = navigation_pathPoints[carIndex]
+  local pathsPoints  = navigation_pathsPoints[carIndex]
 
   -- For minimal work, only consider cars AHEAD of the current one in the sorted list.
   -- (sortedCarsListIndex-1 down to 1). Cars behind can’t block our forward samples.
@@ -224,9 +226,9 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
     local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, PATH_LATERAL_OFFSETS[pathLateralOffsetIndex]))
 
     -- Clear previous samples/meta (reuse tables).
-    local pts = pathPoints[pathLateralOffsetIndex]
-    for i = 1, #pts do
-      pts[i] = nil
+    local pathPoints = pathsPoints[pathLateralOffsetIndex]
+    for i = 1, #pathPoints do
+      pathPoints[i] = nil
     end
     counts[pathLateralOffsetIndex] = 0
     blocked[pathLateralOffsetIndex] = false
@@ -237,8 +239,11 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
     -- Sample along the road: linearly progress forward, but move laterally so that
     -- we hit the target offset by `splitReachMeters` (using an ease-out curve).
     counts[pathLateralOffsetIndex] = 1
-    pts[1] = anchorWorldPosition
 
+    -- First point is always the anchor.
+    pathPoints[1] = anchorWorldPosition
+
+    -- for each step along the path, create a sample point and check for collisions.
     for i = 2, stepCount do
       local progressDelta = (i - 1) * stepZ
       local tLatLinear = math_min(1.0, progressDelta * invSplitReachProgress)
@@ -246,14 +251,16 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
       local sampleZ = wrap01(anchorZ + (i - 1) * stepZ)
       local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
-      local worldPosition   = ac_trackCoordinateToWorld(VecPool_getTempVec3(sampleN, 0.0, sampleZ))
+      local sampleWorldPosition   = ac_trackCoordinateToWorld(VecPool_getTempVec3(sampleN, 0.0, sampleZ))
 
       counts[pathLateralOffsetIndex] = counts[pathLateralOffsetIndex] + 1
-      pts[counts[pathLateralOffsetIndex]] = worldPosition
+      
+      -- save the sample point
+      pathPoints[counts[pathLateralOffsetIndex]] = sampleWorldPosition
 
       -- --- Minimal collider detection (only what’s needed) -------------------
       if not blocked[pathLateralOffsetIndex] and firstAheadSortedCarListIndex >= 1 then
-        local worldPositionX, worldPositionY, worldPositionZ = worldPosition.x, worldPosition.y, worldPosition.z
+        local worldPositionX, worldPositionY, worldPositionZ = sampleWorldPosition.x, sampleWorldPosition.y, sampleWorldPosition.z
 
         -- Check cars in front only; early-exit on first hit.
         for idx = firstAheadSortedCarListIndex, 1, -1 do
@@ -269,7 +276,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
             if d2 <= combinedCollisionRadius2 then
               blocked[pathLateralOffsetIndex] = true
               hitIdx[pathLateralOffsetIndex] = i
-              hitPos[pathLateralOffsetIndex] = worldPosition
+              hitPos[pathLateralOffsetIndex] = sampleWorldPosition
               hitOpp[pathLateralOffsetIndex] = otherCar.index
               break
             end
@@ -301,7 +308,7 @@ function Pathfinding.drawPaths(carIndex)
   -- local hitIdx  = navigation_pathHitIndex[carIndex]
   local hitOpp  = navigation_pathHitOpponentIndex[carIndex]
   local hitPos  = navigation_pathHitWorld[carIndex]
-  local points  = navigation_pathPoints[carIndex]
+  local points  = navigation_pathsPoints[carIndex]
 
   for p = 1, TOTAL_PATH_LATERAL_OFFSETS do
     local cnt = counts[p]
