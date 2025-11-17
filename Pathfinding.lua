@@ -12,6 +12,7 @@
 local Pathfinding = {}
 
 local ac = ac
+local ac_getSim = ac.getSim
 local ac_worldCoordinateToTrack = ac.worldCoordinateToTrack
 local ac_trackCoordinateToWorld = ac.trackCoordinateToWorld
 local render = render
@@ -93,10 +94,14 @@ end
 -- Data-oriented containers
 -- =========================
 
+-- local PATHS_EDGE_OFFSET_N = 1.0  -- normalized offset for outermost paths
+local PATHS_EDGE_OFFSET_N = 0.9  -- normalized offset for outermost paths
+
 -- PATHS ARE MODULE-WIDE (not per-car) so you can expand/reduce them without extra memory per car.
 -- Modify this list to add/remove paths. All code below adapts automatically.
 ---@type table<integer,number>
-local PATH_LATERAL_OFFSETS = { -1.0, -0.75, -0.5, 0.0, 0.5, 0.75, 1.0 }
+local PATH_LATERAL_OFFSETS = { -PATHS_EDGE_OFFSET_N, -0.75, -0.5, 0.0, 0.5, 0.75, PATHS_EDGE_OFFSET_N }
+-- local PATH_LATERAL_OFFSETS = { -0.75, -0.5, 0.0, 0.5, 0.75 }
 local TOTAL_PATH_LATERAL_OFFSETS = #PATH_LATERAL_OFFSETS
 
 ---@type table<integer,string>
@@ -331,21 +336,32 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   -- (sortedCarsListIndex-1 down to 1). Cars behind can’t block our forward samples.
   local firstAheadSortedCarListIndex = (sortedCarsListIndex or 2) - 1
 
+  --[===[
   local approxCarRadiusMeters   = storage_PathFinding.approxCarRadiusMeters
   local safetyMarginMeters      = storage_PathFinding.safetyMarginMeters
   local combinedCollisionRadius = (approxCarRadiusMeters * 2.0) + safetyMarginMeters
   local combinedCollisionRadius2 = combinedCollisionRadius * combinedCollisionRadius
+  --]===]
 
   local lateralSplitExponent = storage_PathFinding.lateralSplitExponent
+
+  local timeToLeavePathBlockedAfterSampleHitSeconds = storage_PathFinding.timeToLeavePathBlockedAfterSampleHitSeconds 
+
+  local sim = ac_getSim()
 
   -- For each path lateral target offset, build each path's samples and check for collisions after creating the samples
   for pathIndex = 1, TOTAL_PATH_LATERAL_OFFSETS do
     local targetOffsetN = math_max(-maxAbsOffsetNormalized, math_min(maxAbsOffsetNormalized, PATH_LATERAL_OFFSETS[pathIndex]))
 
+    local leavePathBlocked = false
     local isPathCurrentlyBlocked = pathsIsBlocked[pathIndex]
+    -- Determine if we should keep the path marked as blocked based on time since last hit
     if isPathCurrentlyBlocked then
-      local timeSinceBlockedMs = ac.getSim().time - (pathsBlockedTime[pathIndex] or 0.0)
-      
+      local timeSinceBlockedMs = sim.time - (pathsBlockedTime[pathIndex] or 0.0)
+      local timeSinceBlockedSeconds = timeSinceBlockedMs * 0.001
+      if timeSinceBlockedSeconds < timeToLeavePathBlockedAfterSampleHitSeconds then
+        leavePathBlocked = true
+      end
     end
 
     -- Clear previous samples/meta (reuse tables).
@@ -354,11 +370,15 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       pathSamplesWorldPositions[i] = nil
     end
     pathsTotalSamples[pathIndex] = 0
-    pathsIsBlocked[pathIndex] = false
-    pathsBlockedSampleIndex[pathIndex] = nil
-    pathsBlockedSampleWorldPosition[pathIndex] = nil
-    pathsBlockedOtherCarIndex[pathIndex] = nil
-    pathsBlockedTime[pathIndex] = nil
+
+    -- Only clear the blocked state if we are not leaving it blocked
+    if not leavePathBlocked then
+      pathsIsBlocked[pathIndex] = false
+      pathsBlockedSampleIndex[pathIndex] = nil
+      pathsBlockedSampleWorldPosition[pathIndex] = nil
+      pathsBlockedOtherCarIndex[pathIndex] = nil
+      pathsBlockedTime[pathIndex] = nil
+    end
 
     -- Sample along the road: linearly progress forward, but move laterally so that we hit the target offset by `splitReachMeters` (using an ease-out curve).
 
@@ -369,7 +389,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
     pathSamplesWorldPositions[1] = anchorWorldPosition
 
     -- NEW: keep track of previous sample position for segment midpoint checks.
-    local lastSampleWorldPosition = anchorWorldPosition
+    -- local lastSampleWorldPosition = anchorWorldPosition
 
     -- for each step along the path, create a sample point and check for collisions.
     for currentSampleIndex = 2, numberOfPathSamples do
@@ -397,7 +417,6 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
           if otherCar and otherCar.index ~= carIndex then
             -- check if this sample is colliding with the other car
             -- local intersecting = isIntersectingSphere(sampleWorldPosition, otherCar.position, combinedCollisionRadius2)
-            -- local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.position, otherCar.aabbSize)
             local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.position, otherCar.aabbSize, otherCar.look, otherCar.side, otherCar.up)
 
             --[====[
@@ -418,7 +437,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
               pathsBlockedSampleIndex[pathIndex] = currentSampleIndex
               pathsBlockedSampleWorldPosition[pathIndex] = sampleWorldPosition
               pathsBlockedOtherCarIndex[pathIndex] = otherCar.index
-              pathsBlockedTime[pathIndex] = ac.getSim().time
+              pathsBlockedTime[pathIndex] = sim.time
               break -- break out of the for loop over other cars since we found a blocked hit for this path so we don't need to check for other cars
             end
           end
@@ -427,7 +446,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       -- ----------------------------------------------------------------------
 
       -- update previous sample position for the next segment
-      lastSampleWorldPosition = sampleWorldPosition
+      -- lastSampleWorldPosition = sampleWorldPosition
     end -- end of samples loop
 
     log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s", carIndex, pathIndex, targetOffsetN, pathsTotalSamples[pathIndex], tostring(pathsIsBlocked[pathIndex]))

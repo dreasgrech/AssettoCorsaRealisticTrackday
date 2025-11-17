@@ -135,6 +135,7 @@ StorageManager.Options_PathFinding = {
     LateralSplitExponent = 6,
     ApproxCarRadiusMeters = 7,
     SafetyMarginMeters = 8,
+    TimeToLeavePathBlockedAfterSampleHitSeconds = 9
 }
 
 local optionsCollection_Debugging_beforeDoD = {
@@ -250,13 +251,14 @@ local optionsCollection_beforeDoD = {
 
 local optionsCollection_PathFinding_beforeDoD = {
     { name = StorageManager.Options_PathFinding.ForwardDistanceMeters, default=60.0, min=10.0, max=500.0 },
-    { name = StorageManager.Options_PathFinding.AnchorAheadMeters, default=1.5, min=0.0, max=30.0 },
+    { name = StorageManager.Options_PathFinding.AnchorAheadMeters, default=0, min=0.0, max=30.0 },
     { name = StorageManager.Options_PathFinding.NumberOfPathSamples, default=12, min=2, max=64 }, -- must have a minimum of two samples
     { name = StorageManager.Options_PathFinding.MaxAbsOffsetNormalized, default=1.0, min=0.1, max=1.0 },
-    { name = StorageManager.Options_PathFinding.SplitReachMeters, default=12.0, min=1.0, max=50.0 },
+    { name = StorageManager.Options_PathFinding.SplitReachMeters, default=5.0, min=1.0, max=50.0 },
     { name = StorageManager.Options_PathFinding.LateralSplitExponent, default=2.2, min=1.0, max=5.0 },
     { name = StorageManager.Options_PathFinding.ApproxCarRadiusMeters, default=1.6, min=0.5, max=5.0 },
-    { name = StorageManager.Options_PathFinding.SafetyMarginMeters, default=0.5, min=0.0, max=2.0 },
+    { name = StorageManager.Options_PathFinding.SafetyMarginMeters, default=0.4, min=0.0, max=2.0 },
+    { name = StorageManager.Options_PathFinding.TimeToLeavePathBlockedAfterSampleHitSeconds, default=0.5, min=0, max=5.0 },
 }
 
 --[====[
@@ -517,6 +519,7 @@ local storageTable_AICarValues = {
 ---@field lateralSplitExponent number @>1: earlier split; =1: linear; <1: later split
 ---@field approxCarRadiusMeters number @Treat each car as a disc with this radius (meters), add a bit of margin
 ---@field safetyMarginMeters number @Additional safety margin around each car
+---@field timeToLeavePathBlockedAfterSampleHitSeconds number @Time to consider a path blocked after a sample hits an obstacle
 
 ---@type StorageTable_PathFinding
 local storageTable_PathFinding = {
@@ -528,6 +531,7 @@ local storageTable_PathFinding = {
     lateralSplitExponent = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.LateralSplitExponent],
     approxCarRadiusMeters = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.ApproxCarRadiusMeters],
     safetyMarginMeters = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.SafetyMarginMeters],
+    timeToLeavePathBlockedAfterSampleHitSeconds = StorageManager.options_PathFinding_default[StorageManager.Options_PathFinding.TimeToLeavePathBlockedAfterSampleHitSeconds],
 }
 
 ---@class StorageTable_Global
