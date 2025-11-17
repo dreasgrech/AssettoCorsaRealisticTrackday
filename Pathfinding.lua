@@ -237,7 +237,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
     -- Sample along the road: linearly progress forward, but move laterally so that we hit the target offset by `splitReachMeters` (using an ease-out curve).
 
-    -- Initialize the sample count (first point is anchor).
+    -- Initialize the sample count (first sample is the anchor).
     pathsTotalSamples[pathIndex] = 1
 
     -- First sample is always the anchor.
@@ -308,7 +308,7 @@ function Pathfinding.drawPaths(carIndex)
   --   • Clear path → thin green polyline.
   --   • Blocked path → red polyline and a highlighted sphere at the first hit sample.
   local pathsTotalSamples  = navigation_pathsTotalSamples[carIndex]
-  local pathsBlocked = navigation_pathsIsBlocked[carIndex]
+  local pathsIsBlocked = navigation_pathsIsBlocked[carIndex]
   local pathsHitsOtherCarsIndex  = navigation_pathsBlockedOtherCarsIndex[carIndex]
   local pathsHitSampleWorldPosition  = navigation_pathsBlockedSampleWorldPosition[carIndex]
   local pathsSamplesWorldPositions  = navigation_pathsSamplesWorldPositions[carIndex]
@@ -316,7 +316,7 @@ function Pathfinding.drawPaths(carIndex)
   for pathIndex = 1, TOTAL_PATH_LATERAL_OFFSETS do
     local pathTotalSamples = pathsTotalSamples[pathIndex]
     if pathTotalSamples and pathTotalSamples >= 2 then
-      local colLine = pathsBlocked[pathIndex] and colLineBlocked or colLineClear
+      local colLine = pathsIsBlocked[pathIndex] and colLineBlocked or colLineClear
       local pathSamplesWorldPositions = pathsSamplesWorldPositions[pathIndex]
 
       -- Polyline
@@ -334,7 +334,7 @@ function Pathfinding.drawPaths(carIndex)
       local lastPathSampleWorldPosition = pathSamplesWorldPositions[pathTotalSamples]
       if lastPathSampleWorldPosition then
         local label = string_format("%.2f", PATH_LATERAL_OFFSETS[pathIndex])
-        if pathsBlocked[pathIndex] then
+        if pathsIsBlocked[pathIndex] then
           label = label .. " (blocked)"
         end
 
@@ -351,7 +351,7 @@ function Pathfinding.drawPaths(carIndex)
 
       -- If blocked, mark the first colliding sample with a bigger orange sphere,
       -- and show which opponent index caused it (helps with auditing).
-      if pathsBlocked[pathIndex] and pathsHitSampleWorldPosition[pathIndex] then
+      if pathsIsBlocked[pathIndex] and pathsHitSampleWorldPosition[pathIndex] then
         render_debugSphere(pathsHitSampleWorldPosition[pathIndex], 0.28, colPointHit)
         if pathsHitsOtherCarsIndex[pathIndex] ~= nil then
           render_debugText(pathsHitSampleWorldPosition[pathIndex] + VecPool_getTempVec3(0, 0.45, 0), string_format("car#%d", pathsHitsOtherCarsIndex[pathIndex]), colLabel)
@@ -375,10 +375,10 @@ end
 -- Sticky behavior: if previously chosen path is still clear, keep it to avoid wobbling.
 -- If all paths are blocked, returns the one that gets the furthest before the first hit.
 local function getBestLateralOffset(carIndex)
-  -- local PATH_LATERAL_OFFSETS = PATH_LATERAL_OFFSETS
   local counts  = navigation_pathsTotalSamples[carIndex]
-  local blocked = navigation_pathsIsBlocked[carIndex]
   if not counts then return nil end
+
+  local pathIsBlocked = navigation_pathsIsBlocked[carIndex]
 
   -- Build a compact decision sheet we’ll log at the end.
   local lines = {}
@@ -388,10 +388,10 @@ local function getBestLateralOffset(carIndex)
   local function appendPathStatus()
     for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
       local cnt  = counts[i] or 0
-      local stat = (blocked[i] and "BLOCKED") or "CLEAR"
+      local stat = (pathIsBlocked[i] and "BLOCKED") or "CLEAR"
       local hitI = navigation_pathsBlockedSampleIndex[carIndex] and navigation_pathsBlockedSampleIndex[carIndex][i]
       local hitO = navigation_pathsBlockedOtherCarsIndex[carIndex] and navigation_pathsBlockedOtherCarsIndex[carIndex][i]
-      if blocked[i] and hitI and hitO then
+      if pathIsBlocked[i] and hitI and hitO then
         lines[#lines+1] = string_format("  path[%d] n=% .2f samples=%d -> %s @sample=%d by car#%d", i, PATH_LATERAL_OFFSETS[i], cnt, stat, hitI, hitO)
       else
         lines[#lines+1] = string_format("  path[%d] n=% .2f samples=%d -> %s", i, PATH_LATERAL_OFFSETS[i], cnt, stat)
@@ -413,7 +413,7 @@ local function getBestLateralOffset(carIndex)
     local haveAll, allClear = true, true
     for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
       if not (counts[i] and counts[i] > 0) then haveAll = false break end
-      if blocked[i] then allClear = false break end
+      if pathIsBlocked[i] then allClear = false break end
     end
     if haveAll and allClear then
       navigation_lastChosenPathIndex[carIndex] = centerIdx
@@ -427,7 +427,7 @@ local function getBestLateralOffset(carIndex)
 
   -- Sticky choice: keep last if still clear.
   local lastIdx = navigation_lastChosenPathIndex[carIndex]
-  if lastIdx and counts[lastIdx] and counts[lastIdx] > 0 and not blocked[lastIdx] then
+  if lastIdx and counts[lastIdx] and counts[lastIdx] > 0 and not pathIsBlocked[lastIdx] then
     appendPathStatus()
     lines[#lines+1] = string_format("  order: (sticky short-circuit)")
     lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: sticky last still clear)", lastIdx, PATH_LATERAL_OFFSETS[lastIdx])
@@ -457,7 +457,7 @@ local function getBestLateralOffset(carIndex)
 
   -- First, try to pick the first CLEAR path by preference.
   for _, idx in ipairs(order) do
-    if counts[idx] and counts[idx] > 0 and not blocked[idx] then
+    if counts[idx] and counts[idx] > 0 and not pathIsBlocked[idx] then
       navigation_lastChosenPathIndex[carIndex] = idx
       lines[#lines+1] = string_format("  chosen: idx=%d n=% .2f (reason: first clear by preference)", idx, PATH_LATERAL_OFFSETS[idx])
       traceDecision(lines)
@@ -471,7 +471,7 @@ local function getBestLateralOffset(carIndex)
   for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
     local cnt = counts[i]
     if cnt and cnt > 0 then
-      local safe = blocked[i] and (hitIdx[i] or 2) or cnt
+      local safe = pathIsBlocked[i] and (hitIdx[i] or 2) or cnt
       if safe > bestSafeSamples then
         bestSafeSamples = safe
         bestIdx = i
