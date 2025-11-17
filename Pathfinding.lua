@@ -175,16 +175,27 @@ local isIntersectingSphere = function(carPosition, otherCarPosition, combinedCol
   return intersecting
 end
 
-local isIntersectingAABB = function(carPosition, otherCarAABBCenter, otherCarAABBSize)
+---@param carPosition vec3
+---@param otherCarPosition vec3
+---@param otherCarAABBSize vec3
+---@return boolean
+local isIntersectingAABB = function(carPosition, otherCarPosition, otherCarAABBSize)
   -- Expand half-extents a bit with safety margin (XZ-plane mostly, Y kept for completeness).
-  local dx = carPosition.x - otherCarAABBCenter.x
-  local dy = carPosition.y - otherCarAABBCenter.y
-  local dz = carPosition.z - otherCarAABBCenter.z
+  local dx = carPosition.x - otherCarPosition.x
+  local dy = carPosition.y - otherCarPosition.y
+  local dz = carPosition.z - otherCarPosition.z
   local halfSizeX = (otherCarAABBSize.x * 0.5)-- + safetyMarginMeters
   local halfSizeY = (otherCarAABBSize.y * 0.5)-- + safetyMarginMeters
   local halfSizeZ = (otherCarAABBSize.z * 0.5)-- + safetyMarginMeters
 
   local intersecting = math_abs(dx) <= halfSizeX and math_abs(dy) <= halfSizeY and math_abs(dz) <= halfSizeZ
+  Logger.log(string_format(
+    "[PF_AABB] math_abs(%.3f) <= %.3f = %s, math_abs(%.3f) <= %.3f = %s, math_abs(%.3f) <= %.3f = %s => intersecting=%s. otherCarPosition=%s",
+     dx, halfSizeX, tostring(math_abs(dx) <= halfSizeX),
+     dy, halfSizeY, tostring(math_abs(dy) <= halfSizeY),
+     dz, halfSizeZ, tostring(math_abs(dz) <= halfSizeZ),
+     tostring(intersecting),
+     tostring(otherCarPosition)))
   return intersecting
 end
 
@@ -294,9 +305,13 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
           -- TODO: Andreas: theoratically this index check is not needed since we only check cars ahead
           if otherCar and otherCar.index ~= carIndex then
             -- check if this sample is colliding with the other car
-            local intersecting = isIntersectingSphere(sampleWorldPosition, otherCar.position, combinedCollisionRadius2)
-            --local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.aabbCenter, otherCar.aabbSize)
+            -- local intersecting = isIntersectingSphere(sampleWorldPosition, otherCar.position, combinedCollisionRadius2)
+            local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.position, otherCar.aabbSize)
             if intersecting then
+
+            -- local intersectingAABB = isIntersectingAABB(sampleWorldPosition, otherCar.aabbCenter, otherCar.aabbSize)
+            -- local intersectingAABB = isIntersectingAABB(sampleWorldPosition, otherCar.position, otherCar.aabbSize)
+
               -- mark the path as blocked
               pathsIsBlocked[pathIndex] = true
               pathsBlockedSampleIndex[pathIndex] = currentSampleIndex
