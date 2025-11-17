@@ -175,6 +175,19 @@ local isIntersectingSphere = function(carPosition, otherCarPosition, combinedCol
   return intersecting
 end
 
+local isIntersectingAABB = function(carPosition, otherCarAABBCenter, otherCarAABBSize)
+  -- Expand half-extents a bit with safety margin (XZ-plane mostly, Y kept for completeness).
+  local dx = carPosition.x - otherCarAABBCenter.x
+  local dy = carPosition.y - otherCarAABBCenter.y
+  local dz = carPosition.z - otherCarAABBCenter.z
+  local halfSizeX = (otherCarAABBSize.x * 0.5)-- + safetyMarginMeters
+  local halfSizeY = (otherCarAABBSize.y * 0.5)-- + safetyMarginMeters
+  local halfSizeZ = (otherCarAABBSize.z * 0.5)-- + safetyMarginMeters
+
+  local intersecting = math_abs(dx) <= halfSizeX and math_abs(dy) <= halfSizeY and math_abs(dz) <= halfSizeZ
+  return intersecting
+end
+
 -- Build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
 ---@param sortedCarsList SortedCarsList @The list of cars sorted by track position (furthest ahead first)
@@ -280,11 +293,9 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
           
           -- TODO: Andreas: theoratically this index check is not needed since we only check cars ahead
           if otherCar and otherCar.index ~= carIndex then
-            -- Keep original quick gate (sphere) for speed; early exit on first overlap:
-            local otherCarPosition = otherCar.position
-            
             -- check if this sample is colliding with the other car
-            local intersecting = isIntersectingSphere(sampleWorldPosition, otherCarPosition, combinedCollisionRadius2)
+            local intersecting = isIntersectingSphere(sampleWorldPosition, otherCar.position, combinedCollisionRadius2)
+            --local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.aabbCenter, otherCar.aabbSize)
             if intersecting then
               -- mark the path as blocked
               pathsIsBlocked[pathIndex] = true
@@ -303,7 +314,8 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   end -- end of paths loop
 end
 
--- Public: draw the paths like in the sketch: a fan from the car front with labels.
+-- Draw the paths generated for the car
+--- @param carIndex integer @The index of the car to draw the paths for
 function Pathfinding.drawPaths(carIndex)
   local anchorWorldPosition = navigation_anchorWorldPosition[carIndex]
   if not anchorWorldPosition then return end
