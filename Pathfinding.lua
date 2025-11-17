@@ -164,6 +164,17 @@ local function ensureCarArrays(carIndex)
   end
 end
 
+local isIntersectingSphere = function(carPosition, otherCarPosition, combinedCollisionRadius2)
+  local dx = otherCarPosition.x - carPosition.x
+  local dy = otherCarPosition.y - carPosition.y
+  local dz = otherCarPosition.z - carPosition.z
+  local d2 = dx*dx + dy*dy + dz*dz
+  
+  -- check if this sample is colliding with the other car
+  local intersecting = d2 <= combinedCollisionRadius2
+  return intersecting
+end
+
 -- Build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
 ---@param sortedCarsList SortedCarsList @The list of cars sorted by track position (furthest ahead first)
@@ -261,7 +272,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
       -- --- Minimal collider detection (only what’s needed) -------------------
       if not pathsIsBlocked[pathIndex] and firstAheadSortedCarListIndex >= 1 then
-        local worldPositionX, worldPositionY, worldPositionZ = sampleWorldPosition.x, sampleWorldPosition.y, sampleWorldPosition.z
+        -- local worldPositionX, worldPositionY, worldPositionZ = sampleWorldPosition.x, sampleWorldPosition.y, sampleWorldPosition.z
 
         -- Check cars in front only; early-exit on first hit.
         for otherCarSortedCarsListIndex = firstAheadSortedCarListIndex, 1, -1 do
@@ -271,13 +282,10 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
           if otherCar and otherCar.index ~= carIndex then
             -- Keep original quick gate (sphere) for speed; early exit on first overlap:
             local otherCarPosition = otherCar.position
-            local dx = otherCarPosition.x - worldPositionX
-            local dy = otherCarPosition.y - worldPositionY
-            local dz = otherCarPosition.z - worldPositionZ
-            local d2 = dx*dx + dy*dy + dz*dz
             
             -- check if this sample is colliding with the other car
-            if d2 <= combinedCollisionRadius2 then
+            local intersecting = isIntersectingSphere(sampleWorldPosition, otherCarPosition, combinedCollisionRadius2)
+            if intersecting then
               -- mark the path as blocked
               pathsIsBlocked[pathIndex] = true
               pathsBlockedSampleIndex[pathIndex] = currentSampleIndex
