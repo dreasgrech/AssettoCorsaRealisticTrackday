@@ -506,7 +506,9 @@ function script.MANIFEST__UPDATE(dt)
             local carForNavigation = ac_getCar(Constants.PATHFINDING_DEBUGGING_CAR_INDEX)
             if carForNavigation and offset then
               local sideCheck = false
-              CarOperations.driveSafelyToSide(Constants.PATHFINDING_DEBUGGING_CAR_INDEX, dt, carForNavigation, offset, 500, true, sideCheck, false)  -- empty storage since we don't need to save anything for the player car
+              -- local rampSpeed = 500
+              local rampSpeed = 2.5
+              CarOperations.driveSafelyToSide(Constants.PATHFINDING_DEBUGGING_CAR_INDEX, dt, carForNavigation, offset, rampSpeed, true, sideCheck, false)  -- empty storage since we don't need to save anything for the player car
             end
           break
         end
@@ -670,6 +672,10 @@ function script.MANIFEST__TRANSPARENT(dt)
 
   if Constants.PATHFINDING_DEBUGGING then
     Pathfinding.drawPaths(Constants.PATHFINDING_DEBUGGING_CAR_INDEX)
+      for i, car in ac_iterateCars() do
+        Pathfinding.renderCarAABB(car, ColorManager.RGBM_Colors.Yellow)
+      end
+    
     -- Pathfinding.drawObstacleAABBsForHits(Constants.PATHFINDING_DEBUGGING_CAR_INDEX, CarManager.currentSortedCarsList)
   end
 

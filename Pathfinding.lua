@@ -178,26 +178,103 @@ end
 ---@param carPosition vec3
 ---@param otherCarPosition vec3
 ---@param otherCarAABBSize vec3
+---@param otherCarForward vec3
+---@param otherCarLeft vec3
+---@param otherCarUp vec3
 ---@return boolean
-local isIntersectingAABB = function(carPosition, otherCarPosition, otherCarAABBSize)
-  -- Expand half-extents a bit with safety margin (XZ-plane mostly, Y kept for completeness).
-  local dx = carPosition.x - otherCarPosition.x
-  local dy = carPosition.y - otherCarPosition.y
-  local dz = carPosition.z - otherCarPosition.z
-  local halfSizeX = (otherCarAABBSize.x * 0.5)-- + safetyMarginMeters
+local isIntersectingAABB = function(carPosition, otherCarPosition, otherCarAABBSize, otherCarForward, otherCarLeft, otherCarUp)
+  -- Treat the other car as an oriented bounding box using its forward/left/up directions.
+  -- Center at mid-height (same convention as CarOperations.getSideAnchorPoints).
+  local safetyMarginMeters = storage_PathFinding.safetyMarginMeters
+  local halfSizeX = (otherCarAABBSize.x * 0.5) + safetyMarginMeters
   local halfSizeY = (otherCarAABBSize.y * 0.5)-- + safetyMarginMeters
-  local halfSizeZ = (otherCarAABBSize.z * 0.5)-- + safetyMarginMeters
+  local halfSizeZ = (otherCarAABBSize.z * 0.5) + safetyMarginMeters
 
-  local intersecting = math_abs(dx) <= halfSizeX and math_abs(dy) <= halfSizeY and math_abs(dz) <= halfSizeZ
+  local centerX = otherCarPosition.x + otherCarUp.x * halfSizeY
+  local centerY = otherCarPosition.y + otherCarUp.y * halfSizeY
+  local centerZ = otherCarPosition.z + otherCarUp.z * halfSizeY
+
+  local dx = carPosition.x - centerX
+  local dy = carPosition.y - centerY
+  local dz = carPosition.z - centerZ
+
+  -- Project into the other car's local space.
+  local localX = dx * otherCarLeft.x     + dy * otherCarLeft.y     + dz * otherCarLeft.z -- left/right
+  local localY = dx * otherCarUp.x       + dy * otherCarUp.y       + dz * otherCarUp.z   -- up/down
+  local localZ = dx * otherCarForward.x  + dy * otherCarForward.y  + dz * otherCarForward.z -- front/back
+
+  local insideX = math_abs(localX) <= halfSizeX
+  local insideY = math_abs(localY) <= halfSizeY
+  local insideZ = math_abs(localZ) <= halfSizeZ
+
+  local intersecting = insideX and insideY and insideZ
   Logger.log(string_format(
-    "[PF_AABB] math_abs(%.3f) <= %.3f = %s, math_abs(%.3f) <= %.3f = %s, math_abs(%.3f) <= %.3f = %s => intersecting=%s. otherCarPosition=%s",
-     dx, halfSizeX, tostring(math_abs(dx) <= halfSizeX),
-     dy, halfSizeY, tostring(math_abs(dy) <= halfSizeY),
-     dz, halfSizeZ, tostring(math_abs(dz) <= halfSizeZ),
+    "[PF_AABB] |localX|=%.3f <= %.3f = %s, |localY|=%.3f <= %.3f = %s, |localZ|=%.3f <= %.3f = %s => intersecting=%s. otherCarPosition=%s",
+     localX, halfSizeX, tostring(insideX),
+     localY, halfSizeY, tostring(insideY),
+     localZ, halfSizeZ, tostring(insideZ),
      tostring(intersecting),
      tostring(otherCarPosition)))
   return intersecting
 end
+
+---@param otherCar ac.StateCar
+---@param color rgbm|nil
+function Pathfinding.renderCarAABB(otherCar, color)
+  if not otherCar or not otherCar.aabbSize then return end
+
+  -- Use the same parameters and logic as isIntersectingAABB
+  local otherCarPosition = otherCar.position
+  local otherCarAABBSize = otherCar.aabbSize
+  local otherCarForward  = otherCar.look
+  local otherCarLeft     = otherCar.side
+  local otherCarUp       = otherCar.up
+
+  local safetyMarginMeters = storage_PathFinding.safetyMarginMeters
+  local halfSizeX = (otherCarAABBSize.x * 0.5) + safetyMarginMeters
+  local halfSizeY = (otherCarAABBSize.y * 0.5)-- + safetyMarginMeters
+  local halfSizeZ = (otherCarAABBSize.z * 0.5) + safetyMarginMeters
+
+  -- Center at mid-height, same as isIntersectingAABB
+  local center = otherCarPosition + otherCarUp * halfSizeY
+
+  -- Local box axes scaled by half-extents (left/right, up/down, front/back)
+  local axisX = otherCarLeft    * halfSizeX
+  local axisY = otherCarUp      * halfSizeY
+  local axisZ = otherCarForward * halfSizeZ
+
+  -- Oriented box corners in world space
+  local c = center
+  local p000 = c - axisX - axisY - axisZ
+  local p001 = c - axisX - axisY + axisZ
+  local p010 = c - axisX + axisY - axisZ
+  local p011 = c - axisX + axisY + axisZ
+  local p100 = c + axisX - axisY - axisZ
+  local p101 = c + axisX - axisY + axisZ
+  local p110 = c + axisX + axisY - axisZ
+  local p111 = c + axisX + axisY + axisZ
+
+  local col = color or colLineBlocked
+
+  -- Bottom rectangle
+  render_debugLine(p000, p001, col)
+  render_debugLine(p001, p101, col)
+  render_debugLine(p101, p100, col)
+  render_debugLine(p100, p000, col)
+
+  -- Top rectangle
+  render_debugLine(p010, p011, col)
+  render_debugLine(p011, p111, col)
+  render_debugLine(p111, p110, col)
+  render_debugLine(p110, p010, col)
+
+  -- Vertical edges
+  render_debugLine(p000, p010, col)
+  render_debugLine(p001, p011, col)
+  render_debugLine(p100, p110, col)
+  render_debugLine(p101, p111, col)
+end
+
 
 -- Build simple paths radiating from the front of the car to lateral targets.
 -- Each path starts at the anchor point and smoothly interpolates current offset → target offset.
@@ -306,7 +383,8 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
           if otherCar and otherCar.index ~= carIndex then
             -- check if this sample is colliding with the other car
             -- local intersecting = isIntersectingSphere(sampleWorldPosition, otherCar.position, combinedCollisionRadius2)
-            local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.position, otherCar.aabbSize)
+            -- local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.position, otherCar.aabbSize)
+            local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.position, otherCar.aabbSize, otherCar.look, otherCar.side, otherCar.up)
             if intersecting then
 
             -- local intersectingAABB = isIntersectingAABB(sampleWorldPosition, otherCar.aabbCenter, otherCar.aabbSize)
