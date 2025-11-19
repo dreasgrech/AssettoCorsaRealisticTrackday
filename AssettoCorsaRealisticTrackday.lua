@@ -65,6 +65,7 @@ StackManager = require("DataStructures.StackManager")
 QueueManager = require("DataStructures.QueueManager")
 CompletableIndexCollectionManager = require("DataStructures.CompletableIndexCollectionManager")
 
+GameTimeManager = require("GameTimeManager")
 AppIconRenderer = require("AppIconRenderer")
 ColorManager = require("ColorManager")
 RaceTrackManager = require("RaceTrackManager")
@@ -355,6 +356,9 @@ function script.MANIFEST__UPDATE(dt)
   if (not shouldAppRun()) then return end
 
   local sim = ac_getSim()
+
+  GameTimeManager.update(dt)
+
   if sim.isPaused then return end
 
   -------------------
