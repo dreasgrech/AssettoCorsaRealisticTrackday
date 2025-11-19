@@ -34,6 +34,8 @@ local Logger = Logger
 local Logger_log = Logger.log
 local VecPool = VecPool
 local VecPool_getTempVec3 = VecPool.getTempVec3
+local GameTimeManager = GameTimeManager
+local GameTimeManager_getPlayingGameTime = GameTimeManager.getPlayingGameTime
 
 
 -- Toggle logs without changing call sites (leave here so it can be switched off easily).
@@ -134,7 +136,7 @@ local navigation_pathsBlockedOtherCarIndex = {}
 local navigation_pathsBlockedSampleWorldPosition = {}
 
 ---@type table<integer,table<integer,integer|nil>>
-local navigation_pathsBlockedTime = {}
+local navigation_pathsBlockedTimeSeconds = {}
 
 -- per-car array of lists of sampled points per path
 ---@type table<integer,table<integer,table<integer,vec3>>>
@@ -161,7 +163,7 @@ local function ensureCarArrays(carIndex)
     navigation_pathsBlockedOtherCarIndex[carIndex] = hitOpp
     navigation_pathsBlockedSampleWorldPosition[carIndex] = hitPos
     navigation_pathsSamplesWorldPositions[carIndex] = points
-    navigation_pathsBlockedTime[carIndex] = times
+    navigation_pathsBlockedTimeSeconds[carIndex] = times
   end
 
   navigation_anchorText[carIndex] = navigation_anchorText[carIndex] or ""
@@ -329,7 +331,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local pathsBlockedSampleIndex  = navigation_pathsBlockedSampleIndex[carIndex]
   local pathsBlockedOtherCarIndex  = navigation_pathsBlockedOtherCarIndex[carIndex]
   local pathsBlockedSampleWorldPosition  = navigation_pathsBlockedSampleWorldPosition[carIndex]
-  local pathsBlockedTime  = navigation_pathsBlockedTime[carIndex]
+  local pathsBlockedTimeSeconds  = navigation_pathsBlockedTimeSeconds[carIndex]
   local pathsSamplesWorldPositions  = navigation_pathsSamplesWorldPositions[carIndex]
 
   -- For minimal work, only consider cars AHEAD of the current one in the sorted list.
@@ -348,6 +350,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
   local timeToLeavePathBlockedAfterSampleHitSeconds = storage_PathFinding.timeToLeavePathBlockedAfterSampleHitSeconds 
 
   local sim = ac_getSim()
+  local playingGameTimeSeconds = GameTimeManager_getPlayingGameTime()
 
   -- For each path lateral target offset, build each path's samples and check for collisions after creating the samples
   for pathIndex = 1, TOTAL_PATH_LATERAL_OFFSETS do
@@ -357,10 +360,13 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
     local isPathCurrentlyBlocked = pathsIsBlocked[pathIndex]
     -- Determine if we should keep the path marked as blocked based on time since last hit
     if isPathCurrentlyBlocked then
-      local timeSinceBlockedMs = sim.time - (pathsBlockedTime[pathIndex] or 0.0)
-      local timeSinceBlockedSeconds = timeSinceBlockedMs * 0.001
+      local pathBlockedTimeSeconds = pathsBlockedTimeSeconds[pathIndex] or 0.0
+      local timeSinceBlockedSeconds = playingGameTimeSeconds - pathBlockedTimeSeconds
+      -- if timeSinceBlockedSeconds < timeToLeavePathBlockedAfterSampleHitSeconds or sim.isPaused then
       if timeSinceBlockedSeconds < timeToLeavePathBlockedAfterSampleHitSeconds then
         leavePathBlocked = true
+
+        -- Logger.log(string_format("[PF] car=%d path[%d] remains BLOCKED (game time: %.2f, path blocked time: %.2f,time since hit: %.2f s < %.2f s)", carIndex, pathIndex, playingGameTimeSeconds, pathBlockedTimeSeconds, timeSinceBlockedSeconds, timeToLeavePathBlockedAfterSampleHitSeconds))
       end
     end
 
@@ -377,7 +383,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       pathsBlockedSampleIndex[pathIndex] = nil
       pathsBlockedSampleWorldPosition[pathIndex] = nil
       pathsBlockedOtherCarIndex[pathIndex] = nil
-      pathsBlockedTime[pathIndex] = nil
+      pathsBlockedTimeSeconds[pathIndex] = nil
     end
 
     -- Sample along the road: linearly progress forward, but move laterally so that we hit the target offset by `splitReachMeters` (using an ease-out curve).
@@ -437,7 +443,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
               pathsBlockedSampleIndex[pathIndex] = currentSampleIndex
               pathsBlockedSampleWorldPosition[pathIndex] = sampleWorldPosition
               pathsBlockedOtherCarIndex[pathIndex] = otherCar.index
-              pathsBlockedTime[pathIndex] = sim.time
+              pathsBlockedTimeSeconds[pathIndex] = playingGameTimeSeconds
               break -- break out of the for loop over other cars since we found a blocked hit for this path so we don't need to check for other cars
             end
           end
@@ -597,7 +603,11 @@ local function getBestLateralOffset(carIndex)
   -- Preference order: center, then ±0.5, ±0.75, ±1.0 (right on ties).
   local order = {}
   local function pushIfExists(val)
-    for i = 1, TOTAL_PATH_LATERAL_OFFSETS do if PATH_LATERAL_OFFSETS[i] == val then table_insert(order, i) return end end
+    for i = 1, TOTAL_PATH_LATERAL_OFFSETS do
+      if PATH_LATERAL_OFFSETS[i] == val then
+        table_insert(order, i) return
+      end
+    end
   end
   pushIfExists(0.0)
   pushIfExists(0.5)
