@@ -142,6 +142,9 @@ local renderDebuggingSection = function(storage_Debugging)
         if ui_button('Simulate accident (manual)', ui.ButtonFlags.None) then
             AccidentManager.simulateAccident_manual()
         end
+        if ui_button('Simulate accident (random)', ui.ButtonFlags.None) then
+            AccidentManager.simulateAccident_random()
+        end
     end)
 
     -- reset the column layout

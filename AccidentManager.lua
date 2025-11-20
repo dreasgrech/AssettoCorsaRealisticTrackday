@@ -347,15 +347,12 @@ function AccidentManager.simulateAccident()
     AccidentManager.registerCollision(culpritCarIndex, collisionLocalPosition, collidedWith)
 end
 
-function AccidentManager.simulateAccident_manual()
+local getAccidentSimulationBaseInfo = function (baseSplinePositionGap)
     local baseSplinePosition = storage_Debugging.debugSimulateAccidentSplinePosition
-    local debugSimulateAccidentCarsGapMeters = storage_Debugging.debugSimulateAccidentCarsGapMeters
 
     -- local baseSplinePositionGap = 0.0006
     -- local baseSplinePositionGap = 0.001
-    local shiftCarsToSideOffset = 2.0
 
-    local baseSplinePositionGap = RaceTrackManager.metersToSplineSpan(debugSimulateAccidentCarsGapMeters)
 
     local accidentsInfo = {
         {
@@ -420,6 +417,10 @@ function AccidentManager.simulateAccident_manual()
         },
     }
 
+    return accidentsInfo
+end
+
+local simulateAccident = function(accidentsInfo, shiftCarsToSideOffset)
     for i = 1, #accidentsInfo do
         Logger.log(string.format("AccidentManager.simulateAccident_manual: Simulating accident #%d", i))
         local accidentInfo = accidentsInfo[i]
@@ -469,13 +470,35 @@ function AccidentManager.simulateAccident_manual()
             collisionWorldPosition,
             accidentInfoVictimCarIndex + 1 -- +1 because 0 is track
         )
-
-        -- move player car
-        physics.setCarPosition(0, ac.trackProgressToWorldCoordinate(baseSplinePosition - 0.005, false), nil)
-        CarOperations.teleportCarToWorldPosition(0, ac.trackProgressToWorldCoordinate(baseSplinePosition - 0.005, false), nil, false)
-
     end
 
+    local baseSplinePosition = accidentsInfo[1].culprit.splinePosition
+
+    -- move player car
+    physics.setCarPosition(0, ac.trackProgressToWorldCoordinate(baseSplinePosition - 0.005, false), nil)
+    CarOperations.teleportCarToWorldPosition(0, ac.trackProgressToWorldCoordinate(baseSplinePosition - 0.005, false), nil, false)
+end
+
+function AccidentManager.simulateAccident_random()
+    local baseSplinePositionGap = math.random(0.001, 0.005)
+    local accidentsInfo = getAccidentSimulationBaseInfo(baseSplinePositionGap)
+    for i = 1, #accidentsInfo do
+        local accidentInfo = accidentsInfo[i]
+        accidentInfo.culprit.direction = vec3(0,0,math.random(-359,359))
+        accidentInfo.victim.direction = vec3(0,0,math.random(0, 359))
+    end
+
+    local shiftCarsToSideOffset = math.random(-5, 5)
+    simulateAccident(accidentsInfo, shiftCarsToSideOffset)
+end
+
+function AccidentManager.simulateAccident_manual()
+    local debugSimulateAccidentCarsGapMeters = storage_Debugging.debugSimulateAccidentCarsGapMeters
+    local baseSplinePositionGap = RaceTrackManager.metersToSplineSpan(debugSimulateAccidentCarsGapMeters)
+    local accidentsInfo = getAccidentSimulationBaseInfo(baseSplinePositionGap)
+    local shiftCarsToSideOffset = 2.0
+
+    simulateAccident(accidentsInfo, shiftCarsToSideOffset)
 end
 
 return AccidentManager
