@@ -391,7 +391,8 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       pathsBlockedTimeSeconds[pathIndex] = nil
     end
 
-    -- Sample along the road: linearly progress forward, but move laterally so that we hit the target offset by `splitReachMeters` (using an ease-out curve).
+    -- Sample along the road: linearly progress forward, but move laterally so that we hit
+    -- the target offset by `splitReachMeters` (using an ease-out curve).
 
     -- Initialize the sample count (first sample is the anchor).
     pathsTotalSamples[pathIndex] = 1
@@ -400,7 +401,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
     pathSamplesWorldPositions[1] = anchorWorldPosition
 
     -- NEW: keep track of previous sample position for segment midpoint checks.
-    -- local lastSampleWorldPosition = anchorWorldPosition
+    local lastSampleWorldPosition = anchorWorldPosition
 
     -- for each step along the path, create a sample point and check for collisions.
     for currentSampleIndex = 2, numberOfPathSamples do
@@ -410,7 +411,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
       local sampleZ = wrap01(anchorZ + (currentSampleIndex - 1) * stepZ)
       local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
-      local sampleWorldPosition   = ac_trackCoordinateToWorld(VecPool_getTempVec3(sampleN, 0.0, sampleZ))
+      local sampleWorldPosition = ac_trackCoordinateToWorld(VecPool_getTempVec3(sampleN, 0.0, sampleZ))
 
       -- increase the sample count since we have a new sample
       pathsTotalSamples[pathIndex] = pathsTotalSamples[pathIndex] + 1
@@ -430,7 +431,6 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
             -- local intersecting = isIntersectingSphere(sampleWorldPosition, otherCar.position, combinedCollisionRadius2)
             local intersecting = isIntersectingAABB(sampleWorldPosition, otherCar.position, otherCar.aabbSize, otherCar.look, otherCar.side, otherCar.up)
 
-            --[====[
             -- EXTRA “BETWEEN SAMPLES” CHECK:
             -- If endpoint is not inside, also test midpoint of the segment between last and current samples.
             if not intersecting then
@@ -440,7 +440,6 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
               local midPoint = VecPool_getTempVec3(midX, midY, midZ)
               intersecting = isIntersectingAABB(midPoint, otherCar.position, otherCar.aabbSize, otherCar.look, otherCar.side, otherCar.up)
             end
-            --]====]
 
             if intersecting then
               -- mark the path as blocked
@@ -449,7 +448,7 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
               pathsBlockedSampleWorldPosition[pathIndex] = sampleWorldPosition
               pathsBlockedOtherCarIndex[pathIndex] = otherCar.index
               pathsBlockedTimeSeconds[pathIndex] = playingGameTimeSeconds
-              break -- break out of the for loop over other cars since we found a blocked hit for this path so we don't need to check for other cars
+              break -- break out of the for loop over other cars since we found a blocked hit for this path
             end
           end
         end -- end of other cars loop
@@ -457,8 +456,9 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
       -- ----------------------------------------------------------------------
 
       -- update previous sample position for the next segment
-      -- lastSampleWorldPosition = sampleWorldPosition
+      lastSampleWorldPosition = sampleWorldPosition
     end -- end of samples loop
+
 
     log("[PF] car=%d path[%d] targetN=%.2f samples=%d blocked=%s", carIndex, pathIndex, targetOffsetN, pathsTotalSamples[pathIndex], tostring(pathsIsBlocked[pathIndex]))
   end -- end of paths loop
