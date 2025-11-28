@@ -103,8 +103,8 @@ local PATHS_EDGE_OFFSET_N = 1.0  -- normalized offset for outermost paths
 -- PATHS ARE MODULE-WIDE (not per-car) so you can expand/reduce them without extra memory per car.
 -- Modify this list to add/remove paths. All code below adapts automatically.
 ---@type table<integer,number>
-local PATH_LATERAL_OFFSETS = { -PATHS_EDGE_OFFSET_N, -0.75, -0.5, 0.0, 0.5, 0.75, PATHS_EDGE_OFFSET_N }
---local PATH_LATERAL_OFFSETS = { -0.75, -0.5, 0.0, 0.5, 0.75 }
+-- local PATH_LATERAL_OFFSETS = { -PATHS_EDGE_OFFSET_N, -0.75, -0.5, 0.0, 0.5, 0.75, PATHS_EDGE_OFFSET_N }
+local PATH_LATERAL_OFFSETS = { -0.75, -0.5, 0.0, 0.5, 0.75 }
 -- local PATH_LATERAL_OFFSETS = {  -0.5, 0.0, 0.5 }
 local TOTAL_PATH_LATERAL_OFFSETS = #PATH_LATERAL_OFFSETS
 
@@ -405,11 +405,16 @@ local calculatePath = function(sortedCarsList, sortedCarsListIndex)
 
     -- for each step along the path, create a sample point and check for collisions.
     for currentSampleIndex = 2, numberOfPathSamples do
-      local progressDelta = (currentSampleIndex - 1) * stepZ
+      local stepSize = stepZ
+      if currentSampleIndex == 2 then
+        -- stepSize = stepZ * 0.1  -- half-step for the first sample after the anchor
+      end
+
+      local progressDelta = (currentSampleIndex - 1) * stepSize
       local tLatLinear = math_min(1.0, progressDelta * invSplitReachProgress)
       local tLat = easeOutPow01(tLatLinear, lateralSplitExponent)
 
-      local sampleZ = wrap01(anchorZ + (currentSampleIndex - 1) * stepZ)
+      local sampleZ = wrap01(anchorZ + (currentSampleIndex - 1) * stepSize)
       local sampleN = currentOffsetN + (targetOffsetN - currentOffsetN) * tLat
       local sampleWorldPosition = ac_trackCoordinateToWorld(VecPool_getTempVec3(sampleN, 0.0, sampleZ))
 
