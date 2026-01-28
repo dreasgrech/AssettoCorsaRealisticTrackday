@@ -558,8 +558,10 @@ local storage_Overtaking = ac.storage(storageTable_Overtaking, getStorageKeyForT
 local storage_AICarValues = ac.storage(storageTable_AICarValues, getStorageKeyForTrackAndMode("aicarvalues", fullTrackID, raceSessionType))
 local storage_PathFinding = ac.storage(storageTable_PathFinding, getStorageKeyForTrackAndMode("pathfinding", fullTrackID, raceSessionType))
 
+--[===[
 -- DISABLING ACCIDENTS FOR NOW SINCE IT'S STILL WIP
 storage_PerTrackPerMode.handleAccidents = Constants.ENABLE_ACCIDENT_HANDLING_IN_APP -- got this setting here for now since accidents are still wip
+--]===]
 
 -- check if the app version has changed since last run
 local thisAppVersion = Constants.APP_VERSION
