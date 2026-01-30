@@ -94,7 +94,7 @@ CSPCompatibilityManager.addFunction(function() return physics.overrideRacingFlag
 CSPCompatibilityManager.addSimStateFunction(function(sim) return sim.trackLengthM end, "ac.getSim().trackLengthM")
 CSPCompatibilityManager.addSimStateFunction(function(sim) return sim.raceSessionType end, "ac.getSim().raceSessionType")
 
-local everythingOK = CSPCompatibilityManager.checkAndAlert(Constants.APP_NAME, Constants.APP_VERSION)
+local everythingOK = CSPCompatibilityManager.checkForMissingElements(Constants.APP_NAME, Constants.APP_VERSION)
 local anyMissingCSPElements = not everythingOK
 CSPCompatibilityManager.freeMemory()
 if not everythingOK then
@@ -410,7 +410,8 @@ function script.MANIFEST__FUNCTION_MAIN(dt)
 
   -- Show the missing CSP elements error message if needed
   if anyMissingCSPElements then
-    ui_textColored(missingCSPElementsErrorMessage, rgbm(1, 0, 0, 1))
+    -- ui_textColored(missingCSPElementsErrorMessage, rgbm(1, 0, 0, 1))
+    ui_textColored(CSPCompatibilityManager.getLastGeneratedErrorMessage(), rgbm(1, 0, 0, 1))
     ui_newLine(1)
     ui_separator()
     ui_newLine(1)
