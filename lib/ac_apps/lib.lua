@@ -2082,6 +2082,7 @@ ac.VAODebugMode = {
 ---| `ui.Icons.Calendar` @![Icon](https://acstuff.club/images/icons_24/calendar.png)
 ---| `ui.Icons.CallBluetooth` @![Icon](https://acstuff.club/images/icons_24/call_bluetooth.png)
 ---| `ui.Icons.Call` @![Icon](https://acstuff.club/images/icons_24/call.png)
+---| `ui.Icons.CameraAlt` @![Icon](https://acstuff.club/images/icons_24/camera_alt.png)
 ---| `ui.Icons.Camera` @![Icon](https://acstuff.club/images/icons_24/camera.png)
 ---| `ui.Icons.Cancel` @![Icon](https://acstuff.club/images/icons_24/cancel.png)
 ---| `ui.Icons.CarFront` @![Icon](https://acstuff.club/images/icons_24/car_front.png)
@@ -2137,6 +2138,7 @@ ac.VAODebugMode = {
 ---| `ui.Icons.FM` @![Icon](https://acstuff.club/images/icons_24/fm.png)
 ---| `ui.Icons.Folder` @![Icon](https://acstuff.club/images/icons_24/folder.png)
 ---| `ui.Icons.Font` @![Icon](https://acstuff.club/images/icons_24/font.png)
+---| `ui.Icons.FuelAlt` @![Icon](https://acstuff.club/images/icons_24/fuel_alt.png)
 ---| `ui.Icons.Fuel` @![Icon](https://acstuff.club/images/icons_24/fuel.png)
 ---| `ui.Icons.Fullscreen` @![Icon](https://acstuff.club/images/icons_24/fullscreen.png)
 ---| `ui.Icons.Gamepad` @![Icon](https://acstuff.club/images/icons_24/gamepad.png)
@@ -2175,6 +2177,7 @@ ac.VAODebugMode = {
 ---| `ui.Icons.List` @![Icon](https://acstuff.club/images/icons_24/list.png)
 ---| `ui.Icons.Loading` @![Icon](https://acstuff.club/images/icons_24/loading.png)
 ---| `ui.Icons.Location` @![Icon](https://acstuff.club/images/icons_24/location.png)
+---| `ui.Icons.Lock` @![Icon](https://acstuff.club/images/icons_24/lock.png)
 ---| `ui.Icons.Lua` @![Icon](https://acstuff.club/images/icons_24/lua.png)
 ---| `ui.Icons.Magnet` @![Icon](https://acstuff.club/images/icons_24/magnet.png)
 ---| `ui.Icons.Map` @![Icon](https://acstuff.club/images/icons_24/map.png)
@@ -2202,6 +2205,7 @@ ac.VAODebugMode = {
 ---| `ui.Icons.Pedals` @![Icon](https://acstuff.club/images/icons_24/pedals.png)
 ---| `ui.Icons.Person` @![Icon](https://acstuff.club/images/icons_24/person.png)
 ---| `ui.Icons.Photograph` @![Icon](https://acstuff.club/images/icons_24/photograph.png)
+---| `ui.Icons.Picking` @![Icon](https://acstuff.club/images/icons_24/picking.png)
 ---| `ui.Icons.Pin` @![Icon](https://acstuff.club/images/icons_24/pin.png)
 ---| `ui.Icons.PitStopAlt` @![Icon](https://acstuff.club/images/icons_24/pit_stop_alt.png)
 ---| `ui.Icons.PitStop` @![Icon](https://acstuff.club/images/icons_24/pit_stop.png)
@@ -2233,6 +2237,7 @@ ac.VAODebugMode = {
 ---| `ui.Icons.Resume` @![Icon](https://acstuff.club/images/icons_24/resume.png)
 ---| `ui.Icons.Rewind` @![Icon](https://acstuff.club/images/icons_24/rewind.png)
 ---| `ui.Icons.Road` @![Icon](https://acstuff.club/images/icons_24/road.png)
+---| `ui.Icons.Route` @![Icon](https://acstuff.club/images/icons_24/route.png)
 ---| `ui.Icons.Rubber` @![Icon](https://acstuff.club/images/icons_24/rubber.png)
 ---| `ui.Icons.SatelliteDishLow` @![Icon](https://acstuff.club/images/icons_24/satellite_dish_low.png)
 ---| `ui.Icons.SatelliteDishNone` @![Icon](https://acstuff.club/images/icons_24/satellite_dish_none.png)
@@ -2256,6 +2261,7 @@ ac.VAODebugMode = {
 ---| `ui.Icons.Sliders` @![Icon](https://acstuff.club/images/icons_24/sliders.png)
 ---| `ui.Icons.SlowMotion` @![Icon](https://acstuff.club/images/icons_24/slow_motion.png)
 ---| `ui.Icons.Smile` @![Icon](https://acstuff.club/images/icons_24/smile.png)
+---| `ui.Icons.Snail` @![Icon](https://acstuff.club/images/icons_24/snail.png)
 ---| `ui.Icons.Spaceship` @![Icon](https://acstuff.club/images/icons_24/spaceship.png)
 ---| `ui.Icons.Speaker` @![Icon](https://acstuff.club/images/icons_24/speaker.png)
 ---| `ui.Icons.Speedometer` @![Icon](https://acstuff.club/images/icons_24/speedometer.png)
@@ -2268,6 +2274,7 @@ ac.VAODebugMode = {
 ---| `ui.Icons.Start` @![Icon](https://acstuff.club/images/icons_24/start.png)
 ---| `ui.Icons.Stats` @![Icon](https://acstuff.club/images/icons_24/stats.png)
 ---| `ui.Icons.Stay` @![Icon](https://acstuff.club/images/icons_24/stay.png)
+---| `ui.Icons.Steam` @![Icon](https://acstuff.club/images/icons_24/steam.png)
 ---| `ui.Icons.SteeringWheel` @![Icon](https://acstuff.club/images/icons_24/steering_wheel.png)
 ---| `ui.Icons.StopAlt` @![Icon](https://acstuff.club/images/icons_24/stop_alt.png)
 ---| `ui.Icons.Stop` @![Icon](https://acstuff.club/images/icons_24/stop.png)
@@ -2328,6 +2335,7 @@ ac.VAODebugMode = {
 ---| `ui.Icons.WeatherWindy` @![Icon](https://acstuff.club/images/icons_24/weather_windy.png)
 ---| `ui.Icons.Webcam` @![Icon](https://acstuff.club/images/icons_24/webcam.png)
 ---| `ui.Icons.Wheel` @![Icon](https://acstuff.club/images/icons_24/wheel.png)
+---| `ui.Icons.Wind` @![Icon](https://acstuff.club/images/icons_24/wind.png)
 ---| `ui.Icons.Wrench` @![Icon](https://acstuff.club/images/icons_24/wrench.png)
 ---| `ui.Icons.YandexMusic` @![Icon](https://acstuff.club/images/icons_24/yandex_music.png)
 ---| `ui.Icons.YoutubeSolid` @![Icon](https://acstuff.club/images/icons_24/youtube_solid.png)
@@ -2373,6 +2381,7 @@ ui.Icons = {
   Calendar = 'CALENDAR', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/calendar.png)
   CallBluetooth = 'CALL_BLUETOOTH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/call_bluetooth.png)
   Call = 'CALL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/call.png)
+  CameraAlt = 'CAMERA_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/camera_alt.png)
   Camera = 'CAMERA', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/camera.png)
   Cancel = 'CANCEL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/cancel.png)
   CarFront = 'CAR_FRONT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/car_front.png)
@@ -2428,6 +2437,7 @@ ui.Icons = {
   FM = 'FM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fm.png)
   Folder = 'FOLDER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/folder.png)
   Font = 'FONT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/font.png)
+  FuelAlt = 'FUEL_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fuel_alt.png)
   Fuel = 'FUEL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fuel.png)
   Fullscreen = 'FULLSCREEN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/fullscreen.png)
   Gamepad = 'GAMEPAD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/gamepad.png)
@@ -2466,6 +2476,7 @@ ui.Icons = {
   List = 'LIST', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/list.png)
   Loading = 'LOADING', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/loading.png)
   Location = 'LOCATION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/location.png)
+  Lock = 'LOCK', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/lock.png)
   Lua = 'LUA', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/lua.png)
   Magnet = 'MAGNET', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/magnet.png)
   Map = 'MAP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/map.png)
@@ -2493,6 +2504,7 @@ ui.Icons = {
   Pedals = 'PEDALS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pedals.png)
   Person = 'PERSON', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/person.png)
   Photograph = 'PHOTOGRAPH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/photograph.png)
+  Picking = 'PICKING', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/picking.png)
   Pin = 'PIN', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pin.png)
   PitStopAlt = 'PIT_STOP_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pit_stop_alt.png)
   PitStop = 'PIT_STOP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/pit_stop.png)
@@ -2524,6 +2536,7 @@ ui.Icons = {
   Resume = 'RESUME', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/resume.png)
   Rewind = 'REWIND', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/rewind.png)
   Road = 'ROAD', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/road.png)
+  Route = 'ROUTE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/route.png)
   Rubber = 'RUBBER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/rubber.png)
   SatelliteDishLow = 'SATELLITE_DISH_LOW', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/satellite_dish_low.png)
   SatelliteDishNone = 'SATELLITE_DISH_NONE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/satellite_dish_none.png)
@@ -2547,6 +2560,7 @@ ui.Icons = {
   Sliders = 'SLIDERS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/sliders.png)
   SlowMotion = 'SLOW_MOTION', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/slow_motion.png)
   Smile = 'SMILE', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/smile.png)
+  Snail = 'SNAIL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/snail.png)
   Spaceship = 'SPACESHIP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/spaceship.png)
   Speaker = 'SPEAKER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/speaker.png)
   Speedometer = 'SPEEDOMETER', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/speedometer.png)
@@ -2559,6 +2573,7 @@ ui.Icons = {
   Start = 'START', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/start.png)
   Stats = 'STATS', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stats.png)
   Stay = 'STAY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stay.png)
+  Steam = 'STEAM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/steam.png)
   SteeringWheel = 'STEERING_WHEEL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/steering_wheel.png)
   StopAlt = 'STOP_ALT', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stop_alt.png)
   Stop = 'STOP', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/stop.png)
@@ -2619,6 +2634,7 @@ ui.Icons = {
   WeatherWindy = 'WEATHER_WINDY', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/weather_windy.png)
   Webcam = 'WEBCAM', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/webcam.png)
   Wheel = 'WHEEL', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/wheel.png)
+  Wind = 'WIND', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/wind.png)
   Wrench = 'WRENCH', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/wrench.png)
   YandexMusic = 'YANDEX_MUSIC', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/yandex_music.png)
   YoutubeSolid = 'YOUTUBE_SOLID', ---@type ui.Icons #![Icon](https://acstuff.club/images/icons_24/youtube_solid.png)
@@ -2634,13 +2650,17 @@ ui.Icons = {
 ---@type string
 __dirname = nil
 
+---If set to `true`, app is being viewed in Lua Debug app. Could be a good condition for calling `ac.debug()`, if you want for script to run as fast as possible.
+---@type boolean
+__monitored = false
+
 ---A filename, either absolute or relative. If relative, will be resolved against AC root folder. Use `os.setCurrentFolder()` to change current folder.
 ---@alias path string
 
 ---Could be either a string, a number or a boolean value (will be converted into string).
 ---String can store any binary data including zero bytes. Could also be an FFI struct and it will
 ---be processed as its binary form.
----@alias binary string|number|boolean
+---@alias binary string
 
 ---Could be either a string, a number, a boolean value or a table (without circular references or any non-serializable
 ---items). Will be serialized here and deserialized in a different script. String can store any binary data including zero bytes.
@@ -2648,6 +2668,8 @@ __dirname = nil
 
 ---Main CSP namespace.
 ac = {}
+
+---@class ac.FFIStruct
 
 ---FFI-accelerated list, acts like a regular list (consequent items, size and capacity, automatically growing, etc.)
 ---Doesn’t store nil values to act more like a Lua table.
@@ -3205,14 +3227,13 @@ function ac.getTrackDataFilename(fileName) end
 function ac.getCarTags(carIndex) end
 
 ---A key unique for each individual PC (uses serial numbers of processor and motherboard).
----Use `ac.uniqueMachineKeyAsync()` instead.
----@deprecated
----@return string
+---@return binary
 function ac.uniqueMachineKey() end
 
 ---A key unique for each individual PC (uses serial numbers of processor and motherboard). Asynchronous version. Returned value is in binary,
----use something like `ac.encodeBase64()` to encode data in readable format.
----@param callback fun(err: string?, response: string?)
+--- use something like `ac.encodeBase64()` to encode data in readable format. Since 0.3.0-preview144, feel free to use `ac.uniqueMachineKey()` instead,
+--- value is computed once sometime at the launch.
+---@param callback fun(err: string?, response: binary?)?
 function ac.uniqueMachineKeyAsync(callback) end
 
 ---Returns ordered list of data file names (not full paths, just the names) of a certain car. Works for both packed and unpacked cars. If failed,
@@ -3267,19 +3288,25 @@ function ac.decodeHalf(v) end
 function ac.decodeHalf2(v) end
 
 ---Computes SHA-256 checksum for given binary data. Very secure, but might be slow with large amounts of data. Data string can contain zero bytes.
----@param data binary
+---@param data binary|number|boolean|ac.FFIStruct
 ---@return string?
 function ac.checksumSHA256(data) end
 
 ---Computes 64-bit xxHash checksum for given binary data. Very fast, not that great for encryption purposes.
 ---Use `bit.tohex()` to turn result into a hex representation. Data string can contain zero bytes.
----@param data binary
+---@param data binary|number|boolean|ac.FFIStruct
 ---@return integer
 function ac.checksumXXH(data) end
 
+---Computes 32-bit CRC32 checksum for given binary data. Very fast, not that great for encryption purposes.
+---Use `bit.tohex()` to turn result into a hex representation. Data string can contain zero bytes.
+---@param data binary|number|boolean|ac.FFIStruct
+---@return integer
+function ac.checksumCRC32(data) end
+
 ---Compresses data. First byte of resulting data is compression type, next four are uncompressed data size, rest is compressed data
 ---itself. If data is failed to compress, returns `nil`. Data string can contain zero bytes.
----@param data binary
+---@param data binary|number|boolean|ac.FFIStruct
 ---@param type ac.CompressionType
 ---@param level integer? @Higher level means better, but slower compression. Maximum value: 12. Default value: 9.
 ---@return string?
@@ -3287,12 +3314,12 @@ function ac.compress(data, type, level) end
 
 ---Decompresses data. First byte of input data is compression type, next four are uncompressed data size. If data is damaged, returns `nil`.
 ---Data string can contain zero bytes.
----@param data binary
+---@param data binary|number|boolean|ac.FFIStruct
 ---@return string?
 function ac.decompress(data) end
 
 ---Encodes data in base64 format. Data string can contain zero bytes.
----@param data binary
+---@param data binary|number|boolean|ac.FFIStruct
 ---@param trimResult boolean? @If `true`, ending “=” will be trimmed. Default value: `false`.
 ---@return string?
 function ac.encodeBase64(data, trimResult) end
@@ -3310,14 +3337,19 @@ function ac.utf8To16(data) end
 
 ---Converts string from UTF-16 (two symbols per character) to common Lua UTF-8. All strings Lua operates with regularly are consired UTF-8. UTF-16 strings
 ---can’t be used in any CSP API unless documentation states that function can take strings containing zeroes. Data string can contain zero bytes.
----@param data binary
+---@param data binary|number|boolean|ac.FFIStruct
 ---@return string?
 function ac.utf16To8(data) end
 
 ---Given an FFI struct, returns bytes with its content. Resulting string may contain zeroes.
----@param data binary
+---@param data binary|number|boolean|ac.FFIStruct
 ---@return string?
 function ac.structBytes(data) end
+
+---Parse string as 64-bit unsigned integer.
+---@param str string
+---@return integer
+function ac.parseUInt64(str) end
 
 function ac.memoryBarrier() end
 
@@ -4000,10 +4032,10 @@ function ac.setSystemMessage(title, description) end
 ---@return integer
 function ac.getUnreadChatMessages() end
 
----Return distances to the nearest left and right cars in meters within 20 meters, or `nil` if there are no cars nearby or blind spot detection is not available for this car.
+---Return distances to the nearest left, right, front and back cars in meters within 200 meters, or `nil` if there are no cars nearby or blind spot detection is not available for this car.
 ---Meant to be used for things like blind spot warnings on side mirrors, it’s fast but inaccurate and only computes results for the nearest cars.
 ---@param carIndex integer @0-based car index.
----@return number?, number?
+---@return number?, number?, number?, number?
 function ac.getCarBlindSpot(carIndex) end
 
 ---Sets given text to the clipboard.
@@ -4015,6 +4047,12 @@ function ac.setClipboardText(text) end
 ---@param callback fun(event: 'start'|'stop'|'jump')
 ---@return ac.Disposable
 function ac.onReplay(callback) end
+
+---Sets a callback which will be called when a car changes live.
+---@param carIndex integer @0-based car index, or -1 for an event to be called for all cars.
+---@param callback fun(carIndex: integer)
+---@return ac.Disposable
+function ac.onCarSwap(carIndex, callback) end
 
 ---Sets a callback which will be called when a car teleports somewhere or its state gets reset.
 ---@param carIndex integer @0-based car index, or -1 for an event to be called for all cars.
@@ -4030,7 +4068,7 @@ function ac.onCarColorChanged(carIndex, callback) end
 
 ---Sets a callback which will be called when a car completes a lap. Should work for remote cars as well.
 ---@param carIndex integer @0-based car index, or -1 for an event to be called for all cars.
----@param callback fun(carIndex: integer, lapTime: integer, valid: boolean, cuts: integer, lapCount: integer)
+---@param callback fun(carIndex: integer, lapTime: integer, valid: boolean, cuts: integer, lapsCount: integer, splits: integer[], lineCrossTime: number)
 ---@return ac.Disposable
 function ac.onLapCompleted(carIndex, callback) end
 
@@ -4084,20 +4122,56 @@ function ac.onSetupsListRefresh(callback) end
 ---@return ac.Disposable
 function ac.onSetupFile(callback) end
 
+---Sets a callback which will be called when assists configuration change, either in main menu or with `physics.setAssists()`. Doesn’t affect assists changing during
+---normal operations, such as Ctrl+A changing ABS.
+---@param callback fun()
+---@return ac.Disposable
+function ac.onAssistsChanged(callback) end
+
+---Return state of assists (can be altered in offline races, either in the main menu or via Physics API. Returns `nil` if physics is not available. All percentage values are returned
+--- in 0…1 range. Added in 0.3.0-preview247.
+---
+--- Flag `editable` is `true` if assists can be edited in main menu. Use `physics.setAssists{ editable = false }` to disallow editing.
+---@return {autoBlip: boolean, autoClutch: boolean, autoShifter: boolean, abs: 'off'|'factory'|'on', tractionControl: 'off'|'factory'|'on', stability: number, damageRate: number, fuelRate: number, tyresWear: number, tyresBlankets: boolean, slipstream: number, idealLine: boolean, editable: boolean}
+function ac.getAssists() end
+
 ---Works even if collisions are disabled, actually checks collider state live. Invokes ODE OPCODE computation, so don’t use too much.
 ---@param car0 integer @0-based car index.
 ---@param car1 integer @0-based car index.
 ---@return boolean
 function ac.areCarsColliding(car0, car1) end
 
----Check collisions between two shapes. Note: if you want to do something like check a car against a million of powerups on a track, consider doing
----some prefiltering to speed things up. For example, `ac.HashSpace()` can hugely improve performance for such case.
+---Check if two shapes are colliding or not. Note: if you want to do something like check a car against a million of power-ups on a track, consider doing
+---some prefiltering to speed things up. For example, `ac.HashSpace()` can hugely improve performance for such case. If you want to access the actual list of
+---contacts, use `ac.areShapesColliding()`.
 ---@param shape1 integer|physics.ColliderType @First entry to check intersection with, either `physics.ColliderType` or a car index.
 ---@param transform1 mat4x4? @Optional transform for the first entry. If not set, identity for shapes and car transform for cars.
 ---@param shape2 integer|physics.ColliderType @Second entry to check intersection with.
 ---@param transform2 mat4x4? @Optional transform for the second entry.
 ---@return boolean
 function ac.areShapesColliding(shape1, transform1, shape2, transform2) end
+
+---Generate list of contacts between two shapes. Added in 0.3.0-preview238. A more advanced (and expensive) version of `ac.areShapesColliding()`.
+--- Returns contacts as returned by ODE. Note: if you think about calling `ac.areShapesColliding()` first, and then this one, don’t: it’s not
+--- going to help with performance.
+---@param shape1 integer|physics.ColliderType @First entry to check intersection with, either `physics.ColliderType` or a car index.
+---@param transform1 mat4x4? @Optional transform for the first entry. If not set, identity for shapes and car transform for cars.
+---@param shape2 integer|physics.ColliderType @Second entry to check intersection with.
+---@param transform2 mat4x4? @Optional transform for the second entry.
+---@param maxContacts integer? @Maximum number of contacts to find. Can’t exceed 128. Default value: 1.
+---@return {pos: vec3, normal: vec3, depth: number}[]
+function ac.getCollidingShapesContacts(shape1, transform1, shape2, transform2, maxContacts) end
+
+---Get car name of a car with a given ID. If there is no such car installed, or we couldn’t find a name, returns ID in quotes.
+---@param carID string
+---@param withYearPostfix boolean? @Default value: `false`.
+---@return string
+function ac.getCarNameByID(carID, withYearPostfix) end
+
+---Get track name of a track with a given ID. If there is no such track installed, or we couldn’t find a name, returns ID in quotes.
+---@param trackID string
+---@return string
+function ac.getTrackNameByID(trackID) end
 
 ---Stops functions like `ac.log()` from logging things into CSP log file, in case you need to log a lot. With it, you
 --- can use Lua Debug app to see latest log entries.
@@ -4142,7 +4216,7 @@ function io.load(filename, fallbackData) end
 
 ---Reads file content into a string, if such file exists, otherwise returns fallback data or `nil`. Asynchronous version.
 ---@param filename path
----@param callback fun(err: string?, response: string?)
+---@param callback fun(err: string?, response: string?)?
 function io.loadAsync(filename, callback) end
 
 ---Writes data into a file, returns `true` if operation was successful. Data string can contain zero bytes.
@@ -4153,11 +4227,17 @@ function io.loadAsync(filename, callback) end
 ---@return boolean @Returns `false` if failed to write a file.
 function io.save(filename, data, ensure) end
 
+---Compress a file. On Windows 10 and newer, uses better compression. On older systems, falls back to the good old stuff.
+---Not available to scripts without I/O access.
+---@param filename path
+---@return boolean @Returns `false` if failed to write a file.
+function io.compress(filename) end
+
 ---Writes data into a file from a different thread, returns `true` via callback if operation was successful. Data string can contain zero bytes.
 ---Not available to scripts without I/O access.
 ---@param filename path
 ---@param data binary?
----@param callback fun(err: string?)
+---@param callback fun(err: string?)?
 ---@param ensure boolean? @If set to `true`, file will be saved with a temporary postfix and then moved to target destination, thus ensuring content is stored as-is, without ending up damaged in case there is a sudden power loss or something like that. Default value: `false`.
 function io.saveAsync(filename, data, callback, ensure) end
 
@@ -4188,18 +4268,21 @@ function io.fileSize(filename) end
 
 ---Returns creation time as number of seconds since 1970, or -1 if there was an error.
 ---@param filename path
+---@param setValue integer? @If set, override last access time with this, still returning the previous value.
 ---@return integer
-function io.creationTime(filename) end
-
----Returns last access time as number of seconds since 1970, or -1 if there was an error.
----@param filename path
----@return integer
-function io.lastAccessTime(filename) end
+function io.creationTime(filename, setValue) end
 
 ---Returns last write time as number of seconds since 1970, or -1 if there was an error.
 ---@param filename path
+---@param setValue integer? @If set, override last access time with this, still returning the previous value.
 ---@return integer
-function io.lastWriteTime(filename) end
+function io.lastWriteTime(filename, setValue) end
+
+---Returns last access time as number of seconds since 1970, or -1 if there was an error.
+---@param filename path
+---@param setValue integer? @If set, override last access time with this, still returning the previous value.
+---@return integer
+function io.lastAccessTime(filename, setValue) end
 
 ---Creates new directory, returns `true` if directory was created. If parent directories are missing, they’ll be created as well.
 ---Not available to scripts without I/O access.
@@ -4315,8 +4398,8 @@ function io.loadFromZip(zipFilename, entryFilename) end
 ---Not available to scripts without I/O access.
 ---@param zipFilename binary?
 ---@param destination path @Full path to target directory.
----@param filter nil|string|{filter: string?, crucial: string?} @Optional filter for full entry paths. Since 0.2.10, you can pass a table with a `crucial` param for an entry path of a crucial file: it’ll be extracted last with a temporary name, and renamed after everything is finished. You can later check the existence of this file to ensure ZIP has been unpacked entirely without any interruptions. If `crucial` param has been passed, but file wasn’t found, callback will report an error.
----@param callback fun(err: string?)
+---@param filter nil|string|{filter: string?, crucial: string?, compress: boolean?} @Optional filter for full entry paths. Since 0.2.10, you can pass a table with a `crucial` param for an entry path of a crucial file: it’ll be extracted last with a temporary name, and renamed after everything is finished. You can later check the existence of this file to ensure ZIP has been unpacked entirely without any interruptions. If `crucial` param has been passed, but file wasn’t found, callback will report an error.
+---@param callback fun(err: string?)?
 function io.extractFromZipAsync(zipFilename, destination, filter, callback) end
 
 ---Computes SHA-256 checksum of a given file, returns result in a callback.
@@ -4332,12 +4415,16 @@ function io.scanZip(zipFilename) end
 ---Not available to scripts without I/O access.
 ---@param filename path? @Pass `nil` to instead get the binary data in the callback.
 ---@param entries table<string, io.ZipEntry> @Keys store entry names (use “/” as separator for creating sub-folders), and values store either binary data or tables in `io.ZipEntry` format.
----@param callback fun(err: string?, response: binary?) @Callback will contain reference to binary data if `filename` is `nil`.
+---@param callback fun(err: string?, response: binary?)? @Callback will contain reference to binary data if `filename` is `nil`.
 function io.createZipAsync(filename, entries, callback) end
 
 ---Returns time in seconds from script start (with high precision).
 ---@return number @Seconds.
 function os.preciseClock() end
+
+---Returns time in milliseconds counting from the same point as `ac.getSim().time`, at the time of the call.
+---@return number @Milliseconds.
+function os.preciseGameTime() end
 
 ---Sets a callback which will be called when CSP itself or a CSP Lua script tries to open an URL. Return `true` if you’re handling URL, so the event would be stopped.
 ---@param mask string @Regular expression to check URLs against of.
@@ -4379,6 +4466,14 @@ function os.dateGlobal(format, timestamp) end
 ---Not available to scripts without I/O access.
 ---@param filename string @If not absolute, considered to be relative to script root folder.
 function os.addDLLDirectory(filename) end
+
+---Load DLL. Loaded DLL can’t be unloaded. Loaded DLLs can’t interact with LuaJIT FFI. If you need to exchange data, use shared memory-mapped files.
+--- And if you want to run some code in background, ideally pack it in an EXE and use `os.runConsoleProcess()` so it’d be cleaner, it could unload
+--- and reload, and wouldn’t take the entire AC with it if crashed. Ideally, don’t use this function at all, but it’s better if you’d use it than
+--- if you’d add a Python app to do the same.
+---Not available to scripts without I/O access.
+---@param filename string @If not absolute, considered to be relative to script root folder.
+function os.loadDLL(filename) end
 
 ---Show a popup message using good old MessageBox. Please do not use it for debugging, instead consider using `ac.log()` and `ac.debug('key', 'value')`
 ---with in-game Lua Debug App.
@@ -4633,6 +4728,8 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field customCarColor rgb @Custom car color selected online, or `math.nan` if color is the default one
 ---@field aabbCenter vec3 @Center of AABB (calculated from LOD D or collider mesh).
 ---@field aabbSize vec3 @Size of AABB in meters (calculated from LOD D or collider mesh).
+---@field bsCenter vec3 @Center of bounding sphere used for main car culling during rendering.
+---@field bsRadius number @Radius of bounding sphere used for main car culling during rendering.
 ---@field index integer @0-based (0 for first car).
 ---@field gearCount integer @Excluding neutral and reverse. Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field turboCount integer @Physics-only (see `ac.CarState.physicsAvailable`)
@@ -4711,7 +4808,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field wheelsOutside integer @Number of wheels outside of allowed area.
 ---@field engineLifeLeft number @Engine life left (1000 for new engine, breaks at 0).
 ---@field dirt number @Body dirt level from 0 to 1.
----@field damage number[] @Damage values from 0 to maximum collision speed in km/h for four different zones (fifth one is not really used). 5 items, starts with 0.
+---@field damage {[0|1|2|3|4]: number} @Damage values from 0 to maximum collision speed in km/h for four different zones (fifth one is not really used). 5 items, starts with 0.
 ---@field gearboxDamage number @Gearbox damage (0 for new gearbox, 1 for non-functional).
 ---@field nodeIndex integer @Car index if 0 is nearest to camera, 1 is second nearest and so on.
 ---@field visibleIndex integer @Car index if 0 is nearest to camera and visible in main camera, 1 is second nearest visible and so on. Cars outside of main camera would have 255 here.
@@ -4728,12 +4825,14 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field lastLapCutsCount integer @Number of lap cuts in last lap.
 ---@field aiLevel number @AI level from 0 to 1 (or -1 if there is no AI).
 ---@field aiAggression number @AI aggression from 0 to 1 (or -1 if there is no AI). Note: aggression level set in a launcher will be multiplied by 0.95, so 100% aggression will show up as 0.95 here.
----@field aiRainTyres number @`True` if currently AI is using rain tyres.
+---@field aiLapsLeft integer @Number of laps left to make for AI before going to pits.
+---@field isAIUsingRainTyres boolean @`True` if AI is using rain tyres now.
+---@field isAIGoingToPits boolean @`True` if AI is going to go to pits when possible.
 ---@field currentSplits integer[] @Time for different splits of current lap, in milliseconds. Items start with 0. To get number of elements, use `#state.currentSplits`.
 ---@field lastSplits integer[] @Time for different splits of last lap, in milliseconds. Items start with 0. To get number of elements, use `#state.lastSplits`.
 ---@field bestSplits integer[] @Best splits times (and not splits of best lap), in milliseconds, unlike other split lists, this one is populated with zeroes for sectors without time from the start. Items start with 0. To get number of elements, use `#state.bestSplits`.
 ---@field bestLapSplits integer[] @Splits times of best lap (not necessarily best split times in itself), in milliseconds. Items start with 0. To get number of elements, use `#state.bestLapSplits`.
----@field wheels ac.StateWheel[] @4 items, starts with 0.
+---@field wheels {[0|1|2|3]: ac.StateWheel} @4 items, starts with 0.
 ---@field extrapolatedMovement boolean @If set to false and you’re adding objects moving close to cars, use ac.CarState.timestamp to estimate dt in such a way that it would match car physics time
 ---@field isActive boolean @True if car is currently active (changes to `false` for disconnected cars if server does not have them visible).
 ---@field isConnected boolean @True if car is currently connected (cars can be disconnected online), or if car is not a remote one.
@@ -4771,6 +4870,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field turningRightOnly boolean
 ---@field lowBeams boolean @`true` if low beams switch is currently active (doesn’t depend on the state of headlights, just on the switch state).
 ---@field highBeams boolean @`true` if high beams are currently active (either with headlights active, or with high beams flashing).
+---@field daytimeRunningLights boolean
 ---@field extraA boolean
 ---@field extraB boolean
 ---@field extraC boolean
@@ -4867,8 +4967,8 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field drivetrainPower number @Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field brakeBias number @Physics-only (see `ac.CarState.physicsAvailable`)
 ---@field speedLimiter number @Returns pit limiter speed in km/h (80 by default unless session specified different settings) or 0 if no limit is currently active. Physics-only (see `ac.CarState.physicsAvailable`)
----@field turboBoosts number[] @Values per each turbo, up to 8 (if there are less turbos in a car, rest are zeroes). Physics-only (see `ac.CarState.physicsAvailable`) 8 items, starts with 0.
----@field turboWastegates number[] @Values per each turbo, up to 8 (if there are less turbos in a car, rest are zeroes). Physics-only (see `ac.CarState.physicsAvailable`) 8 items, starts with 0.
+---@field turboBoosts {[0|1|2|3|4|5|6|7]: number} @Values per each turbo, up to 8 (if there are less turbos in a car, rest are zeroes). Physics-only (see `ac.CarState.physicsAvailable`) 8 items, starts with 0.
+---@field turboWastegates {[0|1|2|3|4|5|6|7]: number} @Values per each turbo, up to 8 (if there are less turbos in a car, rest are zeroes). Physics-only (see `ac.CarState.physicsAvailable`) 8 items, starts with 0.
 ---@field tractionControl2 number
 ---@field fuelMap integer @Current fuel map preset.
 ---@field steerTorque number
@@ -4881,7 +4981,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field aeroLiftRear number @Aero lift coefficient in rear.
 ---@field aeroDrag number @Aero drag coefficient.
 ---@field caster number @Caster angle in degrees.
----@field rideHeight number[] @0 for front, 1 for rear. 2 items, starts with 0.
+---@field rideHeight {[0|1]: number} @0 for front, 1 for rear. 2 items, starts with 0.
 ---@field p2pStatus integer
 ---@field p2pActivations integer
 ---@field altitude number @Altitude in meters above sea level.
@@ -4912,7 +5012,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field forcedPosition integer
 ---@field leaderCompletedLaps integer
 ---@field isOver boolean
----@field leaderboard ac.StateLeaderboardEntry[] @Items start with 0. To get number of elements, use `#state.leaderboard`.
+---@field leaderboard {[integer]: ac.StateLeaderboardEntry} @Items start with 0. To get number of elements, use `#state.leaderboard`.
 
 ---@class ac.StateWheelPhysics : ClassBase
 ---@field brakeTorque number
@@ -4947,10 +5047,10 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field drivetrainVelocity number
 ---@field clutchInertia number
 ---@field clutchState number
----@field wheels ac.StateWheelPhysics[] @4 items, starts with 0.
----@field scriptControllerInputs number[] @256 items, starts with 0.
----@field gearRatios number[] @Items start with 0. To get number of elements, use `#state.gearRatios`.
----@field wings ac.StateWingPhysics[] @Items start with 0. To get number of elements, use `#state.wings`.
+---@field wheels {[0|1|2|3]: ac.StateWheelPhysics} @4 items, starts with 0.
+---@field scriptControllerInputs {[integer]: number} @256 items, starts with 0.
+---@field gearRatios {[integer]: number} @Items start with 0. To get number of elements, use `#state.gearRatios`.
+---@field wings {[integer]: ac.StateWingPhysics} @Items start with 0. To get number of elements, use `#state.wings`.
 
 ---@class ac.StateSim : ClassBase
 ---@field windowWidth integer @Width of AC window in pixels (set in AC video settings). Might not be the same as UI screen size if scaling is used.
@@ -4969,20 +5069,21 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field isCustomVideoMode boolean @True if AC was launched with custom screen mode (fisheye, 360°, splitscreen).
 ---@field isVRConnected boolean @True if AC runs in either Oculus or OpenVR mode and initialization went successfully.
 ---@field staticReflections boolean @True if reflection cubemap does not update live and uses custom cubemap.kn5 instead of track model
----@field directMessagingAvailable boolean @True if it’s an online race and server supports TCP exchange of extra data between clients (allows to send online events more frequently).
----@field directUDPMessagingAvailable boolean @True if it’s an online race and server supports UDP exchange of extra data between clients (allows to send UDP online events).
+---@field directMessagingAvailable boolean @True if it’s an online race and server supports TCP exchange of extra data between clients (allows to send online events more frequently). Also, could be `true` in alt-online mode.
+---@field directUDPMessagingAvailable boolean @True if it’s an online race and server supports UDP exchange of extra data between clients (allows to send UDP online events). Also, could be `true` in alt-online mode.
 ---@field allowTyreBlankets boolean
----@field isReplayOnlyMode boolean @True if AC is ran in replay mode, without any racing.
+---@field isReplayOnlyMode boolean @True if AC is running in replay mode, without any racing.
 ---@field isOnlineRace boolean @True if it’s an online race.
+---@field isAltOnlineRace boolean @True if it’s an alt-online race (fake online race driven by a New Modes Lua script).
 ---@field isShowroomMode boolean @True if AC has been launched in showroom mode.
 ---@field isPreviewsGenerationMode boolean @True if AC has been launched to generate previews.
 ---@field freeCameraAllowed boolean @Can be changed in AC video settings.
----@field isPitsSpeedLimiterForced boolean @By default `true`, but servers or offline races can alter session settings and disable this thing.
+---@field isPitsSpeedLimiterForced boolean @By default, `true`, but servers or offline races can alter session settings and disable this thing.
 ---@field customAISplinesAllowed boolean @Switches to `false` if `physics.setAISpline()` is not allowed in this session
+---@field isTAAActive boolean @True with TAA or upcalers such as DLSS.
 ---@field isFSRActive boolean
 ---@field isTripleFSRActive boolean
 ---@field isLinearColorSpaceActive boolean
----@field allowedTyresOut integer
 ---@field resultScreenTime number @Results screen time in seconds (available online, -1 offline).
 ---@field raceOverTime number @Race over time in seconds (available online, -1 offline).
 ---@field mechanicalDamageRate number @In 0…1 range.
@@ -5080,9 +5181,15 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field trackCamerasSet integer @0-based index of currently active track cameras set.
 ---@field audioMasterVolume number
 ---@field whiteReferencePoint number @Brightness of objects that would look white on-screen, such as UI in VR or driver name tags. You can also use it as a divider to adjust brightness of virtual mirrors (if you are not using postprocessing for virtual mirrors).
+---@field timePostOffset number @Current time offset in seconds from photo mode time offset as well as calls to `ac.setWeatherTimeOffset()`
+---@field timePhotoModeOffset number @Current time offset in seconds from photo mode time offset.
+---@field allowedTyresOut integer
 ---@field specialEvent boolean @One of those archievment challenges is active.
 ---@field isTimedRace boolean
+---@field isTrackOpen boolean @Open track is an A-B track, closed is a circular one.
+---@field isTimeOffsetIgnored boolean @If `true`, something sets explicit timestamp, so calls to `ac.setWeatherTimeOffset()` will be ignored.
 ---@field penaltiesEnabled boolean
+---@field wrongWayPenaltyEnabled boolean
 ---@field fixedSetup boolean
 ---@field leaderLastLap boolean
 ---@field timeRaceEnded boolean
@@ -5165,7 +5272,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field xWidth number
 
 ---@class ac.StateTriple : ClassBase
----@field screens ac.StateTripleItem[] @3 items, starts with 0.
+---@field screens {[0|1|2]: ac.StateTripleItem} @3 items, starts with 0.
 
 ---@class ac.StateVRHand : ClassBase
 ---@field transform mat4x4
@@ -5178,7 +5285,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field busy boolean @Set to true if hand is already going something, like grabbing an object. If so, don’t do any more grabbing (and don’t forget to call `ac.setVRHandBusy()` when you do)
 ---@field openVRButtons integer @OpenVR-specific buttons.
 ---@field openVRTouches integer @OpenVR-specific touches.
----@field openVRAxis vec2[] @OpenVR-specific touches. 5 items, starts with 0.
+---@field openVRAxis {[0|1|2|3|4]: vec2} @OpenVR-specific touches. 5 items, starts with 0.
 
 ---@class ac.StateVR : ClassBase
 ---@field headTransform mat4x4
@@ -5186,7 +5293,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field oculusButtons integer @Oculus-specific buttons.
 ---@field oculusTouches integer @Oculus-specific touches.
 ---@field activeHand integer @Index of a hand that is actively moving, or -1.
----@field hands ac.StateVRHand[] @2 items, starts with 0.
+---@field hands {[0|1]: ac.StateVRHand} @2 items, starts with 0.
 
 ---@class ac.StateTrackir : ClassBase
 ---@field position vec3
@@ -5202,7 +5309,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field accelerometer vec3
 ---@field gyroscope vec3
 ---@field battery number
----@field touches ac.StateDualsenseTouch[] @2 items, starts with 0.
+---@field touches {[0|1]: ac.StateDualsenseTouch} @2 items, starts with 0.
 ---@field batteryCharging boolean
 ---@field batteryFullyCharged boolean
 ---@field headphonesConnected boolean
@@ -5214,7 +5321,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field playerLEDsBrightness integer @0 for max, 1 for medium, 2 for low.
 ---@field disableLEDs boolean
 ---@field playerLEDsFade boolean
----@field playerLEDs boolean[] @5 items, starts with 0.
+---@field playerLEDs {[0|1|2|3|4]: boolean} @5 items, starts with 0.
 
 ---@class ac.StateDualshockTouch : ClassBase
 ---@field delta vec2
@@ -5231,7 +5338,7 @@ function physics.getExtendedDamperTravel(carIndex, corner) end
 ---@field batteryCharging boolean @Might not provide accurate values for some devices.
 ---@field batteryFullyCharged boolean @Might not provide accurate values for some devices.
 ---@field usbConnected boolean @Might not provide accurate values for some devices.
----@field touches ac.StateDualshockTouch[] @2 items, starts with 0.
+---@field touches {[0|1]: ac.StateDualshockTouch} @2 items, starts with 0.
 ---@field connected boolean
 
 ---@class ac.StateDualshockOutput : ClassBase
@@ -5291,10 +5398,11 @@ function try(fn, catch, finally) end
 ---
 ---Any error thrown by `fn()` will be raised and not captured, but `dispose()` will be called either way.
 ---@generic T
----@param fn fun(): T?
+---@param fn fun(...): T?
 ---@param dispose fun()? @CSPs before 0.2.5 require non-nil argument.
+---@param ... any @Arguments to pass to `fn` (added in 0.3.0-preview259).
 ---@return T|nil
-function using(fn, dispose) end
+function using(fn, dispose, ...) end
 
 ---Resolves relative path to a Lua module (relative to Lua file you’re running this function from)
 ---so it would be ready to be passed to `require()` function.
@@ -5451,6 +5559,12 @@ local mat4x4 = nil
 ---@return mat4x4
 function mat4x4:set(value) end
 
+---Get Euler angles from a matrix. Should work in symmetry with `mat4x4.euler()` and if not, please report and it’ll be fixed.
+---@return number @Heading angle in radians.
+---@return number @Pitch angle in radians.
+---@return number @Roll angle in radians.
+function mat4x4:getEuler() end
+
 ---@param destination vec3
 ---@param vec vec3
 ---@return vec3
@@ -5520,6 +5634,12 @@ function mat4x4:mulSelf(other) end
 ---@param other mat4x4
 ---@return mat4x4 @Returns destination matrix.
 function mat4x4:mulTo(destination, other) end
+
+--[[ common/function.lua ]]
+
+-- This annotation merges into the global 'function' primitive type
+---@class function
+---@field bind fun(self: function, ...: any): function
 
 --[[ common/math.lua ]]
 
@@ -5883,6 +6003,12 @@ function string.nextEmoji(self, start) end
 ---@return string
 function string.urlEncode(self, plusForSpaces) end
 
+---Decodes URL argument. Added in 0.3.0-preview238.
+---@param self string
+---@param plusForSpaces boolean? @Use `'+'` for space symbol (works for URLs, but if a regular URL encoding is needed, might be getting in a way). Default value: `true`.
+---@return string
+function string.urlDecode(self, plusForSpaces) end
+
 ---Checks if the beginning of a string matches another string. If string to match is longer than the first one, always returns `false`.
 ---@param self string @String to check the beginning of.
 ---@param another string @String to match.
@@ -5929,6 +6055,12 @@ function string.multiply(self, count) end
 ---@param direction integer? @Direction to pad to, 1 for padding at the end, -1 for padding at the start, 0 for padding from both ends centering string. Default value: `1`.
 ---@return string
 function string.pad(self, targetLength, pad, direction) end
+
+---Xor two strings together. Works fastest if length of `key` is a multiple of 8. Input and output strings can contain zero bytes.
+---@param self string @String to XOR.
+---@param key string @Xoring key.
+---@return string @Xored string.
+function string.xor(self, key) end
 
 ---Similar to `string.find()`: looks for the first match of `pattern` and returns indices, but uses regular expressions.
 ---
@@ -5982,6 +6114,25 @@ function string.reggsub(self, pattern, repl, limit, ignoreCase) end
 ---@param init integer? @1-based offset to start searching from. Default value: `1`.
 ---@return boolean
 function string.cspmatch(self, filter, init) end
+
+--[[ common/string.lua ]]
+
+---Parses URL. Added in 0.3.0-preview238. Any missing components will be returned as empty strings. Generally, has
+---semantics akin to `new URL()` from JavaScript, and uses the same underlying library for parsing. If failed to
+---parse, returns `nil`.
+---
+---Calling `tostring()` on returned table will get the normalized URL back. Also,
+---returned table has its own comparison, logic, allowing to compare different URLs together with ease.
+---
+---You can also alter any fields of the returned table and use `tostring()` to get the altered URL back. Note: if present,
+---`hostname` will be used, so, override `hostname` and `port` instead of `host`. Also, `searchParams`, if present, will
+---be used, ignoring `search`.
+---
+---Method `:getSearchParam()` is a simple shortcut returning the first item with matching key from `searchParams`.
+---@param self string
+---@param plusForSpaces boolean? @Use `'+'` for space symbol (works for URLs, but if a regular URL encoding is needed, might be getting in a way). Default value: `true`.
+---@return nil|{hash: string, host: string, hostname: string, href: string, origin: string, password: string, pathname: string, port: string, protocol: string, search: string, username: string, searchParams: {[string]: string[]}, getSearchParam: (fun(s: self, key: string): string?)}
+function string.urlParse(self, plusForSpaces) end
 
 --[[ common/table.lua ]]
 
@@ -6242,8 +6393,8 @@ function table.findFirst(t, callback, callbackData) end
 ---@generic T
 ---@generic TKey
 ---@param t {[TKey]: T}
----@param key string
----@param value any
+---@param key TKey
+---@param value T
 ---@return T, TKey
 ---@nodiscard
 function table.findByProperty(t, key, value) end
@@ -6280,7 +6431,6 @@ function table.minEntry(t, callback, callbackData) end
 ---@param callback fun(item: T, key: TKey, callbackData: TCallbackData)
 ---@param callbackData TCallbackData?
 ---@return table
----@nodiscard
 function table.forEach(t, callback, callbackData) end
 
 ---Creates a new table with unique elements from original table only. Optionally, a callback
@@ -6342,11 +6492,30 @@ function table.range(endingIndex, startingIndex, step, callback, callbackData) e
 
 ---Creates a new table from iterator. Supports iterators returning one or two values (if two values are returned, first is considered the key,
 ---if not, values are simply added to a list).
+---
+---Example:
+---```
+---local t = table.build(ipairs({1, 2, 3, 4})) -- t is `{1, 2, 3, 4}`
+---local t = table.build(pairs({a = 1, b = 2})) -- t is `{a = 1, b = 2}`
+---```
 ---@generic T
 ---@param iterator fun(...): T
 ---@return T[]
 ---@nodiscard
-function table.build(iterator, k, v) end
+function table.build(iterator, state, nextKey) end
+
+--[[ common/coroutine.lua ]]
+
+---Creates a new coroutine, with body `f`. `f` must be a function. Returns this new coroutine, an object with type `thread`.
+---@param f async fun(...): ...
+---@param flags nil|'e'|'s'|'es' @Flags: use `e` to raise errors from coroutine, `s` to start the coroutine immediately, or `es` for both.
+---@return thread
+function coroutine.create(f, flags) end
+
+---Sleep for some time.
+---@async
+---@param time number @Time to sleep in seconds.
+function coroutine.sleep(time) end
 
 --[[ common/internal.lua ]]
 
@@ -6513,6 +6682,10 @@ function physics.Collider.Cylinder(length, radius, offset, look, debug) end
 ---@return physics.ColliderType
 function physics.Collider.Ray(length, origin, dir, debug) end
 
+---The entire track geometry. Added in 0.3.0-preview238.
+---@return physics.ColliderType
+function physics.Collider.Track() end
+
 --[[ common/ac_extras_ini.lua ]]
 
 ---A wrapper for data parsed from an INI files, supports different INI formats. Parsing is done on
@@ -6631,7 +6804,7 @@ ac.INIConfig.OptionalList = {}
 ---Parse INI config from a string.
 ---@param data string @Serialized INI data.
 ---@param format ac.INIFormat? @Format to parse. Default value: `ac.INIFormat.Default`.
----@param includeFolders ('@cars'|'@tracks'|string)[]? @Optional folders to include files from (only for `ac.INIFormat.ExtendedIncludes` format). Use special values `'@cars'` and `'@tracks'` for car or track configs.
+---@param includeFolders ('@cars'|'@tracks'|string)[]? @Optional folders to include files from (only for `ac.INIFormat.ExtendedIncludes` format). Use special values `'@cars'` and `'@tracks'` for car or track configs. Pass `'@car:N'` or `'@track'`, such as `'@car:0', to not only include corresponding configs, but also for “read()” queries, such as `read('data/tyres.ini/FRONT/RIM_RADIUS', 0.2)`, to work property.
 ---@return ac.INIConfig
 function ac.INIConfig.parse(data, format, includeFolders) end
 
@@ -7009,7 +7182,7 @@ function ac.StructItem.mat4x4() end
 function ac.StructItem.transform(compactPosition, compactRotation, rangeFrom, rangeTo) end
 
 ---Simply create a new FFI structure with a given layout. Doesn’t connect to anything.
----@generic T
+---@generic T : ac.FFIStruct
 ---@param layout T @A table containing fields of structure and their types. Use `ac.StructItem` methods to select types. Alternatively, you can pass a string for the body of the structure here, but be careful with it.
 ---@return T
 function ac.StructItem.build(layout) end
@@ -7070,6 +7243,8 @@ function ac.LutJit:new(o, data, hsvRows) end
 ---- At least 200 ms should pass between sending messages.
 ---- UDP messages are not available (those require `ac.getSim().directUDPMessagingAvailable` flag).
 ---- Don’t use this system to exchange data too often: it uses chat messages to transfer data, so it’s far from optimal.
+---
+---When sending UDP packets, consider adding a byte for packet index and checking it upon receiving: UDP packets might arrive out-of-order and more.
 ---@generic T
 ---@param layout T @A table containing fields of structure and their types. Use `ac.StructItem` methods to select types. Alternatively, you can pass a string for the body of the structure here, but be careful with it.
 ---@param callback fun(sender: ac.StateCar|nil, message: T) @Callback that will be called when a new message of this type is received. Note: it would be called even if message was sent from this script. Use `sender` to check message origin: if it’s `nil`, message has come from the server, if its `.index` is 0, message has come from this client (and possibly this script).
@@ -7555,7 +7730,8 @@ web = {}
 ---@param connect integer? @Time in milliseconds for establishing connection. Default value: 10000 ms.
 ---@param send integer? @Time in milliseconds for sending data. Default value: 30000 ms.
 ---@param receive integer? @Time in milliseconds for receiving data. Default value: 30000 ms.
-function web.timeouts(resolve, connect, send, receive) end
+---@param threads integer? @If set, overrides maximum number of simultaneous requests. Default limit: 2. Maximum allowed value is 32.
+function web.timeouts(resolve, connect, send, receive, threads) end
 
 ---Sends a GET HTTP or HTTPS request. Note: you can only have two requests running at once, mostly to make sure
 ---a faulty script wouldn’t spam a remote server or overload internet connection (that’s how I lost access
@@ -9168,7 +9344,7 @@ function web.loadRemoteAssets(source, callback) end
 
 ---Resolve hostname, return IPv4 via a callback.
 ---@param url string
----@param callback fun(err: string?, response: string?)
+---@param callback fun(err: string?, response: string?)?
 function web.resolveDNS(url, callback) end
 
 ---@param key string
@@ -9316,6 +9492,87 @@ function _ac_AudioEvent:dispose() end
 function _ac_AudioEvent:getDSPMetering(i, dir) end
 --[[ csp.lua ]]
 
+---GIF player can be used to display animated GIFs. Also supports regular and animated WEBP images.
+---@param source string|{width: number, height: number, decompress: boolean?} @URL, filename or binary data.
+---@param simTime boolean? @Pass `true` to use simulation time (pause GIF when AC is paused), or `false` to use UI time. By default, `true` for car and track scripts.
+---@return ui.GIFPlayer
+function ui.GIFPlayer(source, simTime) end
+
+---GIF player can be used to display animated GIFs. Also supports regular and animated WEBP images.
+---@class ui.GIFPlayer
+---@field keepRunning boolean @By default GIFs stop playing if they are not actively used in rendering. If you need them to keep running in background, set this property to `true`.
+local _ui_GIFPlayer = nil
+
+---Get GIF resolution. If GIF is not yet loaded, returns zeroes.
+---@return vec2 @Width and height in pixels.
+function _ui_GIFPlayer:resolution() end
+
+---Push new bitmap data to a live-updating image. Doesn’t do anything if data is wrong size, or if player is not created for this mode.
+---@param data binary
+---@return boolean @Returns `false` if data doesn’t fit.
+function _ui_GIFPlayer:push(data) end
+
+---Rewinds GIF back to beginning.
+---
+---Note: since 0.3.0.144, GIF players using the same source share their internal state, decoder and textures to save on RAM and
+---CPU usage. Using this method on a shared player (if it’s played a bit) will disconnect the player and make it its own thing.
+---@return ui.GIFPlayer @Returns itself for chaining several methods together.
+function _ui_GIFPlayer:rewind() end
+
+---Pauses playback. Added in 0.3.0.144.
+---@return ui.GIFPlayer @Returns itself for chaining several methods together.
+function _ui_GIFPlayer:pause() end
+
+---Resumes playback. Added in 0.3.0.144.
+---@return ui.GIFPlayer @Returns itself for chaining several methods together.
+function _ui_GIFPlayer:resume() end
+
+---Checks if GIF is loaded and ready to be drawn.
+---@return boolean
+function _ui_GIFPlayer:ready() end
+
+---Links playback rate to simulation speed: pauses when game or replay are paused, slows down with replay slow motion,
+---speeds up with replay fast forwarding.
+---@param value boolean? @Set to `true` to link playback rate.
+---@return ui.GIFPlayer @Returns itself for chaining several methods together.
+function _ui_GIFPlayer:linkToSimulationSpeed(value) end
+
+---Returns `false` if GIF decoding has failed.
+---@return boolean
+function _ui_GIFPlayer:valid() end
+--[[ lib_ui_shared.lua ]]
+
+---@param handle integer @Shared texture handle. Can be either a `D3D11_RESOURCE_MISC_SHARED` handle or a handle from `:sharedHandle()` of an extra canvas.
+---@param ntMode nil|integer|boolean? @Set to `true` if the handle is NT handle. Alternatively, set to an integer with source process ID. Default value: `false`. Note: for NT handles it’s better to use the named textures and pass it as a string instead (with the overload).
+---@return ui.SharedTexture
+---@overload fun(name: string) @Overload using name of a shared NT texture, works a lot better.
+function ui.SharedTexture(handle, ntMode) end
+
+---A wrapper for accessing textures shared by other Lua scripts or even by other applications. For the latter, textures need to have `D3D11_RESOURCE_MISC_SHARED` flag and be on the same GPU.
+---@class ui.SharedTexture
+local _ui_SharedTexture = nil
+
+---Dispose texture and release its view. Call this method if remote texture is being destroyed.
+function _ui_SharedTexture:dispose() end
+
+---Sets texture name for debugging. Textures with set name appear in Lua Debug App, allowing to monitor their state.
+---@param name string? @Name to display texture as. If set to `nil` or `false`, name will be reset and texture will be hidden.
+---@return self @Returns itself for chaining several methods together.
+function _ui_SharedTexture:setName(name) end
+
+---Get texture handle used for creating a texture. If texture has failed to load, returns 0. If texture is loaded by name and loaded properly, returns 1.
+---@return integer
+function _ui_SharedTexture:handle() end
+
+---Get texture resolution. If texture has failed to load, returns zeroes.
+---@return vec2 @Width and height in pixels.
+function _ui_SharedTexture:resolution() end
+
+---Returns `false` if access to a shared texture has failed.
+---@return boolean
+function _ui_SharedTexture:valid() end
+--[[ lib_scene.lua ]]
+
 ---Mesh vertex.
 ---@param pos vec3 
 ---@param normal vec3 
@@ -9420,8 +9677,8 @@ function _ac_SceneReference:setMaterialProperty(property, value) end
 ---  ```
 ---@param texture string|"'txDiffuse'"|"'txNormal'"|"'txEmissive'"|"'txMaps'" @Name of a texture slot.
 ---@param value {callback: fun(dt: number), textureSize: vec2, region: {from: vec2, size: vec2}, background: rgbm|boolean|nil}|`{callback = function (dt)  end, textureSize = vec2(512, 512), region = {from = vec2(0, 0), size = vec2(512, 512)}}`
----@overload fun(texture: string, value: string)
----@overload fun(texture: string, value: rgbm)
+---@overload fun(self: ac.SceneReference, texture: string, value: string)
+---@overload fun(self: ac.SceneReference, texture: string, value: rgbm)
 ---@return self @Returns self for easy chaining.
 function _ac_SceneReference:setMaterialTexture(texture, value) end
 
@@ -9584,9 +9841,20 @@ function _ac_SceneReference:loadKN5LODAsync(filename, mainFilename, callback) en
 ---Loads animation from a file (on first call only), sets animation position. To use remote animations, first load them with `web.loadRemoteAnimation()`.
 ---@param filename string @Animation filename (”…ksanim”). If set to `nil`, no animation will be applied.
 ---@param position number? @Animation position from 0 to 1. Default value: 0.
----@param force boolean? @If not set to `true`, animation will be applied only if position is different from position used previously. Default value: `false`.
+---@param force boolean? @If not set to `true`, animation will be applied only if animation position is different from position used previously. Default value: `false`. You might want to use this flag, for example, if some other part of logic might have moved objects and you want to restore their positions as defined by the animation.
 ---@return self @Returns self for easy chaining.
 function _ac_SceneReference:setAnimation(filename, position, force) end
+
+---Loads animation from a file (on first call only), sets animation positio, blending resulting transform with existing state. To actually blend N
+---animations, do something like `node:blendAnimation('main.ksanim', …):blendAnimation('firstLayer.ksanim', …):blendAnimation('secondLayer.ksanim', …)`.
+---You can also use `:setAnimation()` for the first “main.ksanim”, but if doing so, make sure to set its `force` argument to `true`.
+---To use remote animations, first load them with `web.loadRemoteAnimation()`.
+---@param filename string @Animation filename (”…ksanim”). If set to `nil`, no animation will be applied.
+---@param position number? @Animation position from 0 to 1. Default value: 0.
+---@param mix number? @How much this animation should contribute. Default value: `1`. Passing a value equals to or below 0 is the same as not calling the function at all.
+---@param normalize boolean? @Normalize transforms of all the nodes affected by this animation. Resets scale to 100%, removes any skewing.
+---@return self @Returns self for easy chaining.
+function _ac_SceneReference:blendAnimation(filename, position, mix, normalize) end
 
 ---@param visible boolean|`true`|`false`
 ---@param resetMotion boolean? @Default value: `true`. Pass `false` to not reset object motion (if you teleport object somewhere and make it visible all at once without using this option, it’ll appear blurry). Note: you can always use `:clearMotion()` to reset motion manually. Doesn’t have an effect if object has already been visible (in this case, this function doesn’t do anything). 
@@ -9776,7 +10044,7 @@ function _ac_SceneReference:clear() end
 ---@param outPosRef vec3|nil @Local position (not the world one).
 ---@param outNormalRef vec3|nil @Local normal.
 ---@param outUVRef vec2|nil @Texture coordinate.
----@param culling integer? @Set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
+---@param culling integer? @Set to -1 to disable backface culling, or to 0 to hit backfaces only. Default value: 1.
 ---@return number @Distance to hit, or -1 if there was no hit.
 ---@return ac.SceneReference|nil @Reference to a mesh that was hit (same as `outSceneRef`, doubled here for convenience).
 function _ac_SceneReference:raycast(ray, outSceneRef, outPosRef, outNormalRef, outUVRef, culling) end
@@ -9867,28 +10135,28 @@ function _ac_SceneReference:getMaterialPropertyName(index, slotIndex) end
 ---@param index integer|nil @1-based index of an element to get an index of a texture slot of. Default value: 1.
 ---@param slotName string|"'txDiffuse'"|"'txNormal'"|"'txEmissive'"|"'txMaps'" @Name of a texture slot.
 ---@return integer|nil @1-based texture slot index, or `nil` if there is no such property.
----@overload fun(s: ac.SceneReference, slotName: string): integer|nil
+---@overload fun(self: ac.SceneReference, slotName: string): integer|nil
 function _ac_SceneReference:getTextureSlotIndex(index, slotName) end
 
 ---Get index of a certain material property of an element from the name of that property.
 ---@param index integer|nil @1-based index of an element to get an index of a material property of. Default value: 1.
 ---@param propertyName string|"'ksDiffuse'"|"'ksAmbient'"|"'ksEmissive'" @Name of material property.
 ---@return integer|nil @1-based material property index, or `nil` if there is no such property.
----@overload fun(s: ac.SceneReference, propertyName: string): integer|nil
+---@overload fun(self: ac.SceneReference, propertyName: string): integer|nil
 function _ac_SceneReference:getMaterialPropertyIndex(index, propertyName) end
 
 ---Get texture filename of a certain texture slot of an element.
 ---@param index integer|nil @1-based index of an element to get a texture filename of. Default value: 1.
 ---@param slot string|integer|nil|"'txDiffuse'"|"'txNormal'"|"'txEmissive'"|"'txMaps'" @Texture slot name or a 1-based index of a texture slot. Default value: 1.
 ---@return string? @Texture filename or `nil` if there is no such slot or element.
----@overload fun(s: ac.SceneReference, slot: string): string?
+---@overload fun(self: ac.SceneReference, slot: string): string?
 function _ac_SceneReference:getTextureSlotFilename(index, slot) end
 
 ---Get texture details of a certain texture slot of an element. Slower, but has a lot of details.
 ---@param index integer|nil @1-based index of an element to get a texture filename of. Default value: 1.
 ---@param slot string|integer|nil|"'txDiffuse'"|"'txNormal'"|"'txEmissive'"|"'txMaps'" @Texture slot name or a 1-based index of a texture slot. Default value: 1.
 ---@return {index: integer, slot: string, filename: string, size: vec2}? @Texture filename or `nil` if there is no such slot or element.
----@overload fun(s: ac.SceneReference, slot: string): {index: integer, slot: string, filename: string, size: vec2}?
+---@overload fun(self: ac.SceneReference, slot: string): {index: integer, slot: string, filename: string, size: vec2}?
 function _ac_SceneReference:getTextureSlotDetails(index, slot) end
 
 ---Dump shader replacements configs for materials in current selection. Resulting string might be pretty huge. Not all properties are dumped, but more properties might be added later. Some textures are stored as temporary IDs only valid within a session.
@@ -9911,7 +10179,7 @@ function _ac_SceneReference:applyHumanMaterials(neck, modelName, carIndex) end
 ---@param index integer|nil @1-based index of an element to get a material property of. Default value: 1.
 ---@param property string|integer|nil|"'ksDiffuse'"|"'ksAmbient'"|"'ksEmissive'" @Material property name or a 1-based index of a material property. Default value: 1.
 ---@return number|vec2|vec3|vec4|nil @Material property value (type depends on material property type), or `nil` if there is no such element or material property.
----@overload fun(s: ac.SceneReference, property: string): number|vec2|vec3|vec4|nil
+---@overload fun(self: ac.SceneReference, property: string): number|vec2|vec3|vec4|nil
 function _ac_SceneReference:getMaterialPropertyValue(index, property) end
 
 ---Get number of materials in given scene reference (not recursive, only checks meshes and skinned meshes). If same material is used
@@ -10202,6 +10470,7 @@ function _ac_GeometryShot:setName(name) end
 ---@param up vec3? @Camera vector facing upwards relative to camera. Default value: `vec3(0, 1, 0)`.
 ---@param fov number? @FOV in degrees. Default value: 90.
 ---@return ac.GeometryShot @Returns itself for chaining several methods together.
+---@overload fun(self: ac.SceneReference, view: mat4x4, proj: mat4x4, pos: vec3?) @An overload taking raw matrices. Some visuals might not work correctly with some of wilder matrices. `pos` is optional and needed for things like speculars to work.
 function _ac_GeometryShot:update(pos, look, up, fov) end
 
 ---Updates texture making a shot from a position of a track camera. Pass the index of a car to focus on.
@@ -10256,12 +10525,14 @@ function _ac_GeometryShot:setOriginalLighting(value) end
 function _ac_GeometryShot:setSky(value) end
 
 ---Enables particles in the shot. By default, particles are not drawn.
----
----Note: this is not working well currently with post-processing active, drawing HDR colors into LDR texture. 
----Better support for such things is coming a bit later.
 ---@param value boolean? @Set to `true` to enable particles. Default value: `true`.
 ---@return ac.GeometryShot @Returns itself for chaining several methods together.
 function _ac_GeometryShot:setParticles(value) end
+
+---Enables grass in the shot. By default, grass is not drawn. Careful: at the moment, grass exists only around the camera.
+---@param value 'dedicated'|boolean? @Set to `true` to enable grass. Default value: `true`. Since 0.3.0-preview307, you can pass `'dedicated'` to set an alternative Grass FX spawn area (expensive).
+---@return ac.GeometryShot @Returns itself for chaining several methods together.
+function _ac_GeometryShot:setGrass(value) end
 
 ---Changes used shaders set. Switch to a set like `render.ShadersType.SampleColor` to access color of surface without any extra effects.
 ---@param type render.ShadersType? @Type of shaders set to use. Default value: `render.ShadersType.Simplified`.
@@ -10269,7 +10540,7 @@ function _ac_GeometryShot:setParticles(value) end
 function _ac_GeometryShot:setShadersType(type) end
 
 ---Replaces shadow set with an alternative one. Pretty expensive, use carefully.
----@param type 'area' @Type of shadow set to use.
+---@param type 'area'|'dedicated' @Type of shadow set to use: `area` is a basic shadow map around the main camera (without directions), `dedicated` is separate set of shadows for this geometry shot (expensive).
 ---@return ac.GeometryShot @Returns itself for chaining several methods together.
 function _ac_GeometryShot:setAlternativeShadowsSet(type) end
 
@@ -10608,7 +10879,27 @@ function _ac_TrackPaint:triangle(pos, size, angle, thickness, color) end
 ---@param shape2 number? @Second shape modifier, from 0 to 1. Default value: `0.5`.
 ---@return self
 function _ac_TrackPaint:arrow(pos, size, angle, thickness, color, shape1, shape2) end
---[[ lib_physics.lua ]]
+
+---New Mode scripts can use this function even if the rest of Physics API is not available.
+---@param allowedTyresOut integer @Set to a negative value to disable the penalty.
+function physics.setAllowedTyresOut(allowedTyresOut) end
+
+---Toggle penalties on and off. Added in 0.3.0-preview243. New Mode scripts can use this function even if the rest of Physics API is not available.
+---@param penalties boolean|`true`|`false`
+function physics.setPenalties(penalties) end
+
+---Toggle wrong way penalty on and off. Added in 0.3.0-preview243. New Mode scripts can use this function even if the rest of Physics API is not available.
+---@param penalty boolean|`true`|`false`
+function physics.setWrongWayPenalty(penalty) end
+
+---Set assists. Added in 0.3.0-preview254. New Mode scripts can use this function even if the rest of Physics API is not available. If a field is not set, original value will remain.
+--- Changing `tyresBlankets` property while car is in pits resets tyre state.
+---
+--- Set `editable` to `false` to disallow editing assists from the main menu.
+---@param assists {autoBlip: boolean?, autoClutch: boolean?, autoShifter: boolean?, abs: 'off'|'factory'|'on'?, tractionControl: 'off'|'factory'|'on'?, stability: number?, damageRate: number?, fuelRate: number?, tyresWear: number?, tyresBlankets: boolean?, slipstream: number?, idealLine: boolean?, editable: boolean?}
+---@param targetCarIndex integer? @Target car index. If non-zero, global assists will be ignored. Per-car assists: auto-blip, auto-clutch, auto-shift, ABS, TC, stability control, slipstream. Default value: 0.
+---@return integer @Return number of changed items.
+function physics.setAssists(assists, targetCarIndex) end
 
 ---Represents a physics rigid body. Requires double precision physics engine to work.
 ---@class physics.RigidBody
@@ -10817,8 +11108,15 @@ function _ac_AppWindowAccessor:move(value) end
 function _ac_AppWindowAccessor:resize(value) end
 
 ---Returns redirect layer, or 0 if redirect is disabled. Redirected apps can be accessed via `dynamic::hud::redirected::N` textures.
+---Obsolete. Use `:redirectLayer2` instead.
+---@deprecated
 ---@return integer @0 if redirect is disabled.
 function _ac_AppWindowAccessor:redirectLayer() end
+
+---Returns redirect layer, or 0 if redirect is disabled. Redirected apps can be accessed via `dynamic::hud::redirected::N` textures.
+---@return integer @0 if redirect is disabled.
+---@return boolean @`true` if window is duplicated to that layer. Before 0.3.0-preview285, this value would be `nil` by mistake.
+function _ac_AppWindowAccessor:redirectLayer2() end
 
 ---Moves window to a different render layer, or back to existance with `0` passed as `layer`. Windows in separate layers don’t get mouse
 ---commands (but this wrapper can be used to send fake commands instead).
@@ -11701,6 +11999,7 @@ ui.ComboFlags = {
 ---| `ui.InputTextFlags.Placeholder` @Show label as a placeholder.
 ---| `ui.InputTextFlags.ClearButton` @Add button erasing text.
 ---| `ui.InputTextFlags.RetainSelection` @Do not lose selection when Enter is pressed, do not select all with focusing in code.
+---| `ui.InputTextFlags.FocusByDefault` @Automatically focus on input when it appears.
 ui.InputTextFlags = {
   None = 0x0, ---@type ui.InputTextFlags #No special options.
   CharsDecimal = 0x1, ---@type ui.InputTextFlags #Allow “0123456789.+-*/”.
@@ -11719,6 +12018,7 @@ ui.InputTextFlags = {
   Placeholder = 0x400000, ---@type ui.InputTextFlags #Show label as a placeholder.
   ClearButton = 0x800000, ---@type ui.InputTextFlags #Add button erasing text.
   RetainSelection = 0x1000000, ---@type ui.InputTextFlags #Do not lose selection when Enter is pressed, do not select all with focusing in code.
+  FocusByDefault = 0x2000000, ---@type ui.InputTextFlags #Automatically focus on input when it appears.
 }
 
 ---@alias ui.SelectableFlags
@@ -12115,7 +12415,8 @@ function render.glEnd() end
 ---@param radius number
 ---@param color rgbm? @Default value: `rgbm.colors.white`.
 ---@param borderColor rgbm|nil @Optional different color to use close to the border. Default value: `nil`.
-function render.circle(pos, dir, radius, color, borderColor) end
+---@param useWhiteRefPoint boolean? @Set to `true` if you want white color to appear white. Default value: `false`.
+function render.circle(pos, dir, radius, color, borderColor, useWhiteRefPoint) end
 
 ---Draws a simple rectangle othrogonal to `dir` direction using an optimized shader.
 ---@param pos vec3
@@ -12123,7 +12424,8 @@ function render.circle(pos, dir, radius, color, borderColor) end
 ---@param width number
 ---@param height number
 ---@param color rgbm? @Default value: `rgbm.colors.white`.
-function render.rectangle(pos, dir, width, height, color) end
+---@param useWhiteRefPoint boolean? @Set to `true` if you want white color to appear white. Default value: `false`.
+function render.rectangle(pos, dir, width, height, color, useWhiteRefPoint) end
 
 ---Draws a simple quad from four points.
 ---@param p1 vec3
@@ -12132,7 +12434,8 @@ function render.rectangle(pos, dir, width, height, color) end
 ---@param p4 vec3
 ---@param color rgbm? @Default value: `rgbm.colors.white`.
 ---@param texture string|nil @Default value: `nil`.
-function render.quad(p1, p2, p3, p4, color, texture) end
+---@param useWhiteRefPoint boolean? @Set to `true` if you want white color to appear white. Default value: `false`.
+function render.quad(p1, p2, p3, p4, color, texture, useWhiteRefPoint) end
 
 ---@param pos vec3
 ---@param text string
@@ -12198,7 +12501,7 @@ function render.onSceneReady(callback) end
 ---
 --- Special aspects:
 --- - `main.hud.vr`: if first argument is `true`, HUD is rendered after post-processing (or post-processing is disabled), so things you draw have to be in 0…1 space. Return `true` to hide original HUD.
----@param eventName 'main.root.opaque'|'main.track.opaque'|'main.root.transparent'|'main.track.transparent'|'mirror.track.opaque'|'mirror.root.transparent'|'shadow.root'|'main.hud.vr'
+---@param eventName 'main.root.opaque'|'main.track.opaque'|'main.root.transparent'|'main.track.transparent'|'main.smoke'|'mirror.track.opaque'|'mirror.root.transparent'|'shadow.root'|'main.hud.vr'
 ---@param callback fun(): boolean?
 ---@return ac.Disposable
 function render.on(eventName, callback) end
@@ -12428,7 +12731,7 @@ function ui.imageSize(imageSource) end
 ---so subsequent calls don’t take a lot of time. Data string can contain zero bytes.
 ---
 ---To clear cached image and free memory, pass returned value to `ui.unloadImage()`.
----@param data binary
+---@param data binary|number|boolean|ac.FFIStruct
 ---@return string?
 function ui.decodeImage(data) end
 
@@ -12999,6 +13302,9 @@ function ui.windowScrolling() end
 ---@return boolean
 function ui.windowPinned() end
 
+---@param horizontal boolean|`true`|`false`
+function ui.setWindowMouseScrollAxis(horizontal) end
+
 ---Returns `true` if mouse currently is either used by one of IMGUI controls (like dragging something) or if it hovers any of windows. If that’s the case and
 ---your script reacts to clicks on the scene, for example, it’s better to skip that frame.
 ---@return boolean
@@ -13361,8 +13667,9 @@ function ui.dummy(size) end
 
 ---Returns `true` during scrolling.
 ---@param appearOnHover boolean? @Default value: `false`.
+---@param horizontal boolean? @Added in 0.3.0-preview238. Default value: `false`.
 ---@return boolean
-function ui.thinScrollbarBegin(appearOnHover) end
+function ui.thinScrollbarBegin(appearOnHover, horizontal) end
 
 function ui.thinScrollbarEnd() end
 
@@ -13789,6 +14096,10 @@ function ui.windowWidth() end
 ---@return number
 function ui.windowHeight() end
 
+---Get width of title of the current window. Use it if you want to draw something next to the title, as the width might change from version to version of CSP. Added in 0.3.0-preview170.
+---@return number
+function ui.windowTitleWidth() end
+
 ---If current window just been opened.
 ---@return boolean
 function ui.isWindowAppearing() end
@@ -13905,7 +14216,7 @@ function ui.onExclusiveHUD(callback, noPadding) end
 
 ---Open modal popup message with OK and Cancel buttons, return user choice via callback. Since 0.3.0, you can pass `'-'` as `cancelText` to have a dialog
 ---with a single button only.
----@overload fun(title: string, msg: string, callback: function)
+---@overload fun(title: string, msg: string, callback: function, autoclose: boolean)
 ---@param title string
 ---@param msg string
 ---@param okText string|nil @Optional label for OK button. Default value: `nil`.
@@ -13913,7 +14224,8 @@ function ui.onExclusiveHUD(callback, noPadding) end
 ---@param okIconID ui.Icons|nil @Optional icon for OK button. Default value: `nil`.
 ---@param cancelIconID ui.Icons|nil @Optional icon for cancel button. Default value: `nil`.
 ---@param callback fun(okPressed: boolean)? @Default value: `nil`.
-function ui.modalPopup(title, msg, okText, cancelText, okIconID, cancelIconID, callback) end
+---@param autoclose boolean? @Automatically close if clicked outside of dialog, or if Escape button is pressed. Default value: `false`.
+function ui.modalPopup(title, msg, okText, cancelText, okIconID, cancelIconID, callback, autoclose) end
 
 ---Open modal dialog with custom UI. Return `true` from callback when it’s time to close the dialog.
 ---
@@ -13926,7 +14238,7 @@ function ui.modalPopup(title, msg, okText, cancelText, okIconID, cancelIconID, c
 function ui.modalDialog(title, callback, autoclose, closeCallback) end
 
 ---Open modal popup message with text input, OK and Cancel buttons, return user choice via callback.
----@overload fun(title: string, msg: string, defaultValue: string, callback: function)
+---@overload fun(title: string, msg: string, defaultValue: string, callback: function, autoclose: boolean)
 ---@param title string
 ---@param msg string
 ---@param defaultValue string?
@@ -13935,7 +14247,8 @@ function ui.modalDialog(title, callback, autoclose, closeCallback) end
 ---@param okIconID ui.Icons @Optional icon for OK button.
 ---@param cancelIconID ui.Icons @Optional icon for cancel button.
 ---@param callback fun(value: string|nil)
-function ui.modalPrompt(title, msg, defaultValue, okText, cancelText, okIconID, cancelIconID, callback) end
+---@param autoclose boolean? @Automatically close if clicked outside of dialog, or if Escape button is pressed. Default value: `false`.
+function ui.modalPrompt(title, msg, defaultValue, okText, cancelText, okIconID, cancelIconID, callback, autoclose) end
 
 ---Projects world point onto a screen (taking into account UV scale unless second argument is set to `false`).
 ---@param pos vec3
@@ -13970,7 +14283,7 @@ function ui.setDriverPopup(id, carIndex) end
 function ui.mentionDriverInChat(carIndex, autofocus) end
 
 ---Returns state of an image (might act strangely with special textures, like the ones loaded from DLLs; new return values might be added later).
----@param imageSource string @Path to the image, absolute or relative to script folder or AC root. URLs are also accepted.
+---@param imageSource ui.ImageSource @Path to the image, absolute or relative to script folder or AC root. URLs are also accepted.
 ---@return 'ready'|'loading'|'missing'
 function ui.imageState(imageSource) end
 
@@ -14095,14 +14408,14 @@ function physics.setCarAutopilot(active, chooseTyres) end
 ---@return physics.CarControls
 function physics.getCarInputControls() end
 
----Reduces grip for some tyres of a certain car. Invalidates current lap. Could be used as a cheap way to simulate some things
+---Reduces grip for some tyres of a certain car. Could be used as a cheap way to simulate some things
 ---like ice.
 ---@param carIndex integer @0-based car index.
 ---@param wheels ac.Wheel? @Wheels to affect. Default value: `ac.Wheel.All`.
 ---@param decrease number? @0 for tyres to act as usual, 1 for tyres to lose all grip. Default value: 0.
 function physics.setGripDecrease(carIndex, wheels, decrease) end
 
----Not recommended to use. Invalidates lap.
+---Not recommended to use.
 ---@param carIndex integer @0-based car index.
 ---@param wheels ac.Wheel? @Wheels to affect. Default value: `ac.Wheel.All`.
 ---@param aiMultiplier number? @1 for tyres to act as usual. Default value: 1.
@@ -14223,10 +14536,6 @@ function physics.setCarDRS(carIndex, active) end
 ---@param penaltyParam integer? @Penalty parameter (-1 for default value), actual role depends on penalty type. Default value: -1.
 function physics.setCarPenalty(penaltyType, penaltyParam) end
 
----New Mode scripts can use this function even if the rest of Physics API is not available.
----@param allowedTyresOut integer @Set to a negative value to disable the penalty.
-function physics.setAllowedTyresOut(allowedTyresOut) end
-
 ---Stops car from sleeping, invalidates current lap.
 ---@param carIndex integer @0-based car index.
 function physics.awakeCar(carIndex) end
@@ -14262,7 +14571,7 @@ function physics.markLapAsSpoiled(carIndex) end
 ---@param value boolean? @Default value: `true`.
 function physics.setEngineStallEnabled(carIndex, value) end
 
----Sets engine RPM.
+---Sets engine RPM. Invalidates current lap unless setting a value below 400.
 ---@param carIndex integer @0-based car index.
 ---@param rpm number
 function physics.setEngineRPM(carIndex, rpm) end
@@ -14303,6 +14612,27 @@ function physics.blockTeleportingToPits() end
 ---@param callback fun(err: string)
 function physics.startPhysicsWorker(script, data, callback) end
 
+---New Mode scripts can use this function even if the rest of Physics API is not available.
+---@param allowedTyresOut integer @Set to a negative value to disable the penalty.
+function physics.setAllowedTyresOut(allowedTyresOut) end
+
+---Toggle penalties on and off. Added in 0.3.0-preview243. New Mode scripts can use this function even if the rest of Physics API is not available.
+---@param penalties boolean|`true`|`false`
+function physics.setPenalties(penalties) end
+
+---Toggle wrong way penalty on and off. Added in 0.3.0-preview243. New Mode scripts can use this function even if the rest of Physics API is not available.
+---@param penalty boolean|`true`|`false`
+function physics.setWrongWayPenalty(penalty) end
+
+---Set assists. Added in 0.3.0-preview254. New Mode scripts can use this function even if the rest of Physics API is not available. If a field is not set, original value will remain.
+--- Changing `tyresBlankets` property while car is in pits resets tyre state.
+---
+--- Set `editable` to `false` to disallow editing assists from the main menu.
+---@param assists {autoBlip: boolean?, autoClutch: boolean?, autoShifter: boolean?, abs: 'off'|'factory'|'on'?, tractionControl: 'off'|'factory'|'on'?, stability: number?, damageRate: number?, fuelRate: number?, tyresWear: number?, tyresBlankets: boolean?, slipstream: number?, idealLine: boolean?, editable: boolean?}
+---@param targetCarIndex integer? @Target car index. If non-zero, global assists will be ignored. Per-car assists: auto-blip, auto-clutch, auto-shift, ABS, TC, stability control, slipstream. Default value: 0.
+---@return integer @Return number of changed items.
+function physics.setAssists(assists, targetCarIndex) end
+
 ---Returns `true` if script can affect physics engine. If not, only `physics.raycastTrack()` is available.
 ---@return boolean
 function physics.allowed() end
@@ -14316,8 +14646,9 @@ function physics.allowed() end
 ---@param length number
 ---@param point vec3|nil @Default value: `nil`.
 ---@param normal vec3|nil @Default value: `nil`.
+---@param includeNoise boolean? @Set to `true` to take procedural sine noise into account. Default value: `false`.
 ---@return number
-function physics.raycastTrack(pos, dir, length, point, normal) end
+function physics.raycastTrack(pos, dir, length, point, normal, includeNoise) end
 
 ---Changes AI level. Use `ac.getCar(carIndex).aiLevel` to get current value.
 ---@param carIndex integer @0-based car index.
@@ -14448,10 +14779,15 @@ function physics.setAISpline(carIndex, filename, aiHintsFilename) end
 ---@param value number @Set to 1 for normal grip.
 function physics.setExtraAIGrip(carIndex, value) end
 
----Controls if AI goes to pits or not.
+---Controls if AI goes to pits or not. Since 0.3.0-preview147, calling this function with `false` for value blocks out AI going to pits for a short time too.
 ---@param carIndex integer @0-based car index.
 ---@param value boolean? @Default value: `true`.
 function physics.setAIPitStopRequest(carIndex, value) end
+
+---Alter now many laps are left to complete before going back to pits.
+---@param carIndex integer @0-based car index.
+---@param value integer
+function physics.setAILapsToComplete(carIndex, value) end
 
 ---Sets currently selected tyres, resetting damage as well.
 ---@param carIndex integer @0-based car index.
@@ -14502,6 +14838,11 @@ function ac.setDriverVisible(carIndex, isVisible) end
 ---@param amount number @Value from 0 to 1.
 function ac.setDriverMouthOpened(carIndex, amount) end
 
+---Override `PRELOAD_RPM` from “driver3d.ini” live. Change persists after script has been unloaded.
+---@param carIndex integer? @0-based car index.
+---@param threshold number @RPM.
+function ac.setDriverShiftAnimationPreloadThreshold(carIndex, threshold) end
+
 ---Toggles driver door animation.
 ---@param carIndex integer
 ---@param isOpen boolean|`true`|`false`
@@ -14522,10 +14863,13 @@ function ac.disableQuickMenuPitstop(disable) end
 function ac.disableVirtualMirror(disable) end
 
 ---Disables other HUD elements.
----Not available to scripts without I/O access.
 ---@param idsMask 'sessionTime'|'fuel'|'proximity'|'virtualMirror'|'quickPitsMenu'|'leaderboard'|'startingLights'|'wrongWay'|'ping'|'damage'|string[]. @ID or list of IDs.
 ---@param disable boolean? @Default value: `true`.
 function ac.disableExtraHUDElements(idsMask, disable) end
+
+---Set a volume multiplier for master volume. Great option if you want to fade out audio for some reason.
+---@param value number? @Volume multiplier. Default value: 1.
+function ac.setAudioVolumeMultiplier(value) end
 
 ---Disables Neck FX altering driver model.
 ---@param disable boolean? @Default value: `true`.
@@ -14561,7 +14905,6 @@ function ac.focusCar(index) end
 function ac.restartAssettoCorsa(raceIni) end
 
 ---Shutdown Assetto Corsa.
----Not available to scripts without I/O access.
 function ac.shutdownAssettoCorsa() end
 
 ---Override race score used for leaderboard sorting.
@@ -14574,7 +14917,6 @@ function ac.setRaceScore(carIndex, score) end
 function ac.setBodyDirt(carIndex, dirt) end
 
 ---Sends a new chat message.
----Not available to scripts without I/O access.
 ---@param command string?
 ---@return boolean @Returns `false` if message couldn’t be sent (trying to send too often, or not online).
 function ac.sendChatMessage(command) end
@@ -14583,14 +14925,12 @@ function ac.sendChatMessage(command) end
 ---and stop it from showing in chat apps.
 ---
 ---Second argument in callback stores car ID of a car that sent the message, or -1 if message comes from server.
----Not available to scripts without I/O access.
 ---@param callback fun(message: string, senderCarIndex: integer, senderSessionID: integer): boolean @Callback which will be called each time new message arrives.
 ---@return ac.Disposable
 function ac.onChatMessage(callback) end
 
 ---Sets a callback which will be called when user tries to send a message. Return `true` from callback to handle chat message
 ---and stop it from actually being sent (it’ll disappear from the chat as if sent).
----Not available to scripts without I/O access.
 ---@param callback fun(message: string, senderCarIndex: integer, senderSessionID: integer): boolean @Callback which will be called each time new message is being sent.
 ---@return ac.Disposable
 function ac.onOutgoingChatMessage(callback) end
@@ -14644,6 +14984,10 @@ function ac.accessMouseDelta(rawInput, restorePosition, force) end
 ---@return ac.Disposable
 function ui.onDriverContextMenu(callback) end
 
+---Force the most detailed LOD of a car for a few frames.
+---@param carIndex integer? @0-based car index.
+function ac.forceDetailedCarLOD(carIndex) end
+
 ---Returns `true` if resetting car is allowed in current session, invalidates lap.
 ---@return boolean
 function ac.isCarResetAllowed() end
@@ -14665,8 +15009,8 @@ function ac.saveCarStateAsync(callback) end
 
 ---Load car state. Available in few basic modes in offline only (such as practice with a single car), invalidates lap.
 ---@overload fun(data: binary, iterations: integer)
----@param data binary
----@param dataNext binary|nil @Default value: `nil`.
+---@param data binary|number|boolean|ac.FFIStruct
+---@param dataNext binary|number|boolean|ac.FFIStruct|nil @Default value: `nil`.
 ---@param blend number? @Default value: 0.
 ---@param iterations integer? @Default value: 5.
 ---@return boolean @Returns false if the feature is not available in the current mode.
@@ -14733,12 +15077,16 @@ function ac.setCarActive(carIndex, active) end
 ---Block Escape button from pausing AC for a few frames.
 function ac.blockEscapeButton() end
 
+---Reset dynamic track objects. Usually, AC does something similar when a new session starts. Objects will be randomly shifted based on `random_seed`.
+---@param randomSeed integer? @If set, this random seed will be used to randomize objects positioning.
+---@param timePassed number? @If above zero, objects will be moved along their velocities using this value as time in seconds. Default value: 0.
+function ac.resetDynamicTrackObjects(randomSeed, timePassed) end
+
 ---Similar to `ac.ext_applyTrackConfig()` from CSP Python API, reload a track config live. Works even if live updates are disabled. Use carefully,
 ---might cause a freeze or crash the game.
----Not available to scripts without I/O access.
 ---@param targetIndex integer @Set to -1 to apply track config, or to car index to apply a car config.
 ---@param data string @INI config data.
----@param flags integer? @Bit flags. 1: restore the state of track conditions, set by default. 2: partial mode (do not discard existing config loaded from INI file on a disk), set by default. 4: reload 3D-trees as well, set by default. 8: apply shader replacements from the config to the entire model, not just to meshes loaded from KN5. Use `bit.bor()` to combine flags. Default value: 7.
+---@param flags string|integer|nil @Since 0.3.0-preview200, pass a string to define a new config piece with that string as a key, to quickly edit this piece alone without altering anything else and with fastest reload. Or, pass an integer for bit flags: 1: restore the state of track conditions, set by default. 2: partial mode (do not discard existing config loaded from INI file on a disk), set by default. 4: reload 3D-trees as well, set by default. 8: apply shader replacements from the config to the entire model, not just to meshes loaded from KN5. Use `bit.bor()` to combine flags.
 function ac.applyContentConfig(targetIndex, data, flags) end
 
 ---Collect information about available windows.
@@ -14747,10 +15095,12 @@ function ac.getAppWindows() end
 
 ---Pauses or un-pauses file system monitoring used for live reloading. Might be useful to pause it if you’re about to update a lot of configs, for example. Make sure
 ---to always re-enable watching afterwards though, or it’ll be re-enabled in a few seconds automatically.
+---Not available to scripts without I/O access.
 ---@param pause boolean|`true`|`false`
 function ac.pauseFilesWatching(pause) end
 
 ---Enables and disables lights debugging outlines. Parameters can be used to tune which lights would generate those outlines.
+---Not available to scripts without I/O access.
 ---@param filter string
 ---@param count integer
 ---@param mode ac.LightsDebugMode
@@ -14758,14 +15108,22 @@ function ac.pauseFilesWatching(pause) end
 function ac.debugLights(filter, count, mode, distance) end
 
 ---Enables and disables racing line debug view. Racing line is used to keep track of dynamic wetness offset caused by cars drying up the track when driving by.
+---Not available to scripts without I/O access.
 ---@param active boolean? @Default value: `true`.
 function ac.debugRainRacingLine(active) end
+
+---Enables and disables track colliders debug view.
+---Not available to scripts without I/O access.
+---@param filter boolean|string|nil @Filter specifying which objects to show. Pass `false` to disable debugging, or `true` to show all.
+---@param maxDistance number? @Default value: 1000.
+function ac.debugTrackColliders(filter, maxDistance) end
 
 ---Replace track trees with a custom list. Use `listKey` not set in “ext_config.ini” to add new lists. Feel free to call this function each frame if amount of
 ---data is small. For example, you can have a trees editing tool defining two lists: one rarely updating large list with already added trees and another often updating
 ---small list with trees being edited now.
+---Not available to scripts without I/O access.
 ---@param listName string @Path to list name, all tree models are loaded relative to it. Use list name already written in track config to override it.
----@param data string|nil @List of trees in that text file format, or `nil` to clear out the list. Default value: `nil`.
+---@param data string? @List of trees in that text file format, or `nil` to clear out the list.
 ---@param alignSurface boolean? @Set to `true` to align trees positions and shading alogn track surface described in track config (very slow). Default value: `false`.
 function ac.overrideTrackTrees(listName, data, alignSurface) end
 
@@ -14856,9 +15214,17 @@ function ac.setAudioVolume(audioChannelKey, value, carIndex) end
 function ac.setWiperSpeed(carIndex, wiperSpeed) end
 
 ---Sets track world coordinates in degrees. Not available online.
----@param coords number|vec2 @X for lattitude, Y for longitude.
+---Mixes up coordinates (comparing to functions like `ac.getTrackCoordinatesDeg()`)! Use fixed `ac.setTrackCoordinatesDeg2()` instead.
+---@deprecated
+---@param coords number|vec2 @X for longitude, Y for latitude (accidental mix up).
 ---@param headingDeg number? @Heading angle in degrees, optional. Default value: `nil`.
 function ac.setTrackCoordinatesDeg(coords, headingDeg) end
+
+---Sets track world coordinates in degrees. Not available online. `ac.setTrackCoordinatesDeg()` was mixing up coordinates, so now it’s deprecated.
+---Not available to scripts without I/O access.
+---@param coords number|vec2 @X for latitude, Y for longitude.
+---@param headingDeg number? @Heading angle in degrees, optional. Default value: `nil`.
+function ac.setTrackCoordinatesDeg2(coords, headingDeg) end
 
 ---Sets timezone offset for the track in seconds. Not available online. Be careful: unlike with configs, this method does not have any coordinate-related sanity checks.
 ---@param offset number @Offset in seconds (with DST offset added if necessary).
@@ -14899,9 +15265,9 @@ function ac.overrideCameraClipPlanes(nearPlane, farPlane) end
 
 ---Packs driver model into a replacement package.
 ---@param destination string
----@param lodAData binary
----@param lodBData binary
----@param configData binary
+---@param lodAData binary|number|boolean|ac.FFIStruct
+---@param lodBData binary|number|boolean|ac.FFIStruct
+---@param configData binary|number|boolean|ac.FFIStruct
 ---@return boolean
 function ac.packDriverModel(destination, lodAData, lodBData, configData) end
 
@@ -14919,6 +15285,8 @@ function ac.onConsoleInput(callback) end
 
 ---Sets a callback which will be called each frame when computing overall audio volume level. Callback returns a number which is used as volume multiplier.
 ---Use this function to fade out volume for one reason or another.
+---Use `ac.setAudioVolumeMultiplier()` instead.
+---@deprecated
 ---@param callback fun(): number
 ---@return ac.Disposable
 function ac.onAudioVolumeCalculation(callback) end
@@ -14988,14 +15356,15 @@ function ac.areOnboardCameraParamsNeedSaving() end
 
 ---Applies an edit to AC config, such as “video.ini”, live without actually altering file on a disk. Only a very few values are
 ---currently supported.
----@param config 'controls.ini'|'video.ini'|'gameplay.ini'|'assetto_corsa.ini'|'mouse_hider.ini'|'proximity_indicator.ini'|'graphics.ini'|'graphics_adjustments.ini'|'custom_rendering_modes.ini'|'general.ini'|'walking_out.ini'
+---Not available to scripts without I/O access.
+---@param config 'controls.ini'|'video.ini'|'gameplay.ini'|'assetto_corsa.ini'|'mouse_hider.ini'|'proximity_indicator.ini'|'graphics.ini'|'graphics_adjustments.ini'|'custom_rendering_modes.ini'|'general.ini'|'walking_out.ini' @Config file name, not the full path.
 ---@param data string @Serialized INI data.
 function ac.applyLiveConfigEdit(config, data) end
 
----Runs asyncronously.
----@param filename string|nil @If not set, default path will be used. Default value: `nil`.
----@param format ac.ScreenshotFormat? @Default value: `ac.ScreenshotFormat.Auto`.
----@param callback nil|fun(err: string)? @Default value: `nil`.
+---Runs asynchronously.
+---@param filename string? @If not set, default path will be used.
+---@param format {format: ac.ScreenshotFormat?, accumulation: boolean?}|ac.ScreenshotFormat|nil @Default value: `ac.ScreenshotFormat.Auto`.
+---@param callback fun(err: string?)?
 function ac.makeScreenshot(filename, format, callback) end
 
 ---Returns a binary image JPG data containing stuff on the screen (with HUD and everything). Asynchronous version.
@@ -15111,9 +15480,9 @@ function ac.getRealMirrorAABB(mirrorIndex, min, max) end
 ---@param userDriven boolean? @Set to `false` to not write settings to a disk and instead stop user-driven changes for current session. Default value: `true`.
 function ac.setRealMirrorParams(mirrorIndex, params, userDriven) end
 
----Changes behaviour of smoke going off a tyre (won’t affect dust or water splashes). Actual movement of smoke might change with CSP updates.
+---Changes behavior of smoke going off a tyre (won’t affect dust or water splashes). Actual movement of smoke might change with CSP updates.
 ---@param tyreIndex integer
----@param intensity number @Use `math.nan` to restore original behaviour, or a value from 0 to 1.
+---@param intensity number @Use `math.nan` to restore original behavior, or a value from 0 to 1.
 ---@param thickness number @A value from 0 to 1.
 ---@param surfaceHeat number? @Values above 0 will get entire surface to emit smoke as well. Default value: 0.
 function ac.overrideTyreSmoke(tyreIndex, intensity, thickness, surfaceHeat) end
@@ -15122,13 +15491,22 @@ function ac.overrideTyreSmoke(tyreIndex, intensity, thickness, surfaceHeat) end
 ---(do any gearboxes have labels longer than that?) Can be useful for creating automatic gearboxes and such: AC widgets will use this label, and other apps can access the label
 ---using `ac.getCar().gearLabel`.
 ---@param c string|nil @If empty or `nil`, resets label to default gear label. Default value: `nil`.
-function ac.setGearLabel(c) end
+---@param disableShiftingAnimation boolean? @Pass `true` to stop any shifting animations. Default value: `false`.
+function ac.setGearLabel(c, disableShiftingAnimation) end
 
 ---@param mode integer
 function ac.setABS(mode) end
 
+---Use `ac.setTractionControl()` instead.
+---@deprecated
 ---@param mode integer
 function ac.setTC(mode) end
+
+---@param mode integer
+function ac.setTractionControl(mode) end
+
+---@param active boolean|`true`|`false`
+function ac.setAutoShifter(active) end
 
 ---@param turboIndex integer
 ---@return boolean
@@ -15307,8 +15685,12 @@ function ac.redirectFuelWarningIndicator(active) end
 ---@return {name: string, type: 'fuel'|'wing'|'compound'|'pressure'|'repair', min: integer, max: integer, readOnly: boolean, value: integer, values: integer[]}[]
 function ac.getPitstopSpinners() end
 
+---Get information about tabs in setup menu. Mostly, just to check the visibility state.
+---@return {name: string, label: string, visible: boolean, modified: boolean}[]
+function ac.getSetupTabs() end
+
 ---Get information about available spinners in setup menu. Names match section names of setup INI files. Value `label` might contain localized setup items. Array `itemValues` is only present for custom CSP setup entries with LUTs.
----@return {name: string, label: string, min: integer, max: integer, step: integer, value: integer, displayMultiplier: number, readOnly: boolean, units: string?, items: string[]?, itemValues: number[]?, defaultValue: integer?, showClicksMode: integer?}[]
+---@return {name: string, label: string, min: integer, max: integer, step: integer, value: integer, displayMultiplier: number, visible: boolean, readOnly: boolean, units: string?, items: string[]?, itemValues: number[]?, defaultValue: integer?, showClicksMode: integer?}[]
 function ac.getSetupSpinners() end
 
 ---@return boolean
@@ -15355,7 +15737,7 @@ function ac.saveCurrentSetup(setupFilename) end
 function ac.setActiveSetupName(setupName, trackID, changed) end
 
 ---Loads car setup from a file. Works only from setup menu, and only if setup is not fixed.
----@param setupFilename binary @Absolute path, or path relative to “Documents\Assetto Corsa\setups\<car ID>”. Since CSP v0.1.80-preview459 can also be setup contents.
+---@param setupFilename binary|number|boolean|ac.FFIStruct @Absolute path, or path relative to “Documents\Assetto Corsa\setups\<car ID>”. Since CSP v0.1.80-preview459 can also be setup contents.
 ---@return boolean
 function ac.loadSetup(setupFilename) end
 
@@ -15397,15 +15779,25 @@ function ac.restartApp() end
 ---@return string|nil @Returns saved filename, or `nil` if nothing was saved.
 function ac.exportLapTimesToCSV(destination) end
 
+---Can be used to simulate keyboard button presses (please use carefully, and only if you can’t achieve your goal another way). Don’t forget to release pressed buttons!
+---Doesn’t work if AC is not in foreground (actually foreground, not CSP’s relaxed check).
+---Not available to scripts without I/O access.
+---@param keyIndex ui.KeyIndex
+---@param down boolean|`true`|`false`
+function ac.sendKeyboardButtonEvent(keyIndex, down) end
+
 ---Move mouse to a certain position.
+---Not available to scripts without I/O access.
 ---@param posPixels number|vec2 @New mouse cursor position in pixels relative to AC window.
 function ac.setMousePosition(posPixels) end
 
----Can be used for simulating mouse clicks.
+---Can be used for simulating mouse clicks. Doesn’t affect actual mouse key, but only Assetto Corsa.
+---Not available to scripts without I/O access.
 ---@param isDown boolean|`true`|`false`
 function ac.setMouseLeftButtonDown(isDown) end
 
----Can be used for simulating mouse wheel.
+---Can be used for simulating mouse wheel. Doesn’t affect actual mouse key, but only Assetto Corsa.
+---Not available to scripts without I/O access.
 ---@param scroll number
 function ac.setMouseWheel(scroll) end
 
@@ -15458,7 +15850,7 @@ script = {}
 --[[ common/ac_audio.lua ]]
 
 ---Create a new audio event from previously loaded soundbank.
----@param event string|{event: string, dsp: ac.AudioDSP[]?} @Event name, for example, `'/cars/lada_revolution/door'` (leading “/” or “event:” prefix are optional).
+---@param event string|{event: string, dsp: ac.AudioDSP[]?} @Event name, for example, `'/cars/lada_revolution/door'` (leading “/” or “event:” prefix are optional). Since 0.3.0-preview147, you can use `:own` or `:0` (0-based car index) instead of car ID, so your logic could work if car uses sound from a different car. For example, `'cars/:own/engine_ext'` or `'cars/:1/engine_int'`. Remember, when writing CSP car config for a car you can use `[AUDIO_REDIRECT] CARS=primary_car_id, secondary_candidate` to use audio from existing car instead (the first one found would be used), or `[AUDIO_REDIRECT] SHARED=…` to load one of the shared remote audiobanks.
 ---@param reverbResponse boolean|`true`|`false` @Set to true if audio event should be affected by reverb in tunnels and such.
 ---@param useOcclusion boolean? @Set to true if audio event should be affected by walls on configured tracks. Default value: `false`. Car audio events are always occluded if 2D.
 ---@return ac.AudioEvent
@@ -15734,9 +16126,12 @@ function ac.SimpleMesh.trackLine(lineType, absolute, relative) end
 ---@param params {mesh: ac.SceneReference|ac.SimpleMesh, transform: mat4x4|'original', async: boolean, cacheKey: number, defines: table, textures: table, values: table, directValuesExchange: boolean, shader: string}|`{mesh = ac.SimpleMesh.carCollider(0), textures = {}, values = {}, shader = 'float4 main(PS_IN pin) {return float4(pin.Tex.x, pin.Tex.y, 0, 1);}'}` "Table with properties:\n- `transform` (`mat4x4|'original'`): Optional transform in world space. Does not apply to track spline.\n- `async` (`boolean`): If set to `true`, drawing won’t occur until shader would be compiled in a different thread.\n- `cacheKey` (`number`): Optional cache key for compiled shader (caching will depend on shader source code, but not on included files, so make sure to change the key if included files have changed).\n- `defines` (`table`): Defines to pass to the shader, either boolean, numerical or string values (don’t forget to wrap complex expressions in brackets). False values won’t appear in code and true will be replaced with 1 so you could use `#ifdef` and `#ifndef` with them.\n- `textures` (`table`): Table with textures to pass to a shader. For textures, anything passable in `ui.image()` can be used (filename, remote URL, media element, extra canvas, etc.). If you don’t have a texture and need to reset bound one, use `false` for a texture value (instead of `nil`)\n- `values` (`table`): Table with values to pass to a shader. Values can be numbers, booleans, vectors, colors or 4×4 matrix. Values will be aligned automatically.\n- `directValuesExchange` (`boolean`): If you’re reusing table between calls instead of recreating it each time and pass `true` as this parameter, `values` table will be swapped with an FFI structure allowing to skip data copying step and achieve the best performance. Note: with this mode, you’ll have to transpose matrices manually.\n- `shader` (`string`): Shader code (format is HLSL, regular DirectX shader); actual code will be added into a template in “assettocorsa/extension/internal/shader-tpl/mesh.fx”."
 function render.mesh(params) end
 
+---Measure CPU and GPU time it took to execute `drawFn`. Result of a measurement will be shown
+---in Render Stats app.
 ---@param key string
----@param drawFn fun()
-function render.measure(key, drawFn) end
+---@param drawFn fun(...)
+---@param ... any[] @Arguments to pass to `drawFn`. Added in 0.3.0-preview259.
+function render.measure(key, drawFn, ...) end
 
 --[[ common/ac_render_enums.lua ]]
 
@@ -15798,20 +16193,20 @@ function ray:sphere(center, radius) end
 function ray:carCollider(carIndex) end
 
 ---Ray/track intersection. Accounts for ray length (since 0.2.10).
----@param culling integer? @Set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
+---@param culling integer? @Set to -1 to disable backface culling, or to 0 to hit backfaces only. Default value: 1.
 ---@return number @Intersection distance, or -1 if there was no intersection.
 ---@nodiscard
 function ray:track(culling) end
 
 ---Ray/scene intersection (both with track and cars). Accounts for ray length (since 0.2.10).
----@param culling integer? @Set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
+---@param culling integer? @Set to -1 to disable backface culling, or to 0 to hit backfaces only. Default value: 1.
 ---@return number @Intersection distance, or -1 if there was no intersection.
 ---@nodiscard
 function ray:scene(culling) end
 
 ---Ray/cars intersection. Accounts for ray length (since 0.2.10). Casts a ray against actual cars visual 3D geometry,
 ---so it’s likely you don’t need it and would be happier with `:carCollider()`.
----@param culling integer? @Set to 0 to disable backface culling, or to -1 to hit backfaces only. Default value: 1.
+---@param culling integer? @Set to -1 to disable backface culling, or to 0 to hit backfaces only. Default value: 1.
 ---@return number @Intersection distance, or -1 if there was no intersection.
 ---@nodiscard
 function ray:cars(culling) end
@@ -15819,8 +16214,9 @@ function ray:cars(culling) end
 ---Ray/physics meshes intersection. Accounts for ray length.
 ---@param outPosition vec3? @Optional vec3 to which contact point will be written.
 ---@param outNormal vec3? @Optional vec3 to which contact normal will be written.
+---@param includeNoise boolean? @Set to `true` to take procedural sine noise into account.
 ---@return number @Intersection distance, or -1 if there was no intersection.
-function ray:physics(outPosition, outNormal) end
+function ray:physics(outPosition, outNormal, includeNoise) end
 
 ---Distance between ray and a point.
 ---@param p vec3 @Point.
@@ -16637,7 +17033,7 @@ function _ui_ExtraCanvas:gaussianBlurFrom(other, kernelSize) end
 
 ---Downloads data from GPU to CPU asyncronously (usually takes about 0.15 ms to get the data). Resulting data can be
 ---used to access colors of individual pixels or upload it back to CPU restoring original state.
----@param callback fun(err: string, data: ui.ExtraCanvasData)
+---@param callback fun(err: string?, data: ui.ExtraCanvasData?)
 ---@return ui.ExtraCanvas @Returns itself for chaining several methods together.
 function _ui_ExtraCanvas:accessData(callback) end
 
@@ -16758,67 +17154,6 @@ function ui.beginSubgroup(offsetX) end
 ---Ends group began with `ui.beginSubgroup()`.
 function ui.endSubgroup() end
 
----GIF player can be used to display animated GIFs. Also supports regular and animated WEBP images.
----@param source string|{width: number, height: number, decompress: boolean?} @URL, filename or binary data.
----@return ui.GIFPlayer
-function ui.GIFPlayer(source) end
-
----GIF player can be used to display animated GIFs. Also supports regular and animated WEBP images.
----@class ui.GIFPlayer
----@field keepRunning boolean @By default GIFs stop playing if they are not actively used in rendering. If you need them to keep running in background, set this property to `true`.
-local _ui_GIFPlayer = nil
-
----Get GIF resolution. If GIF is not yet loaded, returns zeroes.
----@return vec2 @Width and height in pixels.
-function _ui_GIFPlayer:resolution() end
-
----Push new bitmap data to a live-updating image.
----@param data binary
----@return boolean @Returns `false` if data doesn’t fit.
-function _ui_GIFPlayer:push(data) end
-
----Rewinds GIF back to beginning.
----@return boolean
-function _ui_GIFPlayer:rewind() end
-
----Checks if GIF is loaded and ready to be drawn.
----@return boolean
-function _ui_GIFPlayer:ready() end
-
----Returns `false` if GIF decoding has failed.
----@return boolean
-function _ui_GIFPlayer:valid() end
-
----@param handle integer @Shared texture handle. Can be either a `D3D11_RESOURCE_MISC_SHARED` handle or a handle from `:sharedHandle()` of an extra canvas.
----@param ntMode nil|integer|boolean? @Set to `true` if the handle is NT handle. Alternatively, set to an integer with source process ID. Default value: `false`. Note: for NT handles it’s better to use the named textures and pass it as a string instead (with the overload).
----@return ui.SharedTexture
----@overload fun(name: string) @Overload using name of a shared NT texture, works a lot better.
-function ui.SharedTexture(handle, ntMode) end
-
----A wrapper for accessing textures shared by other Lua scripts or even by other applications. For the latter, textures need to have `D3D11_RESOURCE_MISC_SHARED` flag and be on the same GPU.
----@class ui.SharedTexture
-local _ui_SharedTexture = nil
-
----Dispose texture and release its view. Call this method if remote texture is being destroyed.
-function _ui_SharedTexture:dispose() end
-
----Sets texture name for debugging. Textures with set name appear in Lua Debug App, allowing to monitor their state.
----@param name string? @Name to display texture as. If set to `nil` or `false`, name will be reset and texture will be hidden.
----@return self @Returns itself for chaining several methods together.
-function _ui_SharedTexture:setName(name) end
-
----Get texture handle used for creating a texture. If texture has failed to load, returns 0. If texture is loaded by name and loaded properly, returns 1.
----@return integer
-function _ui_SharedTexture:handle() end
-
----Get texture resolution. If texture has failed to load, returns zeroes.
----@return vec2 @Width and height in pixels.
-function _ui_SharedTexture:resolution() end
-
----Returns `false` if access to a shared texture has failed.
----@return boolean
-function _ui_SharedTexture:valid() end
-
 ---Stops rest of Assetto Corsa from responding to keyboard events (key bindings, etc.), also sets `getUI().wantCaptureKeyboard` flag.
 ---Note: if you writing a script reacting to general keyboard events, consider checking that flag to make sure IMGUI doesn’t have
 ---keyboard captured currently.
@@ -16836,12 +17171,6 @@ function ui.captureKeyboard(wantCaptureKeyboard, wantCaptureText, globalInput) e
 ---@return ui.CapturedKeyboard?
 ---@return boolean @Set to `true` if area was just activated.
 function ui.interactiveArea(id, size) end
-
----Create a new popup. Function `callback()` will be called each frame to render its content until popup is closed. Pass `title` in parameters to create
----a window instead (you can still call `ui.closePopup()` from the window to close it).
----@param callback fun()
----@param params {onClose: fun()?, position: vec2?, pivot: vec2?, size: vec2|{min: vec2?, max: vec2?, initial: vec2?}?, padding: vec2?, flags: ui.WindowFlags?, backgroundColor: rgbm?, title: string?, parentless: boolean?}?
-function ui.popup(callback, params) end
 
 ---@class ui.CapturedKeyboard
 ---@field pressedCount integer @Number of buttons in `.pressed` array.
@@ -16881,6 +17210,12 @@ function _ui_CapturedKeyboard:hotkeyCtrlAlt(button) end
 ---@param button ui.KeyIndex?
 ---@return boolean
 function _ui_CapturedKeyboard:hotkeyCtrlShiftAlt(button) end
+
+---Create a new popup. Function `callback()` will be called each frame to render its content until popup is closed. Pass `title` in parameters to create
+---a window instead (you can still call `ui.closePopup()` from the window to close it).
+---@param callback fun()
+---@param params {onClose: fun()?, position: vec2?, pivot: vec2?, size: vec2|{min: vec2?, max: vec2?, initial: vec2?}?, padding: vec2?, flags: ui.WindowFlags?, backgroundColor: rgbm?, title: string?, parentless: boolean?}?
+function ui.popup(callback, params) end
 
 ---Creates a new layer with user icons. Use `carN::special::driver` to draw an icon of a driver in a certain car (replace N with 0-based car index).
 ---@param priority integer @Layer with higher priority will be used.
@@ -17423,7 +17758,7 @@ function ac.DriverWeightShift(carIndex) end
 
 ---A helper structure to simulate some inputs for controlling the car.
 ---@class ac.CarControlsInput
----@field combineAxes boolean @Added in 0.3.0-preview125. Set to `false` to entirely override original pedal and handbrake values instead of combining. Default value: `true`.
+---@field combineAxis boolean @Added in 0.3.0-preview125. Set to `false` to entirely override original pedal and handbrake values instead of combining. Default value: `true`.
 ---@field gearUp boolean @Set to `true` to activate a flag for the next physics step.
 ---@field gearDown boolean @Set to `true` to activate a flag for the next physics step.
 ---@field brakeBalanceUp boolean @Set to `true` to activate a flag for the next physics step.
