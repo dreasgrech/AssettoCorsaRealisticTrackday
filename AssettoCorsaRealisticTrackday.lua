@@ -94,6 +94,11 @@ CSPCompatibilityManager.addFunction(function() return physics.overrideRacingFlag
 CSPCompatibilityManager.addSimStateFunction(function(sim) return sim.trackLengthM end, "ac.getSim().trackLengthM")
 CSPCompatibilityManager.addSimStateFunction(function(sim) return sim.raceSessionType end, "ac.getSim().raceSessionType")
 
+CSPCompatibilityManager.addFunction(function() return physics.overrideRacingFlag end, "physics.overrideRacingFlag")
+CSPCompatibilityManager.addFunction(function() return ui.dwriteText end, "ui.dwriteText")
+
+CSPCompatibilityManager.ErrorModalDialogTextColor = rgbm(0.961, 0.914, 0.132, 0.75)
+
 local everythingOK = CSPCompatibilityManager.checkForMissingElements(Constants.APP_NAME, Constants.APP_VERSION)
 local anyMissingCSPElements = not everythingOK
 CSPCompatibilityManager.freeMemory()
